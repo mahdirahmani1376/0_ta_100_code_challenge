@@ -28,10 +28,17 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    const STATUS_ = '';
+    const STATUS_PENDING = 'pending';
+    const STATUS_SUCCESS = 'success';
+    const STATUS_FAIL = 'fail';
+    const STATUS_REFUND = 'refund';
+    const STATUS_PENDING_BANK_VERIFY = 'pending_bank_verify';
     const STATUSES = [
-        self::STATUS_,
-        self::STATUS_,
+        self::STATUS_PENDING,
+        self::STATUS_SUCCESS,
+        self::STATUS_FAIL,
+        self::STATUS_REFUND,
+        self::STATUS_PENDING_BANK_VERIFY,
     ];
 
     public function invoice(): BelongsTo
