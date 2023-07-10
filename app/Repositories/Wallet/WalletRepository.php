@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Wallet;
 
-use App\Common\Repository\BaseRepository;
 use App\Models\Wallet;
+use App\Repositories\Base\BaseRepository;
 
 class WalletRepository extends BaseRepository implements Interface\WalletInterface
 {

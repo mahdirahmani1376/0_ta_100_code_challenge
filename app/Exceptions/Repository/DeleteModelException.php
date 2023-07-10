@@ -2,9 +2,9 @@
 
 namespace App\Exceptions\Repository;
 
-use App\Common\Exception\BaseSystemException;
-use App\Common\Exception\ExceptionCodes;
-use App\Common\Exception\ExceptionTypes;
+use App\Exceptions\Base\BaseSystemException;
+use App\Exceptions\Base\ExceptionCodes;
+use App\Exceptions\Base\ExceptionTypes;
 
 /**
  * Class RepositoryDeleteModelException

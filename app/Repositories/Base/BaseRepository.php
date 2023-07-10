@@ -1,18 +1,18 @@
 <?php
 
 
-namespace App\Common\Repository;
+namespace App\Repositories\Base;
 
-use App\Common\Repository\Interface\EloquentRepositoryInterface;
 use App\Exceptions\Repository\DeleteModelException;
+use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
 
 /**
  * @template TModel
- * @template-extends \App\Common\Repository\Interface\EloquentRepositoryInterface
- * @implements \App\Common\Repository\Interface\EloquentRepositoryInterface<TModel>
+ * @template-extends \App\Repositories\Base\Interface\EloquentRepositoryInterface
+ * @implements \App\Repositories\Base\Interface\EloquentRepositoryInterface<TModel>
  */
 class BaseRepository implements EloquentRepositoryInterface
 {

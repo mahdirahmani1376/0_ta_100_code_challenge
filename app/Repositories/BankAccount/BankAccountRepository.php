@@ -2,9 +2,9 @@
 
 namespace App\Repositories\BankAccount;
 
-use App\Common\Repository\BaseRepository;
 use App\Models\BankAccount;
 use App\Repositories\BankAccount\Interface\BankAccountInterface;
+use App\Repositories\Base\BaseRepository;
 
 class BankAccountRepository extends BaseRepository implements BankAccountInterface
 {

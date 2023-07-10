@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Common\Exception;
+namespace App\Exceptions\Base;
 
 use App\Exceptions\ApplicationException\BaseApplicationException;
 use App\Exceptions\SystemException\BaseSystemException;
@@ -52,7 +52,7 @@ trait BaseExceptionTrait
 
     /**
      * @param ...$args
-     * @return $this|\App\Common\Exception\BaseSystemException|\App\Common\Exception\BaseApplicationException
+     * @return $this|\App\Exceptions\Base\BaseSystemException|\App\Exceptions\Base\BaseApplicationException
      */
     public static function make(...$args)
     {

@@ -3,7 +3,7 @@
 namespace App\Exceptions\Http;
 
 
-use App\Common\Exception\HttpException;
+use App\Exceptions\Base\HttpException;
 
 class FatalErrorException extends HttpException
 {

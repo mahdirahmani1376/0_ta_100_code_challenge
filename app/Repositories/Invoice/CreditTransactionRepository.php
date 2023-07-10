@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Invoice;
 
-use App\Common\Repository\BaseRepository;
 use App\Models\CreditTransaction;
+use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\CreditTransactionInterface;
 
 class CreditTransactionRepository extends BaseRepository implements CreditTransactionInterface

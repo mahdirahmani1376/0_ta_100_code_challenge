@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetAppLanguage
 {
-    const DEFAULT_LANG = 'en';
+    const DEFAULT_LANG = 'fa';
     const LANGUAGES = [
         'en',
         'fa',
