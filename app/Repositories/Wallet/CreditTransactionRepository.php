@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\Invoice;
+namespace App\Repositories\Wallet;
 
 use App\Models\CreditTransaction;
 use App\Repositories\Base\BaseRepository;
-use App\Repositories\Invoice\Interface\CreditTransactionInterface;
+use App\Repositories\Wallet\Interface\CreditTransactionInterface;
 
 class CreditTransactionRepository extends BaseRepository implements CreditTransactionInterface
 {

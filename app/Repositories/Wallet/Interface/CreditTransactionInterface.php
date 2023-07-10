@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Invoice\Interface;
+namespace App\Repositories\Wallet\Interface;
 
 interface CreditTransactionInterface
 {
