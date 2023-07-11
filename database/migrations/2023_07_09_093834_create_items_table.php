@@ -18,9 +18,9 @@ return new class extends Migration
             $table->unsignedInteger('invoice_id');
             $table->unsignedInteger('invoiceable_id');
             $table->string('invoiceable_type');
-            $table->float('amount')
+            $table->double('amount')
                 ->comment('can be negative');
-            $table->float('discount')
+            $table->double('discount')
                 ->nullable()
                 ->comment('non-computation field, serves only as to show on reports');
             $table->timestamp('from_date')->nullable();

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('wallet_id');
             $table->unsignedInteger('invoice_id')->nullable();
             $table->unsignedInteger('admin_id')->nullable();
-            $table->float('amount')->comment('can be negative');
+            $table->double('amount')->comment('can be negative');
             $table->text('description')->nullable();
         });
     }

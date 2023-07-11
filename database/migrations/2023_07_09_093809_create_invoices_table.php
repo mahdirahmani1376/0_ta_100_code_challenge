@@ -19,10 +19,10 @@ return new class extends Migration
             $table->unsignedInteger('client_id');
             $table->unsignedBigInteger('rahkaran_id')->nullable();
             $table->string('payment_method');
-            $table->float('total');
-            $table->float('sub_total');
+            $table->double('total');
+            $table->double('sub_total');
             $table->unsignedInteger('tax_rate')->default(0);
-            $table->float('tax')->default(0);
+            $table->double('tax')->default(0);
             $table->string('status');
             $table->boolean('is_mass_payment')->default(false);
             $table->unsignedInteger('admin_id')->nullable();
