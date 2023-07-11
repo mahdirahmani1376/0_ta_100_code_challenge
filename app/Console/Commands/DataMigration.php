@@ -375,9 +375,12 @@ class DataMigration extends Command
             DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             $this->info("Inserting mapped data into $tableName");
-            collect($mappedData)->chunk(5000)->each(function ($rows) use ($tableName) {
+            $mappedDataCount = count($mappedData);
+            $counter = 0;
+            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
-                $this->info('Inserted 5000 items.');
+                $this->info("Inserted $counter out of $mappedDataCount items.");
+                $counter += 5000;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
