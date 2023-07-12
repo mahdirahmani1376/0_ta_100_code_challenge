@@ -17,8 +17,9 @@ return new class extends Migration {
             $table->unsignedInteger('client_id');
             $table->unsignedInteger('invoice_id');
             $table->unsignedBigInteger('rahkaran_id')->nullable();
-            $table->float('amount')->comment('can be negative');
+            $table->double('amount')->comment('can be negative');
             $table->string('status')->default(Transaction::STATUS_PENDING);
+            $table->string('payment_method')->nullable();
             $table->text('description')->nullable();
             $table->string('ip')->nullable();
             $table->string('tracking_code')->nullable();

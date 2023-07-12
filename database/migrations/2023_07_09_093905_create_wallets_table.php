@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->softDeletes();
             $table->unsignedInteger('client_id');
             $table->string('name');
-            $table->float('balance')->default(0);
+            $table->double('balance')->default(0);
             $table->boolean('is_active')->default(true);
         });
     }

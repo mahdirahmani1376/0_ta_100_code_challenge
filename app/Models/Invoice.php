@@ -31,14 +31,14 @@ class Invoice extends Model
 {
     use HasFactory;
 
-    const STATUS_CANCELED = 'canceled';
-    const STATUS_UNPAID = 'unpaid';
-    const STATUS_PAID = 'paid';
+    const STATUS_CANCELED = 'canceled'; // old status 3
+    const STATUS_UNPAID = 'unpaid'; // old status = 0
+    const STATUS_PAID = 'paid'; // old status = 1
     const STATUS_DRAFT = 'draft';
     const STATUS_DELETED         = 'deleted';
     const STATUS_PAYMENT_PENDING = 'payment_pending';
     const STATUS_REFUNDED        = 'refunded';
-    const STATUS_COLLECTIONS     = 'collections';
+    const STATUS_COLLECTIONS     = 'collections'; // old status = 7
 
     public function items(): HasMany
     {

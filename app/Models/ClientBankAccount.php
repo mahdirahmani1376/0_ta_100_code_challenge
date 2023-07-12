@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon updated_at
  * @property Carbon deleted_at
  * @property int client_id
- * @property int zarinpal_bank_acount_id
+ * @property int zarinpal_bank_account_id
  * @property string bank_name
  * @property string owner_name
  * @property string sheba_number

@@ -17,10 +17,10 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedInteger('client_id');
-            $table->unsignedBigInteger('zarinpal_bank_acount_id')->nullable();
-            $table->string('bank_name');
-            $table->string('owner_name');
-            $table->string('sheba_number');
+            $table->unsignedBigInteger('zarinpal_bank_account_id')->nullable();
+            $table->string('bank_name')->nullable();
+            $table->string('owner_name')->nullable();
+            $table->string('sheba_number')->nullable();
             $table->string('account_number')->nullable();
             $table->string('card_number')->nullable();
             $table->string('status')->default(ClientBankAccount::STATUS_PENDING);

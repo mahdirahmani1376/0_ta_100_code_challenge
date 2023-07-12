@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int rahkaran_id
  * @property float amount
  * @property string status
+ * @property string payment_method
  * @property string description
  * @property string ip
  * @property string tracking_code
@@ -28,11 +29,11 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    const STATUS_PENDING = 'pending';
-    const STATUS_SUCCESS = 'success';
-    const STATUS_FAIL = 'fail';
-    const STATUS_REFUND = 'refund';
-    const STATUS_PENDING_BANK_VERIFY = 'pending_bank_verify';
+    const STATUS_PENDING = 'pending'; // old status = 0
+    const STATUS_SUCCESS = 'success'; // old status = 1
+    const STATUS_FAIL = 'fail'; // old status = 2
+    const STATUS_REFUND = 'refund'; // old status 30
+    const STATUS_PENDING_BANK_VERIFY = 'pending_bank_verify'; // old status 6
     const STATUSES = [
         self::STATUS_PENDING,
         self::STATUS_SUCCESS,

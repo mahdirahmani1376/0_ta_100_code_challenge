@@ -31,9 +31,9 @@ class OfflineTransaction extends Model
 {
     use HasFactory;
 
-    const STATUS_PENDING = 'pending';
-    const STATUS_CONFIRMED = 'confirmed';
-    const STATUS_REJECTED = 'rejected';
+    const STATUS_PENDING = 'pending'; // old status = 0
+    const STATUS_CONFIRMED = 'confirmed';// old status = 1
+    const STATUS_REJECTED = 'rejected';// old status = 2
 
     public function invoice(): BelongsTo
     {

@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->unsignedInteger('client_bank_account_id');
             $table->unsignedBigInteger('zarinpal_payout_id')->nullable();
             $table->unsignedInteger('admin_id');
-            $table->float('amount');
+            $table->double('amount');
             $table->text('admin_note')->nullable();
             $table->string('status')->default(ClientCashout::STATUS_PENDING);
             $table->boolean('rejected_by_bank')->default(false);
