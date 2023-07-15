@@ -6,19 +6,23 @@ namespace App\Repositories\Base;
 use App\Exceptions\Repository\DeleteModelException;
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Throwable;
 
 /**
  * @template TModel
- * @template-extends \App\Repositories\Base\Interface\EloquentRepositoryInterface
- * @implements \App\Repositories\Base\Interface\EloquentRepositoryInterface<TModel>
+ * @template-extends EloquentRepositoryInterface
+ * @implements EloquentRepositoryInterface<TModel>
  */
 class BaseRepository implements EloquentRepositoryInterface
 {
     public string $model;
 
     public array $fillable = [];
+    public const DEFAULT_SORT_COLUMN = 'id';
+    public const DEFAULT_SORT_COLUMN_DIRECTION = 'desc';
 
     /**
      * @throws BindingResolutionException
@@ -26,6 +30,14 @@ class BaseRepository implements EloquentRepositoryInterface
     public function newInstance(array $attributes = []): Model
     {
         return app()->make($this->model, $attributes);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function newQuery(): Builder
+    {
+        return $this->newInstance()->newQuery();
     }
 
     public function fill(Model $object, array $attributes, $fillable = []): Model
@@ -67,5 +79,44 @@ class BaseRepository implements EloquentRepositoryInterface
         } catch (Throwable $exception) {
             throw DeleteModelException::throw($exception)->params($object::class, $object->getKey());
         }
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function all(): Collection
+    {
+        return $this->newInstance()->newQuery()->get();
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function findManyByCriteria(
+        $criteria,
+        $limit,
+        $paginate = [],
+        $relations = [],
+        $scopes = [],
+        $columns = ['*'],
+        $sortColumn = self::DEFAULT_SORT_COLUMN,
+        $sortDirection = self::DEFAULT_SORT_COLUMN_DIRECTION,
+    )
+    {
+        $query = $this->newQuery()
+            ->scopes($scopes)
+            ->select($columns)
+            ->with($relations)
+            ->where($criteria)
+            ->orderBy(
+                $sortColumn ?? self::DEFAULT_SORT_COLUMN,
+                $sortDirection ?? self::DEFAULT_SORT_COLUMN_DIRECTION
+            );
+
+        if (isset($limit)) {
+            $query = $query->limit($limit);
+        }
+
+        return !empty($paginate) ? $query->paginate($paginate['perPage'], $columns, 'page', $paginate['page']) : $query->get();
     }
 }

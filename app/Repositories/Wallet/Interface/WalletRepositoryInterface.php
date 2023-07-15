@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Wallet\Interface;
 
-interface WalletInterface
+interface WalletRepositoryInterface
 {
 
 }

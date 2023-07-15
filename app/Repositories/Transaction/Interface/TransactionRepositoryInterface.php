@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Transaction\Interface;
 
-interface TransactionInterface
+interface TransactionRepositoryInterface
 {
 
 }

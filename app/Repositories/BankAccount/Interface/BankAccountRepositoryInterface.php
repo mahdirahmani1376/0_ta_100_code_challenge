@@ -2,7 +2,7 @@
 
 namespace App\Repositories\BankAccount\Interface;
 
-interface BankAccountInterface
+interface BankAccountRepositoryInterface
 {
 
 }
