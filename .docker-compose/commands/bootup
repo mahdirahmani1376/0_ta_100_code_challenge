@@ -1,0 +1,16 @@
+#!/bin/bash
+
+Run as root
+if [[ `whoami` != 'root' ]]; then
+        echo "Please run as root"
+        exit 1
+fi
+
+printf "\033[0;32m > composer install ...\n"
+(cd /var/www/ && composer install --ignore-platform-reqs)
+
+printf "\033[0;32m > Migrating the database ...\n"
+(cd /var/www/ && php artisan migrate )
+
+printf "\033[0;32m > Generate app key ...\n"
+(cd /var/www/ && php artisan key:generate )
