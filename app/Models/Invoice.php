@@ -74,6 +74,11 @@ class Invoice extends Model
         'rahkaran_id',
     ];
 
+    protected $casts = [
+        'due_date' => 'datetime',
+        'paid_at' => 'datetime',
+    ];
+
     public function items(): HasMany
     {
         return $this->hasMany(Item::class);

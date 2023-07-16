@@ -13,15 +13,16 @@ class IndexInvoiceController
     public function __construct(IndexInvoiceAction $indexInvoiceAction)
     {
         $this->indexInvoiceAction = $indexInvoiceAction;
+
     }
 
     public function __invoke(IndexInvoiceRequest $request)
     {
-        $invoices = ($this->indexInvoiceAction)(
+        $result = ($this->indexInvoiceAction)(
             $request->validated(),
             $request->getPaginationParams(),
         );
 
-        return InvoiceResource::collection($invoices);
+        return InvoiceResource::collection($result);
     }
 }

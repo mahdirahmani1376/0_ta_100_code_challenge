@@ -2,34 +2,30 @@
 
 namespace App\Actions\Admin\Invoice;
 
-use App\Services\Admin\Invoice\GenerateInvoiceExcelFileService;
 use App\Services\Admin\Invoice\IndexInvoiceService;
-use Illuminate\Support\Collection;
+use App\Services\Invoice\Item\ListItemByCriteriaService;
 
 class IndexInvoiceAction
 {
     private IndexInvoiceService $indexInvoiceService;
-    private GenerateInvoiceExcelFileService $generateInvoiceExcelFileService;
+    private ListItemByCriteriaService $listItemByCriteriaService;
 
     public function __construct(
-        IndexInvoiceService             $indexInvoiceService,
-        GenerateInvoiceExcelFileService $generateInvoiceExcelFileService
+        IndexInvoiceService       $indexInvoiceService,
+        ListItemByCriteriaService $listItemByCriteriaService,
     )
     {
         $this->indexInvoiceService = $indexInvoiceService;
-        $this->generateInvoiceExcelFileService = $generateInvoiceExcelFileService;
+        $this->listItemByCriteriaService = $listItemByCriteriaService;
     }
 
-    public function __invoke(array $data, array $paginationParam): Collection|string
+    public function __invoke(array $data, array $paginationParam)
     {
-        $invoices = ($this->indexInvoiceService)($data, $paginationParam);
-
-        if (isset($data['export']) && $data['export']) {
-            $excelFile = ($this->generateInvoiceExcelFileService)($invoices);
-            // upload to object store and get its link
-            return 'link-to-file';
-        } else {
-            return $invoices;
+        $items = ($this->listItemByCriteriaService)($data);
+        if ($items->isNotEmpty()) {
+            $data['item_invoice_ids'] = $items->pluck('invoice_id')->unique()->toArray();
         }
+
+        return ($this->indexInvoiceService)($data, $paginationParam);
     }
 }
