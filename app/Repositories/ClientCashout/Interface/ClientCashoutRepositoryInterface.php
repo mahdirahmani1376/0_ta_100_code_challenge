@@ -2,7 +2,7 @@
 
 namespace App\Repositories\ClientCashout\Interface;
 
-interface ClientCashoutInterface
+interface ClientCashoutRepositoryInterface
 {
 
 }

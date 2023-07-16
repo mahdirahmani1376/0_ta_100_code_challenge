@@ -12,13 +12,23 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    libzip-dev \
+    unzip \
+    supervisor \
+    libcap2-bin
+
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install mbstring
+RUN docker-php-ext-install exif
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-install bcmath
+RUN docker-php-ext-install gd
+RUN docker-php-ext-install zip
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -27,6 +37,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN useradd -G www-data,root -u $UID -d /home/$USER $USER
 RUN mkdir -p /home/$USER/.composer && \
     chown -R $USER:$USER /home/$USER
+
+COPY php.ini /usr/local/etc/php/php.ini
 
 # Set working directory
 WORKDIR /var/www

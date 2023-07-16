@@ -348,15 +348,20 @@ class DataMigration extends Command
 
     private function migrateItem(): void
     {
+//        ini_set('memory_limit', '500M');
         $tableName = (new Item())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
-            $oldData = DB::connection('whmcs')->select('SELECT * FROM `tblinvoiceitems`');
-            $this->info('Fetched data');
+            $invoiceIds = implode(',', Invoice::query()->select('id')->get()->pluck('id')->toArray());
+            $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` where `invoiceid` in ($invoiceIds)");
+            $this->info('Fetched data, records: '.count($oldData));
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
-                $newRow = [];
+                if (Invoice::query()->find($row['invoiceid']) == null) {
+                    return null;
+                }
 
+                $newRow = [];
                 $newRow['id'] = $row['id'];
                 $newRow['created_at'] = Carbon::now()->toDateTimeString();
                 $newRow['updated_at'] = Carbon::now()->toDateTimeString();

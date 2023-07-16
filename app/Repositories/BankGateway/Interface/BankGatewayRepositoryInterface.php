@@ -2,7 +2,7 @@
 
 namespace App\Repositories\BankGateway\Interface;
 
-interface BankGatewayInterface
+interface BankGatewayRepositoryInterface
 {
 
 }
