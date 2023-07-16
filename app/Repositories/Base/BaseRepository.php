@@ -6,6 +6,7 @@ namespace App\Repositories\Base;
 use App\Exceptions\Repository\DeleteModelException;
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -87,6 +88,13 @@ class BaseRepository implements EloquentRepositoryInterface
     public function all(): Collection
     {
         return $this->newInstance()->newQuery()->get();
+    }
+
+    public function paginate(Builder $query): LengthAwarePaginator
+    {
+        return $query->paginate(
+            get_paginate_params(request())['perPage']
+        );
     }
 
     /**

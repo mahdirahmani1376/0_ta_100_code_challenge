@@ -76,6 +76,6 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             return $query->get();
         }
 
-        return $query->paginate($paginationParam['perPage']);
+        return $this->paginate($query);
     }
 }
