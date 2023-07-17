@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 if (!function_exists('get_paginate_params')) {
@@ -27,5 +29,20 @@ if (!function_exists("get_sortable_items")) {
     function get_sortable_items(array $items): array
     {
         return array_unique(array_merge($items, ['created_at', 'updated_at', 'id']));
+    }
+}
+
+if (!function_exists("check_rahkaran")) {
+    /**
+     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
+     */
+    function check_rahkaran(Invoice $invoice): void
+    {
+        if ($invoice->rahkaran_id && $invoice->balance == 0 && in_array($invoice->status, [
+                Invoice::STATUS_REFUNDED,
+                Invoice::STATUS_PAID,
+            ])) {
+            throw InvoiceLockedAndAlreadyImportedToRahkaranException::make($invoice->getKey());
+        }
     }
 }
