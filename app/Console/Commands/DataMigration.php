@@ -302,6 +302,7 @@ class DataMigration extends Command
                 $newRow['paid_at'] = $row['paid_date'];
                 $newRow['rahkaran_id'] = $row['rahkaran_id'];
                 $newRow['payment_method'] = $row['payment_method'];
+                $newRow['balance'] = $row['balance'];
                 $newRow['total'] = $row['total'];
                 $newRow['sub_total'] = $row['sub_total'];
                 $newRow['tax_rate'] = 9;
