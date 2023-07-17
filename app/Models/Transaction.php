@@ -42,6 +42,19 @@ class Transaction extends Model
         self::STATUS_PENDING_BANK_VERIFY,
     ];
 
+    protected $fillable = [
+        'client_id',
+        'invoice_id',
+        'rahkaran_id',
+        'amount',
+        'status',
+        'payment_method',
+        'description',
+        'ip',
+        'tracking_code',
+        'reference_id',
+    ];
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
