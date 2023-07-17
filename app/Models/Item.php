@@ -32,6 +32,23 @@ class Item extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $casts = [
+        'deleted_at' => 'datetime',
+        'from_date' => 'datetime',
+        'to_date' => 'datetime',
+    ];
+
+    protected $fillable = [
+        'invoice_id',
+        'invoiceable_id',
+        'invoiceable_type',
+        'amount',
+        'discount',
+        'from_date',
+        'to_date',
+        'description',
+    ];
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
