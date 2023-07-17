@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Admin\Invoice;
 
+use App\Http\Resources\Admin\Transaction\TransactionResource;
 use App\Models\Invoice;
-use App\Repositories\Invoice\InvoiceNumberRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,6 +31,8 @@ class InvoiceResource extends JsonResource
             'admin_id' => $this->admin_id,
             'is_credit' => $this->is_credit,
             'invoice_number' => InvoiceNumberResource::make($this->invoiceNumber),
+            'transactions' => TransactionResource::collection($this->transactions),
+            'items' => ItemResource::collection($this->items),
         ];
     }
 }
