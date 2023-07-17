@@ -22,5 +22,7 @@ class FindWalletByClientIdService
                 'client_id' => $clientId,
             ]);
         }
+
+        return $wallet;
     }
 }
