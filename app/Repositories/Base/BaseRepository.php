@@ -20,8 +20,6 @@ use Throwable;
 class BaseRepository implements EloquentRepositoryInterface
 {
     public string $model;
-
-    public array $fillable = [];
     public const DEFAULT_SORT_COLUMN = 'id';
     public const DEFAULT_SORT_COLUMN_DIRECTION = 'desc';
 
@@ -46,7 +44,7 @@ class BaseRepository implements EloquentRepositoryInterface
         if (!empty($fillable)) {
             $object->fillable($fillable);
         } else {
-            $object->fillable($this->fillable);
+            $object->fillable($object->getFillable());
         }
 
         return $object->fill($attributes);
