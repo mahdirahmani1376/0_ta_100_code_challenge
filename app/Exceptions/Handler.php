@@ -3,7 +3,6 @@
 namespace App\Exceptions;
 
 use App\Exceptions\Base\BaseSystemException;
-use App\Exceptions\SystemException\BaseSystemException as SystemException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Throwable;
