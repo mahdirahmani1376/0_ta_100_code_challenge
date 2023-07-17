@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Wallet;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedInteger('client_id');
-            $table->string('name');
+            $table->string('name')->default(Wallet::WALLET_DEFAULT_NAME);
             $table->double('balance')->default(0);
             $table->boolean('is_active')->default(true);
         });
