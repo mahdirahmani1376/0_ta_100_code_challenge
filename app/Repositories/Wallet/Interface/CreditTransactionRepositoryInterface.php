@@ -2,7 +2,9 @@
 
 namespace App\Repositories\Wallet\Interface;
 
-interface CreditTransactionRepositoryInterface
+use App\Repositories\Base\Interface\EloquentRepositoryInterface;
+
+interface CreditTransactionRepositoryInterface extends EloquentRepositoryInterface
 {
 
 }

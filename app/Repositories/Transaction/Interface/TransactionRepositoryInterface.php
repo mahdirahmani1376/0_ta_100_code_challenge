@@ -2,7 +2,10 @@
 
 namespace App\Repositories\Transaction\Interface;
 
-interface TransactionRepositoryInterface
-{
+use App\Models\Invoice;
+use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 
+interface TransactionRepositoryInterface extends EloquentRepositoryInterface
+{
+    public function sumOfPaidTransactions(Invoice $invoice): int;
 }
