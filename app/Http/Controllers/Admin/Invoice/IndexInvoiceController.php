@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Invoice;
 
 use App\Actions\Admin\Invoice\IndexInvoiceAction;
 use App\Http\Requests\Admin\Invoice\IndexInvoiceRequest;
-use App\Http\Resources\Admin\Invoice\InvoiceResource;
+use App\Http\Resources\Admin\Invoice\IndexInvoiceResource;
 
 class IndexInvoiceController
 {
@@ -23,6 +23,6 @@ class IndexInvoiceController
             $request->getPaginationParams(),
         );
 
-        return InvoiceResource::collection($result);
+        return IndexInvoiceResource::collection($result);
     }
 }
