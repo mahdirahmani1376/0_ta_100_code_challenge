@@ -24,4 +24,13 @@ class Wallet extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    const WALLET_DEFAULT_NAME = 'client';
+
+    protected $fillable = [
+        'client_id',
+        'name',
+        'balance',
+        'is_active',
+    ];
 }
