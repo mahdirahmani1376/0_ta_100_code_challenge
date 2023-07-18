@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services\Admin\Invoice;
+namespace App\Services\Admin\Invoice\Item;
 
 use App\Models\Invoice;
+use App\Models\Item;
 use App\Repositories\Invoice\Interface\ItemRepositoryInterface;
 
-class StoreItemService
+class UpdateItemService
 {
     private ItemRepositoryInterface $itemRepository;
 
@@ -14,10 +15,8 @@ class StoreItemService
         $this->itemRepository = $itemRepository;
     }
 
-    public function __invoke(Invoice $invoice, array $data)
+    public function __invoke(Item $item, array $data): Item
     {
-        return $this->itemRepository->create(
-            array_merge($data, ['invoice_id' => $invoice->id,])
-        );
+        return $this->itemRepository->update($item, $data);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Actions\Admin\Invoice;
+namespace App\Actions\Admin\Invoice\Item;
 
 
 use App\Actions\Invoice\CalcInvoicePriceFieldsAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Models\Invoice;
-use App\Services\Admin\Invoice\StoreItemService;
+use App\Services\Admin\Invoice\Item\StoreItemService;
 
 class StoreItemAction
 {

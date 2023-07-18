@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Invoice;
+namespace App\Http\Controllers\Admin\Invoice\Item;
 
-use App\Actions\Admin\Invoice\StoreItemAction;
-use App\Http\Requests\Admin\Invoice\StoreItemRequest;
+use App\Actions\Admin\Invoice\Item\StoreItemAction;
+use App\Http\Requests\Admin\Invoice\Item\StoreItemRequest;
 use App\Http\Resources\Admin\Invoice\ItemResource;
 use App\Models\Invoice;
 

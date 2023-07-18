@@ -15,6 +15,11 @@ Route::namespace('Invoice')
         Route::get('{invoice}', 'ShowInvoiceController');
         Route::put('{invoice}', 'UpdateInvoiceController');
         Route::post('{invoice}/status', 'ChangeInvoiceStatusController');
-        Route::post('{invoice}/item', 'StoreItemController');
+        Route::namespace('Item')
+            ->prefix('{invoice}/item')
+            ->group(function () {
+                Route::post('/', 'StoreItemController');
+                Route::put('{item}', 'UpdateItemController');
+            });
 
     });
