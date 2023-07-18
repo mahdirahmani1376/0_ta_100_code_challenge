@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\Invoice;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddItemRequest extends FormRequest
+class StoreItemRequest extends FormRequest
 {
     public function authorize(): bool
     {

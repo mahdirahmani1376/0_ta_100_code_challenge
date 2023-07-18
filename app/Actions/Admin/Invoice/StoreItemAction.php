@@ -6,14 +6,14 @@ namespace App\Actions\Admin\Invoice;
 use App\Actions\Invoice\CalcInvoicePriceFieldsAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Models\Invoice;
-use App\Services\Admin\Invoice\AddItemService;
+use App\Services\Admin\Invoice\StoreItemService;
 
-class AddItemAction
+class StoreItemAction
 {
-    private AddItemService $addItemService;
+    private StoreItemService $addItemService;
     private CalcInvoicePriceFieldsAction $calcInvoicePriceFieldsAction;
 
-    public function __construct(AddItemService               $addItemService,
+    public function __construct(StoreItemService             $addItemService,
                                 CalcInvoicePriceFieldsAction $calcInvoicePriceFieldsAction)
     {
         $this->addItemService = $addItemService;
