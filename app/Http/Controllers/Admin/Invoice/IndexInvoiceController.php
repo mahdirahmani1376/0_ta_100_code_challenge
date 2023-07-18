@@ -19,8 +19,7 @@ class IndexInvoiceController
     public function __invoke(IndexInvoiceRequest $request)
     {
         $result = ($this->indexInvoiceAction)(
-            $request->validated(),
-            $request->getPaginationParams(),
+            $request->validated()
         );
 
         return IndexInvoiceResource::collection($result);
