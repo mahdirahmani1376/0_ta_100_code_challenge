@@ -18,6 +18,7 @@ class CalcInvoiceTaxService
 
     public function __invoke(Invoice $invoice): Invoice
     {
+        $invoice->refresh();
         $tax = ($invoice->sub_total * $invoice->tax_rate) / 100;
 
         return $this->invoiceRepository->update(
