@@ -22,4 +22,16 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where('status', Transaction::STATUS_SUCCESS)
             ->sum('amount');
     }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function getLastSuccessfulTransaction(Invoice $invoice)
+    {
+        return $this->newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->where('amount', '>', 10)
+            ->orderBy('created_at', 'desc')
+            ->first('created_at');
+    }
 }

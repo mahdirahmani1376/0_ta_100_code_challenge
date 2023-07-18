@@ -14,5 +14,6 @@ Route::namespace('Invoice')
         Route::post('/', 'StoreInvoiceController');
         Route::get('{invoice}', 'ShowInvoiceController');
         Route::put('{invoice}', 'UpdateInvoiceController');
+        Route::post('{invoice}/status', 'ChangeInvoiceStatusController');
 
     });
