@@ -2,13 +2,12 @@
 
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Models\Invoice;
-use Illuminate\Http\Request;
 
 if (!function_exists('get_paginate_params')) {
-    function get_paginate_params(Request $request): array
+    function get_paginate_params(): array
     {
-        $perPage = $request->get('perPage');
-        $page = $request->get('page');
+        $perPage = \request()->get('perPage');
+        $page = \request()->get('page');
 
         if (empty($perPage) || is_array($perPage) || is_object($perPage) || (int)$perPage < 0 || (int)$perPage > 200) {
             $perPage = 10;

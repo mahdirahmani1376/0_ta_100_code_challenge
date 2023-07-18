@@ -15,8 +15,8 @@ class IndexInvoiceService
         $this->invoiceRepository = $invoiceRepository;
     }
 
-    public function __invoke(array $data, array $paginationParam)
+    public function __invoke(array $data)
     {
-        return $this->invoiceRepository->adminIndex($data, $paginationParam);
+        return $this->invoiceRepository->adminIndex($data);
     }
 }
