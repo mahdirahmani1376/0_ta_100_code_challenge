@@ -13,8 +13,8 @@ class ItemResource extends JsonResource
         /** @var Item $this */
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
             'deleted_at' => $this->deleted_at?->toDateTimeString(),
             'invoice_id' => $this->invoice_id,
             'invoiceable_id' => $this->invoiceable_id,
