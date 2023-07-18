@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Collection items
  * @property InvoiceNumber invoiceNumber
  * @property Collection transactions
+ * @property Collection offlineTransactions
  */
 class Invoice extends Model
 {
@@ -101,5 +102,10 @@ class Invoice extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function offlineTransactions(): HasMany
+    {
+        return $this->hasMany(OfflineTransaction::class);
     }
 }

@@ -12,5 +12,6 @@ Route::namespace('Invoice')
             });
         Route::get('/', 'IndexInvoiceController');
         Route::post('/', 'StoreInvoiceController');
+        Route::get('{invoice}', 'ShowInvoiceController');
 
     });
