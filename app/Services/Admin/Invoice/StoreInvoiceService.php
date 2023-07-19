@@ -16,7 +16,7 @@ class StoreInvoiceService
 
     public function __invoke(array $data)
     {
-        $data['tax_rate'] = Invoice::DEFAULT_TAX_RATE;
+        $data['tax_rate'] = $data['tax_rate'] ?? Invoice::DEFAULT_TAX_RATE;
         $data['payment_method'] = Invoice::PAYMENT_METHOD_CREDIT;
         $data['created_at'] = $data['invoice_date'] ?? now();
         if ($data['status'] == Invoice::STATUS_REFUNDED && empty($data['paid_at'])) {

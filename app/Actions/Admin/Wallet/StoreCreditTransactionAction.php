@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Wallet;
 
+use App\Models\CreditTransaction;
 use App\Services\Admin\Wallet\StoreCreditTransactionService;
 use App\Services\Wallet\CalcWalletBalanceService;
 use App\Services\Wallet\FindWalletByClientIdService;
@@ -23,7 +24,7 @@ class StoreCreditTransactionAction
         $this->calcWalletBalanceService = $calcWalletBalanceService;
     }
 
-    public function __invoke(int $clientId, array $data)
+    public function __invoke(int $clientId, array $data): CreditTransaction
     {
         $wallet = ($this->findWalletByClientIdService)($clientId);
         $creditTransaction = ($this->storeCreditTransactionService)($wallet, $data);

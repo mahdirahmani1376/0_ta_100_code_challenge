@@ -39,6 +39,7 @@ Route::namespace('Wallet')
         Route::prefix('credit-transaction')
             ->group(function () {
                 Route::post('/', 'StoreCreditTransactionController');
+                Route::post('deduct-balance', 'DeductBalanceController');
             });
 
     });
