@@ -18,7 +18,7 @@ class StoreInvoiceService
     {
         $data['tax_rate'] = Invoice::DEFAULT_TAX_RATE;
         $data['payment_method'] = Invoice::PAYMENT_METHOD_CREDIT;
-        $data['created_at'] = $data['invoice_date'];
+        $data['created_at'] = $data['invoice_date'] ?? now();
         if ($data['status'] == Invoice::STATUS_REFUNDED && empty($data['paid_at'])) {
             $data['paid_at'] = $data['created_at'];
         }

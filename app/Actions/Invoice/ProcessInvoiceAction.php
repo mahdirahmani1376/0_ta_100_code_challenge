@@ -13,13 +13,10 @@ use App\Services\Invoice\ChangeInvoiceStatusService;
  */
 class ProcessInvoiceAction
 {
-    private CalcInvoiceBalanceService $calcInvoiceBalanceService;
     private ChangeInvoiceStatusService $changeInvoiceStatusService;
 
-    public function __construct(CalcInvoiceBalanceService  $calcInvoiceBalanceService,
-                                ChangeInvoiceStatusService $changeInvoiceStatusService)
+    public function __construct(ChangeInvoiceStatusService $changeInvoiceStatusService)
     {
-        $this->calcInvoiceBalanceService = $calcInvoiceBalanceService;
         $this->changeInvoiceStatusService = $changeInvoiceStatusService;
     }
 
@@ -28,8 +25,6 @@ class ProcessInvoiceAction
      */
     public function __invoke(Invoice $invoice, $shouldProcessPaidInvoice = false): Invoice
     {
-        $invoice = ($this->calcInvoiceBalanceService)($invoice);
-
         if (
             $shouldProcessPaidInvoice &&
             in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING]) &&

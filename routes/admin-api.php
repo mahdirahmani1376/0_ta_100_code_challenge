@@ -8,6 +8,7 @@ Route::namespace('Invoice')
     ->group(function () {
         Route::get('/', 'IndexInvoiceController');
         Route::post('/', 'StoreInvoiceController');
+        Route::post('charge-wallet-invoice', 'ChargeWalletInvoiceController');
         Route::get('{invoice}', 'ShowInvoiceController');
         Route::put('{invoice}', 'UpdateInvoiceController');
         Route::post('{invoice}/status', 'ChangeInvoiceStatusController');
