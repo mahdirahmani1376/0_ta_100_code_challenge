@@ -21,6 +21,7 @@ class CalcInvoiceBalanceService
     public function __invoke(Invoice $invoice): Invoice
     {
         $sumOfPaidTransactions = $this->transactionRepository->sumOfPaidTransactions($invoice);
+        dump($sumOfPaidTransactions);
         $balance = $invoice->total - $sumOfPaidTransactions;
 
         return $this->invoiceRepository->update(
