@@ -11,6 +11,7 @@ Route::namespace('Invoice')
         Route::get('{invoice}', 'ShowInvoiceController');
         Route::put('{invoice}', 'UpdateInvoiceController');
         Route::post('{invoice}/status', 'ChangeInvoiceStatusController');
+        Route::post('{invoice}/manual-check', 'ManualCheckController');
         Route::prefix('invoice-number')
             ->group(function () {
                 Route::get('/', 'IndexInvoiceNumberController');
