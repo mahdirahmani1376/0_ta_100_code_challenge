@@ -14,7 +14,7 @@ class StoreCreditTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required',],
+            'amount' => ['required', 'gte:1'],
             'description' => [
                 'nullable',
                 'string'
