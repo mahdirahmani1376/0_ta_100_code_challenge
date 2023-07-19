@@ -20,6 +20,7 @@ Route::namespace('Invoice')
             ->group(function () {
                 Route::post('/', 'StoreItemController');
                 Route::put('{item}', 'UpdateItemController');
+                Route::delete('{item}', 'DeleteItemController');
             });
 
     });

@@ -22,8 +22,8 @@ class StoreItemAction
 
     public function __invoke(Invoice $invoice, array $data)
     {
-        if (($invoice->status == 'Paid' || $invoice->status == 'Refunded' || isset($invoice->rahkaran_id)) && $data['amount'] != '0') {
-            throw new BadRequestException('شما نمی‌توانید آیتمی به این فاکتور اضافه کنید');
+        if ($data['amount'] != '0') {
+            check_rahkaran($invoice);
         }
 
         $item = ($this->addItemService)($invoice, $data);
