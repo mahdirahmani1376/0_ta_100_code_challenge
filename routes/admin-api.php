@@ -28,5 +28,10 @@ Route::namespace('Invoice')
             ->group(function () {
                 Route::post('/', 'StoreTransactionController');
             });
+    });
 
+Route::namespace('Wallet')
+    ->prefix('wallet/{clientId}')
+    ->group(function () {
+        Route::get('/', 'ShowWalletController');
     });

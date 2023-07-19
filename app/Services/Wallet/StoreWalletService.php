@@ -5,7 +5,7 @@ namespace App\Services\Wallet;
 use App\Models\Wallet;
 use App\Repositories\Wallet\Interface\WalletRepositoryInterface;
 
-class FindWalletByClientIdService
+class StoreWalletService
 {
     private WalletRepositoryInterface $walletRepository;
 
@@ -14,8 +14,10 @@ class FindWalletByClientIdService
         $this->walletRepository = $walletRepository;
     }
 
-    public function __invoke(int $clientId): ?Wallet
+    public function __invoke(int $clientId): Wallet
     {
-        return $this->walletRepository->findByClientId($clientId);
+        return $this->walletRepository->create([
+            'client_id' => $clientId,
+        ]);
     }
 }

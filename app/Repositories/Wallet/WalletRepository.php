@@ -12,7 +12,7 @@ class WalletRepository extends BaseRepository implements Interface\WalletReposit
     public function findByClientId(int $clientId): Wallet|null
     {
         return $this->newQuery()
-            ->where('client_id')
+            ->where('client_id', $clientId)
             ->first();
     }
 }

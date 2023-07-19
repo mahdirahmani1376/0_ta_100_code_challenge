@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Invoice;
 
+use App\Actions\Admin\Wallet\ShowWalletAction;
 use App\Actions\Invoice\CalcInvoicePriceFieldsAction;
 use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Models\Invoice;
@@ -21,7 +22,7 @@ class StoreInvoiceAction
     private StoreRefundTransactionService $storeRefundTransactionService;
     private ProcessInvoiceAction $processInvoiceAction;
     private CalcInvoicePriceFieldsAction $calcInvoicePriceFieldsAction;
-    private FindWalletByClientIdService $findWalletByClientIdService;
+    private ShowWalletAction $showWalletAction;
 
     public function __construct(StoreInvoiceService                 $storeInvoiceService,
                                 StoreItemService                    $storeItemService,
@@ -29,7 +30,8 @@ class StoreInvoiceAction
                                 StoreRefundTransactionService       $storeRefundTransactionService,
                                 CalcInvoicePriceFieldsAction        $calcInvoicePriceFieldsAction,
                                 ProcessInvoiceAction                $processInvoiceAction,
-                                FindWalletByClientIdService         $findWalletByClientIdService)
+                                ShowWalletAction $showWalletAction
+    )
     {
         $this->storeInvoiceService = $storeInvoiceService;
         $this->storeItemService = $storeItemService;
@@ -37,7 +39,7 @@ class StoreInvoiceAction
         $this->storeRefundTransactionService = $storeRefundTransactionService;
         $this->processInvoiceAction = $processInvoiceAction;
         $this->calcInvoicePriceFieldsAction = $calcInvoicePriceFieldsAction;
-        $this->findWalletByClientIdService = $findWalletByClientIdService;
+        $this->showWalletAction = $showWalletAction;
     }
 
     public function __invoke(array $data)
@@ -56,7 +58,7 @@ class StoreInvoiceAction
             $invoice = ($this->processInvoiceAction)($invoice);
 
             if ($data['status'] == Invoice::STATUS_REFUNDED) {
-                $wallet = ($this->findWalletByClientIdService)($invoice->client_id);
+                $wallet = ($this->showWalletAction)($invoice->client_id);
                 ($this->storeRefundCreditTransactionService)($invoice, $wallet);
                 ($this->storeRefundTransactionService)($invoice);
 
