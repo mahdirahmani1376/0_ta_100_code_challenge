@@ -93,7 +93,7 @@ class BaseRepository implements EloquentRepositoryInterface
      */
     public function all(): Collection
     {
-        return $this->newInstance()->newQuery()->get();
+        return $this->newQuery()->get();
     }
 
     public function paginate(Builder $query): LengthAwarePaginator
