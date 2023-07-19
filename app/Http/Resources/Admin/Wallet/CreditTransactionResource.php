@@ -13,8 +13,8 @@ class CreditTransactionResource extends JsonResource
         /** @var CreditTransaction $this */
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated' => $this->updated,
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated' => $this->updated?->toDateTimeString(),
             'client_id' => $this->client_id,
             'wallet_id' => $this->wallet_id,
             'invoice_id' => $this->invoice_id,

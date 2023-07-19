@@ -18,4 +18,11 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
                 ->where('client_id', $clientId)
         );
     }
+
+    public function sum(int $clientId): int
+    {
+        return $this->newQuery()
+            ->where('client_id', $clientId)
+            ->sum('amount');
+    }
 }

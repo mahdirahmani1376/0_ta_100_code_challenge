@@ -34,5 +34,10 @@ Route::namespace('Wallet')
     ->prefix('wallet/{clientId}')
     ->group(function () {
         Route::get('/', 'ShowWalletController');
-        Route::get('/list', 'ShowWalletAndTransactionController');
+        Route::get('list', 'ShowWalletAndTransactionController');
+        Route::prefix('credit-transaction')
+            ->group(function () {
+                Route::post('/', 'StoreCreditTransactionController');
+            });
+
     });

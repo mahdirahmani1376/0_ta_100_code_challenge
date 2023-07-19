@@ -8,4 +8,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 interface CreditTransactionRepositoryInterface extends EloquentRepositoryInterface
 {
     public function indexByClientId(int $clientId): LengthAwarePaginator;
+
+    public function sum(int $clientId): int;
 }
