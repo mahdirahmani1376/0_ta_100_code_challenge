@@ -410,7 +410,7 @@ class DataMigration extends Command
                                 FROM offline_payments
                                 LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
                                 LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                WHERE invoices.client_id IS NOT NULL');
+                                WHERE invoices.client_id IS NULL');
             if (!empty($abnormalData)) {
                 $this->error('SKIPPING ABNORMAL DATA (transactions.id):');
                 collect((array)$abnormalData)->each(function ($row) {
@@ -441,6 +441,7 @@ class DataMigration extends Command
                 $newRow['client_id'] = $row['i_client_id'];
                 $newRow['invoice_id'] = $row['i_invoice_id'];
                 $newRow['bank_account_id'] = $row['bank_account_id'];
+                $newRow['amount'] = strlen($row['amount']) > 0 ? $row['amount'] : 0;
                 if ($row['status'] == 0) {
                     $newRow['status'] = OfflineTransaction::STATUS_PENDING;
                 } elseif ($row['status'] == 1) {
