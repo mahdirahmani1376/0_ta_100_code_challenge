@@ -50,4 +50,5 @@ Route::namespace('BankGateway')
         Route::post('/', 'StoreBankGatewayController');
         Route::get('{bankGateway}', 'ShowBankGatewayController');
         Route::put('{bankGateway}', 'UpdateBankGatewayController');
+        Route::delete('{bankGateway}', 'DeleteBankGatewayController');
     });
