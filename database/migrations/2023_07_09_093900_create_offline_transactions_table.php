@@ -18,11 +18,13 @@ return new class extends Migration
             $table->unsignedInteger('client_id');
             $table->unsignedInteger('invoice_id');
             $table->unsignedInteger('bank_account_id');
+            $table->unsignedInteger('admin_id')->nullable();
             $table->double('amount');
             $table->string('status');
             $table->string('payment_method');
             $table->string('tracking_code')->nullable();
             $table->string('mobile')->nullable();
+            $table->string('account_name')->nullable();
             $table->text('description')->nullable();
         });
     }

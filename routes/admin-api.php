@@ -52,3 +52,9 @@ Route::namespace('BankGateway')
         Route::put('{bankGateway}', 'UpdateBankGatewayController');
         Route::delete('{bankGateway}', 'DeleteBankGatewayController');
     });
+
+Route::namespace('OfflineTransaction')
+    ->prefix('offline-transaction')
+    ->group(function () {
+        Route::get('/', 'IndexOfflineTransactionController');
+    });

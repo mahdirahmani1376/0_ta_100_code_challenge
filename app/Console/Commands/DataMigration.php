@@ -441,6 +441,7 @@ class DataMigration extends Command
                 $newRow['client_id'] = $row['i_client_id'];
                 $newRow['invoice_id'] = $row['i_invoice_id'];
                 $newRow['bank_account_id'] = $row['bank_account_id'];
+                $newRow['admin_id'] = $row['admin_user_id'];
                 $newRow['amount'] = strlen($row['amount']) > 0 ? $row['amount'] : 0;
                 if ($row['status'] == 0) {
                     $newRow['status'] = OfflineTransaction::STATUS_PENDING;
@@ -454,6 +455,7 @@ class DataMigration extends Command
                 $newRow['payment_method'] = $row['payment_method'];
                 $newRow['tracking_code'] = $row['tracking_code'];
                 $newRow['mobile'] = $row['mobile'];
+                $newRow['account_name'] = $row['account_name'];
                 $newRow['description'] = $row['description'];
 
                 return $newRow;
