@@ -2,7 +2,9 @@
 
 namespace App\Repositories\BankGateway\Interface;
 
-interface BankGatewayRepositoryInterface
+use App\Repositories\Base\Interface\EloquentRepositoryInterface;
+
+interface BankGatewayRepositoryInterface extends EloquentRepositoryInterface
 {
 
 }

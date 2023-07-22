@@ -43,3 +43,9 @@ Route::namespace('Wallet')
             });
 
     });
+
+Route::namespace('BankGateway')
+    ->prefix('bank-gateway')
+    ->group(function () {
+        Route::post('/', 'StoreBankGatewayController');
+    });
