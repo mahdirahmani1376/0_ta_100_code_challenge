@@ -96,6 +96,7 @@ class DataMigration extends Command
                     $newRow['deleted_at'] = Carbon::now();
                 }
                 $config = [];
+                $config['status'] = $row['status'];
                 if (!empty($row['merchant_id'])) {
                     $config['merchant_id'] = $row['merchant_id'];
                 }
