@@ -30,4 +30,10 @@ class BankGateway extends Model
     protected $casts = [
         'config' => 'array',
     ];
+
+    protected $fillable = [
+        'name',
+        'name_fa',
+        'config',
+    ];
 }

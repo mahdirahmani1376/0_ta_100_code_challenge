@@ -47,6 +47,7 @@ Route::namespace('Wallet')
 Route::namespace('BankGateway')
     ->prefix('bank-gateway')
     ->group(function () {
+        Route::get('/', 'IndexBankGatewayController');
         Route::post('/', 'StoreBankGatewayController');
         Route::get('{bankGateway}', 'ShowBankGatewayController');
     });
