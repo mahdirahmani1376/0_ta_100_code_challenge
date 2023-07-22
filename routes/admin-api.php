@@ -41,7 +41,6 @@ Route::namespace('Wallet')
                 Route::post('/', 'StoreCreditTransactionController');
                 Route::post('deduct-balance', 'DeductBalanceController');
             });
-
     });
 
 Route::namespace('BankGateway')
@@ -50,4 +49,5 @@ Route::namespace('BankGateway')
         Route::get('/', 'IndexBankGatewayController');
         Route::post('/', 'StoreBankGatewayController');
         Route::get('{bankGateway}', 'ShowBankGatewayController');
+        Route::put('{bankGateway}', 'UpdateBankGatewayController');
     });
