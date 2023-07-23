@@ -59,4 +59,5 @@ Route::namespace('OfflineTransaction')
         Route::get('/', 'IndexOfflineTransactionController');
         Route::post('', 'StoreOfflineTransactionController');
         Route::get('{offlineTransaction}', 'ShowOfflineTransactionController');
+        Route::delete('{offlineTransaction}', 'DeleteOfflineTransactionController');
     });
