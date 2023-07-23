@@ -17,6 +17,7 @@ class StoreOfflineTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'invoice_id' => ['required', 'exists:invoices,id',],
             'amount' => ['required', 'integer',],
             'payment_method' => ['required', 'string', Rule::in(OfflineTransaction::PAYMENT_METHODS),],
             'mobile' => ['nullable', new ValidIRMobile,],

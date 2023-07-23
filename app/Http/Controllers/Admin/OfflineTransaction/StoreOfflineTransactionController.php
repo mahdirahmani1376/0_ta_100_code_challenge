@@ -19,9 +19,9 @@ class StoreOfflineTransactionController
     /**
      * @throws \Exception
      */
-    public function __invoke(StoreOfflineTransactionRequest $request, Invoice $invoice)
+    public function __invoke(StoreOfflineTransactionRequest $request)
     {
-        $offlineTransaction = ($this->storeOfflineTransactionAction)($invoice, $request->validated());
+        $offlineTransaction = ($this->storeOfflineTransactionAction)($request->validated());
 
         return OfflineTransactionResource::make($offlineTransaction);
     }

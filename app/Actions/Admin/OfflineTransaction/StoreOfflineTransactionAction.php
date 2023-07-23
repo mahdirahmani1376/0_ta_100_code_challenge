@@ -3,19 +3,21 @@
 namespace App\Actions\Admin\OfflineTransaction;
 
 use App\Actions\Invoice\CalcInvoicePriceFieldsAction;
-use App\Models\Invoice;
+use App\Models\Transaction;
 use App\Services\Admin\OfflineTransaction\StoreOfflineTransactionService;
 use App\Services\Admin\Transaction\StoreTransactionService;
+use App\Services\Invoice\FindInvoiceByIdService;
 use Illuminate\Support\Facades\DB;
-use App\Models\Transaction;
 
 class StoreOfflineTransactionAction
 {
     private StoreOfflineTransactionService $storeOfflineTransactionService;
     private StoreTransactionService $storeTransactionService;
     private CalcInvoicePriceFieldsAction $calcInvoicePriceFieldsAction;
+    private FindInvoiceByIdService $findInvoiceByIdService;
 
     public function __construct(
+        FindInvoiceByIdService         $findInvoiceByIdService,
         StoreOfflineTransactionService $storeOfflineTransactionService,
         StoreTransactionService        $storeTransactionService,
         CalcInvoicePriceFieldsAction   $calcInvoicePriceFieldsAction,
@@ -24,10 +26,12 @@ class StoreOfflineTransactionAction
         $this->storeOfflineTransactionService = $storeOfflineTransactionService;
         $this->storeTransactionService = $storeTransactionService;
         $this->calcInvoicePriceFieldsAction = $calcInvoicePriceFieldsAction;
+        $this->findInvoiceByIdService = $findInvoiceByIdService;
     }
 
-    public function __invoke(Invoice $invoice, array $data)
+    public function __invoke(array $data)
     {
+        $invoice = ($this->findInvoiceByIdService)($data['invoice_id']);
         check_rahkaran($invoice);
 
         try {
