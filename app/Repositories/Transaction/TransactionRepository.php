@@ -34,4 +34,14 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->orderBy('created_at', 'desc')
             ->first('created_at');
     }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function findByTrackingCode($trackingCode): ?Transaction
+    {
+        return self::newQuery()
+            ->where('tracking_code', $trackingCode)
+            ->first();
+    }
 }
