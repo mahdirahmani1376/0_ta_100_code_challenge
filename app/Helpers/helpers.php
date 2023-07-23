@@ -45,3 +45,40 @@ if (!function_exists("check_rahkaran")) {
         }
     }
 }
+
+if (!function_exists('fa2en')) {
+    function fa2en($string)
+    {
+        return str_replace(
+            ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'],
+            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+            , $string);
+    }
+}
+
+if (!function_exists('clean_ir_mobile')) {
+    function clean_ir_mobile($input)
+    {
+        $number = fa2en($input);
+        $number = str_replace('+', '00', $number);
+        $number = preg_replace('/[\D]/', '', $number);
+
+        if (strpos($number, '00989') === 0 && strlen($number) === 14) {
+            return 0 . substr($number, 4, strlen($number));
+        }
+
+        if (strpos($number, '989') === 0 && strlen($number) === 12) {
+            return 0 . substr($number, 2, strlen($number));
+        }
+
+        if (strpos($number, '9') === 0 && strlen($number) === 10) {
+            return 0 . $number;
+        }
+
+        if (strpos($number, '09') === 0 && strlen($number) === 11) {
+            return $number;
+        }
+
+        return false;
+    }
+}

@@ -32,7 +32,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OfflineTransaction extends Model
 {
     use HasFactory;
+    public const PAYMENT_GATEWAY_NAME = 'offline_bank';
 
+    const PAYMENT_METHOD_OFFLINE_BANK = 'offline-bank';
+    const PAYMENT_METHOD_SHABA_NUMBER = 'shaba-number';
+    const PAYMENT_METHOD_CARD_TO_CARD = 'card-to-card';
+    const PAYMENT_METHOD_ACCOUNT_NUMBER = 'account-number';
+    const PAYMENT_METHODS = [
+        self::PAYMENT_METHOD_OFFLINE_BANK,
+        self::PAYMENT_METHOD_SHABA_NUMBER,
+        self::PAYMENT_METHOD_CARD_TO_CARD,
+        self::PAYMENT_METHOD_ACCOUNT_NUMBER,
+    ];
     const STATUS_PENDING = 'pending'; // old status = 0
     const STATUS_CONFIRMED = 'confirmed';// old status = 1
     const STATUS_REJECTED = 'rejected';// old status = 2
@@ -53,7 +64,6 @@ class OfflineTransaction extends Model
         'payment_method',
         'tracking_code',
         'mobile',
-        'account_name',
         'description',
     ];
 

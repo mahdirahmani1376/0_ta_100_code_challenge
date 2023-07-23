@@ -20,7 +20,7 @@ class StoreTransactionService
     {
         $data['invoice_id'] = $invoice->getKey();
         $data['client_id'] = $invoice->client_id;
-        $data['status'] = Transaction::STATUS_SUCCESS;
+        $data['status'] = $data['status'] ?? Transaction::STATUS_SUCCESS;
         if (empty($data['created_at'])) {
             $data['created_at'] = now();
         }

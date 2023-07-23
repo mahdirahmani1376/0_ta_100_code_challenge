@@ -57,4 +57,5 @@ Route::namespace('OfflineTransaction')
     ->prefix('offline-transaction')
     ->group(function () {
         Route::get('/', 'IndexOfflineTransactionController');
+        Route::post('{invoice}', 'StoreOfflineTransactionController');
     });

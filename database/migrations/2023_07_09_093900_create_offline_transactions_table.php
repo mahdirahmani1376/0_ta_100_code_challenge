@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('tracking_code')->nullable();
             $table->string('mobile')->nullable();
-            $table->string('account_name')->nullable();
             $table->text('description')->nullable();
         });
     }

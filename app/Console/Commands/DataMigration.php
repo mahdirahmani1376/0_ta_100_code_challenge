@@ -455,7 +455,6 @@ class DataMigration extends Command
                 $newRow['payment_method'] = $row['payment_method'];
                 $newRow['tracking_code'] = $row['tracking_code'];
                 $newRow['mobile'] = $row['mobile'];
-                $newRow['account_name'] = $row['account_name'];
                 $newRow['description'] = $row['description'];
 
                 return $newRow;
