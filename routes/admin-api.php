@@ -61,4 +61,5 @@ Route::namespace('OfflineTransaction')
         Route::get('{offlineTransaction}', 'ShowOfflineTransactionController');
         Route::delete('{offlineTransaction}', 'DeleteOfflineTransactionController');
         Route::Put('{offlineTransaction}', 'UpdateOfflineTransactionController');
+        Route::get('{offlineTransaction}/similar', 'IndexSimilarOfflineTransactionController');
     });

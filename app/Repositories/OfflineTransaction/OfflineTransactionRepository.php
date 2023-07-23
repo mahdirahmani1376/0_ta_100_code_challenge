@@ -42,4 +42,21 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
 
         return self::paginate($query);
     }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function adminIndexSimilar(OfflineTransaction $offlineTransaction): LengthAwarePaginator
+    {
+        $query = self::newQuery()
+            ->where('id', '<>', $offlineTransaction->getKey())
+            ->where('amount', $offlineTransaction->amount)
+            ->whereDate('paid_at', $offlineTransaction->paid_at)
+            ->orderBy(
+                $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
+                $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+            );
+
+        return self::paginate($query);
+    }
 }
