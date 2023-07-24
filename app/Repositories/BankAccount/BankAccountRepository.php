@@ -28,8 +28,8 @@ class BankAccountRepository extends BaseRepository implements BankAccountReposit
             });
         }
         $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+            $data['sort'] ?? 'display_order',
+            $data['sortDirection'] ?? 'asc',
         );
 
         return self::paginate($query);
