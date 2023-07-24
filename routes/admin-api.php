@@ -87,4 +87,5 @@ Route::namespace('ClientBankAccount')
     ->group(function () {
         Route::get('/', 'IndexClientBankAccountController');
         Route::post('/', 'StoreClientBankAccountController');
+        Route::put('{clientBankAccount}', 'UpdateClientBankAccountController');
     });
