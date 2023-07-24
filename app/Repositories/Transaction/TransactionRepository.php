@@ -7,6 +7,9 @@ use App\Models\Transaction;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class TransactionRepository extends BaseRepository implements TransactionRepositoryInterface
 {
@@ -43,5 +46,61 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         return self::newQuery()
             ->where('tracking_code', $trackingCode)
             ->first();
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function adminIndex(array $data): Collection|LengthAwarePaginator
+    {
+        $query = self::newQuery();
+
+        if (!empty($data['search'])) {
+            $query->where(function (Builder $query) use ($data) {
+                return $query->where('reference_id', 'LIKE', '%' . empty($data['search']) . '%')
+                    ->orWhere('id', '%' . empty($data['search']) . '%')
+                    ->orWhere('invoice_id', 'LIKE', '%' . empty($data['search']) . '%')
+                    ->orWhere('tracking_code', 'LIKE', '%' . empty($data['search']) . '%')
+                    ->orWhere("description", "LIKE", '%' . empty($data['search']) . '%');
+            });
+        }
+
+        if (!empty($data['date'])) {
+            $query->whereDate('created_at', '=', $data['date']);
+        }
+        if (!empty($data['status'])) {
+            $query->where('status', '=', $data['status']);
+        }
+        if (!empty($data['tracking_code'])) {
+            $query->where('tracking_code', '=', $data['tracking_code']);
+        }
+        if (!empty($data['reference_id'])) {
+            $query->where('reference_id', '=', $data['reference_id']);
+        }
+        if (!empty($data['payment_method'])) {
+            $query->where('payment_method', '=', $data['payment_method']);
+        }
+        if (!empty($data['invoice_id'])) {
+            $query->where('invoice_id', '=', $data['invoice_id']);
+        }
+        if (!empty($data['client_id'])) {
+            $query->where('client_id', '=', $data['client_id']);
+        }
+        if (!empty($data['to_date'])) {
+            $query->whereDate('created_at', '<=', $data['to_date']);
+        }
+        if (!empty($data['from_date'])) {
+            $query->whereDate('created_at', '>=', $data['from_date']);
+        }
+        $query->orderBy(
+            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
+            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+        );
+
+        if (isset($data['export']) && $data['export']) {
+            return $query->get();
+        }
+
+        return $this->paginate($query);
     }
 }

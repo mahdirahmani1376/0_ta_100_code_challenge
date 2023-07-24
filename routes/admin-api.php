@@ -25,10 +25,17 @@ Route::namespace('Invoice')
                 Route::delete('{item}', 'DeleteItemController');
             });
         Route::namespace('Transaction')
-            ->prefix('{invoice}/transaction')
+            ->prefix('transaction')
             ->group(function () {
-                Route::post('/', 'StoreTransactionController');
+                Route::post('{invoice}', 'StoreTransactionController');
+                Route::get('/', 'IndexTransactionController');
             });
+    });
+
+Route::namespace('Invoice\Transaction')
+    ->prefix('transaction')
+    ->group(function () {
+        Route::get('/', 'IndexTransactionController');
     });
 
 Route::namespace('Wallet')
@@ -57,7 +64,7 @@ Route::namespace('OfflineTransaction')
     ->prefix('offline-transaction')
     ->group(function () {
         Route::get('/', 'IndexOfflineTransactionController');
-        Route::post('', 'StoreOfflineTransactionController');
+        Route::post('/', 'StoreOfflineTransactionController');
         Route::get('{offlineTransaction}', 'ShowOfflineTransactionController');
         Route::delete('{offlineTransaction}', 'DeleteOfflineTransactionController');
         Route::Put('{offlineTransaction}', 'UpdateOfflineTransactionController');
