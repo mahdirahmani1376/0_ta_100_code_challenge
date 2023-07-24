@@ -96,4 +96,5 @@ Route::namespace('ClientCashout')
         Route::get('/', 'IndexClientCashoutController');
         Route::post('/', 'StoreClientCashoutController');
         Route::get('{clientCashout}', 'ShowClientCashoutController');
+        Route::put('{clientCashout}', 'UpdateClientCashoutController');
     });

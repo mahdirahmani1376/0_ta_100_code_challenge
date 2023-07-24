@@ -26,6 +26,10 @@ class StoreClientCashoutRequest extends FormRequest
                 'required',
                 'numeric',
             ],
+            'amount' => [
+                'nullable',
+                'numeric',
+            ],
         ];
     }
 }
