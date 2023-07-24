@@ -62,7 +62,6 @@ Route::namespace('Wallet')
             });
     });
 
-
 Route::namespace('BankGateway')
     ->prefix('bank-gateway')
     ->group(function () {
@@ -73,3 +72,8 @@ Route::namespace('BankGateway')
         Route::delete('{bankGateway}', 'DeleteBankGatewayController');
     });
 
+Route::namespace('BankAccount')
+    ->prefix('bank-account')
+    ->group(function () {
+        Route::get('/', 'IndexBankAccountController');
+    });
