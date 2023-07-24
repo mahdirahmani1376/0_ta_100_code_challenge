@@ -94,5 +94,6 @@ Route::namespace('ClientCashout')
     ->prefix('client-cashout')
     ->group(function () {
         Route::get('/', 'IndexClientCashoutController');
+        Route::post('/', 'StoreClientCashoutController');
         Route::get('{clientCashout}', 'ShowClientCashoutController');
     });
