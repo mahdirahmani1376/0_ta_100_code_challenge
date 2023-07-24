@@ -78,4 +78,6 @@ Route::namespace('BankAccount')
         Route::get('/', 'IndexBankAccountController');
         Route::post('/', 'StoreBankAccountController');
         Route::put('{bankAccount}', 'UpdateBankAccountController');
+        Route::delete('{bankAccount}', 'UpdateBankAccountController');
+        Route::get('{bankAccount}', 'ShowBankAccountController');
     });
