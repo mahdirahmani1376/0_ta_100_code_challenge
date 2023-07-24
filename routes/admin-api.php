@@ -86,4 +86,5 @@ Route::namespace('ClientBankAccount')
     ->prefix('client-bank-account')
     ->group(function () {
         Route::get('/', 'IndexClientBankAccountController');
+        Route::post('/', 'StoreClientBankAccountController');
     });
