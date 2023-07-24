@@ -81,3 +81,9 @@ Route::namespace('BankAccount')
         Route::get('{bankAccount}', 'ShowBankAccountController');
         Route::delete('{bankAccount}', 'DeleteBankAccountController');
     });
+
+Route::namespace('ClientBankAccount')
+    ->prefix('client-bank-account')
+    ->group(function () {
+        Route::get('/', 'IndexClientBankAccountController');
+    });
