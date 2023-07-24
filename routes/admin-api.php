@@ -38,17 +38,30 @@ Route::namespace('Invoice\Transaction')
         Route::get('/', 'IndexTransactionController');
     });
 
-Route::namespace('Wallet')
-    ->prefix('wallet/{clientId}')
+Route::namespace('OfflineTransaction')
+    ->prefix('offline-transaction')
     ->group(function () {
-        Route::get('/', 'ShowWalletController');
-        Route::get('list', 'ShowWalletAndTransactionController');
-        Route::prefix('credit-transaction')
+        Route::get('/', 'IndexOfflineTransactionController');
+        Route::post('/', 'StoreOfflineTransactionController');
+        Route::get('{offlineTransaction}', 'ShowOfflineTransactionController');
+        Route::delete('{offlineTransaction}', 'DeleteOfflineTransactionController');
+        Route::Put('{offlineTransaction}', 'UpdateOfflineTransactionController');
+        Route::get('{offlineTransaction}/similar', 'IndexSimilarOfflineTransactionController');
+    });
+
+Route::namespace('Wallet')
+    ->prefix('wallet')
+    ->group(function () {
+        Route::get('credit-transaction', 'IndexCreditTransactionController');
+        Route::get('{clientId}', 'ShowWalletController');
+        Route::get('{clientId}/list', 'ShowWalletAndTransactionController');
+        Route::prefix('{clientId}/credit-transaction')
             ->group(function () {
                 Route::post('/', 'StoreCreditTransactionController');
                 Route::post('deduct-balance', 'DeductBalanceController');
             });
     });
+
 
 Route::namespace('BankGateway')
     ->prefix('bank-gateway')
@@ -60,13 +73,3 @@ Route::namespace('BankGateway')
         Route::delete('{bankGateway}', 'DeleteBankGatewayController');
     });
 
-Route::namespace('OfflineTransaction')
-    ->prefix('offline-transaction')
-    ->group(function () {
-        Route::get('/', 'IndexOfflineTransactionController');
-        Route::post('/', 'StoreOfflineTransactionController');
-        Route::get('{offlineTransaction}', 'ShowOfflineTransactionController');
-        Route::delete('{offlineTransaction}', 'DeleteOfflineTransactionController');
-        Route::Put('{offlineTransaction}', 'UpdateOfflineTransactionController');
-        Route::get('{offlineTransaction}/similar', 'IndexSimilarOfflineTransactionController');
-    });

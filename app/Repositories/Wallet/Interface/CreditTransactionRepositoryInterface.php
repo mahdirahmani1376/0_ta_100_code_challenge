@@ -10,4 +10,6 @@ interface CreditTransactionRepositoryInterface extends EloquentRepositoryInterfa
     public function indexByClientId(int $clientId): LengthAwarePaginator;
 
     public function sum(int $clientId): int;
+
+    public function adminIndex(array $data): LengthAwarePaginator;
 }
