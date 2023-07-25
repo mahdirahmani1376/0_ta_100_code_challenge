@@ -45,6 +45,14 @@ class InvoiceNumber extends Model
         self::TYPE_REFUND,
     ];
 
+    protected $fillable = [
+        'id',
+        'invoice_number',
+        'fiscal_year',
+        'type',
+        'invoice_id',
+    ];
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);

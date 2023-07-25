@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int client_id
  * @property int rahkaran_id
  * @property string payment_method
+ * @property int balance
  * @property int total
  * @property int sub_total
  * @property int tax_rate
@@ -29,7 +31,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int admin_id
  * @property boolean is_credit
  *
+ * @property Collection items
  * @property InvoiceNumber invoiceNumber
+ * @property Collection transactions
+ * @property Collection offlineTransactions
  */
 class Invoice extends Model
 {
@@ -55,7 +60,12 @@ class Invoice extends Model
         self::STATUS_COLLECTIONS,
     ];
 
+    const PAYMENT_METHOD_CREDIT = 'client_credit';
+
+    const DEFAULT_TAX_RATE = 11;
+
     protected $fillable = [
+        'created_at',
         'due_date',
         'paid_at',
         'client_id',
@@ -87,5 +97,15 @@ class Invoice extends Model
     public function invoiceNumber(): HasOne
     {
         return $this->hasOne(InvoiceNumber::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function offlineTransactions(): HasMany
+    {
+        return $this->hasMany(OfflineTransaction::class);
     }
 }

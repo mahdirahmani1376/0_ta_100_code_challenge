@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Admin\Invoice;
 
+use App\Http\Resources\Admin\Transaction\TransactionResource;
 use App\Models\Invoice;
-use App\Repositories\Invoice\InvoiceNumberRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,13 +15,14 @@ class InvoiceResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
             'due_date' => $this->due_date?->toDateTimeString(),
             'paid_at' => $this->paid_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'rahkaran_id' => $this->rahkaran_id,
             'payment_method' => $this->payment_method,
+            'balance' => $this->balance,
             'total' => $this->total,
             'sub_total' => $this->sub_total,
             'tax_rate' => $this->tax_rate,
@@ -31,6 +32,8 @@ class InvoiceResource extends JsonResource
             'admin_id' => $this->admin_id,
             'is_credit' => $this->is_credit,
             'invoice_number' => InvoiceNumberResource::make($this->invoiceNumber),
+            'transactions' => TransactionResource::collection($this->transactions),
+            'items' => ItemResource::collection($this->items),
         ];
     }
 }

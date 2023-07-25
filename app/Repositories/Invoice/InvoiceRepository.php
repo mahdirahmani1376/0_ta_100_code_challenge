@@ -6,8 +6,9 @@ use App\Models\Invoice;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection;
 
 class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInterface
 {
@@ -16,7 +17,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
     /**
      * @throws BindingResolutionException
      */
-    public function adminIndex(array $data, array $paginationParam)
+    public function adminIndex(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
 
@@ -76,6 +77,6 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             return $query->get();
         }
 
-        return $query->paginate($paginationParam['perPage']);
+        return $this->paginate($query);
     }
 }

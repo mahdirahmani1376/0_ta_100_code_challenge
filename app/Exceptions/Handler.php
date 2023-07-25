@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use App\Exceptions\Base\BaseSystemException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +28,24 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof BaseSystemException) {
+            return $this->generateJsonResponseForSystemException($e);
+        }
+
+        return parent::render($request, $e);
+    }
+
+    protected function generateJsonResponseForSystemException(BaseSystemException $exception): JsonResponse
+    {
+        return response()->json([
+            'code'      => $exception->getCode(),
+            'logRef'    => $exception->getLogRef(),
+            'errorCode' => $exception->getErrorCode(),
+            'message'   => __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams())
+        ], $exception->getCode());
     }
 }

@@ -35,6 +35,13 @@ class ClientCashout extends Model
     const STATUS_PAYOUT_COMPLETE = 'complete';
     const STATUS_REJECTED = 'rejected';
 
+    const STATUSES = [
+        self::STATUS_ACTIVE,
+        self::STATUS_PENDING,
+        self::STATUS_PAYOUT_COMPLETE,
+        self::STATUS_REJECTED,
+    ];
+
     public function clientBankAccount(): BelongsTo
     {
         return $this->belongsTo(ClientBankAccount::class);

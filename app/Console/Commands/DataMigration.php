@@ -96,6 +96,7 @@ class DataMigration extends Command
                     $newRow['deleted_at'] = Carbon::now();
                 }
                 $config = [];
+                $config['status'] = $row['status'];
                 if (!empty($row['merchant_id'])) {
                     $config['merchant_id'] = $row['merchant_id'];
                 }
@@ -302,6 +303,7 @@ class DataMigration extends Command
                 $newRow['paid_at'] = $row['paid_date'];
                 $newRow['rahkaran_id'] = $row['rahkaran_id'];
                 $newRow['payment_method'] = $row['payment_method'];
+                $newRow['balance'] = $row['balance'];
                 $newRow['total'] = $row['total'];
                 $newRow['sub_total'] = $row['sub_total'];
                 $newRow['tax_rate'] = 9;
@@ -408,7 +410,7 @@ class DataMigration extends Command
                                 FROM offline_payments
                                 LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
                                 LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                WHERE invoices.client_id IS NOT NULL');
+                                WHERE invoices.client_id IS NULL');
             if (!empty($abnormalData)) {
                 $this->error('SKIPPING ABNORMAL DATA (transactions.id):');
                 collect((array)$abnormalData)->each(function ($row) {
@@ -439,6 +441,8 @@ class DataMigration extends Command
                 $newRow['client_id'] = $row['i_client_id'];
                 $newRow['invoice_id'] = $row['i_invoice_id'];
                 $newRow['bank_account_id'] = $row['bank_account_id'];
+                $newRow['admin_id'] = $row['admin_user_id'];
+                $newRow['amount'] = strlen($row['amount']) > 0 ? $row['amount'] : 0;
                 if ($row['status'] == 0) {
                     $newRow['status'] = OfflineTransaction::STATUS_PENDING;
                 } elseif ($row['status'] == 1) {

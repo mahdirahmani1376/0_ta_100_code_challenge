@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Invoice;
 
+use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\ItemRepositoryInterface;
@@ -31,5 +32,15 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
         $query->limit($limit);
 
         return $query->get();
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function sumAmountByInvoice(Invoice $invoice): int
+    {
+        return $this->newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->sum('amount');
     }
 }

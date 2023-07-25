@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string sheba_number
  * @property string account_number
  * @property string card_number
+ * @property string status
  */
 class ClientBankAccount extends Model
 {
@@ -31,4 +32,10 @@ class ClientBankAccount extends Model
     const STATUS_ACTIVE = 'active';
     const STATUS_PENDING = 'pending';
     const STATUS_REJECTED = 'rejected';
+
+    const STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_ACTIVE,
+        self::STATUS_REJECTED,
+    ];
 }

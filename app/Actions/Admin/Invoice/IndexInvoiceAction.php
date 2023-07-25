@@ -19,13 +19,13 @@ class IndexInvoiceAction
         $this->listItemByCriteriaService = $listItemByCriteriaService;
     }
 
-    public function __invoke(array $data, array $paginationParam)
+    public function __invoke(array $data)
     {
         $items = ($this->listItemByCriteriaService)($data);
         if ($items->isNotEmpty()) {
             $data['item_invoice_ids'] = $items->pluck('invoice_id')->unique()->toArray();
         }
 
-        return ($this->indexInvoiceService)($data, $paginationParam);
+        return ($this->indexInvoiceService)($data);
     }
 }

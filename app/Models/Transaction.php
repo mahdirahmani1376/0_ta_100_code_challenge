@@ -29,6 +29,7 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    const PAYMENT_METHOD_OFFLINE = 'offline';
     const STATUS_PENDING = 'pending'; // old status = 0
     const STATUS_SUCCESS = 'success'; // old status = 1
     const STATUS_FAIL = 'fail'; // old status = 2
@@ -40,6 +41,19 @@ class Transaction extends Model
         self::STATUS_FAIL,
         self::STATUS_REFUND,
         self::STATUS_PENDING_BANK_VERIFY,
+    ];
+
+    protected $fillable = [
+        'client_id',
+        'invoice_id',
+        'rahkaran_id',
+        'amount',
+        'status',
+        'payment_method',
+        'description',
+        'ip',
+        'tracking_code',
+        'reference_id',
     ];
 
     public function invoice(): BelongsTo

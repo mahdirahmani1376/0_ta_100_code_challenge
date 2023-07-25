@@ -9,7 +9,6 @@ namespace App\Exceptions\Base;
 class ExceptionTypes
 {
     public const TYPE_ACTION     = 1;
-
     public const TYPE_SERVICE    = 2;
     public const TYPE_REPOSITORY = 3;
     public const TYPE_MODEL      = 4;

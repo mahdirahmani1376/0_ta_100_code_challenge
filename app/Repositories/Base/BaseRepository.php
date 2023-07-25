@@ -6,6 +6,7 @@ namespace App\Repositories\Base;
 use App\Exceptions\Repository\DeleteModelException;
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -19,8 +20,6 @@ use Throwable;
 class BaseRepository implements EloquentRepositoryInterface
 {
     public string $model;
-
-    public array $fillable = [];
     public const DEFAULT_SORT_COLUMN = 'id';
     public const DEFAULT_SORT_COLUMN_DIRECTION = 'desc';
 
@@ -45,7 +44,7 @@ class BaseRepository implements EloquentRepositoryInterface
         if (!empty($fillable)) {
             $object->fillable($fillable);
         } else {
-            $object->fillable($this->fillable);
+            $object->fillable($object->getFillable());
         }
 
         return $object->fill($attributes);
@@ -60,6 +59,14 @@ class BaseRepository implements EloquentRepositoryInterface
         $this->fill($object, $attributes, $fillable)->save();
 
         return $object;
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function find(int $id): Model
+    {
+        return self::newQuery()->find($id);
     }
 
     public function update(Model $object, array $attributes, array $fillable = []): Model
@@ -86,7 +93,14 @@ class BaseRepository implements EloquentRepositoryInterface
      */
     public function all(): Collection
     {
-        return $this->newInstance()->newQuery()->get();
+        return $this->newQuery()->get();
+    }
+
+    public function paginate(Builder $query): LengthAwarePaginator
+    {
+        return $query->paginate(
+            get_paginate_params()['perPage']
+        );
     }
 
     /**

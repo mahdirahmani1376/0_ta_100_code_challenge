@@ -16,8 +16,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedInteger('invoice_id');
-            $table->unsignedInteger('invoiceable_id');
-            $table->string('invoiceable_type');
+            $table->unsignedInteger('invoiceable_id')->nullable();
+            $table->string('invoiceable_type')->nullable();
             $table->double('amount')
                 ->comment('can be negative');
             $table->double('discount')

@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -19,9 +21,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string name
  * @property float balance
  * @property boolean is_active
+ *
+ * @property Collection creditTransactions
  */
 class Wallet extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    const WALLET_DEFAULT_NAME = 'client';
+
+    protected $fillable = [
+        'client_id',
+        'name',
+        'balance',
+        'is_active',
+    ];
+
+    public function creditTransactions(): HasMany
+    {
+        return $this->hasMany(CreditTransaction::class);
+    }
 }
