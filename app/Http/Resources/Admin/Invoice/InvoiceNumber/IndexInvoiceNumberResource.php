@@ -15,7 +15,6 @@ class IndexInvoiceNumberResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
-            'deleted_at' => $this->deleted_at?->toDateTimeString(),
             'invoice_id' => $this->invoice_id,
             'invoice_number' => $this->invoice_number,
             'fiscal_year' => $this->fiscal_year,

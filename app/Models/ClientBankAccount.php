@@ -38,4 +38,15 @@ class ClientBankAccount extends Model
         self::STATUS_ACTIVE,
         self::STATUS_REJECTED,
     ];
+
+    protected $fillable = [
+        'client_id',
+        'zarinpal_bank_account_id',
+        'bank_name',
+        'owner_name',
+        'sheba_number',
+        'account_number',
+        'card_number',
+        'status',
+    ];
 }

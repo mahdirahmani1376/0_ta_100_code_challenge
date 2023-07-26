@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Admin\BankGateway;
+namespace App\Http\Resources\Public\BankGateway;
 
 use App\Models\BankGateway;
 use Illuminate\Http\Request;
@@ -17,7 +17,6 @@ class BankGatewayResource extends JsonResource
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'name' => $this->name,
             'name_fa' => $this->name_fa,
-            'config' => $this->config,
         ];
     }
 }

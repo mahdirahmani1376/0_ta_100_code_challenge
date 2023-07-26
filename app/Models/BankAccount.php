@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon updated_at
  * @property Carbon deleted_at
  * @property string title
+ * @property string status
  * @property int display_order
  * @property string sheba_number
  * @property string account_number
@@ -26,4 +27,16 @@ class BankAccount extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
+
+    protected $fillable = [
+        'title',
+        'display_order',
+        'sheba_number',
+        'account_number',
+        'card_number',
+        'rahkaran_id',
+    ];
 }

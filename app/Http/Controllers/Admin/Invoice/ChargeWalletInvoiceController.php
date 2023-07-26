@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Invoice;
 
 use App\Actions\Admin\Invoice\ChargeWalletInvoiceAction;
+use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Http\Requests\Admin\Invoice\ChargeWalletInvoiceRequest;
 use App\Http\Resources\Admin\Invoice\InvoiceResource;
 
@@ -16,7 +17,7 @@ class ChargeWalletInvoiceController
     }
 
     /**
-     * @throws \Exception
+     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(ChargeWalletInvoiceRequest $request)
     {

@@ -15,11 +15,13 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedInteger('invoice_id')->nullable();
+            $table->unsignedBigInteger('invoice_id')->nullable();
             $table->string('invoice_number');
             $table->string('fiscal_year');
             $table->string('status')->default(InvoiceNumber::STATUS_UNUSED);
             $table->string('type')->default(InvoiceNumber::TYPE_PAID);
+
+            $table->foreign('invoice_id')->references('id')->on('invoices');
         });
     }
 

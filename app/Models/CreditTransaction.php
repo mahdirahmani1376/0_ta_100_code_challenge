@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int id
  * @property Carbon created_at
- * @property Carbon updated
+ * @property Carbon updated_at
  * @property int client_id
  * @property int wallet_id
  * @property int invoice_id
@@ -24,6 +24,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CreditTransaction extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'client_id',
+        'wallet_id',
+        'invoice_id',
+        'admin_id',
+        'amount',
+        'description',
+    ];
 
     public function invoice(): BelongsTo
     {

@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->unsignedInteger('client_id');
-            $table->unsignedInteger('wallet_id');
-            $table->unsignedInteger('invoice_id')->nullable();
-            $table->unsignedInteger('admin_id')->nullable();
+            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('wallet_id');
+            $table->unsignedBigInteger('invoice_id')->nullable();
+            $table->unsignedBigInteger('admin_id')->nullable();
             $table->double('amount')->comment('can be negative');
             $table->text('description')->nullable();
+
+            $table->foreign('invoice_id')->references('id')->on('invoices');
+            $table->foreign('wallet_id')->references('id')->on('wallets');
         });
     }
 

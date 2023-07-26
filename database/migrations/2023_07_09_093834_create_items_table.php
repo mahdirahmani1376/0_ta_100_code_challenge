@@ -15,17 +15,18 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedInteger('invoice_id');
+            $table->unsignedBigInteger('invoice_id');
             $table->unsignedInteger('invoiceable_id')->nullable();
             $table->string('invoiceable_type')->nullable();
-            $table->double('amount')
-                ->comment('can be negative');
+            $table->double('amount');
             $table->double('discount')
                 ->nullable()
                 ->comment('non-computation field, serves only as to show on reports');
             $table->timestamp('from_date')->nullable();
             $table->timestamp('to_date')->nullable();
             $table->text('description')->nullable();
+
+            $table->foreign('invoice_id')->references('id')->on('invoices');
         });
     }
 

@@ -8,6 +8,7 @@ use App\Repositories\Base\BaseRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class BankGatewayRepository extends BaseRepository implements BankGatewayRepositoryInterface
 {
@@ -35,4 +36,14 @@ class BankGatewayRepository extends BaseRepository implements BankGatewayReposit
 
         return self::paginate($query);
     }
+
+    public function all(bool $isAdmin = false): Collection
+    {
+        return $this->newQuery()
+            ->when(!$isAdmin, function (Builder $builder) {
+                $builder->where('status', BankGateway::STATUS_ACTIVE);
+            })
+            ->get();
+    }
+
 }

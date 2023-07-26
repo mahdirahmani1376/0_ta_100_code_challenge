@@ -1,23 +1,18 @@
 <?php
 
-namespace App\Actions\Invoice;
+namespace App\Services\Invoice;
 
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Models\Invoice;
-use App\Services\Invoice\CalcInvoiceBalanceService;
-use App\Services\Invoice\ChangeInvoiceStatusService;
+use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 
-/**
- * This Action calculates invoice's balance and if the invoice is paid in full
- * and some conditions are met it will try to sync some data from main app like giving the client her product (Hosting,Domain...)
- */
-class ProcessInvoiceAction
+class ProcessInvoiceService
 {
-    private ChangeInvoiceStatusService $changeInvoiceStatusService;
+    private InvoiceRepositoryInterface $invoiceRepository;
 
-    public function __construct(ChangeInvoiceStatusService $changeInvoiceStatusService)
+    public function __construct(InvoiceRepositoryInterface $invoiceRepository)
     {
-        $this->changeInvoiceStatusService = $changeInvoiceStatusService;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     /**
@@ -32,7 +27,7 @@ class ProcessInvoiceAction
             $invoice->total > 0
         ) {
             // TODO dispatch paid invoice job
-            $invoice = ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
+            $invoice = $this->invoiceRepository->update($invoice, ['status' => Invoice::STATUS_PAID,], ['status',]);
         }
 
         check_rahkaran($invoice);

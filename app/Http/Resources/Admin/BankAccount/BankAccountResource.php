@@ -15,7 +15,6 @@ class BankAccountResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
-            'deleted_at' => $this->deleted_at?->toDateTimeString(),
             'display_order' => $this->display_order,
             'title' => $this->title,
             'sheba_number' => $this->sheba_number,

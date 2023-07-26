@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Invoice;
 
+use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Models\Invoice;
 
 class ChargeWalletInvoiceAction
@@ -13,9 +14,6 @@ class ChargeWalletInvoiceAction
         $this->storeInvoiceAction = $storeInvoiceAction;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function __invoke(int $clientId, int $amount)
     {
         $data = [

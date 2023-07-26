@@ -15,16 +15,19 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->timestamp('paid_at')->nullable();
-            $table->unsignedInteger('client_id');
-            $table->unsignedInteger('invoice_id');
-            $table->unsignedInteger('bank_account_id');
-            $table->unsignedInteger('admin_id')->nullable();
+            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('invoice_id');
+            $table->unsignedBigInteger('bank_account_id');
+            $table->unsignedBigInteger('admin_id')->nullable();
             $table->double('amount');
             $table->string('status');
             $table->string('payment_method');
             $table->string('tracking_code')->nullable();
             $table->string('mobile')->nullable();
             $table->text('description')->nullable();
+
+            $table->foreign('invoice_id')->references('id')->on('invoices');
+            $table->foreign('bank_account_id')->references('id')->on('bank_accounts');
         });
     }
 

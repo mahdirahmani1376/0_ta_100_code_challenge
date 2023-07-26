@@ -20,8 +20,8 @@ class IndexBankGatewayService
     /**
      * @throws BindingResolutionException
      */
-    public function __invoke(): Collection
+    public function __invoke(bool $isAdmin = false): Collection
     {
-        return $this->bankGatewayRepository->all();
+        return $this->bankGatewayRepository->all($isAdmin);
     }
 }
