@@ -17,7 +17,7 @@ class DeleteBankAccountController
 
     public function __invoke(BankAccount $bankAccount)
     {
-        $bankAccount = ($this->deleteBankAccountAction)($bankAccount);
+        ($this->deleteBankAccountAction)($bankAccount);
 
         return response()->json([], Response::HTTP_ACCEPTED);
     }
