@@ -15,7 +15,6 @@ class ClientBankAccountResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
             'client_id' => $this->client_id,
             'zarinpal_bank_account_id' => $this->zarinpal_bank_account_id,
             'bank_name' => $this->bank_name,

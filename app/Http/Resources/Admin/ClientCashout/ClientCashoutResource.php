@@ -15,7 +15,6 @@ class ClientCashoutResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
             'client_id' => $this->client_id,
             'client_bank_account_id' => $this->client_bank_account_id,
             'zarinpal_payout_id' => $this->zarinpal_payout_id,

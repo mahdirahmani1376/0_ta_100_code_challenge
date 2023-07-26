@@ -15,7 +15,6 @@ class BankGatewayResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
-            'deleted_at' => $this->deleted_at?->toDateTimeString(),
             'name' => $this->name,
             'name_fa' => $this->name_fa,
             'config' => $this->config,

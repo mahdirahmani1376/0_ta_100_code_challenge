@@ -18,7 +18,6 @@ class ShowWalletAndTransactionResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
-            'deleted_at' => $this->deleted_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'name' => $this->name,
             'balance' => $this->balance,
