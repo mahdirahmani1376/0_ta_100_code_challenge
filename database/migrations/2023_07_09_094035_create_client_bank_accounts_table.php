@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedInteger('client_id');
+            $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('zarinpal_bank_account_id')->nullable();
             $table->string('bank_name')->nullable();
             $table->string('owner_name')->nullable();

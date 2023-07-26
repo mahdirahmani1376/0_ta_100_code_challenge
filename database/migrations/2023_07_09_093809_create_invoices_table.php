@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->timestamp('due_date')->nullable();
             $table->timestamp('paid_at')->nullable();
-            $table->unsignedInteger('client_id');
+            $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('rahkaran_id')->nullable();
             $table->string('payment_method');
             $table->double('balance')->default(0);
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->double('tax')->default(0);
             $table->string('status');
             $table->boolean('is_mass_payment')->default(false);
-            $table->unsignedInteger('admin_id')->nullable();
+            $table->unsignedBigInteger('admin_id')->nullable();
             $table->boolean('is_credit')->default(false);
         });
     }
