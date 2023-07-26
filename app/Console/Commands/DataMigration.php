@@ -27,11 +27,11 @@ class DataMigration extends Command
     {
         self::migrateBankAccount();
         self::migrateBankGateway();
+        self::migrateWallet();
+        self::migrateInvoice();
         self::migrateClientBankAccount();
         self::migrateClientCashout();
-        self::migrateWallet();
         self::migrateCreditTransaction();
-        self::migrateInvoice();
         self::migrateItem();
         self::migrateOfflineTransaction();
         self::migrateTransaction();
@@ -65,7 +65,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($bankAccountTableName)->truncate();
+//            DB::table($bankAccountTableName)->truncate();
             $this->info("Truncated $bankAccountTableName");
             DB::table($bankAccountTableName)->insert($newBankAccounts);
             $this->info("End of data migrate for $bankAccountTableName");
@@ -126,7 +126,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -164,7 +164,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -202,7 +202,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -234,7 +234,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -274,7 +274,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -338,7 +338,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -379,7 +379,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
@@ -460,7 +460,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -534,7 +534,7 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-            DB::table($tableName)->truncate();
+//            DB::table($tableName)->truncate();
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
