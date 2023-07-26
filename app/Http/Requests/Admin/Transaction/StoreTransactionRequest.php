@@ -48,7 +48,7 @@ class StoreTransactionRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'payment_method' => [
                 'required',
-                Rule::in(($indexBankGatewayService())->pluck('name')->toArray())
+                Rule::in(($indexBankGatewayService(true))->pluck('name')->toArray())
             ],
             'tracking_code' => ['required', 'string'],
             'created_at' => [

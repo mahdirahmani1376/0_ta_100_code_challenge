@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon deleted_at
  * @property string name
  * @property string name_fa
+ * @property string status
  * @property array config
  */
 class BankGateway extends Model

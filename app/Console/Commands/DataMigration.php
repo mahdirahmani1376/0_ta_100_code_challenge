@@ -56,7 +56,11 @@ class DataMigration extends Command
                 $newRow['display_order'] = $row['order'];
                 if ($row['active'] == 0) {
                     $newRow['deleted_at'] = Carbon::now();
+                    $newRow['status'] = BankAccount::STATUS_INACTIVE;
+                } else {
+                    $newRow['status'] = BankAccount::STATUS_ACTIVE;
                 }
+
                 $newRow['sheba_number'] = $row['sheba_number'];
                 $newRow['account_number'] = $row['account_number'];
                 $newRow['card_number'] = $row['card_number'];
@@ -356,7 +360,7 @@ class DataMigration extends Command
         try {
             $invoiceIds = implode(',', Invoice::query()->select('id')->get()->pluck('id')->toArray());
             $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` where `invoiceid` in ($invoiceIds)");
-            $this->info('Fetched data, records: '.count($oldData));
+            $this->info('Fetched data, records: ' . count($oldData));
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 if (Invoice::query()->find($row['invoiceid']) == null) {
