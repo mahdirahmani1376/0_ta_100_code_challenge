@@ -42,6 +42,17 @@ class ClientCashout extends Model
         self::STATUS_REJECTED,
     ];
 
+    protected $fillable = [
+        'client_id',
+        'client_bank_account_id',
+        'zarinpal_payout_id',
+        'admin_id',
+        'amount',
+        'admin_note',
+        'status',
+        'rejected_by_bank',
+    ];
+
     public function clientBankAccount(): BelongsTo
     {
         return $this->belongsTo(ClientBankAccount::class);

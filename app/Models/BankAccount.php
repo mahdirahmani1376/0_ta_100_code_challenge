@@ -26,4 +26,13 @@ class BankAccount extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'title',
+        'display_order',
+        'sheba_number',
+        'account_number',
+        'card_number',
+        'rahkaran_id',
+    ];
 }
