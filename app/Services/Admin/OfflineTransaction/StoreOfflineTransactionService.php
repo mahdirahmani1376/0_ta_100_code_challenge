@@ -19,6 +19,7 @@ class StoreOfflineTransactionService
     {
         $data['invoice_id'] = $invoice->getKey();
         $data['status'] = OfflineTransaction::STATUS_PENDING;
+        $data['client_id'] = $invoice->client_id;
 
         return $this->offlineTransactionRepository->create($data,[
             'paid_at',
