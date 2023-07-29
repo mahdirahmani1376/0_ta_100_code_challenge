@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Profile\Invoice;
 
 use App\Actions\Profile\Invoice\IndexInvoiceAction;
 use App\Http\Requests\Profile\Invoice\IndexInvoiceRequest;
-use App\Http\Resources\Profile\Invoice\InvoiceResource;
+use App\Http\Resources\Profile\Invoice\IndexInvoiceResource;
 
 class IndexInvoiceController
 {
@@ -19,6 +19,6 @@ class IndexInvoiceController
     {
         $invoices = ($this->indexInvoiceAction)($request->validated());
 
-        return InvoiceResource::collection($invoices);
+        return IndexInvoiceResource::collection($invoices);
     }
 }

@@ -2,13 +2,12 @@
 
 namespace App\Http\Resources\Profile\Invoice;
 
-use App\Http\Resources\Profile\OfflineTransaction\OfflineTransactionResource;
 use App\Http\Resources\Profile\Transaction\TransactionResource;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class InvoiceResource extends JsonResource
+class IndexInvoiceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -33,8 +32,6 @@ class InvoiceResource extends JsonResource
             'admin_id' => $this->admin_id,
             'is_credit' => $this->is_credit,
             'transactions' => TransactionResource::collection($this->transactions),
-            'items' => ItemResource::collection($this->items),
-            'offline_transactions' => OfflineTransactionResource::collection($this->offlineTransactions),
         ];
     }
 }
