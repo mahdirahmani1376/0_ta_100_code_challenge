@@ -11,4 +11,5 @@ Route::namespace('Invoice')
         Route::get('/', IndexInvoiceController::class);
         Route::get('{profileInvoice}', ShowInvoiceController::class);
         Route::post('{profileInvoice}/offline-transaction', StoreOfflineTransactionController::class);
+        Route::delete('{profileInvoice}/offline-transaction/{profileOfflineTransaction}', DeleteOfflineTransactionController::class);
     });

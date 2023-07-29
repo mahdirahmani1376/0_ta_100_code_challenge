@@ -35,12 +35,14 @@ class Transaction extends Model
     const STATUS_FAIL = 'fail'; // old status = 2
     const STATUS_REFUND = 'refund'; // old status 30
     const STATUS_PENDING_BANK_VERIFY = 'pending_bank_verify'; // old status 6
+    const STATUS_CANCELED = 'canceled';
     const STATUSES = [
         self::STATUS_PENDING,
         self::STATUS_SUCCESS,
         self::STATUS_FAIL,
         self::STATUS_REFUND,
         self::STATUS_PENDING_BANK_VERIFY,
+        self::STATUS_CANCELED,
     ];
 
     protected $fillable = [

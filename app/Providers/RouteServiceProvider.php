@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Invoice;
+use App\Models\OfflineTransaction;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -53,6 +54,12 @@ class RouteServiceProvider extends ServiceProvider
             return Invoice::query()
                 ->where('client_id', request('client_id'))
                 ->where('id', $profileInvoiceId)
+                ->firstOrFail();
+        });
+        Route::bind('profileOfflineTransaction', function ($profileOfflineTransaction) {
+            return OfflineTransaction::query()
+                ->where('client_id', request('client_id'))
+                ->where('id', $profileOfflineTransaction)
                 ->firstOrFail();
         });
     }
