@@ -31,7 +31,7 @@ class DeleteOfflineTransactionAction
     {
         check_rahkaran($invoice);
 
-        if ($offlineTransaction->status === OfflineTransaction::STATUS_PENDING) {
+        if ($offlineTransaction->status !== OfflineTransaction::STATUS_PENDING) {
             throw new BadRequestException(trans('finance.error.OnlyPendingOfflinePaymentAllowed'));
         }
 
