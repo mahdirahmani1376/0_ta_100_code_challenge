@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin\Transaction;
 
 use App\Exceptions\Http\BadRequestException;
-use App\Models\BankGateway;
 use App\Models\Invoice;
 use App\Services\BankGateway\IndexBankGatewayService;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -16,15 +15,11 @@ class StoreTransactionRequest extends FormRequest
     {
         /** @var Invoice $invoice */
         $invoice = request('invoice');
-        if ($invoice->balance < 0 ) {
-            throw new BadRequestException(
-                trans('finance.invoice.NegativeBalance')
-            );
+        if ($invoice->balance < 0) {
+            throw new BadRequestException(__('finance.invoice.NegativeBalance'));
         }
         if ($invoice->balance == 0 || request('amount') > $invoice->balance) {
-            throw new BadRequestException(
-                trans('finance.invoice.AmountExceedsInvoiceBalance')
-            );
+            throw new BadRequestException(__('finance.invoice.AmountExceedsInvoiceBalance'));
         }
 
         return true;

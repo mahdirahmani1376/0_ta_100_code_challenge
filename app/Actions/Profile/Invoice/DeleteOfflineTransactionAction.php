@@ -32,11 +32,11 @@ class DeleteOfflineTransactionAction
         check_rahkaran($invoice);
 
         if ($offlineTransaction->status !== OfflineTransaction::STATUS_PENDING) {
-            throw new BadRequestException(trans('finance.error.OnlyPendingOfflinePaymentAllowed'));
+            throw new BadRequestException(__('finance.error.OnlyPendingOfflinePaymentAllowed'));
         }
 
         if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_PAYMENT_PENDING])) {
-            throw new BadRequestException(trans('finance.error.OnlyUnpaidInvoiceAllowed'));
+            throw new BadRequestException(__('finance.error.OnlyUnpaidInvoiceAllowed'));
         }
 
         $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);

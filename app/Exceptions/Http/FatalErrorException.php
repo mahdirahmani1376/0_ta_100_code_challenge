@@ -13,7 +13,7 @@ class FatalErrorException extends HttpException
         parent::__construct(
             1007,
             get_class_name($this),
-            env('APP_DEBUG') == true ? $message : trans('app.' . get_class_name($this)),
+            env('APP_DEBUG') == true ? $message : __('app.' . get_class_name($this)),
             500
         );
     }
