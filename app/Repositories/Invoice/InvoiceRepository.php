@@ -14,9 +14,6 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
 {
     public string $model = Invoice::class;
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function adminIndex(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
@@ -114,5 +111,17 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         );
 
         return self::paginate($query);
+    }
+
+    public function prepareInvoicesForMassPayment(array $data): Collection
+    {
+        $query = self::newQuery();
+        $query->where('client_id', $data['client_id']);
+        $query->where('status', Invoice::STATUS_UNPAID);
+        $query->where('is_credit', false);
+        $query->where('is_mass_payment', false);
+        $query->whereIn('id', $data['invoice_ids']);
+
+        return $query->get();
     }
 }
