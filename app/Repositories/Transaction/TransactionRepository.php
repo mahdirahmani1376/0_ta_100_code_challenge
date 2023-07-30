@@ -15,9 +15,6 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 {
     public string $model = Transaction::class;
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function sumOfPaidTransactions(Invoice $invoice): int
     {
         return $this->newQuery()
@@ -26,9 +23,6 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->sum('amount');
     }
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function getLastSuccessfulTransaction(Invoice $invoice)
     {
         return $this->newQuery()
@@ -38,9 +32,6 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->first('created_at');
     }
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function findByTrackingCode($trackingCode): ?Transaction
     {
         return self::newQuery()
@@ -48,23 +39,19 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->first();
     }
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function adminIndex(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
 
         if (!empty($data['search'])) {
             $query->where(function (Builder $query) use ($data) {
-                return $query->where('reference_id', 'LIKE', '%' . empty($data['search']) . '%')
-                    ->orWhere('id', '%' . empty($data['search']) . '%')
-                    ->orWhere('invoice_id', 'LIKE', '%' . empty($data['search']) . '%')
-                    ->orWhere('tracking_code', 'LIKE', '%' . empty($data['search']) . '%')
-                    ->orWhere("description", "LIKE", '%' . empty($data['search']) . '%');
+                return $query->where('reference_id', 'LIKE', '%' . $data['search'] . '%')
+                    ->orWhere('id', '%' . $data['search'] . '%')
+                    ->orWhere('invoice_id', 'LIKE', '%' . $data['search'] . '%')
+                    ->orWhere('tracking_code', 'LIKE', '%' . $data['search'] . '%')
+                    ->orWhere("description", "LIKE", '%' . $data['search'] . '%');
             });
         }
-
         if (!empty($data['date'])) {
             $query->whereDate('created_at', '=', $data['date']);
         }
@@ -100,6 +87,33 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         if (isset($data['export']) && $data['export']) {
             return $query->get();
         }
+
+        return $this->paginate($query);
+    }
+    public function profileIndex(array $data): Collection|LengthAwarePaginator
+    {
+        $query = self::newQuery();
+
+        $query->where('client_id', $data['client_id']);
+        if (!empty($data['search'])) {
+            $query->where(function (Builder $query) use ($data) {
+                return $query->where('reference_id', 'LIKE', '%' . $data['search'] . '%')
+                    ->orWhere('id', '%' . $data['search'] . '%')
+                    ->orWhere('invoice_id', 'LIKE', '%' . $data['search'] . '%')
+                    ->orWhere('tracking_code', 'LIKE', '%' . $data['search'] . '%')
+                    ->orWhere("description", "LIKE", '%' . $data['search'] . '%');
+            });
+        }
+        if (!empty($data['status'])) {
+            $query->where('status', '=', $data['status']);
+        }
+        if (!empty($data['payment_method'])) {
+            $query->where('payment_method', '=', $data['payment_method']);
+        }
+        $query->orderBy(
+            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
+            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+        );
 
         return $this->paginate($query);
     }

@@ -17,4 +17,6 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
     public function findByTrackingCode($trackingCode): ?Transaction;
 
     public function adminIndex(array $data): Collection|LengthAwarePaginator;
+
+    public function profileIndex(array $data): Collection|LengthAwarePaginator;
 }

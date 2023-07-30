@@ -5,6 +5,7 @@ use App\Http\Controllers\Profile\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Profile\Invoice\ShowInvoiceController;
 use App\Http\Controllers\Profile\Invoice\StoreMassPaymentInvoiceController;
 use App\Http\Controllers\Profile\Invoice\StoreOfflineTransactionController;
+use App\Http\Controllers\Profile\Transaction\IndexTransactionController;
 use App\Http\Controllers\Profile\Wallet\ShowWalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,4 +23,10 @@ Route::namespace('Wallet')
     ->prefix('wallet')
     ->group(function () {
         Route::get('/', ShowWalletController::class);
+    });
+
+Route::namespace('Transaction')
+    ->prefix('transaction')
+    ->group(function () {
+        Route::get('/', IndexTransactionController::class);
     });
