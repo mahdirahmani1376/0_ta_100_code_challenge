@@ -43,3 +43,9 @@ Route::namespace('ClientBankAccount')
         Route::post('/', StoreClientBankAccountController::class);
         Route::put('{profileClientBankAccount}', UpdateClientBankAccountController::class);
     });
+
+Route::namespace('ClientCashout')
+    ->prefix('client-cashout')
+    ->group(function () {
+        Route::get('/', IndexClientCashoutController::class);
+    });
