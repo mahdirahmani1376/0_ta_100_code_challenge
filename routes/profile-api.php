@@ -6,6 +6,7 @@ use App\Http\Controllers\Profile\Invoice\ShowInvoiceController;
 use App\Http\Controllers\Profile\Invoice\StoreMassPaymentInvoiceController;
 use App\Http\Controllers\Profile\Invoice\StoreOfflineTransactionController;
 use App\Http\Controllers\Profile\Transaction\IndexTransactionController;
+use App\Http\Controllers\Profile\Wallet\AddBalanceController;
 use App\Http\Controllers\Profile\Wallet\ShowWalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::namespace('Wallet')
     ->prefix('wallet')
     ->group(function () {
         Route::get('/', ShowWalletController::class);
+        Route::post('add-balance', AddBalanceController::class);
     });
 
 Route::namespace('Transaction')
