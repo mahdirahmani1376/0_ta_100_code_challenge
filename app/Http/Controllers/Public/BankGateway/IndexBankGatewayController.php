@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public\BankGateway;
 
 use App\Actions\Public\BankGateway\IndexBankGatewayAction;
 use App\Http\Resources\Public\BankGateway\BankGatewayResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexBankGatewayController
 {
@@ -14,6 +15,9 @@ class IndexBankGatewayController
         $this->indexBankGatewayAction = $indexBankGatewayAction;
     }
 
+    /**
+     * @return AnonymousResourceCollection
+     */
     public function __invoke()
     {
         $bankGateways = ($this->indexBankGatewayAction)();

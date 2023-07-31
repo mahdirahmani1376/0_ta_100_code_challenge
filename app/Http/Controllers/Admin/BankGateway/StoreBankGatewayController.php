@@ -15,6 +15,10 @@ class StoreBankGatewayController
         $this->storeBankGatewayAction = $storeBankGatewayAction;
     }
 
+    /**
+     * @param StoreBankGatewayRequest $request
+     * @return BankGatewayResource
+     */
     public function __invoke(StoreBankGatewayRequest $request)
     {
         $bankGateway = ($this->storeBankGatewayAction)($request->validated());

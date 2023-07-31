@@ -16,6 +16,11 @@ class StoreTransactionController
         $this->storeTransactionAction = $storeTransactionAction;
     }
 
+    /**
+     * @param Invoice $invoice
+     * @param StoreTransactionRequest $request
+     * @return TransactionResource
+     */
     public function __invoke(Invoice $invoice, StoreTransactionRequest $request)
     {
         $transaction = ($this->storeTransactionAction)($invoice, $request->validated());

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\BankGateway;
 
 use App\Actions\Admin\BankGateway\DeleteBankGatewayAction;
 use App\Models\BankGateway;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class DeleteBankGatewayController
@@ -15,9 +16,13 @@ class DeleteBankGatewayController
         $this->deleteBankGatewayAction = $deleteBankGatewayAction;
     }
 
+    /**
+     * @param BankGateway $bankGateway
+     * @return JsonResponse
+     */
     public function __invoke(BankGateway $bankGateway)
     {
-        $bankGateway = ($this->deleteBankGatewayAction)($bankGateway);
+        ($this->deleteBankGatewayAction)($bankGateway);
 
         return response()->json([], Response::HTTP_ACCEPTED);
     }

@@ -15,6 +15,10 @@ class AddBalanceController
         $this->addBalanceAction = $addBalanceAction;
     }
 
+    /**
+     * @param AddBalanceRequest $request
+     * @return InvoiceResource
+     */
     public function __invoke(AddBalanceRequest $request)
     {
         $invoice = ($this->addBalanceAction)($request->validated());

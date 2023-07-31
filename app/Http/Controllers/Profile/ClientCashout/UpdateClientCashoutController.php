@@ -16,6 +16,11 @@ class UpdateClientCashoutController
         $this->updateClientCashoutAction = $updateClientCashoutAction;
     }
 
+    /**
+     * @param ClientCashout $clientCashout
+     * @param UpdateClientCashoutRequest $request
+     * @return ClientCashoutResource
+     */
     public function __invoke(ClientCashout $clientCashout, UpdateClientCashoutRequest $request)
     {
         $clientCashout = ($this->updateClientCashoutAction)($clientCashout, $request->validated());

@@ -7,6 +7,10 @@ use App\Models\OfflineTransaction;
 
 class ShowOfflineTransactionController
 {
+    /**
+     * @param OfflineTransaction $offlineTransaction
+     * @return OfflineTransactionResource
+     */
     public function __invoke(OfflineTransaction $offlineTransaction)
     {
         return OfflineTransactionResource::make($offlineTransaction);

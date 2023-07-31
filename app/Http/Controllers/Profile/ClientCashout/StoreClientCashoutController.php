@@ -15,6 +15,10 @@ class StoreClientCashoutController
         $this->storeClientCashoutAction = $storeClientCashoutAction;
     }
 
+    /**
+     * @param StoreClientCashoutRequest $request
+     * @return ClientCashoutResource
+     */
     public function __invoke(StoreClientCashoutRequest $request)
     {
         $clientCashout = ($this->storeClientCashoutAction)(request('client_id'), $request->validated());
