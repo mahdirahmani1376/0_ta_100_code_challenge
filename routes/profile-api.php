@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Profile\ClientBankAccount\IndexClientBankAccountController;
 use App\Http\Controllers\Profile\Invoice\DeleteOfflineTransactionController;
 use App\Http\Controllers\Profile\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Profile\Invoice\ShowInvoiceController;
@@ -31,4 +32,10 @@ Route::namespace('Transaction')
     ->prefix('transaction')
     ->group(function () {
         Route::get('/', IndexTransactionController::class);
+    });
+
+Route::namespace('ClientBankAccount')
+    ->prefix('client-bank-account')
+    ->group(function () {
+        Route::get('/', IndexClientBankAccountController::class);
     });
