@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\ClientBankAccount;
 use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -12,24 +13,21 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * The path to your application's "home" route.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
-     */
     public const HOME = '/home';
 
-    /**
-     * Define your route model bindings, pattern filters, and other route configuration.
-     */
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        $this->bindRoutes();
+
+        $this->bindRouteParameter();
+    }
+
+    public function bindRoutes(): void
+    {
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api/profile')
@@ -49,7 +47,10 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
+    }
 
+    public function bindRouteParameter(): void
+    {
         Route::bind('profileInvoice', function ($profileInvoiceId) {
             return Invoice::query()
                 ->where('client_id', request('client_id'))
@@ -60,6 +61,12 @@ class RouteServiceProvider extends ServiceProvider
             return OfflineTransaction::query()
                 ->where('client_id', request('client_id'))
                 ->where('id', $profileOfflineTransaction)
+                ->firstOrFail();
+        });
+        Route::bind('profileClientBankAccount', function ($clientBankAccount) {
+            return ClientBankAccount::query()
+                ->where('client_id', request('client_id'))
+                ->where('id', $clientBankAccount)
                 ->firstOrFail();
         });
     }
