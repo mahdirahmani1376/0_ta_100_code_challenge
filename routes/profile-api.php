@@ -3,6 +3,8 @@
 use App\Http\Controllers\Profile\ClientBankAccount\IndexClientBankAccountController;
 use App\Http\Controllers\Profile\ClientBankAccount\StoreClientBankAccountController;
 use App\Http\Controllers\Profile\ClientBankAccount\UpdateClientBankAccountController;
+use App\Http\Controllers\Profile\ClientCashout\IndexClientCashoutController;
+use App\Http\Controllers\Profile\ClientCashout\StoreClientCashoutController;
 use App\Http\Controllers\Profile\Invoice\DeleteOfflineTransactionController;
 use App\Http\Controllers\Profile\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Profile\Invoice\ShowInvoiceController;
@@ -48,4 +50,5 @@ Route::namespace('ClientCashout')
     ->prefix('client-cashout')
     ->group(function () {
         Route::get('/', IndexClientCashoutController::class);
+        Route::post('/', StoreClientCashoutController::class);
     });

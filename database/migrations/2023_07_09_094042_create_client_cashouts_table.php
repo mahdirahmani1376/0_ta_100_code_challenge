@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('client_bank_account_id');
             $table->unsignedBigInteger('zarinpal_payout_id')->nullable();
-            $table->unsignedInteger('admin_id');
+            $table->unsignedInteger('admin_id')->nullable();
             $table->double('amount')->nullable();
             $table->text('admin_note')->nullable();
             $table->string('status')->default(ClientCashout::STATUS_PENDING);
