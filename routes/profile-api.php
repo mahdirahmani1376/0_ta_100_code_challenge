@@ -5,6 +5,7 @@ use App\Http\Controllers\Profile\ClientBankAccount\StoreClientBankAccountControl
 use App\Http\Controllers\Profile\ClientBankAccount\UpdateClientBankAccountController;
 use App\Http\Controllers\Profile\ClientCashout\IndexClientCashoutController;
 use App\Http\Controllers\Profile\ClientCashout\StoreClientCashoutController;
+use App\Http\Controllers\Profile\ClientCashout\UpdateClientCashoutController;
 use App\Http\Controllers\Profile\Invoice\DeleteOfflineTransactionController;
 use App\Http\Controllers\Profile\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Profile\Invoice\ShowInvoiceController;
@@ -51,4 +52,5 @@ Route::namespace('ClientCashout')
     ->group(function () {
         Route::get('/', IndexClientCashoutController::class);
         Route::post('/', StoreClientCashoutController::class);
+        Route::put('{profileClientCashOut}', UpdateClientCashoutController::class);
     });

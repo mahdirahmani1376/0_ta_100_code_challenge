@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\ClientBankAccount;
+use App\Models\ClientCashout;
 use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -67,6 +68,12 @@ class RouteServiceProvider extends ServiceProvider
             return ClientBankAccount::query()
                 ->where('client_id', request('client_id'))
                 ->where('id', $clientBankAccount)
+                ->firstOrFail();
+        });
+        Route::bind('profileClientCashOut', function ($profileClientCashOut) {
+            return ClientCashout::query()
+                ->where('client_id', request('client_id'))
+                ->where('id', $profileClientCashOut)
                 ->firstOrFail();
         });
     }
