@@ -59,7 +59,7 @@ trait BaseExceptionTrait
         $exception = new static();
         $exception->code = $exception->getErrorCode();
         $exception->setMessageParams($args);
-        $exception->message = trans('exceptions.' . $exception->getLogRef(), $exception->getMessageParams());
+        $exception->message = __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams());
 
         return $exception;
     }
@@ -84,7 +84,7 @@ trait BaseExceptionTrait
     public function params(...$args): self
     {
         $this->setMessageParams($args);
-        $this->message = trans('exceptions.' . $this->getLogRef(), $this->getMessageParams());
+        $this->message = __('exceptions.' . $this->getLogRef(), $this->getMessageParams());
 
         return $this;
     }

@@ -15,6 +15,10 @@ class StoreBankAccountController
         $this->storeBankAccountAction = $storeBankAccountAction;
     }
 
+    /**
+     * @param StoreBankAccountRequest $request
+     * @return BankAccountResource
+     */
     public function __invoke(StoreBankAccountRequest $request)
     {
         $bankAccount = ($this->storeBankAccountAction)($request->validated());

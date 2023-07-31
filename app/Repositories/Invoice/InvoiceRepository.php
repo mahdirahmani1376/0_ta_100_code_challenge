@@ -14,9 +14,6 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
 {
     public string $model = Invoice::class;
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function adminIndex(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
@@ -78,5 +75,53 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         }
 
         return $this->paginate($query);
+    }
+
+    public function profileIndex(array $data): LengthAwarePaginator
+    {
+        $query = self::newQuery();
+        $query->where('client_id', $data['client_id']);
+        if (!empty($data['search'])) {
+            $query->where(function (Builder $query) use ($data) {
+                $query->where('id', "LIKE", '%' . $data['search'] . '%')
+                    ->orWhere("total", $data['search'] . '.00');
+
+                if (!empty($data['item_invoice_ids'])) {
+                    $query->orWhereIn('id', $data['item_invoice_ids']);
+                }
+            });
+        }
+        if (!empty($data['status'])) {
+            if ($data['status'] == Invoice::STATUS_UNPAID) {
+                $query->whereIn('status', [
+                    Invoice::STATUS_UNPAID,
+                    Invoice::STATUS_COLLECTIONS,
+                    Invoice::STATUS_PAYMENT_PENDING,
+                ]);
+            }else{
+                $query->where('status', '=', $data['status']);
+            }
+        }
+        $query->where('status', '<>', Invoice::STATUS_DRAFT);
+        $query->where('is_mass_payment', false);
+
+        $query->orderBy(
+            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
+            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+        );
+
+        return self::paginate($query);
+    }
+
+    public function prepareInvoicesForMassPayment(array $data): Collection
+    {
+        $query = self::newQuery();
+        $query->where('client_id', $data['client_id']);
+        $query->where('status', Invoice::STATUS_UNPAID);
+        $query->where('is_credit', false);
+        $query->where('is_mass_payment', false);
+        $query->whereIn('id', $data['invoice_ids']);
+
+        return $query->get();
     }
 }

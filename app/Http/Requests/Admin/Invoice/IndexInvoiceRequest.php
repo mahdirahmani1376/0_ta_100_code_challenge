@@ -38,9 +38,4 @@ class IndexInvoiceRequest extends FormRequest
             'non_checked' => 'nullable|boolean'
         ];
     }
-
-    public function getPaginationParams(): array
-    {
-        return get_paginate_params($this);
-    }
 }

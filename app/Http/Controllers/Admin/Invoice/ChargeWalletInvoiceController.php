@@ -17,6 +17,8 @@ class ChargeWalletInvoiceController
     }
 
     /**
+     * @param ChargeWalletInvoiceRequest $request
+     * @return InvoiceResource
      * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(ChargeWalletInvoiceRequest $request)

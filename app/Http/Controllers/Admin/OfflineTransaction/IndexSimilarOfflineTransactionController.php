@@ -7,6 +7,7 @@ use App\Actions\Admin\OfflineTransaction\IndexSimilarOfflineTransactionAction;
 use App\Http\Requests\Admin\OfflineTransaction\IndexOfflineTransactionRequest;
 use App\Http\Resources\Admin\OfflineTransaction\OfflineTransactionResource;
 use App\Models\OfflineTransaction;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexSimilarOfflineTransactionController
 {
@@ -17,6 +18,10 @@ class IndexSimilarOfflineTransactionController
         $this->indexSimilarOfflineTransactionAction = $indexSimilarOfflineTransactionAction;
     }
 
+    /**
+     * @param OfflineTransaction $offlineTransaction
+     * @return AnonymousResourceCollection
+     */
     public function __invoke(OfflineTransaction $offlineTransaction)
     {
         $offlineTransactions = ($this->indexSimilarOfflineTransactionAction)($offlineTransaction);

@@ -23,7 +23,18 @@ class ClientCashoutRepository extends BaseRepository implements ClientCashoutRep
         if (!empty('status')) {
             $query->where('status', $data['status']);
         }
+        $query->orderBy(
+            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
+            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+        );
 
         return self::paginate($query);
+    }
+
+    public function profileIndex(int $clientId, array $data): LengthAwarePaginator
+    {
+        $data['client_id'] = $clientId;
+
+        return self::adminIndex($data);
     }
 }

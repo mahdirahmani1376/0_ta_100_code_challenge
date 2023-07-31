@@ -6,7 +6,6 @@ use App\Models\OfflineTransaction;
 use App\Services\Admin\OfflineTransaction\UpdateOfflineTransactionService;
 use App\Services\Admin\Transaction\UpdateTransactionService;
 use App\Services\Transaction\FindTransactionByTrackingCodeService;
-use Illuminate\Support\Facades\DB;
 
 class UpdateOfflineTransactionAction
 {
@@ -29,23 +28,15 @@ class UpdateOfflineTransactionAction
     {
         check_rahkaran($offlineTransaction->invoice);
 
-        try {
-            DB::beginTransaction();
-            $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
+        $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
 
-            $offlineTransaction = ($this->updateOfflineTransactionService)($offlineTransaction, $data);
+        $offlineTransaction = ($this->updateOfflineTransactionService)($offlineTransaction, $data);
 
-            $transactionData = [
-                'created_at' => $data['paid_at'],
-                'tracking_code' => $data['tracking_code']
-            ];
-            ($this->updateTransactionService)($transaction, $transactionData);
-
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            throw $exception;
-        }
+        $transactionData = [
+            'created_at' => $data['paid_at'],
+            'tracking_code' => $data['tracking_code']
+        ];
+        ($this->updateTransactionService)($transaction, $transactionData);
 
         return $offlineTransaction;
     }

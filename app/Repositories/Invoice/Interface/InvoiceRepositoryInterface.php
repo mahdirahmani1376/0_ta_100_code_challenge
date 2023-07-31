@@ -9,4 +9,8 @@ use Illuminate\Database\Eloquent\Collection;
 interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
 {
     public function adminIndex(array $data): LengthAwarePaginator|Collection;
+
+    public function profileIndex(array $data): LengthAwarePaginator;
+
+    public function prepareInvoicesForMassPayment(array $data): Collection;
 }

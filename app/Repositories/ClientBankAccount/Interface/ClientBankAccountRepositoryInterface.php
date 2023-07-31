@@ -8,4 +8,5 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 interface ClientBankAccountRepositoryInterface extends EloquentRepositoryInterface
 {
     public function adminIndex(array $data): LengthAwarePaginator;
+    public function profileIndex(int $clientId, array $data): LengthAwarePaginator;
 }

@@ -37,4 +37,11 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
 
         return self::paginate($query);
     }
+
+    public function profileIndex(int $clientId, array $data): LengthAwarePaginator
+    {
+        $data['client_id'] = $clientId;
+
+        return self::adminIndex($data);
+    }
 }

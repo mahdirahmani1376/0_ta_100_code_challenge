@@ -16,6 +16,11 @@ class UpdateClientBankAccountController
         $this->updateClientBankAccountAction = $updateClientBankAccountAction;
     }
 
+    /**
+     * @param ClientBankAccount $clientBankAccount
+     * @param UpdateClientBankAccountRequest $request
+     * @return ClientBankAccountResource
+     */
     public function __invoke(ClientBankAccount $clientBankAccount, UpdateClientBankAccountRequest $request)
     {
         $clientBankAccount = ($this->updateClientBankAccountAction)($clientBankAccount, $request->validated());

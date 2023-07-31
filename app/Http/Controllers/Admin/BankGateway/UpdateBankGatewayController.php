@@ -17,6 +17,11 @@ class UpdateBankGatewayController
         $this->updateBankGatewayAction = $updateBankGatewayAction;
     }
 
+    /**
+     * @param UpdateBankGatewayRequest $request
+     * @param BankGateway $bankGateway
+     * @return BankGatewayResource
+     */
     public function __invoke(UpdateBankGatewayRequest $request, BankGateway $bankGateway)
     {
         $bankGateway = ($this->updateBankGatewayAction)($bankGateway, $request->validated());

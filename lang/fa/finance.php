@@ -10,6 +10,7 @@ return [
         'DeletePaymentError' => 'خطایی هنگام حذف تراکنش رخ داده است.',
         'OnlyUnpaidInvoiceAllowed' => 'این امکان فقط برای فاکتورهای پرداخت نشده وجود دارد.',
         'OnlyPendingOfflinePaymentAllowed' => 'این امکان فقط برای پرداخت آفلاین درحال انتظار وجود دارد.',
+        'CannotMakeMassPaymentInvoice' => 'هیچ یک از فاکتور های ارسال شده امکان پرداخت گروهی ندارد.',
     ],
     'invoice' => [
         'AmountExceedsInvoiceBalance' => 'مقدار انتخاب شده از مبلغ فاکتور بیشتر می باشد.',

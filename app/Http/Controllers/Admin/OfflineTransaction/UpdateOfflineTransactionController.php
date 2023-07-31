@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\OfflineTransaction;
 
 use App\Actions\Admin\OfflineTransaction\UpdateOfflineTransactionAction;
+use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Http\Requests\Admin\OfflineTransaction\UpdateOfflineTransactionRequest;
 use App\Http\Resources\Admin\OfflineTransaction\OfflineTransactionResource;
 use App\Models\OfflineTransaction;
@@ -19,7 +20,10 @@ class UpdateOfflineTransactionController
     }
 
     /**
-     * @throws \Exception
+     * @param OfflineTransaction $offlineTransaction
+     * @param UpdateOfflineTransactionRequest $request
+     * @return OfflineTransactionResource
+     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(OfflineTransaction $offlineTransaction, UpdateOfflineTransactionRequest $request)
     {

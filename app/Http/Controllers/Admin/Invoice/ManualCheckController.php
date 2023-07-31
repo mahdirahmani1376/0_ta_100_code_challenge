@@ -16,6 +16,11 @@ class ManualCheckController
         $this->manualCheckAction = $manualCheckAction;
     }
 
+    /**
+     * @param Invoice $invoice
+     * @param ManualCheckRequest $request
+     * @return InvoiceResource
+     */
     public function __invoke(Invoice $invoice, ManualCheckRequest $request)
     {
         $invoice = ($this->manualCheckAction)($invoice, $request->validated('admin_id'));
