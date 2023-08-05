@@ -12,5 +12,31 @@ This application developed and customized by [Laravel Framework](https://laravel
 4. RUN ` docker-compose exec --user root app .docker-compose/commands/bootup`
 5. OPEN `http://localhost` to check if everything is working
 
-### Author(s)
+
+## Project structure
+1. Controller `app\Http\Controllers`
+   - A `Controller` is responsible for taking validated data from RequestForms and passing it down to an `Action` and then take its result and using JsonResponse to return it
+2. Action `app\Actions`
+    - An `Action` is responsible for high level business logic , this class usually consumes one or more `Service` in a linear order to complete its "task/action"
+    - An `Action` CAN consume another `Action` if needed
+      - for example, `Wallet\DeductCreditAction` can consume `Wallet\StoreCreditTransactionAction`
+3. Service `app\Services`
+   - A `Service` is responsible for low level logic which mostly involves with read/writing data via one or more `Repository`
+   - A `Service` cannot consume (dependency inject) another `Service`, this should be done via an `Action` on a higher level, for example when making an "Invoice" which has two "Items" one `service` is responsible for making an invoice first and then another `service` is responsible for attaching those items to the Invoice created on the first step, `Action` should handle this procedure, low level logic should not be responsible for this data flow
+4. Repository `app\Repositories`
+    - A `Repository` is responsible to interact with DataStore like mySql or mongoDB
+    - A `Repository` is the lowest level of logic and should not consume any `Service` `Action` or other `Repositories`
+- Class Hierarchy Example:
+  - POST `/api/invoice`
+    - StoreInvoiceController
+      - $data = StoreInvoiceRequest 
+      - $invoice = StoreInvoiceAction($data)
+        - $invoice = StoreInvoiceService($data)
+          - InvoiceRepository
+        - StoreItemService($invoice)
+          - ItemRepository
+        - return $invoice
+      - return InvoiceResource($invoice)
+
+### Author
 * **Esmaeel Cheshmeh Khavar** ([Gmail](mailto:e.cheshmehkhavar@gmail.com))
