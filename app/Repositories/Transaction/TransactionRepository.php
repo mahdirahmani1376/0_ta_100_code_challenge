@@ -6,7 +6,6 @@ use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -14,6 +13,14 @@ use Illuminate\Support\Collection;
 class TransactionRepository extends BaseRepository implements TransactionRepositoryInterface
 {
     public string $model = Transaction::class;
+
+    public function refundSuccessfulTransactions(Invoice $invoice)
+    {
+        return self::newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->where('status', Transaction::STATUS_SUCCESS)
+            ->update(['status' => Transaction::STATUS_REFUND]);
+    }
 
     public function sumOfPaidTransactions(Invoice $invoice): int
     {
@@ -90,6 +97,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
         return $this->paginate($query);
     }
+
     public function profileIndex(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();

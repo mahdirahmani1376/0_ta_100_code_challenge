@@ -31,8 +31,10 @@ class Item extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    const TYPE_MASS_PAYMENT_INVOICE    = 'MassPaymentInvoice';
-    const TYPE_ADD_CLIENT_CREDIT       = 'AddClientCredit';
+
+    const TYPE_MASS_PAYMENT_INVOICE = 'MassPaymentInvoice';
+    const TYPE_ADD_CLIENT_CREDIT = 'AddClientCredit';
+    public const TYPE_DOMAIN_SERVICE = 'DomainService';
     protected $casts = [
         'deleted_at' => 'datetime',
         'from_date' => 'datetime',

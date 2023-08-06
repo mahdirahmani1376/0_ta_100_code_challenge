@@ -10,6 +10,8 @@ use Illuminate\Support\Collection;
 
 interface TransactionRepositoryInterface extends EloquentRepositoryInterface
 {
+    public function refundSuccessfulTransactions(Invoice $invoice);
+
     public function sumOfPaidTransactions(Invoice $invoice): int;
 
     public function getLastSuccessfulTransaction(Invoice $invoice);
