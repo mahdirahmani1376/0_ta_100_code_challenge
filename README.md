@@ -11,6 +11,7 @@ This application developed and customized by [Laravel Framework](https://laravel
 3. RUN `docker-compose up -d` to bring up your containers
 4. RUN ` docker-compose exec --user root app .docker-compose/commands/bootup`
 5. OPEN `http://localhost` to check if everything is working
+6. Make sure config values are set in MainApp refer to `Commands/Cron` section of this readme
 
 
 ## Project structure
@@ -38,5 +39,12 @@ This application developed and customized by [Laravel Framework](https://laravel
         - return $invoice
       - return InvoiceResource($invoice)
 
+
+## Commands/Cron
+    Required config values in main app:
+    - CRON_AUTO_INVOICE_CANCELLATION_DAYS
+    - CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS
+    - CRON_FINANCE_INVOICE_REMINDER_DAYS_1
+    - CRON_FINANCE_INVOICE_REMINDER_DAYS_2
 ### Author
 * **Esmaeel Cheshmeh Khavar** ([Gmail](mailto:e.cheshmehkhavar@gmail.com))
