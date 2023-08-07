@@ -18,7 +18,7 @@ use Throwable;
 class CancelOverDueInvoiceCommand extends Command
 {
     protected $signature = 'cron:overdue-invoice
-                            {--test=true : Run in test mode, will not commit anything into DB}
+                            {--test : Run in test mode, will not commit anything into DB}
                             {--threshold=0 : Threshold for how old an Invoice should be in day}
                             {--threshold-domain=0 : Threshold for how old a Domain Invoice should be in day}';
 
@@ -37,7 +37,10 @@ class CancelOverDueInvoiceCommand extends Command
         $this->cancelInvoiceAction = $cancelInvoiceAction;
         $this->invoiceRepository = $invoiceRepository;
 
-        $this->test = $this->option('test') == 'true';
+        $this->test = !empty($this->option('test'));
+        if ($this->test) {
+            $this->info('TEST MODE ACTIVE');
+        }
 
         App::setLocale('fa');
         $this->alert('Cancelling overdue invoices , now: ' . JalaliCalender::getJalaliString(now()) . '  ' . now()->toDateTimeString());
