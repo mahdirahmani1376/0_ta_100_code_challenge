@@ -21,7 +21,41 @@ class MainAppService
             $response = Http::withHeader('Accept', 'application/json')
                 ->withHeader('Content-Type', 'application/json')
                 ->withToken('token')
-                ->get($url, ['key' => $key]);
+                ->get($url, $param);
+
+            if ($response->status() == Response::HTTP_OK) {
+                return $response->json('data');
+            }
+
+            Log::error('MainApp internal api error', [
+                'url' => $url,
+                'param' => json_encode($param),
+                'response' => $response->body(),
+            ]);
+
+            throw MainAppInternalAPIException::make($url, json_encode($param));
+        } catch (\Exception $exception) {
+            if ($exception instanceof MainAppInternalAPIException) {
+                throw $exception;
+            }
+
+            throw MainAppInternalAPIException::make($url, json_encode($param));
+        }
+    }
+
+    /**
+     * @throws MainAppInternalAPIException
+     */
+    public static function getClients(array $clientIds)
+    {
+        $url = config('services.main_app.base_url') . config('services.main_app.get_clients_url');
+        $param = ['client_ids' => $clientIds];
+
+        try {
+            $response = Http::withHeader('Accept', 'application/json')
+                ->withHeader('Content-Type', 'application/json')
+                ->withToken('token')
+                ->get($url, $param);
 
             if ($response->status() == Response::HTTP_OK) {
                 return $response->json('data');

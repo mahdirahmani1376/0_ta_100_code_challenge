@@ -34,5 +34,6 @@ return [
     'main_app' => [
         'base_url' => env('MAINAPP_BASE_URL'),
         'get_config_url' => '/api/internal/finance/config',
+        'get_clients_url' => '/api/internal/finance/client',
     ],
 ];
