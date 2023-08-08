@@ -35,8 +35,7 @@ class CalcInvoicePriceFieldsService
         $total = $subTotal + $tax;
 
         $sumOfPaidTransactions = $this->transactionRepository->sumOfPaidTransactions($invoice);
-        $balance = $invoice->total - $sumOfPaidTransactions;
-
+        $balance = $total - $sumOfPaidTransactions;
 
         return $this->invoiceRepository->update(
             $invoice,

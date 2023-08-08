@@ -13,6 +13,11 @@ use http\Exception\InvalidArgumentException;
  */
 class JalaliCalender
 {
+    public static function getJalaliString(Carbon $carbon): string
+    {
+        return self::toJalali($carbon->year, $carbon->month, $carbon->day);
+    }
+
     /**
      * @param $gy
      * @param $gm

@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\Invoice\ChangeInvoiceStatusController;
 use App\Http\Controllers\Admin\Invoice\ChargeWalletInvoiceController;
 use App\Http\Controllers\Admin\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Admin\Invoice\IndexInvoiceNumberController;
+use App\Http\Controllers\Admin\Invoice\InvoiceReportController;
 use App\Http\Controllers\Admin\Invoice\Item\DeleteItemController;
 use App\Http\Controllers\Admin\Invoice\Item\StoreItemController;
 use App\Http\Controllers\Admin\Invoice\Item\UpdateItemController;
@@ -49,6 +50,7 @@ Route::namespace('Invoice')
         Route::get('/', IndexInvoiceController::class);
         Route::post('/', StoreInvoiceController::class);
         Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
+        Route::get('report', InvoiceReportController::class);
         Route::get('{invoice}', ShowInvoiceController::class);
         Route::put('{invoice}', UpdateInvoiceController::class);
         Route::post('{invoice}/status', ChangeInvoiceStatusController::class);

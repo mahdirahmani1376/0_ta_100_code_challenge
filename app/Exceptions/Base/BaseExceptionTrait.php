@@ -2,8 +2,6 @@
 
 namespace App\Exceptions\Base;
 
-use App\Exceptions\ApplicationException\BaseApplicationException;
-use App\Exceptions\SystemException\BaseSystemException;
 use Exception;
 use Throwable;
 
@@ -26,7 +24,7 @@ trait BaseExceptionTrait
 
     protected array $messageParams = [];
 
-    abstract public function __construct($message = '', $code = 0, Throwable $previous = null);
+    abstract public function __construct(string $message = '', int $code = 0, Throwable $previous = null);
 
     public function getLogRef()
     {

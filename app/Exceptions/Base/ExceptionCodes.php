@@ -12,5 +12,7 @@ final class ExceptionCodes
     public const REPOSITORY_DELETE_MODEL = '530001';
     public const REPOSITORY_MODEL_NOT_FOUND = '530002';
     public const LOCKED_INVOICE_ALREADY_IMPORTED_TO_RAHKARAN = '530003';
-
+    public const MAIN_APP_INTERNAL_API = '530004';
+    public const MIN_DATE_OUT_OF_RANGE_FISCAL_YEAR = '570058';
+    public const MAX_DATE_OUT_OF_RANGE_FISCAL_YEAR = '570059';
 }
