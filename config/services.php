@@ -36,9 +36,4 @@ return [
         'get_config_url' => '/api/internal/finance/config',
         'get_clients_url' => '/api/internal/finance/client',
     ],
-
-    'telegram' => [
-        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
-        'bot_chat_id' => env('TELEGRAM_BOT_CHAT_ID'),
-    ],
 ];

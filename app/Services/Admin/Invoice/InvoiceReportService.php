@@ -1,31 +1,20 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Services\Admin\Invoice;
 
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
-use Exception;
-use Illuminate\Console\Command;
 
-class FinanceReportCommand extends Command
+class InvoiceReportService
 {
-    protected $signature = 'cron:finance-report';
-
-    protected $description = 'Finance hourly reports';
     private InvoiceRepositoryInterface $invoiceRepository;
 
-    public function handle(InvoiceRepositoryInterface $invoiceRepository)
+    public function __construct(InvoiceRepositoryInterface $invoiceRepository)
     {
         $this->invoiceRepository = $invoiceRepository;
-        $this->alert('Finance hourly report');
-
-        $this->financeReport();
-        $this->checkShahkaran(); // TODO
-
-        $this->info('Finance report finished.');
     }
 
-    private function financeReport()
+    public function __invoke()
     {
         $date1 = now()->startOfDay();
         $date2 = now()->startOfHour();
@@ -94,20 +83,6 @@ class FinanceReportCommand extends Command
             ->where('status', Invoice::STATUS_PAID)
             ->sum('total');
 
-        $content = $content . "*" . number_format($lastDayTotalIncome) . " IRR*";
-
-
-        try {
-            $this->info($content);
-//            TelegramService::sendNotification($content);
-        } catch (Exception $e) {
-            sleep(2);
-//            TelegramService::sendNotification($content);
-        }
-    }
-
-    private function checkShahkaran()
-    {
-
+        return $content . "*" . number_format($lastDayTotalIncome) . " IRR*";
     }
 }
