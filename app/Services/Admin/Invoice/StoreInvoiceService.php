@@ -30,6 +30,7 @@ class StoreInvoiceService
             'status',
             'paid_at',
             'client_id',
+            'due_date',
         ]);
     }
 }
