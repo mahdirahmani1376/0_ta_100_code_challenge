@@ -29,7 +29,7 @@ class StoreInvoiceRequest extends FormRequest
             'items.*.description' => ['required', 'string'],
             'items.*.amount' => ['required', 'numeric'],
             'items.*.invoiceable_type' => ['nullable', 'string'],
-            'items.*.invoiceable_id' => ['nullable', 'string'],
+            'items.*.invoiceable_id' => ['nullable', 'numeric'],
             'items.*.from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'items.*.to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
         ];
