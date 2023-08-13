@@ -13,8 +13,8 @@ class TransactionResource extends JsonResource
         /** @var Transaction $this */
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'invoice_id' => $this->invoice_id,
             'rahkaran_id' => $this->rahkaran_id,
