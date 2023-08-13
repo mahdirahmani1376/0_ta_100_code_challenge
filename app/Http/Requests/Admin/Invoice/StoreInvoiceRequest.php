@@ -20,15 +20,16 @@ class StoreInvoiceRequest extends FormRequest
             'invoice_date' => ['required', 'date', 'date_format:Y-m-d'],
             'due_date' => ['required', 'date', 'date_format:Y-m-d'],
             'paid_at' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'status' => Rule::in([
+            'status' => [Rule::in([
                 Invoice::STATUS_UNPAID,
                 Invoice::STATUS_DRAFT,
                 Invoice::STATUS_REFUNDED,
-            ]),
-            'items' => 'required|array',
-            'items.*.description' => 'required|string',
-            'items.*.amount' => 'required|numeric',
-            'items.*.invoiceable_type' => 'nullable|string',
+            ])],
+            'items' => ['required', 'array'],
+            'items.*.description' => ['required', 'string'],
+            'items.*.amount' => ['required', 'numeric'],
+            'items.*.invoiceable_type' => ['nullable', 'string'],
+            'items.*.invoiceable_id' => ['nullable', 'string'],
             'items.*.from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'items.*.to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
         ];
