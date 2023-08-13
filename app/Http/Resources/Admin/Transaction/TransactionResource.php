@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Admin\Transaction;
 
+use App\Http\Resources\Admin\Invoice\InvoiceOfTransactionResource;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -25,6 +26,7 @@ class TransactionResource extends JsonResource
             'ip' => $this->ip,
             'tracking_code' => $this->tracking_code,
             'reference_id' => $this->reference_id,
+            'invoice' => InvoiceOfTransactionResource::make($this->invoice)
         ];
     }
 }
