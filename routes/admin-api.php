@@ -47,14 +47,6 @@ use Illuminate\Support\Facades\Route;
 Route::namespace('Invoice')
     ->prefix('invoice')
     ->group(function () {
-        Route::get('/', IndexInvoiceController::class);
-        Route::post('/', StoreInvoiceController::class);
-        Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
-        Route::get('report', InvoiceReportController::class);
-        Route::get('{invoice}', ShowInvoiceController::class);
-        Route::put('{invoice}', UpdateInvoiceController::class);
-        Route::post('{invoice}/status', ChangeInvoiceStatusController::class);
-        Route::post('{invoice}/manual-check', ManualCheckController::class);
         Route::prefix('invoice-number')
             ->group(function () {
                 Route::get('/', IndexInvoiceNumberController::class);
@@ -72,6 +64,14 @@ Route::namespace('Invoice')
                 Route::post('{invoice}', StoreTransactionController::class);
                 Route::get('/', IndexTransactionController::class);
             });
+        Route::get('/', IndexInvoiceController::class);
+        Route::post('/', StoreInvoiceController::class);
+        Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
+        Route::get('report', InvoiceReportController::class);
+        Route::get('{invoice}', ShowInvoiceController::class);
+        Route::put('{invoice}', UpdateInvoiceController::class);
+        Route::post('{invoice}/status', ChangeInvoiceStatusController::class);
+        Route::post('{invoice}/manual-check', ManualCheckController::class);
     });
 
 
