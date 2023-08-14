@@ -19,10 +19,9 @@ class DeductBalanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => [
-                'required',
-                'gte:1',
-            ],
+            'amount' => ['required', 'gte:1',],
+            'description' => ['nullable', 'string',],
+            'date' => ['nullable', 'date_format:Y-m-d',],
         ];
     }
 }
