@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Admin\OfflineTransaction;
 
-use App\Actions\Admin\OfflineTransaction\IndexOfflineTransactionAction;
 use App\Actions\Admin\OfflineTransaction\IndexSimilarOfflineTransactionAction;
-use App\Http\Requests\Admin\OfflineTransaction\IndexOfflineTransactionRequest;
-use App\Http\Resources\Admin\OfflineTransaction\OfflineTransactionResource;
+use App\Http\Resources\Admin\OfflineTransaction\ShowOfflineTransactionResource;
 use App\Models\OfflineTransaction;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -26,6 +24,6 @@ class IndexSimilarOfflineTransactionController
     {
         $offlineTransactions = ($this->indexSimilarOfflineTransactionAction)($offlineTransaction);
 
-        return OfflineTransactionResource::collection($offlineTransactions);
+        return ShowOfflineTransactionResource::collection($offlineTransactions);
     }
 }
