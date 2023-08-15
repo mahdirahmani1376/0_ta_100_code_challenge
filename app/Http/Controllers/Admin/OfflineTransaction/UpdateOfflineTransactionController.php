@@ -6,6 +6,7 @@ use App\Actions\Admin\OfflineTransaction\UpdateOfflineTransactionAction;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Http\Requests\Admin\OfflineTransaction\UpdateOfflineTransactionRequest;
 use App\Http\Resources\Admin\OfflineTransaction\OfflineTransactionResource;
+use App\Http\Resources\Admin\OfflineTransaction\ShowOfflineTransactionResource;
 use App\Models\OfflineTransaction;
 use Illuminate\Http\Response;
 
@@ -29,6 +30,6 @@ class UpdateOfflineTransactionController
     {
         $offlineTransaction = ($this->updateOfflineTransactionAction)($offlineTransaction, $request->validated());
 
-        return OfflineTransactionResource::make($offlineTransaction);
+        return ShowOfflineTransactionResource::make($offlineTransaction);
     }
 }
