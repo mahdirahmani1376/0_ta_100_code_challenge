@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int invoice_id
  * @property int bank_account_id
  * @property int admin_id
+ * @property string amount
  * @property string status
  * @property string payment_method
  * @property string tracking_code

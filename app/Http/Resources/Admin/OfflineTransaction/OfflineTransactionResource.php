@@ -19,6 +19,7 @@ class OfflineTransactionResource extends JsonResource
             'client_id' => $this->client_id,
             'invoice_id' => $this->invoice_id,
             'bank_account_id' => $this->bank_account_id,
+            'amount' => $this->amount,
             'status' => $this->status,
             'payment_method' => $this->payment_method,
             'tracking_code' => $this->tracking_code,
