@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\OfflineTransaction;
 
 use App\Http\Resources\Admin\OfflineTransaction\OfflineTransactionResource;
+use App\Http\Resources\Admin\OfflineTransaction\ShowOfflineTransactionResource;
 use App\Models\OfflineTransaction;
 
 class ShowOfflineTransactionController
@@ -13,6 +14,6 @@ class ShowOfflineTransactionController
      */
     public function __invoke(OfflineTransaction $offlineTransaction)
     {
-        return OfflineTransactionResource::make($offlineTransaction);
+        return ShowOfflineTransactionResource::make($offlineTransaction);
     }
 }
