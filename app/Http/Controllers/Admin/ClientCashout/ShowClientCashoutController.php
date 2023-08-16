@@ -13,6 +13,7 @@ class ShowClientCashoutController
      */
     public function __invoke(ClientCashout $clientCashout)
     {
+        // TODO implement zarinpal->syncStatusWithZarinpal()
         return ClientCashoutResource::make($clientCashout);
     }
 }
