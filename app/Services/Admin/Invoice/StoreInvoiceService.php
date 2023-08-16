@@ -23,14 +23,6 @@ class StoreInvoiceService
             $data['paid_at'] = $data['created_at'];
         }
 
-        return $this->invoiceRepository->create($data, [
-            'tax_rate',
-            'payment_method',
-            'created_at',
-            'status',
-            'paid_at',
-            'client_id',
-            'due_date',
-        ]);
+        return $this->invoiceRepository->create($data);
     }
 }

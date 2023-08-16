@@ -23,10 +23,7 @@ class ChargeWalletInvoiceController
      */
     public function __invoke(ChargeWalletInvoiceRequest $request)
     {
-        $invoice = ($this->chargeWalletInvoiceAction)(
-            $request->validated('client_id'),
-            $request->validated('amount'),
-        );
+        $invoice = ($this->chargeWalletInvoiceAction)($request->validated());
 
         return InvoiceResource::make($invoice);
     }
