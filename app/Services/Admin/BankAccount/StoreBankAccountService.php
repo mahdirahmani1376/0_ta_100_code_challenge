@@ -23,6 +23,7 @@ class StoreBankAccountService
             'title',
             'display_order',
             'rahkaran_id',
+            'status',
         ]);
     }
 }
