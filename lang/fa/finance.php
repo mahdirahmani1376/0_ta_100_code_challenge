@@ -99,5 +99,15 @@ return [
     ],
     'affiliation' => [
         'item_desc' => 'بابت تخفیف استفاده از کد :code'
-    ]
+    ],
+    'mergeInvoice' => [
+        'needMoreInvoice' => "برای اینکار به حداقل دو فاکتور نیاز است",
+        'notCredit' => "فاکتور شماره :invoice_id پرداختی است",
+        'notMassPayment' => "فاکتور شماره :invoice_id تجمیعی است",
+        'notRahkaranId' => "فاکتور شماره :invoice_id دارای شناسه راهکاران است",
+        'notAllowedStatus' => "فاکتور شماره :invoice_id نباید در وضعیت :status قرار داشته باشد",
+        'withDifferentClient' => "فاکتور به کاربران متفاوت متصل هستند",
+        'withDifferentTaxRate' => "ضریب مالیات فاکتور های انتخابی متفاوت است و امکان ادغام آنها وجود ندارد.",
+        'mergeFailed' => "ادغام فاکتور ها با خطا مواجه شد",
+    ],
 ];

@@ -36,4 +36,6 @@ interface EloquentRepositoryInterface
         $sortColumn = 'id',
         $sortDirection = 'desc'
     );
+
+    public function indexByIds(array $ids): Collection;
 }

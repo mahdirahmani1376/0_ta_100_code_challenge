@@ -133,4 +133,11 @@ class BaseRepository implements EloquentRepositoryInterface
 
         return !empty($paginate) ? $query->paginate($paginate['perPage'], $columns, 'page', $paginate['page']) : $query->get();
     }
+
+    public function indexByIds(array $ids): Collection
+    {
+        return self::newQuery()
+            ->whereIn('id', $ids)
+            ->get();
+    }
 }

@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Invoice\Item\DeleteItemController;
 use App\Http\Controllers\Admin\Invoice\Item\StoreItemController;
 use App\Http\Controllers\Admin\Invoice\Item\UpdateItemController;
 use App\Http\Controllers\Admin\Invoice\ManualCheckController;
+use App\Http\Controllers\Admin\Invoice\MergeInvoiceController;
 use App\Http\Controllers\Admin\Invoice\ShowInvoiceController;
 use App\Http\Controllers\Admin\Invoice\StoreInvoiceController;
 use App\Http\Controllers\Admin\Invoice\Transaction\IndexTransactionController;
@@ -67,6 +68,7 @@ Route::namespace('Invoice')
         Route::get('/', IndexInvoiceController::class);
         Route::post('/', StoreInvoiceController::class);
         Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
+        Route::post('merge', MergeInvoiceController::class);
         Route::get('report', InvoiceReportController::class);
         Route::get('{invoice}', ShowInvoiceController::class);
         Route::put('{invoice}', UpdateInvoiceController::class);

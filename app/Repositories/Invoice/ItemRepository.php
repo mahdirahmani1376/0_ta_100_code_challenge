@@ -40,4 +40,11 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
             ->where('invoice_id', $invoice->getKey())
             ->sum('amount');
     }
+
+    public function indexByInvoices(array $invoiceIds): Collection
+    {
+        return self::newQuery()
+            ->whereIn('invoice_id', $invoiceIds)
+            ->get();
+    }
 }

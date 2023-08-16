@@ -15,4 +15,5 @@ final class ExceptionCodes
     public const MAIN_APP_INTERNAL_API = '530004';
     public const MIN_DATE_OUT_OF_RANGE_FISCAL_YEAR = '570058';
     public const MAX_DATE_OUT_OF_RANGE_FISCAL_YEAR = '570059';
+    public const INVOICE_IS_CREDIT_OR_MASS_PAYMENT = '410095';
 }
