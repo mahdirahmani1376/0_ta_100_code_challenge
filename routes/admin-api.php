@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\Invoice\Item\UpdateItemController;
 use App\Http\Controllers\Admin\Invoice\ManualCheckController;
 use App\Http\Controllers\Admin\Invoice\MergeInvoiceController;
 use App\Http\Controllers\Admin\Invoice\ShowInvoiceController;
+use App\Http\Controllers\Admin\Invoice\SplitInvoiceController;
 use App\Http\Controllers\Admin\Invoice\StoreInvoiceController;
 use App\Http\Controllers\Admin\Invoice\Transaction\IndexTransactionController;
 use App\Http\Controllers\Admin\Invoice\Transaction\StoreTransactionController;
@@ -74,6 +75,7 @@ Route::namespace('Invoice')
         Route::put('{invoice}', UpdateInvoiceController::class);
         Route::post('{invoice}/status', ChangeInvoiceStatusController::class);
         Route::post('{invoice}/manual-check', ManualCheckController::class);
+        Route::post('{invoice}/split', SplitInvoiceController::class);
     });
 
 

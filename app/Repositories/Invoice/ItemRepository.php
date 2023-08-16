@@ -47,4 +47,11 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
             ->whereIn('invoice_id', $invoiceIds)
             ->get();
     }
+
+    public function reAssignItemsToInvoice(Invoice $invoice, array $itemIds): int
+    {
+        return self::newQuery()
+            ->whereIn('id', $itemIds)
+            ->update(['invoice_id' => $invoice->getKey()]);
+    }
 }

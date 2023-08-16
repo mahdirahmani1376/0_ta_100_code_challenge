@@ -11,4 +11,7 @@ return [
     ExceptionCodes::MIN_DATE_OUT_OF_RANGE_FISCAL_YEAR => 'حداقل تاریخ شروع باید از :fiscal_year_start_day بزرگتر باشد, مقدار کنونی :from_date',
     ExceptionCodes::MAX_DATE_OUT_OF_RANGE_FISCAL_YEAR => 'حداکثر تاریخ شروع باید از :fiscal_year_end_day کوچکتر باشد, مقدار کنونی :to_date',
     ExceptionCodes::INVOICE_IS_CREDIT_OR_MASS_PAYMENT => ':message',
+    ExceptionCodes::UPDATING_PAID_OR_REFUNDED_INVOICE_NOT_ALLOWED => 'فاکتور مورد نظر قابل ویرایش نمی باشد.',
+    ExceptionCodes::INVOICE_HAS_ACTIVE_TRANSACTIONS => 'فاکتور :invoice_id دارای تراکنش های موفق می باشد.',
+    ExceptionCodes::AT_LEAST_ONE_INVOICE_ITEM_MUST_REMAIN => 'برای جداسازی فاکتور حداقل یک آیتم باید باقی بماند.',
 ];

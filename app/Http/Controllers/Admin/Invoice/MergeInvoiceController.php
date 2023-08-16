@@ -23,6 +23,7 @@ class MergeInvoiceController
      * @param MergeInvoiceRequest $request
      * @return InvoiceResource
      * @throws MergeInvoiceException
+     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(MergeInvoiceRequest $request)
     {
