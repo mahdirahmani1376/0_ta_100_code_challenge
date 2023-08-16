@@ -23,6 +23,7 @@ class UpdateBankAccountService
             'title',
             'display_order',
             'rahkaran_id',
+            'status',
         ]);
     }
 }
