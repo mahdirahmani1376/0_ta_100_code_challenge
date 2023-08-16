@@ -27,6 +27,10 @@ class BankAccountRepository extends BaseRepository implements BankAccountReposit
                     ->orWhere('title', 'LIKE', '%' . $data['search'] . '%');
             });
         }
+        if (!empty($data['status'])) {
+            $query->where('status', $data['status']);
+        }
+
         $query->orderBy(
             $data['sort'] ?? 'display_order',
             $data['sortDirection'] ?? 'asc',
