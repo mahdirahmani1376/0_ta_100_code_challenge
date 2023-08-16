@@ -30,6 +30,10 @@ class StoreClientCashoutRequest extends FormRequest
                 'nullable',
                 'numeric',
             ],
+            'admin_note' => [
+                'nullable',
+                'max:255',
+            ],
         ];
     }
 }
