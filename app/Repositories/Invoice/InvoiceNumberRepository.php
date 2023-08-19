@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Invoice;
 
+use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
@@ -37,5 +38,45 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
         }
 
         return self::paginate($query);
+    }
+
+    public function findByInvoice(Invoice $invoice): ?InvoiceNumber
+    {
+        return self::newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->first();
+    }
+
+    public function getAvailableInvoiceNumber(string $type, string $fiscalYear): ?InvoiceNumber
+    {
+        return self::newQuery()
+            ->whereNull('invoice_id')
+            ->where('type', $type)
+            ->where('fiscal_year', $fiscalYear)
+            ->where('status', InvoiceNumber::STATUS_UNUSED)
+            ->first();
+    }
+
+    public function use(Invoice $invoice, InvoiceNumber $invoiceNumber): int
+    {
+        return self::newQuery()
+            ->where('id', $invoiceNumber->getKey())
+            ->update([
+                'status' => InvoiceNumber::STATUS_USED,
+                'invoice_id' => $invoice->getKey(),
+            ]);
+    }
+
+    public function getLatestInvoiceNumber(string $type): int
+    {
+        self::newQuery()
+            ->where('type', $type)
+            ->max('invoice_number');
+    }
+
+    public function insert(array $data): bool
+    {
+        self::newQuery()
+            ->insert($data);
     }
 }
