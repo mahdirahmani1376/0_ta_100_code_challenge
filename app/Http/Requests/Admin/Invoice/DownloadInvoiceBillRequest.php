@@ -15,7 +15,6 @@ class DownloadInvoiceBillRequest extends FormRequest
     {
         return [
             'admin_id' => ['required', 'numeric',],
-            'create_fresh' => ['nullable', 'bool',],
         ];
     }
 }
