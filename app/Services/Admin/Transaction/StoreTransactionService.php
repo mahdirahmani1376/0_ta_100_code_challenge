@@ -24,7 +24,13 @@ class StoreTransactionService
         if (empty($data['created_at'])) {
             $data['created_at'] = now();
         }
+        if (empty($data['description'])) {
+            $data['description'] = ' ';
+        }
         $data['description'] .= '---Record created by Admin #' . request('admin_id', -1);
+        if (empty($data['tracking_code'])) {
+            $data['tracking_code'] = 'NO_TRACKING_CODE';
+        }
         if (empty($data['reference_id'])) {
             $data['reference_id'] = 'NO_REFERENCE_' . $data['tracking_code'];
         }

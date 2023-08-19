@@ -13,7 +13,6 @@ class InvoiceResource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var Invoice $this */
-
         return [
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),

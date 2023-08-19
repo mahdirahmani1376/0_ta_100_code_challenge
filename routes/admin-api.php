@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ClientCashout\IndexClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\ShowClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\StoreClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\UpdateClientCashoutController;
+use App\Http\Controllers\Admin\Invoice\ApplyBalanceToInvoiceController;
 use App\Http\Controllers\Admin\Invoice\ChangeInvoiceStatusController;
 use App\Http\Controllers\Admin\Invoice\ChargeWalletInvoiceController;
 use App\Http\Controllers\Admin\Invoice\DownloadInvoiceBillController;
@@ -78,6 +79,7 @@ Route::namespace('Invoice')
         Route::post('{invoice}/manual-check', ManualCheckController::class);
         Route::post('{invoice}/split', SplitInvoiceController::class);
         Route::get('{invoice}/download', DownloadInvoiceBillController::class);
+        Route::post('{invoice}/apply-balance', ApplyBalanceToInvoiceController::class);
     });
 
 
