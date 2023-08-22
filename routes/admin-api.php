@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\Invoice\SplitInvoiceController;
 use App\Http\Controllers\Admin\Invoice\StoreInvoiceController;
 use App\Http\Controllers\Admin\Invoice\Transaction\IndexTransactionController;
 use App\Http\Controllers\Admin\Invoice\Transaction\StoreTransactionController;
+use App\Http\Controllers\Admin\Invoice\Transaction\VerifyTransactionController;
 use App\Http\Controllers\Admin\Invoice\UpdateInvoiceController;
 use App\Http\Controllers\Admin\OfflineTransaction\DeleteOfflineTransactionController;
 use App\Http\Controllers\Admin\OfflineTransaction\IndexOfflineTransactionController;
@@ -67,8 +68,9 @@ Route::namespace('Invoice')
         Route::namespace('Transaction')
             ->prefix('transaction')
             ->group(function () {
-                Route::post('{invoice}', StoreTransactionController::class);
                 Route::get('/', IndexTransactionController::class);
+                Route::post('{invoice}', StoreTransactionController::class);
+                Route::post('{transaction}/verify', VerifyTransactionController::class);
             });
         Route::get('/', IndexInvoiceController::class);
         Route::post('/', StoreInvoiceController::class);

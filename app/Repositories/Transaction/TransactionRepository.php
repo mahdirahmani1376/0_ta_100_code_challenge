@@ -36,7 +36,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where('invoice_id', $invoice->getKey())
             ->where('amount', '>', 10)
             ->orderBy('created_at', 'desc')
-            ->first('created_at');
+            ->first();
     }
 
     public function findByTrackingCode($trackingCode): ?Transaction

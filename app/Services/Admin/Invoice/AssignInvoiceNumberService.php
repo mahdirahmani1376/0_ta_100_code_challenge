@@ -41,7 +41,6 @@ class AssignInvoiceNumberService
         }
 
         $invoiceNumber = $this->invoiceNumberRepository->findByInvoice($invoice);
-
         // If Invoice already has an InvoiceNumber do nothing
         if (!is_null($invoiceNumber)) {
             return $invoiceNumber;

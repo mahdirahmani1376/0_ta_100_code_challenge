@@ -3,6 +3,7 @@
 namespace App\Services\Invoice;
 
 use App\Models\Invoice;
+use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 
@@ -33,11 +34,12 @@ class CalcInvoicePaidAtService
         }
 
         // Try to find the last successful transaction and use its 'created_at' timestamp as when invoice was paid at
-        $lastSuccessfulTransactionCreatedAt = $this->transactionRepository->getLastSuccessfulTransaction($invoice);
-        if (!is_null($lastSuccessfulTransactionCreatedAt)) {
+        /** @var Transaction $lastSuccessfulTransaction */
+        $lastSuccessfulTransaction = $this->transactionRepository->getLastSuccessfulTransaction($invoice);
+        if (!is_null($lastSuccessfulTransaction)) {
             return $this->invoiceRepository->update(
                 $invoice,
-                ['paid_at' => $lastSuccessfulTransactionCreatedAt,],
+                ['paid_at' => $lastSuccessfulTransaction->created_at,],
                 ['paid_at',]
             );
         }

@@ -69,7 +69,7 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
 
     public function getLatestInvoiceNumber(string $type): int
     {
-        self::newQuery()
+        return self::newQuery()
             ->where('type', $type)
             ->max('invoice_number');
     }
