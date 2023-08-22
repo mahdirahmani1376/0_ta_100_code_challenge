@@ -7,7 +7,6 @@ use App\Actions\Admin\Wallet\StoreCreditTransactionAction;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\AssignInvoiceNumberService;
 use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
-use App\Services\Admin\Transaction\StoreRefundCreditTransactionService;
 use App\Services\Admin\Transaction\StoreRefundTransactionService;
 use App\Services\Admin\Wallet\StoreCreditTransactionForOfflineTransactionService;
 use App\Services\Invoice\CalcInvoicePaidAtService;
@@ -16,7 +15,6 @@ use App\Services\Wallet\CalcWalletBalanceService;
 class ProcessInvoiceAction
 {
     private ShowWalletAction $showWalletAction;
-    private StoreRefundCreditTransactionService $storeRefundCreditTransactionService;
     private StoreRefundTransactionService $storeRefundTransactionService;
     private ChangeInvoiceStatusService $changeInvoiceStatusService;
     private CalcInvoicePaidAtService $calcInvoicePaidAtService;
@@ -27,7 +25,6 @@ class ProcessInvoiceAction
 
     public function __construct(
         ShowWalletAction                                   $showWalletAction,
-        StoreRefundCreditTransactionService                $storeRefundCreditTransactionService,
         StoreRefundTransactionService                      $storeRefundTransactionService,
         ChangeInvoiceStatusService                         $changeInvoiceStatusService,
         CalcInvoicePaidAtService                           $calcInvoicePaidAtService,
@@ -38,7 +35,6 @@ class ProcessInvoiceAction
     )
     {
         $this->showWalletAction = $showWalletAction;
-        $this->storeRefundCreditTransactionService = $storeRefundCreditTransactionService;
         $this->storeRefundTransactionService = $storeRefundTransactionService;
         $this->changeInvoiceStatusService = $changeInvoiceStatusService;
         $this->calcInvoicePaidAtService = $calcInvoicePaidAtService;
