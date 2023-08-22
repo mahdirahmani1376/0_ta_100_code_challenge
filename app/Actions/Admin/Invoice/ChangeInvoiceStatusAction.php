@@ -25,6 +25,6 @@ class ChangeInvoiceStatusAction
 
         $invoice = ($this->changeInvoiceStatusService)($invoice, $status);
 
-        return ($this->calcInvoicePaidAtService)($invoice, $status);
+        return ($this->calcInvoicePaidAtService)($invoice);
     }
 }

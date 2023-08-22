@@ -34,6 +34,7 @@ class Item extends Model
 
     const TYPE_MASS_PAYMENT_INVOICE = 'MassPaymentInvoice';
     const TYPE_ADD_CLIENT_CREDIT = 'AddClientCredit';
+    public const TYPE_ADD_CLOUD_CREDIT = 'AddCloudCredit';
     public const TYPE_DOMAIN_SERVICE = 'DomainService';
     protected $casts = [
         'deleted_at' => 'datetime',

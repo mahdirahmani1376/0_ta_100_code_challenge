@@ -73,10 +73,4 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
             ->where('type', $type)
             ->max('invoice_number');
     }
-
-    public function insert(array $data): bool
-    {
-        self::newQuery()
-            ->insert($data);
-    }
 }

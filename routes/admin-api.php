@@ -41,6 +41,7 @@ use App\Http\Controllers\Admin\OfflineTransaction\IndexSimilarOfflineTransaction
 use App\Http\Controllers\Admin\OfflineTransaction\ShowOfflineTransactionController;
 use App\Http\Controllers\Admin\OfflineTransaction\StoreOfflineTransactionController;
 use App\Http\Controllers\Admin\OfflineTransaction\UpdateOfflineTransactionController;
+use App\Http\Controllers\Admin\OfflineTransaction\VerifyOfflineTransactionController;
 use App\Http\Controllers\Admin\Wallet\DeductBalanceController;
 use App\Http\Controllers\Admin\Wallet\IndexCreditTransactionController;
 use App\Http\Controllers\Admin\Wallet\ShowWalletAndTransactionController;
@@ -92,6 +93,7 @@ Route::namespace('OfflineTransaction')
         Route::delete('{offlineTransaction}', DeleteOfflineTransactionController::class);
         Route::Put('{offlineTransaction}', UpdateOfflineTransactionController::class);
         Route::get('{offlineTransaction}/similar', IndexSimilarOfflineTransactionController::class);
+        Route::post('{offlineTransaction}/verify', VerifyOfflineTransactionController::class);
     });
 
 Route::namespace('Wallet')

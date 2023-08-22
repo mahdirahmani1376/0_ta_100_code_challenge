@@ -18,14 +18,14 @@ class CalcInvoicePaidAtService
         $this->transactionRepository = $transactionRepository;
     }
 
-    public function __invoke(Invoice $invoice, string $status): Invoice
+    public function __invoke(Invoice $invoice): Invoice
     {
         // Do not change paid_at
         if ($invoice->balance != 0) {
             return $invoice;
         }
         // Do not change paid_at
-        if (!in_array($status, [
+        if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
             Invoice::STATUS_REFUNDED,
         ])) {

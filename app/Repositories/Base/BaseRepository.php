@@ -140,4 +140,10 @@ class BaseRepository implements EloquentRepositoryInterface
             ->whereIn('id', $ids)
             ->get();
     }
+
+    public function insert(array $data): bool
+    {
+        return self::newQuery()
+            ->insert($data);
+    }
 }

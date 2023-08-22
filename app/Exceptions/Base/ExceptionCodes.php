@@ -21,4 +21,5 @@ final class ExceptionCodes
     public const AT_LEAST_ONE_INVOICE_ITEM_MUST_REMAIN = '420031';
     public const APPLY_CREDIT_TO_CREDIT_INVOICE_NOT_ALLOWED = '410088';
     public const AMOUNT_IS_MORE_THAN_INVOICE_BALANCE = '410090';
+    public const OFFLINE_PAYMENT_APPLY = "410133";
 }

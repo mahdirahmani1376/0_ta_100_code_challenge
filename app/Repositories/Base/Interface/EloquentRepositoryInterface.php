@@ -16,6 +16,7 @@ interface EloquentRepositoryInterface
     public function fill(Model $object, array $attributes, $fillable = []);
 
     public function create(array $attributes, array $fillable = []): Model;
+
     public function find(int $id): Model;
 
     public function update(Model $object, array $attributes, array $fillable = []): Model;
@@ -38,4 +39,6 @@ interface EloquentRepositoryInterface
     );
 
     public function indexByIds(array $ids): Collection;
+
+    public function insert(array $data): bool;
 }

@@ -4,8 +4,6 @@ namespace App\Actions\Admin\Invoice;
 
 use App\Actions\Admin\Wallet\ShowWalletAction;
 use App\Actions\Invoice\CalcInvoicePriceFieldsAction;
-use App\Actions\Invoice\ProcessInvoiceAction;
-use App\Models\Invoice;
 use App\Services\Admin\Invoice\Item\StoreItemService;
 use App\Services\Admin\Invoice\StoreInvoiceService;
 use App\Services\Admin\Transaction\StoreRefundCreditTransactionService;
@@ -22,6 +20,7 @@ class StoreInvoiceAction
     private ShowWalletAction $showWalletAction;
     private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
     private ProcessInvoiceService $processInvoiceService;
+    private ProcessInvoiceAction $processInvoiceAction;
 
     public function __construct(StoreInvoiceService                 $storeInvoiceService,
                                 StoreItemService                    $storeItemService,
@@ -30,6 +29,7 @@ class StoreInvoiceAction
                                 ProcessInvoiceService               $processInvoiceService,
                                 ShowWalletAction                    $showWalletAction,
                                 CalcInvoicePriceFieldsService       $calcInvoicePriceFieldsService,
+                                ProcessInvoiceAction                $processInvoiceAction
     )
     {
         $this->storeInvoiceService = $storeInvoiceService;
@@ -39,6 +39,7 @@ class StoreInvoiceAction
         $this->showWalletAction = $showWalletAction;
         $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
         $this->processInvoiceService = $processInvoiceService;
+        $this->processInvoiceAction = $processInvoiceAction;
     }
 
     public function __invoke(array $data)
@@ -50,17 +51,10 @@ class StoreInvoiceAction
                 ($this->storeItemService)($invoice, $item);
             }
         }
-        // Calculate sun_total, tax, total fields of invoice
+        // Calculate sub_total, tax, total fields of invoice
         $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
-        $invoice = ($this->processInvoiceService)($invoice);
-
-        if ($data['status'] == Invoice::STATUS_REFUNDED) {
-            $wallet = ($this->showWalletAction)($invoice->client_id);
-            ($this->storeRefundCreditTransactionService)($invoice, $wallet);
-            ($this->storeRefundTransactionService)($invoice);
-
-            ($this->processInvoiceService)($invoice);
-        }
+        // TODO check if invoice is paid refunded or ...
+//        ($this->processInvoiceAction)($invoice);
 
         return $invoice;
     }

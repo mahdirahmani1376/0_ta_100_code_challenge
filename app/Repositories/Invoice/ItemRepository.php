@@ -54,4 +54,15 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
             ->whereIn('id', $itemIds)
             ->update(['invoice_id' => $invoice->getKey()]);
     }
+
+    public function findAddCreditItem(Invoice $invoice): ?Item
+    {
+        return self::newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->whereIn('status', [
+                Item::TYPE_ADD_CLIENT_CREDIT,
+                Item::TYPE_ADD_CLOUD_CREDIT,
+            ])
+            ->first();
+    }
 }

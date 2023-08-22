@@ -4,7 +4,6 @@ namespace App\Actions\Admin\Invoice;
 
 use App\Exceptions\Http\BadRequestException;
 use App\Models\Invoice;
-use App\Models\InvoiceNumber;
 use App\Services\Admin\Invoice\AssignInvoiceNumberService;
 
 class DownloadInvoiceBillAction
@@ -47,12 +46,7 @@ class DownloadInvoiceBillAction
             $invoice->invoiceNumber()->doesntExist() &&
             $invoiceDate->greaterThan('2021-03-21')
         ) {
-            if ($invoice->status === Invoice::STATUS_PAID || $invoice->status === Invoice::STATUS_COLLECTIONS) {
-                ($this->assignInvoiceNumberService)($invoice, InvoiceNumber::TYPE_PAID);
-            }
-            if ($invoice->status === Invoice::STATUS_REFUNDED) {
-                ($this->assignInvoiceNumberService)($invoice, InvoiceNumber::TYPE_REFUND);
-            }
+            ($this->assignInvoiceNumberService)($invoice);
         }
 
         return $invoice;

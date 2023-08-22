@@ -13,19 +13,16 @@ class StoreOfflineTransactionAction
     private StoreOfflineTransactionService $storeOfflineTransactionService;
     private StoreTransactionService $storeTransactionService;
     private FindInvoiceByIdService $findInvoiceByIdService;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
 
     public function __construct(
         FindInvoiceByIdService         $findInvoiceByIdService,
         StoreOfflineTransactionService $storeOfflineTransactionService,
         StoreTransactionService        $storeTransactionService,
-        CalcInvoicePriceFieldsService  $calcInvoicePriceFieldsService,
     )
     {
         $this->storeOfflineTransactionService = $storeOfflineTransactionService;
         $this->storeTransactionService = $storeTransactionService;
         $this->findInvoiceByIdService = $findInvoiceByIdService;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
     }
 
     public function __invoke(array $data)
@@ -38,8 +35,6 @@ class StoreOfflineTransactionAction
         $data['payment_method'] = Transaction::PAYMENT_METHOD_OFFLINE;
         $data['status'] = Transaction::STATUS_PENDING;
         ($this->storeTransactionService)($invoice, $data);
-
-        ($this->calcInvoicePriceFieldsService)($invoice);
 
         return $offlineTransaction;
     }

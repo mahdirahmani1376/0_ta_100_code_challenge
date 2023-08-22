@@ -2,12 +2,14 @@
 
 namespace App\Repositories\OfflineTransaction;
 
+use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class OfflineTransactionRepository extends BaseRepository implements OfflineTransactionRepositoryInterface
 {
@@ -57,5 +59,13 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
             );
 
         return self::paginate($query);
+    }
+
+    public function sumOfVerifiedOfflineTransactions(Invoice $invoice): Collection
+    {
+        return self::newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->where('status', OfflineTransaction::STATUS_CONFIRMED)
+            ->sum('amount');
     }
 }

@@ -15,8 +15,16 @@ class AssignInvoiceNumberService
         $this->invoiceNumberRepository = $invoiceNumberRepository;
     }
 
-    public function __invoke(Invoice $invoice, string $type): ?InvoiceNumber
+    public function __invoke(Invoice $invoice): ?InvoiceNumber
     {
+        if (!in_array($invoice->status,[
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_COLLECTIONS,
+            Invoice::STATUS_REFUNDED,
+        ])) {
+            return null;
+        }
+
         // MassPayment Invoices cant have InvoiceNumber
         if ($invoice->is_mass_payment) {
             return null;
@@ -38,6 +46,8 @@ class AssignInvoiceNumberService
         if (!is_null($invoiceNumber)) {
             return $invoiceNumber;
         }
+
+        $type = $invoice->status == Invoice::STATUS_REFUNDED ? InvoiceNumber::TYPE_REFUND : InvoiceNumber::TYPE_PAID;
 
         $fiscalYear = config('payment.invoice_number.current_fiscal_year'); // TODO
 
