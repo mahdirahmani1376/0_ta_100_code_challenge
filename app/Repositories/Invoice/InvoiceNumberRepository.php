@@ -47,30 +47,35 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
             ->first();
     }
 
-    public function getAvailableInvoiceNumber(string $type, string $fiscalYear): ?InvoiceNumber
+    public function use(Invoice $invoice, string $type, string $fiscalYear): int
     {
         return self::newQuery()
             ->whereNull('invoice_id')
             ->where('type', $type)
             ->where('fiscal_year', $fiscalYear)
             ->where('status', InvoiceNumber::STATUS_UNUSED)
-            ->first();
-    }
-
-    public function use(Invoice $invoice, InvoiceNumber $invoiceNumber): int
-    {
-        return self::newQuery()
-            ->where('id', $invoiceNumber->getKey())
+            ->limit(1)
             ->update([
+                'invoice_id' => $invoice->id,
                 'status' => InvoiceNumber::STATUS_USED,
-                'invoice_id' => $invoice->getKey(),
+                'updated_at' => now(),
             ]);
     }
 
-    public function getLatestInvoiceNumber(string $type): int
+    public function getLatestInvoiceNumber(string $type, string $fiscalYear): int
     {
         return self::newQuery()
             ->where('type', $type)
+            ->where('fiscal_year', $fiscalYear)
             ->max('invoice_number');
+    }
+
+    public function countUnused(string $type, string $fiscalYear): int
+    {
+        return self::newQuery()
+            ->where('type', $type)
+            ->where('fiscal_year', $fiscalYear)
+            ->whereNull('invoice_id')
+            ->count();
     }
 }
