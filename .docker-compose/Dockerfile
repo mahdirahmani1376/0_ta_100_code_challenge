@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     libcap2-bin
 
-
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -30,6 +29,9 @@ RUN docker-php-ext-install bcmath
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install zip
 
+#installing redis extension
+RUN pecl install redis && docker-php-ext-enable redis
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -39,8 +41,12 @@ RUN mkdir -p /home/$USER/.composer && \
     chown -R $USER:$USER /home/$USER
 
 COPY php.ini /usr/local/etc/php/php.ini
+COPY horizon.conf /etc/supervisor/conf.d/horizon.conf
+COPY ./entrypoint.sh /
 
 # Set working directory
 WORKDIR /var/www
 
 USER $USER
+
+#ENTRYPOINT ["/entrypoint.sh"]

@@ -14,8 +14,20 @@ services:
         networks:
             - finance_service_network
             - database_mysql_network
-#        depends_on:
-#            - redis
+        depends_on:
+            - redis
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'sail-redis:/data'
+        networks:
+            - finance_service_network
+        healthcheck:
+            test: [ "CMD", "redis-cli", "ping" ]
+            retries: 3
+            timeout: 5s
     nginx:
         image: nginx:1.17-alpine
         container_name: 'finance_service_nginx'
@@ -40,4 +52,5 @@ networks:
         driver: bridge
     database_mysql_network:
         external: true
-
+volumes:
+    sail-redis:
