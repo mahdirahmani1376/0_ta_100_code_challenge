@@ -2,9 +2,11 @@
 
 namespace App\Services\Admin\Invoice;
 
+use App\Jobs\GenerateInvoiceNumberJob;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class AssignInvoiceNumberService
 {
@@ -17,7 +19,7 @@ class AssignInvoiceNumberService
 
     public function __invoke(Invoice $invoice): ?InvoiceNumber
     {
-        if (!in_array($invoice->status,[
+        if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
             Invoice::STATUS_COLLECTIONS,
             Invoice::STATUS_REFUNDED,
@@ -27,6 +29,11 @@ class AssignInvoiceNumberService
 
         // MassPayment Invoices cant have InvoiceNumber
         if ($invoice->is_mass_payment) {
+            return null;
+        }
+
+        // Credit Invoices cant have InvoiceNumber
+        if ($invoice->is_credit) {
             return null;
         }
 
@@ -49,12 +56,14 @@ class AssignInvoiceNumberService
         $type = $invoice->status == Invoice::STATUS_REFUNDED ? InvoiceNumber::TYPE_REFUND : InvoiceNumber::TYPE_PAID;
 
         $fiscalYear = config('payment.invoice_number.current_fiscal_year'); // TODO
-
-        $invoiceNumber = $this->invoiceNumberRepository->getAvailableInvoiceNumber($type, $fiscalYear);
+        $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear);
 
         // No available InvoiceNumber, generate 100 available InvoiceNumbers
-        if (is_null($invoiceNumber)) {
-            $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type);
+        // Normally this if-clause MUST NOT be executed if it keeps executing something is wrong and needs investigation
+        if ($affectedRecordCount == 0) {
+            info('Could not assign InvoiceNumber to invoice: '. $invoice->id);
+            info('Generating 100 InvoiceNumbers');
+            $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
             $hundredAvailableInvoiceNumbers = [];
             $now = now();
             for ($i = 1; $i <= 100; $i++) {
@@ -71,11 +80,14 @@ class AssignInvoiceNumberService
             $this->invoiceNumberRepository->insert($hundredAvailableInvoiceNumbers);
 
             // Try again to get an available InvoiceNumber
-            $invoiceNumber = $this->invoiceNumberRepository->getAvailableInvoiceNumber($type, $fiscalYear);
+            $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear);
+            if ($affectedRecordCount == 0) {
+                // TODO send critical error alert to sysAdmin / devTeam
+            }
         }
 
-        $this->invoiceNumberRepository->use($invoice, $invoiceNumber);
+        GenerateInvoiceNumberJob::dispatch($type, $fiscalYear);
 
-        return $invoiceNumber;
+        return $invoice->invoiceNumber;
     }
 }
