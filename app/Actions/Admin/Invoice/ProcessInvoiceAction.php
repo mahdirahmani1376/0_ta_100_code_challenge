@@ -4,8 +4,8 @@ namespace App\Actions\Admin\Invoice;
 
 use App\Actions\Admin\Wallet\ShowWalletAction;
 use App\Actions\Admin\Wallet\StoreCreditTransactionAction;
+use App\Jobs\AssignInvoiceNumberJob;
 use App\Models\Invoice;
-use App\Services\Admin\Invoice\AssignInvoiceNumberService;
 use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
 use App\Services\Admin\Transaction\StoreRefundTransactionService;
 use App\Services\Admin\Wallet\StoreCreditTransactionForOfflineTransactionService;
@@ -19,7 +19,6 @@ class ProcessInvoiceAction
     private ChangeInvoiceStatusService $changeInvoiceStatusService;
     private CalcInvoicePaidAtService $calcInvoicePaidAtService;
     private StoreCreditTransactionAction $storeCreditTransactionAction;
-    private AssignInvoiceNumberService $assignInvoiceNumberService;
     private StoreCreditTransactionForOfflineTransactionService $storeCreditTransactionForOfflineTransactionService;
     private CalcWalletBalanceService $calcWalletBalanceService;
 
@@ -29,7 +28,6 @@ class ProcessInvoiceAction
         ChangeInvoiceStatusService                         $changeInvoiceStatusService,
         CalcInvoicePaidAtService                           $calcInvoicePaidAtService,
         StoreCreditTransactionAction                       $storeCreditTransactionAction,
-        AssignInvoiceNumberService                         $assignInvoiceNumberService,
         StoreCreditTransactionForOfflineTransactionService $storeCreditTransactionForOfflineTransactionService,
         CalcWalletBalanceService                           $calcWalletBalanceService,
     )
@@ -39,7 +37,6 @@ class ProcessInvoiceAction
         $this->changeInvoiceStatusService = $changeInvoiceStatusService;
         $this->calcInvoicePaidAtService = $calcInvoicePaidAtService;
         $this->storeCreditTransactionAction = $storeCreditTransactionAction;
-        $this->assignInvoiceNumberService = $assignInvoiceNumberService;
         $this->storeCreditTransactionForOfflineTransactionService = $storeCreditTransactionForOfflineTransactionService;
         $this->calcWalletBalanceService = $calcWalletBalanceService;
     }
@@ -51,13 +48,16 @@ class ProcessInvoiceAction
             ($this->storeCreditTransactionAction)($invoice->client_id, [
                 'amount' => $invoice->total,
                 'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
-            ])
+            ]);
             ($this->storeRefundTransactionService)($invoice);
         }
 
         // Change status to paid unless it is a REFUND invoice
-        // TODO what about collection
-        if ($invoice->status !== Invoice::STATUS_REFUNDED) {
+        if (!in_array($invoice->status, [
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_COLLECTIONS,
+            Invoice::STATUS_REFUNDED,
+        ])) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
         }
         // Calc paid_at
@@ -66,9 +66,7 @@ class ProcessInvoiceAction
         }
 
         // Assign InvoiceNumber
-        // TODO dispatch this service as a queued job
-        // TODO can is_credit invoices have InvoiceNumber ?
-        ($this->assignInvoiceNumberService)($invoice);
+        AssignInvoiceNumberJob::dispatch($invoice);
 
         // If invoice is charge-wallet (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
