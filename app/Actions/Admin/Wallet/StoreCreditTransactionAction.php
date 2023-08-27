@@ -9,24 +9,24 @@ use App\Services\Wallet\FindWalletByClientIdService;
 
 class StoreCreditTransactionAction
 {
-    private FindWalletByClientIdService $findWalletByClientIdService;
     private StoreCreditTransactionService $storeCreditTransactionService;
     private CalcWalletBalanceService $calcWalletBalanceService;
+    private ShowWalletAction $showWalletAction;
 
     public function __construct(
-        FindWalletByClientIdService   $findWalletByClientIdService,
+        ShowWalletAction              $showWalletAction,
         StoreCreditTransactionService $storeCreditTransactionService,
         CalcWalletBalanceService      $calcWalletBalanceService
     )
     {
-        $this->findWalletByClientIdService = $findWalletByClientIdService;
         $this->storeCreditTransactionService = $storeCreditTransactionService;
         $this->calcWalletBalanceService = $calcWalletBalanceService;
+        $this->showWalletAction = $showWalletAction;
     }
 
     public function __invoke(int $clientId, array $data): CreditTransaction
     {
-        $wallet = ($this->findWalletByClientIdService)($clientId);
+        $wallet = ($this->showWalletAction)($clientId);
         $creditTransaction = ($this->storeCreditTransactionService)($wallet, $data); // TODO import into Rahkaran 'storeReceipt'
         ($this->calcWalletBalanceService)($wallet);
 
