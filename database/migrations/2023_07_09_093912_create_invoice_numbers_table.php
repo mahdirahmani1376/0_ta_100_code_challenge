@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedBigInteger('invoice_id')->nullable();
-            $table->string('invoice_number');
+            $table->unsignedBigInteger('invoice_number');
             $table->string('fiscal_year');
             $table->string('status')->default(InvoiceNumber::STATUS_UNUSED);
             $table->string('type')->default(InvoiceNumber::TYPE_PAID);
