@@ -62,7 +62,10 @@ class ApplyBalanceToInvoiceAction
         ($this->storeTransactionAction)($invoice, [
             'amount' => $data['amount'],
             'payment_method' => Transaction::PAYMENT_METHOD_WALLET_BALANCE,
+            'status' => Transaction::STATUS_SUCCESS,
         ]);
+
+        // TODO ProcessInvoiceAction
 
         return $invoice;
     }
