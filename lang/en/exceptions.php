@@ -1,5 +1,5 @@
 <?php
-
+// TODO if we ever need english trans, this file is missing some keys
 
 use App\Exceptions\Base\ExceptionCodes;
 
