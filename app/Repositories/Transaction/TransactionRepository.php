@@ -125,4 +125,17 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
         return $this->paginate($query);
     }
+
+    public function profileListEverything(int $clientId): Collection
+    {
+        return self::newQuery()
+            ->where('client_id', $clientId)
+            ->where('status', Transaction::STATUS_SUCCESS)
+            ->whereNotIn('payment_method', [
+                Transaction::PAYMENT_METHOD_WALLET_BALANCE,
+                Transaction::PAYMENT_METHOD_CREDIT,
+            ])
+            ->where('amount', '>=', 50000)
+            ->get(['id', 'updated_at', 'invoice_id', 'amount', 'description',]);
+    }
 }

@@ -7,6 +7,8 @@ use App\Repositories\Base\BaseRepository;
 use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class CreditTransactionRepository extends BaseRepository implements CreditTransactionRepositoryInterface
 {
@@ -59,5 +61,16 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
         );
 
         return self::paginate($query);
+    }
+
+    public function profileListEverything(int $clientId): Collection
+    {
+        return self::newQuery()
+            ->where('client_id', $clientId)
+            ->where(function (Builder $builder) {
+                $builder->where('amount', '<=', -50000)
+                    ->orWhere('amount', '>=', 50000);
+            })
+            ->get(['id', 'created_at', 'updated_at', 'invoice_id', 'amount', 'description',]);
     }
 }

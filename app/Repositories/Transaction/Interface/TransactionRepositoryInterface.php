@@ -21,4 +21,6 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
     public function adminIndex(array $data): Collection|LengthAwarePaginator;
 
     public function profileIndex(array $data): Collection|LengthAwarePaginator;
+
+    public function profileListEverything(int $clientId): Collection;
 }

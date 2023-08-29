@@ -5,7 +5,6 @@ namespace App\Repositories\Invoice;
 use App\Models\Invoice;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -98,7 +97,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
                     Invoice::STATUS_COLLECTIONS,
                     Invoice::STATUS_PAYMENT_PENDING,
                 ]);
-            }else{
+            } else {
                 $query->where('status', '=', $data['status']);
             }
         }
@@ -113,15 +112,28 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         return self::paginate($query);
     }
 
+    public function profileListEverything(int $clientId): Collection
+    {
+        return self::newQuery()
+            ->where('client_id', $clientId)
+            ->where('status', Invoice::STATUS_PAID)
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->where(function (Builder $builder) {
+                $builder->where('total', '<=', -50000)
+                    ->orWhere('total', '>=', 50000);
+            })
+            ->get(['id', 'paid_at', 'total']);
+    }
+
     public function prepareInvoicesForMassPayment(array $data): Collection
     {
-        $query = self::newQuery();
-        $query->where('client_id', $data['client_id']);
-        $query->where('status', Invoice::STATUS_UNPAID);
-        $query->where('is_credit', false);
-        $query->where('is_mass_payment', false);
-        $query->whereIn('id', $data['invoice_ids']);
-
-        return $query->get();
+        return self::newQuery()
+            ->where('client_id', $data['client_id'])
+            ->where('status', Invoice::STATUS_UNPAID)
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->whereIn('id', $data['invoice_ids'])
+            ->get();
     }
 }
