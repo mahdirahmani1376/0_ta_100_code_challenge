@@ -23,7 +23,7 @@ class ApplyBalanceToInvoiceController
     /**
      * @param Invoice $invoice
      * @param ApplyBalanceToInvoiceRequest $request
-     * @return void
+     * @return InvoiceResource
      * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      * @throws ApplyCreditToCreditInvoiceException
      * @throws AmountIsMoreThanInvoiceBalanceException
