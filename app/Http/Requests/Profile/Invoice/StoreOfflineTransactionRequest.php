@@ -17,13 +17,14 @@ class StoreOfflineTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'integer'],
+            'amount' => ['required', 'integer',],
             'tracking_code' => ['required', 'unique:offline_transactions',],
             'payment_method' => ['required', 'string', Rule::in(OfflineTransaction::PAYMENT_METHODS),],
             'description' => ['nullable', 'string'],
             'bank_account_id' => ['required', 'exists:bank_accounts,id',],
-            'mobile' => ['nullable', new ValidIRMobile],
-            'paid_at' => ['required', 'bail', 'date_format:Y-m-d', 'before:tomorrow'],
+            'mobile' => ['nullable', new ValidIRMobile,],
+            'paid_at' => ['required', 'bail', 'date_format:Y-m-d', 'before:tomorrow',],
+            'client_id' => ['required', 'numeric',],
         ];
     }
 }
