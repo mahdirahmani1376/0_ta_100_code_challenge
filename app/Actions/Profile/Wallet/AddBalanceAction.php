@@ -32,7 +32,8 @@ class AddBalanceAction
             'status' => Invoice::STATUS_UNPAID,
             'client_id' => $data['client_id'],
             'is_credit' => true,
-            'description' => __('finance.invoice.ClientCreditInvoiceItem')
+            'description' => __('finance.invoice.ClientCreditInvoiceItem'),
+            'tax_rate' => 0,
         ]);
         ($this->storeItemService)($invoice, [
             'amount' => $data['amount'],
