@@ -31,6 +31,7 @@ class Transaction extends Model
 
     const PAYMENT_METHOD_OFFLINE = 'offline';
     const PAYMENT_METHOD_WALLET_BALANCE = 'wallet_balance';
+    const PAYMENT_METHOD_CREDIT = 'client_credit';
     const STATUS_PENDING = 'pending'; // old status = 0
     const STATUS_SUCCESS = 'success'; // old status = 1
     const STATUS_FAIL = 'fail'; // old status = 2
