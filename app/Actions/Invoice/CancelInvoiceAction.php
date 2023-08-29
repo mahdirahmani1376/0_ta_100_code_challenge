@@ -1,5 +1,5 @@
 <?php
-
+// TODO im not sure about this class's namespace and position in folder hierarchy , rethink about this later
 namespace App\Actions\Invoice;
 
 use App\Actions\Wallet\StoreCreditTransactionAction;
@@ -27,6 +27,10 @@ class CancelInvoiceAction
     public function __invoke(Invoice $invoice)
     {
         check_rahkaran($invoice);
+
+        if ($invoice->status != Invoice::STATUS_UNPAID) {
+            return $invoice;
+        }
 
         ($this->cancelInvoiceService)($invoice);
         // Get sum of successful transactions of this invoice
