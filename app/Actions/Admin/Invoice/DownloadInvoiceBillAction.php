@@ -24,17 +24,19 @@ class DownloadInvoiceBillAction
             Invoice::STATUS_COLLECTIONS,
             Invoice::STATUS_PAYMENT_PENDING
         ])) {
-            throw new BadRequestException(trans('finance.invoice.OfficialInvoiceStatusError'));
+            throw new BadRequestException(__('finance.invoice.OfficialInvoiceStatusError'));
         }
-
+        if ($invoice->is_credit) {
+            throw new BadRequestException(__('finance.invoice.CreditInvoiceCannotHaveInvoiceNumber'));
+        }
         $invoiceDate = $invoice->status === Invoice::STATUS_PAID ? $invoice->paid_at : $invoice->created_at;
 
         if (empty($invoiceDate)) {
-            throw new BadRequestException(trans('finance.invoice.NotCorrectStatus'));
+            throw new BadRequestException(__('finance.invoice.NotCorrectStatus'));
         }
 
         if (($invoiceDate->lessThan('2021-03-21') && $invoice->invoiceNumber()->doesntExist() && !$invoice->is_credit && $invoice->status !== Invoice::STATUS_UNPAID)) {
-            throw new BadRequestException(trans('finance.invoice.LessThan1400'));
+            throw new BadRequestException(__('finance.invoice.LessThan1400'));
         }
 
         if (!$invoice->is_credit &&
