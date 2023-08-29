@@ -17,6 +17,7 @@ class StoreClientBankAccountAction
 
     public function __invoke(array $data): ClientBankAccount
     {
+        // TODO log
         $data['status'] = ClientBankAccount::STATUS_PENDING;
         if (!empty($data['sheba_number'])){
             $data['sheba_number'] = Str::upper($data['sheba_number']);

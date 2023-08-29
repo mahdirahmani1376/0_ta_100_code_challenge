@@ -17,6 +17,7 @@ class UpdateClientBankAccountAction
 
     public function __invoke(ClientBankAccount $clientBankAccount, array $data): ClientBankAccount
     {
+        // TODO LOG
         // If user is updating its ClientBankAccount record status must change back to "pending"
         $data['status'] = ClientBankAccount::STATUS_PENDING;
         if (!empty($data['sheba_number'])){
