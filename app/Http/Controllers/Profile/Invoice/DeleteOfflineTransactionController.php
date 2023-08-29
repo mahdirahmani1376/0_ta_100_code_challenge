@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Profile\Invoice;
 use App\Actions\Profile\Invoice\DeleteOfflineTransactionAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
-use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -20,15 +19,14 @@ class DeleteOfflineTransactionController
     }
 
     /**
-     * @param Invoice $invoice
      * @param OfflineTransaction $offlineTransaction
      * @return JsonResponse
      * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      * @throws BadRequestException
      */
-    public function __invoke(Invoice $invoice, OfflineTransaction $offlineTransaction)
+    public function __invoke(OfflineTransaction $offlineTransaction)
     {
-        ($this->deleteOfflineTransactionAction)($invoice, $offlineTransaction);
+        ($this->deleteOfflineTransactionAction)($offlineTransaction);
 
         return response()->json([], Response::HTTP_ACCEPTED);
     }
