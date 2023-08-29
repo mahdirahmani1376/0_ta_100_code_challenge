@@ -22,4 +22,5 @@ final class ExceptionCodes
     public const APPLY_CREDIT_TO_CREDIT_INVOICE_NOT_ALLOWED = '410088';
     public const AMOUNT_IS_MORE_THAN_INVOICE_BALANCE = '410090';
     public const OFFLINE_PAYMENT_APPLY = "410133";
+    public const INVOICE_CANCELLATION_FAILED = '410084';
 }
