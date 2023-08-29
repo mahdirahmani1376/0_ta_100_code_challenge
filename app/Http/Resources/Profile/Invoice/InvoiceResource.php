@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Profile\Invoice;
 
 use App\Http\Resources\Profile\OfflineTransaction\OfflineTransactionResource;
-use App\Http\Resources\Profile\Transaction\TransactionResource;
+use App\Http\Resources\Profile\Transaction\TransactionWithoutInvoiceResource;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -32,9 +32,10 @@ class InvoiceResource extends JsonResource
             'is_mass_payment' => $this->is_mass_payment,
             'admin_id' => $this->admin_id,
             'is_credit' => $this->is_credit,
-            'transactions' => TransactionResource::collection($this->transactions),
+            'transactions' => TransactionWithoutInvoiceResource::collection($this->transactions),
             'items' => ItemResource::collection($this->items),
             'offline_transactions' => OfflineTransactionResource::collection($this->offlineTransactions),
+            'invoice_number' => InvoiceNumberResource::make($this->invoiceNumber),
         ];
     }
 }
