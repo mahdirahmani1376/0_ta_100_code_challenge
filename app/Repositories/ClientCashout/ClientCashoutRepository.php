@@ -18,9 +18,9 @@ class ClientCashoutRepository extends BaseRepository implements ClientCashoutRep
             $query->where('client_id', $data['client_id']);
         }
         if (!empty($data['bank_account_id'])) {
-            $query->where('bank_account_id', $data['bank_account_id']);
+            $query->where('client_bank_account_id', $data['client_bank_account_id']);
         }
-        if (!empty('status')) {
+        if (!empty($data['status'])) {
             $query->where('status', $data['status']);
         }
         $query->orderBy(
