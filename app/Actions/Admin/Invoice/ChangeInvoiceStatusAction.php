@@ -24,7 +24,8 @@ class ChangeInvoiceStatusAction
         check_rahkaran($invoice);
 
         $invoice = ($this->changeInvoiceStatusService)($invoice, $status);
-
+        // TODO Run ProcessInvoiceAction instead if its paid
+        // TODO run CancelInvoiceAction if its cancelled
         return ($this->calcInvoicePaidAtService)($invoice);
     }
 }
