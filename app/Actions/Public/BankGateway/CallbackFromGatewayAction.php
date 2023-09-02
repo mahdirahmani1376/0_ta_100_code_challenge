@@ -31,7 +31,7 @@ class CallbackFromGatewayAction
         // Immediately change Transaction's status into STATUS_PENDING_BANK_VERIFY
         ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_PENDING_BANK_VERIFY,]);
         // Try to verify if this transaction is successful or failed
-        $gateway = ($this->findBankGatewayByNameService)($gatewayName, $source);
+        $gateway = ($this->findBankGatewayByNameService)($gatewayName);
         $gateway->callbackFromGateway($transaction, $data);
 
         return $redirectTo;

@@ -44,7 +44,7 @@ class PayInvoiceAction
         // Prepare a "pending" transaction for this Invoice
         // Prepare callbackUrl e.g. /callback/{transaction}/{gateway}/{source} => callback/1/zibal/cloud
         // Redirect to Gateway via the Transaction
-        $bankGateway = ($this->findBankGatewayByNameService)($gatewayName, $source);
+        $bankGateway = ($this->findBankGatewayByNameService)($gatewayName);
         $transaction = ($this->storeTransactionService)($invoice, [
             'status' => Transaction::STATUS_PENDING,
             'amount' => $invoice->balance,

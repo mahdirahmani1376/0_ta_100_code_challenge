@@ -42,15 +42,14 @@ class Zibal implements Interface\BankGatewayInterface
 
     public function __construct(
         private readonly BankGateway $bankGateway,
-        private readonly ?string     $source,
     )
     {
         $this->updateTransactionService = app(UpdateTransactionService::class);
     }
 
-    public static function make(BankGateway $bankGateway, ?string $source): Interface\BankGatewayInterface
+    public static function make(BankGateway $bankGateway): Interface\BankGatewayInterface
     {
-        return new static($bankGateway, $source);
+        return new static($bankGateway);
     }
 
     public function getRedirectUrlToGateway(Transaction $transaction, string $callbackUrl): string
@@ -88,10 +87,12 @@ class Zibal implements Interface\BankGatewayInterface
             ]);
 
         if ($response->json('result') != 100) {
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw new BadRequestException('Zibal result: ' . $response->json('result')); // TODO maybe use a custom exception class
         }
 
         if ($response->json('amount') != $transaction->amount) {
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw new BadRequestException('Zibal status: ' . $response->json('status')); // TODO maybe use a custom exception class
         }
 

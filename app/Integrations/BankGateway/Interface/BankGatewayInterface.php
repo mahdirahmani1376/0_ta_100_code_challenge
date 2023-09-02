@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 interface BankGatewayInterface
 {
-    public static function make(BankGateway $bankGateway, ?string $source): self;
+    public static function make(BankGateway $bankGateway): self;
 
     public function getRedirectUrlToGateway(Transaction $transaction, string $callbackUrl): string;
 

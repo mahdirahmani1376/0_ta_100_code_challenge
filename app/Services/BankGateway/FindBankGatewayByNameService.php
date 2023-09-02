@@ -14,14 +14,14 @@ class FindBankGatewayByNameService
         $this->bankGatewayRepository = $bankGatewayRepository;
     }
 
-    public function __invoke(string $name, ?string $source): BankGatewayInterface
+    public function __invoke(string $name): BankGatewayInterface
     {
         $bankGatewayModel = $this->bankGatewayRepository->findByName($name);
 
         try {
             $provider = "App\\Integrations\\BankGateway\\" . $name;
 
-            return $provider::make($bankGatewayModel, $source);
+            return $provider::make($bankGatewayModel);
         } catch (\Exception $e) {
             // TODO make proper exception
             info($e->getTrace());
