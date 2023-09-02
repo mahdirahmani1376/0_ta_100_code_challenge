@@ -33,7 +33,7 @@ class VerifyTransactionAction
         }
 
         ($this->verifyTransactionService)($transaction);
-        ($this->processInvoiceAction)($transaction->invoice);
+        ($this->processInvoiceAction)($transaction->invoice); // TODO check
 
         return $transaction;
     }

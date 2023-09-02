@@ -53,17 +53,13 @@ class Zibal implements Interface\BankGatewayInterface
         return new static($bankGateway, $source);
     }
 
-    public function getRedirectUrlToGateway(Transaction $transaction): string
+    public function getRedirectUrlToGateway(Transaction $transaction, string $callbackUrl): string
     {
-        $callbackUrl = $this->source == 'cloud' ?
-            config('payment.bank_gateway.cloud_callback_url') :
-            config('payment.bank_gateway.callback_url');
-
         $response = Http::withHeader('Accept-Encoding', 'application/json')
             ->post($this->bankGateway->config['request_url'], [
                 'merchant' => $this->bankGateway->config['merchant_id'],
                 'amount' => $transaction->amount,
-                'callbackUrl' => $callbackUrl . $transaction->getKey(),
+                'callbackUrl' => $callbackUrl,
             ]);
 
         if ($response->json('result') != 100) {

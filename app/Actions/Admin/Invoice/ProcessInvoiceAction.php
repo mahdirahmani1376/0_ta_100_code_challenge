@@ -1,5 +1,5 @@
 <?php
-
+// TODO low priority - reconsider this Action's namespace, i think it should be moved under public namespace but then what about its dependencies ?!
 namespace App\Actions\Admin\Invoice;
 
 use App\Actions\Admin\Wallet\ShowWalletAction;
@@ -40,7 +40,9 @@ class ProcessInvoiceAction
         $this->storeCreditTransactionForOfflineTransactionService = $storeCreditTransactionForOfflineTransactionService;
         $this->calcWalletBalanceService = $calcWalletBalanceService;
     }
-
+    // TODO check ProcessInvoiceAction logic - e.g. balance == 0 ?
+    // TODO check usage of this action
+    // TODO make sure to not process an already processed Invoice twice
     public function __invoke(Invoice $invoice): Invoice
     {
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
@@ -66,7 +68,7 @@ class ProcessInvoiceAction
         }
 
         // Assign InvoiceNumber
-        AssignInvoiceNumberJob::dispatch($invoice);
+        AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
 
         // If invoice is charge-wallet (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance

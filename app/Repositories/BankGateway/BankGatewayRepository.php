@@ -46,4 +46,11 @@ class BankGatewayRepository extends BaseRepository implements BankGatewayReposit
             ->get();
     }
 
+    public function findByName(string $name): ?BankGateway
+    {
+        return self::newQuery()
+            ->where('name', $name)
+            ->where('status', BankGateway::STATUS_ACTIVE)
+            ->firstOrFail();
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Actions\Admin\Invoice\Transaction;
 
 use App\Models\Invoice;
+use App\Models\Transaction;
 use App\Services\Admin\Transaction\StoreTransactionService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 
@@ -25,7 +26,11 @@ class StoreTransactionAction
 
         $transaction = ($this->storeTransactionService)($invoice, $data);
 
-        ($this->calcInvoicePriceFieldsService)($invoice);
+        // We only need to re-calculate price fields if this transaction has STATUS_SUCCESS
+        // otherwise nothing SHOULD be changed so invoking the CalcInvoicePriceFieldsService is NOT necessary
+        if ($data['status'] == Transaction::STATUS_SUCCESS) {
+            ($this->calcInvoicePriceFieldsService)($invoice);
+        }
 
         return $transaction;
     }

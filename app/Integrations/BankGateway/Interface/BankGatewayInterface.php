@@ -10,7 +10,7 @@ interface BankGatewayInterface
 {
     public static function make(BankGateway $bankGateway, ?string $source): self;
 
-    public function getRedirectUrlToGateway(Transaction $transaction): string;
+    public function getRedirectUrlToGateway(Transaction $transaction, string $callbackUrl): string;
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction;
 }

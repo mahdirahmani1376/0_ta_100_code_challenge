@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Public\BankGateway\CallbackFromGatewayController;
 use App\Http\Controllers\Public\BankGateway\IndexBankGatewayController;
+use App\Http\Controllers\Public\BankGateway\PayInvoiceController;
 use App\Http\Controllers\Public\Invoice\ShowInvoiceStatusController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,8 +11,11 @@ Route::namespace('Invoice')
     ->group(function () {
         Route::get('{invoice}/status', ShowInvoiceStatusController::class);
     });
+
 Route::namespace('BankGateway')
     ->prefix('bank-gateway')
     ->group(function () {
         Route::get('/', IndexBankGatewayController::class);
+        Route::get('pay/{invoice}/{gateway}/{?source}', PayInvoiceController::class);
+        Route::any('callback/{transaction}/{gateway}/{?source}', CallbackFromGatewayController::class);
     });

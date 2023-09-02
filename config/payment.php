@@ -13,8 +13,10 @@ return [
         'current_fiscal_year' => env('INVOICE_NUMBER_CURRENT_FISCAL_YEAR'), // TODO default value should be read from config table
     ],
     'bank_gateway' => [ // TODO callback urls should be main-app urls
-        'callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/',
-        'cloud_callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/',
+        'callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/{transaction}/{gateway}/{source}',
+        'cloud_callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/{transaction}/{gateway}/{source}', // TODO maybe remove cloud url?
+        'result_redirect_url' => 'redirect',
+        'result_cloud_redirect_url' => 'cloud-redirect',
     ],
 ];
 
