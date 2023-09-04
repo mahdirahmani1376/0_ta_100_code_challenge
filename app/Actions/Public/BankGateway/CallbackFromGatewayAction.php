@@ -22,9 +22,9 @@ class CallbackFromGatewayAction
             config('payment.bank_gateway.result_redirect_url');
 
 
-        // Transaction's status MUST be "pending" in order to process callback from gateway,
+        // Transaction's status MUST be "STATUS_PENDING" or "STATUS_PENDING_BANK_VERIFY" in order to process callback from gateway,
         // otherwise ignore the request
-        if ($transaction->status != Transaction::STATUS_PENDING) {
+        if (!in_array($transaction->status, [Transaction::STATUS_PENDING, Transaction::STATUS_PENDING_BANK_VERIFY])) {
             return $redirectTo;
         }
 
