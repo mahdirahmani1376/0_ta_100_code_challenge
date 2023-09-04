@@ -4,6 +4,7 @@ namespace App\Services\BankGateway;
 
 use App\Integrations\BankGateway\Interface\BankGatewayInterface;
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
+use Illuminate\Support\Str;
 
 class FindBankGatewayByNameService
 {
@@ -19,7 +20,7 @@ class FindBankGatewayByNameService
         $bankGatewayModel = $this->bankGatewayRepository->findByName($name);
 
         try {
-            $provider = "App\\Integrations\\BankGateway\\" . $name;
+            $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($name);
 
             return $provider::make($bankGatewayModel);
         } catch (\Exception $e) {
