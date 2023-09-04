@@ -74,7 +74,7 @@ class Zibal implements Interface\BankGatewayInterface
     {
         if (!$data['success']) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zibal was not successful, status: ' . $data['status']);
+            throw new BadRequestException('Zibal was not successful, status: ' . $data['success']);
         }
         if ($data['trackId'] != $transaction->tracking_code) {
             throw new BadRequestException("Zibal miss match tracking_code, transactionId: $transaction->id , trackId: " . $data['trackId']);
