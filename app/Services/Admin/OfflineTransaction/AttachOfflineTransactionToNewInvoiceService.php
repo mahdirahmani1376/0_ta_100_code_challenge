@@ -8,11 +8,8 @@ use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryIn
 
 class AttachOfflineTransactionToNewInvoiceService
 {
-    private OfflineTransactionRepositoryInterface $offlineTransactionRepository;
-
-    public function __construct(OfflineTransactionRepositoryInterface $offlineTransactionRepository)
+    public function __construct(private readonly OfflineTransactionRepositoryInterface $offlineTransactionRepository)
     {
-        $this->offlineTransactionRepository = $offlineTransactionRepository;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction, Invoice $newInvoice)
@@ -20,6 +17,8 @@ class AttachOfflineTransactionToNewInvoiceService
         return $this->offlineTransactionRepository->update($offlineTransaction, [
             'invoice_id' => $newInvoice->getKey(),
             'status' => OfflineTransaction::STATUS_CONFIRMED,
-        ], ['invoice_id', 'status']);
+        ], [
+            'invoice_id', 'status'
+        ]);
     }
 }

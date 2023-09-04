@@ -9,12 +9,8 @@ use App\Models\BankGateway;
 
 class UpdateBankGatewayController
 {
-
-    private UpdateBankGatewayAction $updateBankGatewayAction;
-
-    public function __construct(UpdateBankGatewayAction $updateBankGatewayAction)
+    public function __construct(private readonly UpdateBankGatewayAction $updateBankGatewayAction)
     {
-        $this->updateBankGatewayAction = $updateBankGatewayAction;
     }
 
     /**

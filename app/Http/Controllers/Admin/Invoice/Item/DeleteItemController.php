@@ -10,11 +10,8 @@ use App\Models\Item;
 
 class DeleteItemController
 {
-    private DeleteItemAction $deleteItemAction;
-
-    public function __construct(DeleteItemAction $deleteItemAction)
+    public function __construct(private readonly DeleteItemAction $deleteItemAction)
     {
-        $this->deleteItemAction = $deleteItemAction;
     }
 
     /**

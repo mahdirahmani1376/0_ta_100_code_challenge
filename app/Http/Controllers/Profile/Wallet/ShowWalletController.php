@@ -8,11 +8,8 @@ use App\Http\Resources\Profile\Wallet\WalletResource;
 
 class ShowWalletController
 {
-    private ShowWalletAction $showWalletAction;
-
-    public function __construct(ShowWalletAction $showWalletAction)
+    public function __construct(private readonly ShowWalletAction $showWalletAction)
     {
-        $this->showWalletAction = $showWalletAction;
     }
 
     /**

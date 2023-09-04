@@ -9,11 +9,8 @@ use App\Http\Resources\Profile\Invoice\InvoiceResource;
 
 class StoreMassPaymentInvoiceController
 {
-    private StoreMassPaymentInvoiceAction $storeMassPaymentInvoiceAction;
-
-    public function __construct(StoreMassPaymentInvoiceAction $storeMassPaymentInvoiceAction)
+    public function __construct(private readonly StoreMassPaymentInvoiceAction $storeMassPaymentInvoiceAction)
     {
-        $this->storeMassPaymentInvoiceAction = $storeMassPaymentInvoiceAction;
     }
 
     /**

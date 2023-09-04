@@ -5,16 +5,18 @@ namespace App\Http\Controllers\Admin\Wallet;
 use App\Actions\Admin\Wallet\IndexCreditTransactionAction;
 use App\Http\Requests\Admin\Wallet\IndexCreditTransactionRequest;
 use App\Http\Resources\Admin\Wallet\CreditTransactionResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexCreditTransactionController
 {
-    private IndexCreditTransactionAction $indexCreditTransactionAction;
-
-    public function __construct(IndexCreditTransactionAction $indexCreditTransactionAction)
+    public function __construct(private readonly IndexCreditTransactionAction $indexCreditTransactionAction)
     {
-        $this->indexCreditTransactionAction = $indexCreditTransactionAction;
     }
 
+    /**
+     * @param IndexCreditTransactionRequest $request
+     * @return AnonymousResourceCollection
+     */
     public function __invoke(IndexCreditTransactionRequest $request)
     {
         $creditTransactions = ($this->indexCreditTransactionAction)($request->validated());

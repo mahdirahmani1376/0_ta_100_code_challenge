@@ -8,11 +8,8 @@ use App\Repositories\Invoice\Interface\ItemRepositoryInterface;
 
 class FindAddCreditItemService
 {
-    private ItemRepositoryInterface $itemRepository;
-
-    public function __construct(ItemRepositoryInterface $itemRepository)
+    public function __construct(private readonly ItemRepositoryInterface $itemRepository)
     {
-        $this->itemRepository = $itemRepository;
     }
 
     public function __invoke(Invoice $invoice): ?Item

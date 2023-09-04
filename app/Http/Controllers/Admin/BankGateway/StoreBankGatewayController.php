@@ -8,11 +8,8 @@ use App\Http\Resources\Admin\BankGateway\BankGatewayResource;
 
 class StoreBankGatewayController
 {
-    private StoreBankGatewayAction $storeBankGatewayAction;
-
-    public function __construct(StoreBankGatewayAction $storeBankGatewayAction)
+    public function __construct(private readonly StoreBankGatewayAction $storeBankGatewayAction)
     {
-        $this->storeBankGatewayAction = $storeBankGatewayAction;
     }
 
     /**

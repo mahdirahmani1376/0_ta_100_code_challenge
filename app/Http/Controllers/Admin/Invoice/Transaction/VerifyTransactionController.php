@@ -11,16 +11,13 @@ use App\Models\Transaction;
 
 class VerifyTransactionController
 {
-    private VerifyTransactionAction $verifyTransactionAction;
-
-    public function __construct(VerifyTransactionAction $verifyTransactionAction)
+    public function __construct(private readonly VerifyTransactionAction $verifyTransactionAction)
     {
-        $this->verifyTransactionAction = $verifyTransactionAction;
     }
 
     /**
-     * @param Invoice $invoice
-     * @param StoreTransactionRequest $request
+     * @param Transaction $transaction
+     * @param VerifyTransactionRequest $request
      * @return TransactionResource
      */
     public function __invoke(Transaction $transaction, VerifyTransactionRequest $request)

@@ -10,16 +10,11 @@ use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 
 class StoreCreditTransactionForOfflineTransactionService
 {
-    private OfflineTransactionRepositoryInterface $offlineTransactionRepository;
-    private CreditTransactionRepositoryInterface $creditTransactionRepository;
-
     public function __construct(
-        OfflineTransactionRepositoryInterface $offlineTransactionRepository,
-        CreditTransactionRepositoryInterface  $creditTransactionRepository,
+        private readonly OfflineTransactionRepositoryInterface $offlineTransactionRepository,
+        private readonly CreditTransactionRepositoryInterface  $creditTransactionRepository,
     )
     {
-        $this->offlineTransactionRepository = $offlineTransactionRepository;
-        $this->creditTransactionRepository = $creditTransactionRepository;
     }
 
     public function __invoke(Invoice $invoice, Wallet $wallet): ?CreditTransaction

@@ -10,16 +10,13 @@ use App\Models\BankAccount;
 
 class UpdateBankAccountController
 {
-    private UpdateBankAccountAction $updateBankAccountAction;
-
-    public function __construct(UpdateBankAccountAction $updateBankAccountAction)
+    public function __construct(private readonly UpdateBankAccountAction $updateBankAccountAction)
     {
-        $this->updateBankAccountAction = $updateBankAccountAction;
     }
 
     /**
      * @param BankAccount $bankAccount
-     * @param StoreBankAccountRequest $request
+     * @param UpdateBankAccountRequest $request
      * @return BankAccountResource
      */
     public function __invoke(BankAccount $bankAccount, UpdateBankAccountRequest $request)

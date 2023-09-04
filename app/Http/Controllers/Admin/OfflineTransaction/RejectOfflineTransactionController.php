@@ -11,11 +11,8 @@ use App\Models\OfflineTransaction;
 
 class RejectOfflineTransactionController
 {
-    private RejectOfflineTransactionAction $rejectOfflineTransactionAction;
-
-    public function __construct(RejectOfflineTransactionAction $rejectOfflineTransactionAction)
+    public function __construct(private readonly RejectOfflineTransactionAction $rejectOfflineTransactionAction)
     {
-        $this->rejectOfflineTransactionAction = $rejectOfflineTransactionAction;
     }
 
     /**

@@ -9,11 +9,8 @@ use Illuminate\Http\Response;
 
 class DeleteBankAccountController
 {
-    private DeleteBankAccountAction $deleteBankAccountAction;
-
-    public function __construct(DeleteBankAccountAction $deleteBankAccountAction)
+    public function __construct(private readonly DeleteBankAccountAction $deleteBankAccountAction)
     {
-        $this->deleteBankAccountAction = $deleteBankAccountAction;
     }
 
     /**

@@ -10,11 +10,8 @@ use App\Models\Invoice;
 
 class DownloadInvoiceBillController
 {
-    private DownloadInvoiceBillAction $downloadInvoiceBillAction;
-
-    public function __construct(DownloadInvoiceBillAction $downloadInvoiceBillAction)
+    public function __construct(private readonly DownloadInvoiceBillAction $downloadInvoiceBillAction)
     {
-        $this->downloadInvoiceBillAction = $downloadInvoiceBillAction;
     }
 
     /**

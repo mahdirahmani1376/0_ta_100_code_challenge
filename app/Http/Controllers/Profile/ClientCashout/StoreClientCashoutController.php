@@ -8,11 +8,8 @@ use App\Http\Resources\Profile\ClientCashout\ClientCashoutResource;
 
 class StoreClientCashoutController
 {
-    private StoreClientCashoutAction $storeClientCashoutAction;
-
-    public function __construct(StoreClientCashoutAction $storeClientCashoutAction)
+    public function __construct(private readonly StoreClientCashoutAction $storeClientCashoutAction)
     {
-        $this->storeClientCashoutAction = $storeClientCashoutAction;
     }
 
     /**

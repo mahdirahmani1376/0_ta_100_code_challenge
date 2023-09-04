@@ -7,11 +7,8 @@ use App\Http\Requests\Profile\ListEverythingRequest;
 
 class ListEverythingController
 {
-    private ListEverythingAction $listEverythingAction;
-
-    public function __construct(ListEverythingAction $listEverythingAction)
+    public function __construct(private readonly ListEverythingAction $listEverythingAction)
     {
-        $this->listEverythingAction = $listEverythingAction;
     }
 
     public function __invoke(ListEverythingRequest $request)

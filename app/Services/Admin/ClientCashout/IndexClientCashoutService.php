@@ -7,11 +7,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexClientCashoutService
 {
-    private ClientCashoutRepositoryInterface $clientCashoutRepository;
-
-    public function __construct(ClientCashoutRepositoryInterface $clientCashoutRepository)
+    public function __construct(private readonly ClientCashoutRepositoryInterface $clientCashoutRepository)
     {
-        $this->clientCashoutRepository = $clientCashoutRepository;
     }
 
     public function __invoke(array $data): LengthAwarePaginator

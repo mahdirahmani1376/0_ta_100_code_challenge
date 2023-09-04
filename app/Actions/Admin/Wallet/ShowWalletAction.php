@@ -8,16 +8,11 @@ use App\Services\Wallet\StoreWalletService;
 
 class ShowWalletAction
 {
-    private FindWalletByClientIdService $findWalletByClientIdService;
-    private StoreWalletService $storeWalletService;
-
     public function __construct(
-        FindWalletByClientIdService $findWalletByClientIdService,
-        StoreWalletService          $storeWalletService
+        private readonly FindWalletByClientIdService $findWalletByClientIdService,
+        private readonly StoreWalletService          $storeWalletService
     )
     {
-        $this->findWalletByClientIdService = $findWalletByClientIdService;
-        $this->storeWalletService = $storeWalletService;
     }
 
     public function __invoke(int $clientId): Wallet

@@ -16,37 +16,18 @@ use App\Services\Transaction\FindTransactionByTrackingCodeService;
 
 class VerifyOfflineTransactionAction
 {
-    private FindAddCreditItemService $findAddCreditItemService;
-    private UpdateItemAction $updateItemAction;
-    private ProcessInvoiceAction $processInvoiceAction;
-    private ChargeWalletInvoiceAction $chargeWalletInvoiceAction;
-    private AttachOfflineTransactionToNewInvoiceService $attachOfflineTransactionToNewInvoiceService;
-    private AttachTransactionToNewInvoiceService $attachTransactionToNewInvoiceService;
-    private FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService;
-    private ApplyBalanceToInvoiceAction $applyBalanceToInvoiceAction;
-    private VerifyOfflineTransactionService $verifyOfflineTransactionService;
-
     public function __construct(
-        FindAddCreditItemService                    $findAddCreditItemService,
-        UpdateItemAction                            $updateItemAction,
-        ProcessInvoiceAction                        $processInvoiceAction,
-        ChargeWalletInvoiceAction                   $chargeWalletInvoiceAction,
-        AttachOfflineTransactionToNewInvoiceService $attachOfflineTransactionToNewInvoiceService,
-        AttachTransactionToNewInvoiceService        $attachTransactionToNewInvoiceService,
-        FindTransactionByTrackingCodeService        $findTransactionByTrackingCodeService,
-        ApplyBalanceToInvoiceAction                 $applyBalanceToInvoiceAction,
-        VerifyOfflineTransactionService             $verifyOfflineTransactionService,
+        private readonly FindAddCreditItemService                    $findAddCreditItemService,
+        private readonly UpdateItemAction                            $updateItemAction,
+        private readonly ProcessInvoiceAction                        $processInvoiceAction,
+        private readonly ChargeWalletInvoiceAction                   $chargeWalletInvoiceAction,
+        private readonly AttachOfflineTransactionToNewInvoiceService $attachOfflineTransactionToNewInvoiceService,
+        private readonly AttachTransactionToNewInvoiceService        $attachTransactionToNewInvoiceService,
+        private readonly FindTransactionByTrackingCodeService        $findTransactionByTrackingCodeService,
+        private readonly ApplyBalanceToInvoiceAction                 $applyBalanceToInvoiceAction,
+        private readonly VerifyOfflineTransactionService             $verifyOfflineTransactionService,
     )
     {
-        $this->findAddCreditItemService = $findAddCreditItemService;
-        $this->updateItemAction = $updateItemAction;
-        $this->processInvoiceAction = $processInvoiceAction;
-        $this->chargeWalletInvoiceAction = $chargeWalletInvoiceAction;
-        $this->attachOfflineTransactionToNewInvoiceService = $attachOfflineTransactionToNewInvoiceService;
-        $this->attachTransactionToNewInvoiceService = $attachTransactionToNewInvoiceService;
-        $this->findTransactionByTrackingCodeService = $findTransactionByTrackingCodeService;
-        $this->applyBalanceToInvoiceAction = $applyBalanceToInvoiceAction;
-        $this->verifyOfflineTransactionService = $verifyOfflineTransactionService;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction)

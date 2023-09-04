@@ -13,11 +13,8 @@ use App\Models\Invoice;
 
 class ApplyBalanceToInvoiceController
 {
-    private ApplyBalanceToInvoiceAction $applyBalanceToInvoiceAction;
-
-    public function __construct(ApplyBalanceToInvoiceAction $applyBalanceToInvoiceAction)
+    public function __construct(private readonly ApplyBalanceToInvoiceAction $applyBalanceToInvoiceAction)
     {
-        $this->applyBalanceToInvoiceAction = $applyBalanceToInvoiceAction;
     }
 
     /**

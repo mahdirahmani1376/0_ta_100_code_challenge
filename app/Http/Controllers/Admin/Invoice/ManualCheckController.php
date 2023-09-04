@@ -9,11 +9,8 @@ use App\Models\Invoice;
 
 class ManualCheckController
 {
-    private ManualCheckAction $manualCheckAction;
-
-    public function __construct(ManualCheckAction $manualCheckAction)
+    public function __construct(private readonly ManualCheckAction $manualCheckAction)
     {
-        $this->manualCheckAction = $manualCheckAction;
     }
 
     /**

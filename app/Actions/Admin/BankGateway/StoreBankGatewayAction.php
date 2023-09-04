@@ -6,11 +6,8 @@ use App\Services\Admin\BankGateway\StoreBankGatewayService;
 
 class StoreBankGatewayAction
 {
-    private StoreBankGatewayService $storeBankGatewayService;
-
-    public function __construct(StoreBankGatewayService $storeBankGatewayService)
+    public function __construct(private readonly StoreBankGatewayService $storeBankGatewayService)
     {
-        $this->storeBankGatewayService = $storeBankGatewayService;
     }
 
     public function __invoke(array $data)

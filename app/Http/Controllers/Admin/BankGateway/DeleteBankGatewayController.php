@@ -9,11 +9,8 @@ use Illuminate\Http\Response;
 
 class DeleteBankGatewayController
 {
-    private DeleteBankGatewayAction $deleteBankGatewayAction;
-
-    public function __construct(DeleteBankGatewayAction $deleteBankGatewayAction)
+    public function __construct(private readonly DeleteBankGatewayAction $deleteBankGatewayAction)
     {
-        $this->deleteBankGatewayAction = $deleteBankGatewayAction;
     }
 
     /**

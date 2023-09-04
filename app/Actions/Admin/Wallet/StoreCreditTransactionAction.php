@@ -5,23 +5,15 @@ namespace App\Actions\Admin\Wallet;
 use App\Models\CreditTransaction;
 use App\Services\Admin\Wallet\StoreCreditTransactionService;
 use App\Services\Wallet\CalcWalletBalanceService;
-use App\Services\Wallet\FindWalletByClientIdService;
 
 class StoreCreditTransactionAction
 {
-    private StoreCreditTransactionService $storeCreditTransactionService;
-    private CalcWalletBalanceService $calcWalletBalanceService;
-    private ShowWalletAction $showWalletAction;
-
     public function __construct(
-        ShowWalletAction              $showWalletAction,
-        StoreCreditTransactionService $storeCreditTransactionService,
-        CalcWalletBalanceService      $calcWalletBalanceService
+        private readonly ShowWalletAction              $showWalletAction,
+        private readonly StoreCreditTransactionService $storeCreditTransactionService,
+        private readonly CalcWalletBalanceService      $calcWalletBalanceService
     )
     {
-        $this->storeCreditTransactionService = $storeCreditTransactionService;
-        $this->calcWalletBalanceService = $calcWalletBalanceService;
-        $this->showWalletAction = $showWalletAction;
     }
 
     public function __invoke(int $clientId, array $data): CreditTransaction

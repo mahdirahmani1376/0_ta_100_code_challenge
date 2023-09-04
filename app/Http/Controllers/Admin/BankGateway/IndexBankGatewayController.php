@@ -9,11 +9,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexBankGatewayController
 {
-    private IndexBankGatewayAction $indexBankGatewayAction;
-
-    public function __construct(IndexBankGatewayAction $indexBankGatewayAction)
+    public function __construct(private readonly IndexBankGatewayAction $indexBankGatewayAction)
     {
-        $this->indexBankGatewayAction = $indexBankGatewayAction;
     }
 
     /**

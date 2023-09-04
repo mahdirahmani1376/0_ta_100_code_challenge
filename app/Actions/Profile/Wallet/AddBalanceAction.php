@@ -10,19 +10,12 @@ use App\Services\Profile\Invoice\StoreInvoiceService;
 
 class AddBalanceAction
 {
-    private StoreInvoiceService $storeInvoiceService;
-    private StoreItemService $storeItemService;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
-
     public function __construct(
-        StoreInvoiceService           $storeInvoiceService,
-        StoreItemService              $storeItemService,
-        CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService
+        private readonly StoreInvoiceService           $storeInvoiceService,
+        private readonly StoreItemService              $storeItemService,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService
     )
     {
-        $this->storeInvoiceService = $storeInvoiceService;
-        $this->storeItemService = $storeItemService;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
     }
 
     public function __invoke(array $data)

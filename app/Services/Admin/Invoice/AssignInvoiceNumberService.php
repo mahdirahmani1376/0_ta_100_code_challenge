@@ -6,15 +6,11 @@ use App\Jobs\GenerateInvoiceNumberJob;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
-use Illuminate\Support\Facades\DB;
 
 class AssignInvoiceNumberService
 {
-    private InvoiceNumberRepositoryInterface $invoiceNumberRepository;
-
-    public function __construct(InvoiceNumberRepositoryInterface $invoiceNumberRepository)
+    public function __construct(private readonly InvoiceNumberRepositoryInterface $invoiceNumberRepository)
     {
-        $this->invoiceNumberRepository = $invoiceNumberRepository;
     }
 
     public function __invoke(Invoice $invoice): ?InvoiceNumber
@@ -61,7 +57,7 @@ class AssignInvoiceNumberService
         // No available InvoiceNumber, generate 100 available InvoiceNumbers
         // Normally this if-clause MUST NOT be executed if it keeps executing something is wrong and needs investigation
         if ($affectedRecordCount == 0) {
-            info('Could not assign InvoiceNumber to invoice: '. $invoice->id);
+            info('Could not assign InvoiceNumber to invoice: ' . $invoice->id);
             info('Generating 100 InvoiceNumbers');
             $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
             $hundredAvailableInvoiceNumbers = [];

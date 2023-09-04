@@ -8,11 +8,8 @@ use App\Services\Admin\Invoice\AssignInvoiceNumberService;
 
 class DownloadInvoiceBillAction
 {
-    private AssignInvoiceNumberService $assignInvoiceNumberService;
-
-    public function __construct(AssignInvoiceNumberService $assignInvoiceNumberService)
+    public function __construct(private readonly AssignInvoiceNumberService $assignInvoiceNumberService)
     {
-        $this->assignInvoiceNumberService = $assignInvoiceNumberService;
     }
 
     public function __invoke(Invoice $invoice, array $data)

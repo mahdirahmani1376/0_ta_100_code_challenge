@@ -10,11 +10,8 @@ use App\Models\Invoice;
 
 class UpdateInvoiceController
 {
-    private UpdateInvoiceAction $updateInvoiceAction;
-
-    public function __construct(UpdateInvoiceAction $updateInvoiceAction)
+    public function __construct(private readonly UpdateInvoiceAction $updateInvoiceAction)
     {
-        $this->updateInvoiceAction = $updateInvoiceAction;
     }
 
     /**

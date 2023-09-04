@@ -8,14 +8,11 @@ use App\Services\Invoice\CalcInvoicePriceFieldsService;
 
 class UpdateInvoiceAction
 {
-    private UpdateInvoiceService $updateInvoiceService;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
-
-    public function __construct(UpdateInvoiceService          $updateInvoiceService,
-                                CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService)
+    public function __construct(
+        private readonly UpdateInvoiceService          $updateInvoiceService,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService
+    )
     {
-        $this->updateInvoiceService = $updateInvoiceService;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
     }
 
     public function __invoke(Invoice $invoice, array $data)

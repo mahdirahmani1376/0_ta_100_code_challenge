@@ -7,11 +7,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class IndexItemsByInvoices
 {
-    private ItemRepositoryInterface $itemRepository;
-
-    public function __construct(ItemRepositoryInterface $itemRepository)
+    public function __construct(private readonly ItemRepositoryInterface $itemRepository)
     {
-        $this->itemRepository = $itemRepository;
     }
 
     public function __invoke(Collection $invoices)

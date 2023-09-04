@@ -6,11 +6,8 @@ use App\Actions\Admin\Invoice\InvoiceReportAction;
 
 class InvoiceReportController
 {
-    private InvoiceReportAction $invoiceReportAction;
-
-    public function __construct(InvoiceReportAction $invoiceReportAction)
+    public function __construct(private readonly InvoiceReportAction $invoiceReportAction)
     {
-        $this->invoiceReportAction = $invoiceReportAction;
     }
 
     public function __invoke()

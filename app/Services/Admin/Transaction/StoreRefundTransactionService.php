@@ -8,23 +8,24 @@ use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 
 class StoreRefundTransactionService
 {
-    private TransactionRepositoryInterface $transactionRepository;
-
-    public function __construct(TransactionRepositoryInterface $transactionRepository)
+    public function __construct(private readonly TransactionRepositoryInterface $transactionRepository)
     {
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function __invoke(Invoice $invoice)
     {
-        $data = [
+        return $this->transactionRepository->create([
             'payment_method' => Invoice::PAYMENT_METHOD_CREDIT,
             'invoice_id' => $invoice->getKey(),
             'status' => Transaction::STATUS_SUCCESS,
             'amount' => $invoice->total,
             'client_id' => $invoice->client_id,
-        ];
-
-        return $this->transactionRepository->create($data, array_keys($data));
+        ], [
+            'payment_method',
+            'invoice_id',
+            'status',
+            'amount',
+            'client_id',
+        ]);
     }
 }

@@ -8,14 +8,11 @@ use App\Services\Invoice\CalcInvoicePaidAtService;
 
 class ChangeInvoiceStatusAction
 {
-    private ChangeInvoiceStatusService $changeInvoiceStatusService;
-    private CalcInvoicePaidAtService $calcInvoicePaidAtService;
-
-    public function __construct(ChangeInvoiceStatusService $changeInvoiceStatusService,
-                                CalcInvoicePaidAtService   $calcInvoicePaidAtService)
+    public function __construct(
+        private readonly ChangeInvoiceStatusService $changeInvoiceStatusService,
+        private readonly CalcInvoicePaidAtService   $calcInvoicePaidAtService
+    )
     {
-        $this->changeInvoiceStatusService = $changeInvoiceStatusService;
-        $this->calcInvoicePaidAtService = $calcInvoicePaidAtService;
     }
 
     public function __invoke(Invoice $invoice, string $status): Invoice

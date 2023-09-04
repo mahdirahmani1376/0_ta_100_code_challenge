@@ -7,11 +7,8 @@ use App\Services\Admin\BankAccount\DeleteBankAccountService;
 
 class DeleteBankAccountAction
 {
-    private DeleteBankAccountService $deleteBankAccountService;
-
-    public function __construct(DeleteBankAccountService $deleteBankAccountService)
+    public function __construct(private readonly DeleteBankAccountService $deleteBankAccountService)
     {
-        $this->deleteBankAccountService = $deleteBankAccountService;
     }
 
     public function __invoke(BankAccount $bankAccount)

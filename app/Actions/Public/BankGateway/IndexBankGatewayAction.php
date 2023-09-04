@@ -6,11 +6,8 @@ use App\Services\BankGateway\IndexBankGatewayService;
 
 class IndexBankGatewayAction
 {
-    private IndexBankGatewayService $indexBankGatewayService;
-
-    public function __construct(IndexBankGatewayService $indexBankGatewayService)
+    public function __construct(private readonly IndexBankGatewayService $indexBankGatewayService)
     {
-        $this->indexBankGatewayService = $indexBankGatewayService;
     }
 
     public function __invoke()

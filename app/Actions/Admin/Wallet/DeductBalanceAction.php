@@ -6,11 +6,8 @@ use App\Models\CreditTransaction;
 
 class DeductBalanceAction
 {
-    private StoreCreditTransactionAction $storeCreditTransactionAction;
-
-    public function __construct(StoreCreditTransactionAction $storeCreditTransactionAction)
+    public function __construct(private readonly StoreCreditTransactionAction $storeCreditTransactionAction)
     {
-        $this->storeCreditTransactionAction = $storeCreditTransactionAction;
     }
 
     public function __invoke(int $clientId, array $data): CreditTransaction

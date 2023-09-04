@@ -9,11 +9,8 @@ use App\Http\Resources\Admin\Invoice\InvoiceResource;
 
 class StoreInvoiceController
 {
-    private StoreInvoiceAction $storeInvoiceAction;
-
-    public function __construct(StoreInvoiceAction $storeInvoiceAction)
+    public function __construct(private readonly StoreInvoiceAction $storeInvoiceAction)
     {
-        $this->storeInvoiceAction = $storeInvoiceAction;
     }
 
     /**

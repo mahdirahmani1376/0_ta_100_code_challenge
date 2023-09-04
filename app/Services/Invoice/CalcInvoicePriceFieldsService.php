@@ -9,19 +9,12 @@ use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 
 class CalcInvoicePriceFieldsService
 {
-    private InvoiceRepositoryInterface $invoiceRepository;
-    private ItemRepositoryInterface $itemRepository;
-    private TransactionRepositoryInterface $transactionRepository;
-
     public function __construct(
-        ItemRepositoryInterface        $itemRepository,
-        InvoiceRepositoryInterface     $invoiceRepository,
-        TransactionRepositoryInterface $transactionRepository,
+        private readonly ItemRepositoryInterface        $itemRepository,
+        private readonly InvoiceRepositoryInterface     $invoiceRepository,
+        private readonly TransactionRepositoryInterface $transactionRepository,
     )
     {
-        $this->invoiceRepository = $invoiceRepository;
-        $this->itemRepository = $itemRepository;
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function __invoke(Invoice $invoice): Invoice

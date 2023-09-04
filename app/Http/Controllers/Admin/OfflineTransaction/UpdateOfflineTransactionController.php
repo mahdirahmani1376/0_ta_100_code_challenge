@@ -12,12 +12,8 @@ use Illuminate\Http\Response;
 
 class UpdateOfflineTransactionController
 {
-
-    private UpdateOfflineTransactionAction $updateOfflineTransactionAction;
-
-    public function __construct(UpdateOfflineTransactionAction $updateOfflineTransactionAction)
+    public function __construct(private readonly UpdateOfflineTransactionAction $updateOfflineTransactionAction)
     {
-        $this->updateOfflineTransactionAction = $updateOfflineTransactionAction;
     }
 
     /**

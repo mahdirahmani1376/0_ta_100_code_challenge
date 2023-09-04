@@ -9,11 +9,8 @@ use App\Models\ClientBankAccount;
 
 class UpdateClientBankAccountController
 {
-    private UpdateClientBankAccountAction $updateClientBankAccountAction;
-
-    public function __construct(UpdateClientBankAccountAction $updateClientBankAccountAction)
+    public function __construct(private readonly UpdateClientBankAccountAction $updateClientBankAccountAction)
     {
-        $this->updateClientBankAccountAction = $updateClientBankAccountAction;
     }
 
     /**

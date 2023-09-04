@@ -8,11 +8,8 @@ use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 
 class AttachTransactionToNewInvoiceService
 {
-    private TransactionRepositoryInterface $transactionRepository;
-
-    public function __construct(TransactionRepositoryInterface $transactionRepository)
+    public function __construct(private readonly TransactionRepositoryInterface $transactionRepository)
     {
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function __invoke(Transaction $transaction, Invoice $newInvoice)

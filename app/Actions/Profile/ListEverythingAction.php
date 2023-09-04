@@ -6,11 +6,8 @@ use App\Services\Profile\ListEverythingService;
 
 class ListEverythingAction
 {
-    private ListEverythingService $listEverythingService;
-
-    public function __construct(ListEverythingService $listEverythingService)
+    public function __construct(private readonly ListEverythingService $listEverythingService)
     {
-        $this->listEverythingService = $listEverythingService;
     }
 
     public function __invoke(int $clientId, int $offset = null)

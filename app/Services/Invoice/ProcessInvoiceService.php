@@ -2,22 +2,15 @@
 
 namespace App\Services\Invoice;
 
-use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 
 class ProcessInvoiceService
 {
-    private InvoiceRepositoryInterface $invoiceRepository;
-
-    public function __construct(InvoiceRepositoryInterface $invoiceRepository)
+    public function __construct(private readonly InvoiceRepositoryInterface $invoiceRepository)
     {
-        $this->invoiceRepository = $invoiceRepository;
     }
 
-    /**
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
-     */
     public function __invoke(Invoice $invoice, $shouldProcessPaidInvoice = false): Invoice
     {
         if (

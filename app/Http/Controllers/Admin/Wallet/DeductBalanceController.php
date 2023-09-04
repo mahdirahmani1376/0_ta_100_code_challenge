@@ -8,13 +8,15 @@ use App\Http\Resources\Admin\Wallet\CreditTransactionResource;
 
 class DeductBalanceController
 {
-    private DeductBalanceAction $deductBalanceAction;
-
-    public function __construct(DeductBalanceAction $deductBalanceAction)
+    public function __construct(private readonly DeductBalanceAction $deductBalanceAction)
     {
-        $this->deductBalanceAction = $deductBalanceAction;
     }
 
+    /**
+     * @param int $clientId
+     * @param DeductBalanceRequest $request
+     * @return CreditTransactionResource
+     */
     public function __invoke(int $clientId, DeductBalanceRequest $request)
     {
         $creditTransaction = ($this->deductBalanceAction)($clientId, $request->validated());

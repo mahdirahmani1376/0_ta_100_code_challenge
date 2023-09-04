@@ -7,11 +7,8 @@ use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryIn
 
 class UpdateOfflineTransactionService
 {
-    private OfflineTransactionRepositoryInterface $offlineTransactionRepository;
-
-    public function __construct(OfflineTransactionRepositoryInterface $offlineTransactionRepository)
+    public function __construct(private readonly OfflineTransactionRepositoryInterface $offlineTransactionRepository)
     {
-        $this->offlineTransactionRepository = $offlineTransactionRepository;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction, array $data): OfflineTransaction

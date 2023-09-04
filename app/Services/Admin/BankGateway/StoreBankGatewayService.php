@@ -6,11 +6,8 @@ use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
 
 class StoreBankGatewayService
 {
-    private BankGatewayRepositoryInterface $bankGatewayRepository;
-
-    public function __construct(BankGatewayRepositoryInterface $bankGatewayRepository)
+    public function __construct(private readonly BankGatewayRepositoryInterface $bankGatewayRepository)
     {
-        $this->bankGatewayRepository = $bankGatewayRepository;
     }
 
     public function __invoke(array $data)

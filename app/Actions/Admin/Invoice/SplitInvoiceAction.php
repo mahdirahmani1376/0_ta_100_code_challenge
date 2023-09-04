@@ -2,36 +2,43 @@
 
 namespace App\Actions\Admin\Invoice;
 
+use App\Exceptions\SystemException\AtLeastOneInvoiceItemMustRemainException;
+use App\Exceptions\SystemException\InvoiceHasActiveTransactionsException;
+use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\Item\ReAssignItemToInvoiceService;
-use App\Services\Admin\Invoice\ValidateInvoicesBeforeSplitService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 
 class SplitInvoiceAction
 {
-    private ValidateInvoicesBeforeSplitService $validateInvoicesBeforeSplitService;
-    private ReAssignItemToInvoiceService $reAssignItemToInvoiceService;
-    private StoreInvoiceAction $storeInvoiceAction;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
-
     public function __construct(
-        ValidateInvoicesBeforeSplitService $validateInvoicesBeforeSplitService,
-        ReAssignItemToInvoiceService       $reAssignItemToInvoiceService,
-        StoreInvoiceAction                 $storeInvoiceAction,
-        CalcInvoicePriceFieldsService      $calcInvoicePriceFieldsService,
+        private readonly ReAssignItemToInvoiceService       $reAssignItemToInvoiceService,
+        private readonly StoreInvoiceAction                 $storeInvoiceAction,
+        private readonly CalcInvoicePriceFieldsService      $calcInvoicePriceFieldsService,
     )
     {
-        $this->validateInvoicesBeforeSplitService = $validateInvoicesBeforeSplitService;
-        $this->reAssignItemToInvoiceService = $reAssignItemToInvoiceService;
-        $this->storeInvoiceAction = $storeInvoiceAction;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
     }
 
     public function __invoke(Invoice $invoice, array $data)
     {
         check_rahkaran($invoice);
 
-        ($this->validateInvoicesBeforeSplitService)($invoice, $data['item_ids']);
+        if (in_array($invoice->status, [
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_REFUNDED,
+        ])) {
+            throw UpdatingPaidOrRefundedInvoiceNotAllowedException::make($invoice->getKey(), $invoice->status);
+        }
+
+        // If invoice has at least one successful transaction its balance will be smaller than total
+        if ($invoice->total != $invoice->balance) {
+            throw InvoiceHasActiveTransactionsException::make($invoice->getKey());
+        }
+
+        // If $itemsIds count is the same as $invoice's all items count we cant split it
+        if ($invoice->items()->count() == count($data['item_ids'])) {
+            throw AtLeastOneInvoiceItemMustRemainException::make($invoice->getKey());
+        }
 
         $invoiceData = [
             'status' => Invoice::STATUS_UNPAID,

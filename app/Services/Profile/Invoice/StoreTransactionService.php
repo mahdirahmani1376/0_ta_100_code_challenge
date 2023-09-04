@@ -9,11 +9,8 @@ use Illuminate\Http\Request;
 
 class StoreTransactionService
 {
-    private TransactionRepositoryInterface $transactionRepository;
-
-    public function __construct(TransactionRepositoryInterface $transactionRepository)
+    public function __construct(private readonly TransactionRepositoryInterface $transactionRepository)
     {
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function __invoke(Invoice $invoice, array $data): Transaction

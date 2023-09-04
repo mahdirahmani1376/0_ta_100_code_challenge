@@ -10,11 +10,8 @@ use App\Models\Invoice;
 
 class StoreOfflineTransactionController
 {
-    private StoreOfflineTransactionAction $storeOfflineTransactionAction;
-
-    public function __construct(StoreOfflineTransactionAction $storeOfflineTransactionAction)
+    public function __construct(private readonly StoreOfflineTransactionAction $storeOfflineTransactionAction)
     {
-        $this->storeOfflineTransactionAction = $storeOfflineTransactionAction;
     }
 
     /**

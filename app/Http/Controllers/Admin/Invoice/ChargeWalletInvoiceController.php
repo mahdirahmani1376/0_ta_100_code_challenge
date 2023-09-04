@@ -9,11 +9,8 @@ use App\Http\Resources\Admin\Invoice\InvoiceResource;
 
 class ChargeWalletInvoiceController
 {
-    private ChargeWalletInvoiceAction $chargeWalletInvoiceAction;
-
-    public function __construct(ChargeWalletInvoiceAction $chargeWalletInvoiceAction)
+    public function __construct(private readonly ChargeWalletInvoiceAction $chargeWalletInvoiceAction)
     {
-        $this->chargeWalletInvoiceAction = $chargeWalletInvoiceAction;
     }
 
     /**

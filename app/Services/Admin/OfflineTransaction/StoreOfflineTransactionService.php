@@ -8,11 +8,8 @@ use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryIn
 
 class StoreOfflineTransactionService
 {
-    private OfflineTransactionRepositoryInterface $offlineTransactionRepository;
-
-    public function __construct(OfflineTransactionRepositoryInterface $offlineTransactionRepository)
+    public function __construct(private readonly OfflineTransactionRepositoryInterface $offlineTransactionRepository)
     {
-        $this->offlineTransactionRepository = $offlineTransactionRepository;
     }
 
     public function __invoke(Invoice $invoice, array $data): OfflineTransaction
@@ -21,7 +18,7 @@ class StoreOfflineTransactionService
         $data['status'] = OfflineTransaction::STATUS_PENDING;
         $data['client_id'] = $invoice->client_id;
 
-        return $this->offlineTransactionRepository->create($data,[
+        return $this->offlineTransactionRepository->create($data, [
             'paid_at',
             'client_id',
             'invoice_id',

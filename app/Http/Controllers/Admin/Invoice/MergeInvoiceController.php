@@ -12,11 +12,8 @@ use App\Http\Resources\Admin\Invoice\InvoiceResource;
 
 class MergeInvoiceController
 {
-    private MergeInvoiceAction $mergeInvoiceAction;
-
-    public function __construct(MergeInvoiceAction $mergeInvoiceAction)
+    public function __construct(private readonly MergeInvoiceAction $mergeInvoiceAction)
     {
-        $this->mergeInvoiceAction = $mergeInvoiceAction;
     }
 
     /**

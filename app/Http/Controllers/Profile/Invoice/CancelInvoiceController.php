@@ -11,11 +11,8 @@ use App\Models\Invoice;
 
 class CancelInvoiceController
 {
-    private CancelInvoiceAction $cancelInvoiceAction;
-
-    public function __construct(CancelInvoiceAction $cancelInvoiceAction)
+    public function __construct(private readonly CancelInvoiceAction $cancelInvoiceAction)
     {
-        $this->cancelInvoiceAction = $cancelInvoiceAction;
     }
 
     /**

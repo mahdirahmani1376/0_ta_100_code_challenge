@@ -9,19 +9,12 @@ use App\Services\Transaction\RefundTransactionService;
 
 class CancelInvoiceAction
 {
-    private CancelInvoiceService $cancelInvoiceService;
-    private RefundTransactionService $refundTransactionService;
-    private StoreCreditTransactionAction $storeCreditTransactionAction;
-
     public function __construct(
-        CancelInvoiceService         $cancelInvoiceService,
-        RefundTransactionService     $refundTransactionService,
-        StoreCreditTransactionAction $storeCreditTransactionAction
+        private readonly CancelInvoiceService         $cancelInvoiceService,
+        private readonly RefundTransactionService     $refundTransactionService,
+        private readonly StoreCreditTransactionAction $storeCreditTransactionAction
     )
     {
-        $this->cancelInvoiceService = $cancelInvoiceService;
-        $this->refundTransactionService = $refundTransactionService;
-        $this->storeCreditTransactionAction = $storeCreditTransactionAction;
     }
 
     public function __invoke(Invoice $invoice)

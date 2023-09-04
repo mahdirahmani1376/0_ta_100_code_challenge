@@ -9,14 +9,11 @@ use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 
 class CalcInvoicePaidAtService
 {
-    private InvoiceRepositoryInterface $invoiceRepository;
-    private TransactionRepositoryInterface $transactionRepository;
-
-    public function __construct(InvoiceRepositoryInterface     $invoiceRepository,
-                                TransactionRepositoryInterface $transactionRepository)
+    public function __construct(
+        private readonly InvoiceRepositoryInterface     $invoiceRepository,
+        private readonly TransactionRepositoryInterface $transactionRepository,
+    )
     {
-        $this->invoiceRepository = $invoiceRepository;
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function __invoke(Invoice $invoice): Invoice

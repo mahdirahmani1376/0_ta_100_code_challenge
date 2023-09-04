@@ -9,19 +9,12 @@ use App\Services\Transaction\FindTransactionByTrackingCodeService;
 
 class RejectOfflineTransactionAction
 {
-    private FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService;
-    private RejectOfflineTransactionService $rejectOfflineTransactionService;
-    private RejectTransactionService $rejectTransactionService;
-
     public function __construct(
-        FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService,
-        RejectOfflineTransactionService      $rejectOfflineTransactionService,
-        RejectTransactionService             $rejectTransactionService,
+        private readonly FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService,
+        private readonly RejectOfflineTransactionService      $rejectOfflineTransactionService,
+        private readonly RejectTransactionService             $rejectTransactionService,
     )
     {
-        $this->findTransactionByTrackingCodeService = $findTransactionByTrackingCodeService;
-        $this->rejectOfflineTransactionService = $rejectOfflineTransactionService;
-        $this->rejectTransactionService = $rejectTransactionService;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction): OfflineTransaction

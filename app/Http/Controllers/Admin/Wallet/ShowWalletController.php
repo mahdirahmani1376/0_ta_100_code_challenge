@@ -7,13 +7,14 @@ use App\Http\Resources\Admin\Wallet\ShowWalletResource;
 
 class ShowWalletController
 {
-    private ShowWalletAction $showWalletAction;
-
-    public function __construct(ShowWalletAction $showWalletAction)
+    public function __construct(private readonly ShowWalletAction $showWalletAction)
     {
-        $this->showWalletAction = $showWalletAction;
     }
 
+    /**
+     * @param int $clientId
+     * @return ShowWalletResource
+     */
     public function __invoke(int $clientId)
     {
         $wallet = ($this->showWalletAction)($clientId);

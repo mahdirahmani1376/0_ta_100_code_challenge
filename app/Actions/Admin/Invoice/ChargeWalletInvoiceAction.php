@@ -7,11 +7,8 @@ use App\Models\Item;
 
 class ChargeWalletInvoiceAction
 {
-    private StoreInvoiceAction $storeInvoiceAction;
-
-    public function __construct(StoreInvoiceAction $storeInvoiceAction)
+    public function __construct(private readonly StoreInvoiceAction $storeInvoiceAction)
     {
-        $this->storeInvoiceAction = $storeInvoiceAction;
     }
 
     public function __invoke(array $data)

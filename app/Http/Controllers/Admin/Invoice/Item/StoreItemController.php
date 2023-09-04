@@ -10,11 +10,8 @@ use App\Models\Invoice;
 
 class StoreItemController
 {
-    private StoreItemAction $addItemAction;
-
-    public function __construct(StoreItemAction $addItemAction)
+    public function __construct(private readonly StoreItemAction $addItemAction)
     {
-        $this->addItemAction = $addItemAction;
     }
 
     /**

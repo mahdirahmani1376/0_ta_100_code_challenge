@@ -9,21 +9,14 @@ use App\Services\Invoice\CalcInvoicePriceFieldsService;
 
 class StoreInvoiceAction
 {
-    private StoreInvoiceService $storeInvoiceService;
-    private StoreItemService $storeItemService;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
-    private ProcessInvoiceAction $processInvoiceAction;
 
-    public function __construct(StoreInvoiceService           $storeInvoiceService,
-                                StoreItemService              $storeItemService,
-                                CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
-                                ProcessInvoiceAction          $processInvoiceAction,
+    public function __construct(
+        private readonly StoreInvoiceService           $storeInvoiceService,
+        private readonly StoreItemService              $storeItemService,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
+        private readonly ProcessInvoiceAction          $processInvoiceAction,
     )
     {
-        $this->storeInvoiceService = $storeInvoiceService;
-        $this->storeItemService = $storeItemService;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
-        $this->processInvoiceAction = $processInvoiceAction;
     }
 
     public function __invoke(array $data)

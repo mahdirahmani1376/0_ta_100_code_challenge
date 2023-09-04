@@ -7,11 +7,8 @@ use App\Services\Admin\OfflineTransaction\DeleteOfflineTransactionService;
 
 class DeleteOfflineTransactionAction
 {
-    private DeleteOfflineTransactionService $offlineTransactionService;
-
-    public function __construct(DeleteOfflineTransactionService $offlineTransactionService)
+    public function __construct(private readonly DeleteOfflineTransactionService $offlineTransactionService)
     {
-        $this->offlineTransactionService = $offlineTransactionService;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction)

@@ -7,11 +7,8 @@ use App\Services\Admin\Invoice\ManualCheckService;
 
 class ManualCheckAction
 {
-    private ManualCheckService $manualCheckService;
-
-    public function __construct(ManualCheckService $manualCheckService)
+    public function __construct(private readonly ManualCheckService $manualCheckService)
     {
-        $this->manualCheckService = $manualCheckService;
     }
 
     public function __invoke(Invoice $invoice, int $adminId): Invoice

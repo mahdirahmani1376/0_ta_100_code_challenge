@@ -6,16 +6,11 @@ use App\Services\Wallet\IndexCreditTransactionService;
 
 class ShowWalletAndTransactionAction
 {
-    private ShowWalletAction $showWalletAction;
-    private IndexCreditTransactionService $creditTransactionService;
-
     public function __construct(
-        ShowWalletAction              $showWalletAction,
-        IndexCreditTransactionService $creditTransactionService
+        private readonly ShowWalletAction              $showWalletAction,
+        private readonly IndexCreditTransactionService $creditTransactionService
     )
     {
-        $this->showWalletAction = $showWalletAction;
-        $this->creditTransactionService = $creditTransactionService;
     }
 
     public function __invoke(int $clientId)

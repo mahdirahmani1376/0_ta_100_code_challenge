@@ -7,11 +7,8 @@ use App\Services\Admin\ClientCashout\StoreClientCashoutService;
 
 class StoreClientCashoutAction
 {
-    private StoreClientCashoutService $clientCashoutService;
-
-    public function __construct(StoreClientCashoutService $clientCashoutService)
+    public function __construct(private readonly StoreClientCashoutService $clientCashoutService)
     {
-        $this->clientCashoutService = $clientCashoutService;
     }
 
     public function __invoke(array $data)

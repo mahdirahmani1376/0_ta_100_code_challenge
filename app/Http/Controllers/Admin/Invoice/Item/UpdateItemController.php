@@ -11,11 +11,8 @@ use App\Models\Item;
 
 class UpdateItemController
 {
-    private UpdateItemAction $updateItemAction;
-
-    public function __construct(UpdateItemAction $updateItemAction)
+    public function __construct(private readonly UpdateItemAction $updateItemAction)
     {
-        $this->updateItemAction = $updateItemAction;
     }
 
     /**

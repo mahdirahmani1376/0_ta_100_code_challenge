@@ -8,18 +8,15 @@ use Illuminate\Support\Str;
 
 class StoreClientBankAccountAction
 {
-    private StoreClientBankAccountService $storeClientBankAccountService;
-
-    public function __construct(StoreClientBankAccountService $storeClientBankAccountService)
+    public function __construct(private readonly StoreClientBankAccountService $storeClientBankAccountService)
     {
-        $this->storeClientBankAccountService = $storeClientBankAccountService;
     }
 
     public function __invoke(array $data): ClientBankAccount
     {
         // TODO log
         $data['status'] = ClientBankAccount::STATUS_PENDING;
-        if (!empty($data['sheba_number'])){
+        if (!empty($data['sheba_number'])) {
             $data['sheba_number'] = Str::upper($data['sheba_number']);
         }
 

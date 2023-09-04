@@ -13,19 +13,12 @@ use App\Models\Transaction;
 
 class ApplyBalanceToInvoiceAction
 {
-    private ShowWalletAction $showWalletAction;
-    private DeductBalanceAction $deductBalanceAction;
-    private StoreTransactionAction $storeTransactionAction;
-
     public function __construct(
-        ShowWalletAction       $showWalletAction,
-        DeductBalanceAction    $deductBalanceAction,
-        StoreTransactionAction $storeTransactionAction,
+        private readonly ShowWalletAction       $showWalletAction,
+        private readonly DeductBalanceAction    $deductBalanceAction,
+        private readonly StoreTransactionAction $storeTransactionAction,
     )
     {
-        $this->showWalletAction = $showWalletAction;
-        $this->deductBalanceAction = $deductBalanceAction;
-        $this->storeTransactionAction = $storeTransactionAction;
     }
 
     public function __invoke(Invoice $invoice, array $data)

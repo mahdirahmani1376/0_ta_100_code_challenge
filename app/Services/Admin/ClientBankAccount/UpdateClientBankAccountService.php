@@ -7,11 +7,8 @@ use App\Repositories\ClientBankAccount\Interface\ClientBankAccountRepositoryInte
 
 class UpdateClientBankAccountService
 {
-    private ClientBankAccountRepositoryInterface $clientBankAccountRepository;
-
-    public function __construct(ClientBankAccountRepositoryInterface $clientBankAccountRepository)
+    public function __construct(private readonly ClientBankAccountRepositoryInterface $clientBankAccountRepository)
     {
-        $this->clientBankAccountRepository = $clientBankAccountRepository;
     }
 
     public function __invoke(ClientBankAccount $clientBankAccount, array $data): ClientBankAccount

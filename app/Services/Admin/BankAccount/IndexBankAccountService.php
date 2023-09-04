@@ -7,11 +7,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexBankAccountService
 {
-    private BankAccountRepositoryInterface $bankAccountRepository;
-
-    public function __construct(BankAccountRepositoryInterface $bankAccountRepository)
+    public function __construct(private readonly BankAccountRepositoryInterface $bankAccountRepository)
     {
-        $this->bankAccountRepository = $bankAccountRepository;
     }
 
     public function __invoke(array $data): LengthAwarePaginator

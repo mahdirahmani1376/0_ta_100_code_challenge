@@ -7,11 +7,8 @@ use App\Repositories\Wallet\Interface\WalletRepositoryInterface;
 
 class StoreWalletService
 {
-    private WalletRepositoryInterface $walletRepository;
-
-    public function __construct(WalletRepositoryInterface $walletRepository)
+    public function __construct(private readonly WalletRepositoryInterface $walletRepository)
     {
-        $this->walletRepository = $walletRepository;
     }
 
     public function __invoke(int $clientId): Wallet

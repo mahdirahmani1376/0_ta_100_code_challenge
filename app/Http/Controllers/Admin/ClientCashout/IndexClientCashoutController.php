@@ -9,11 +9,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexClientCashoutController
 {
-    private IndexClientCashoutAction $indexClientCashoutAction;
-
-    public function __construct(IndexClientCashoutAction $indexClientCashoutAction)
+    public function __construct(private readonly IndexClientCashoutAction $indexClientCashoutAction)
     {
-        $this->indexClientCashoutAction = $indexClientCashoutAction;
     }
 
     /**

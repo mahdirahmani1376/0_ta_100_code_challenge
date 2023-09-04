@@ -10,11 +10,8 @@ use App\Models\Invoice;
 
 class ChangeInvoiceStatusController
 {
-    private ChangeInvoiceStatusAction $changeInvoiceStatusAction;
-
-    public function __construct(ChangeInvoiceStatusAction $changeInvoiceStatusAction)
+    public function __construct(private readonly ChangeInvoiceStatusAction $changeInvoiceStatusAction)
     {
-        $this->changeInvoiceStatusAction = $changeInvoiceStatusAction;
     }
 
     /**

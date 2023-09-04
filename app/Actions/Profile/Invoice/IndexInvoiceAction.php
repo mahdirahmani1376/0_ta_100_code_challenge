@@ -7,16 +7,11 @@ use App\Services\Profile\Invoice\IndexInvoiceService;
 
 class IndexInvoiceAction
 {
-    private IndexInvoiceService $indexInvoiceService;
-    private ListItemByCriteriaService $listItemByCriteriaService;
-
     public function __construct(
-        IndexInvoiceService       $indexInvoiceService,
-        ListItemByCriteriaService $listItemByCriteriaService,
+        private readonly IndexInvoiceService       $indexInvoiceService,
+        private readonly ListItemByCriteriaService $listItemByCriteriaService,
     )
     {
-        $this->indexInvoiceService = $indexInvoiceService;
-        $this->listItemByCriteriaService = $listItemByCriteriaService;
     }
 
     public function __invoke(array $data)

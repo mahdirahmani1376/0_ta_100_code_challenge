@@ -6,11 +6,8 @@ use App\Services\Admin\Invoice\IndexInvoiceNumberService;
 
 class IndexInvoiceNumberAction
 {
-    private IndexInvoiceNumberService $indexInvoiceNumberService;
-
-    public function __construct(IndexInvoiceNumberService $indexInvoiceNumberService)
+    public function __construct(private readonly IndexInvoiceNumberService $indexInvoiceNumberService)
     {
-        $this->indexInvoiceNumberService = $indexInvoiceNumberService;
     }
 
     public function __invoke(array $data)

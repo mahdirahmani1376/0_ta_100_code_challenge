@@ -8,11 +8,8 @@ use Illuminate\Support\Str;
 
 class FindBankGatewayByNameService
 {
-    private BankGatewayRepositoryInterface $bankGatewayRepository;
-
-    public function __construct(BankGatewayRepositoryInterface $bankGatewayRepository)
+    public function __construct(private readonly BankGatewayRepositoryInterface $bankGatewayRepository)
     {
-        $this->bankGatewayRepository = $bankGatewayRepository;
     }
 
     public function __invoke(string $name): BankGatewayInterface

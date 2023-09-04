@@ -7,11 +7,8 @@ use App\Repositories\BankAccount\Interface\BankAccountRepositoryInterface;
 
 class StoreBankAccountService
 {
-    private BankAccountRepositoryInterface $bankAccountRepository;
-
-    public function __construct(BankAccountRepositoryInterface $bankAccountRepository)
+    public function __construct(private readonly BankAccountRepositoryInterface $bankAccountRepository)
     {
-        $this->bankAccountRepository = $bankAccountRepository;
     }
 
     public function __invoke(array $data): BankAccount

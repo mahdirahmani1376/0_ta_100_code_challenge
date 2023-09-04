@@ -7,11 +7,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class IndexInvoiceNumberService
 {
-    private InvoiceNumberRepositoryInterface $invoiceNumberRepository;
-
-    public function __construct(InvoiceNumberRepositoryInterface $invoiceNumberRepository)
+    public function __construct(private readonly InvoiceNumberRepositoryInterface $invoiceNumberRepository)
     {
-        $this->invoiceNumberRepository = $invoiceNumberRepository;
     }
 
     public function __invoke(array $data): LengthAwarePaginator

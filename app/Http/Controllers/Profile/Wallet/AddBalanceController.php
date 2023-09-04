@@ -8,11 +8,8 @@ use App\Http\Resources\Profile\Invoice\InvoiceResource;
 
 class AddBalanceController
 {
-    private AddBalanceAction $addBalanceAction;
-
-    public function __construct(AddBalanceAction $addBalanceAction)
+    public function __construct(private readonly AddBalanceAction $addBalanceAction)
     {
-        $this->addBalanceAction = $addBalanceAction;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace App\Actions\Admin\Invoice\Item;
 
-use App\Actions\Invoice\CalcInvoicePriceFieldsAction;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Services\Admin\Invoice\Item\DeleteItemService;
@@ -10,15 +9,11 @@ use App\Services\Invoice\CalcInvoicePriceFieldsService;
 
 class DeleteItemAction
 {
-    private DeleteItemService $deleteItemService;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
-
     public function __construct(
-        DeleteItemService            $deleteItemService,
-        calcInvoicePriceFieldsService $calcInvoicePriceFieldsService)
+        private readonly DeleteItemService             $deleteItemService,
+        private readonly calcInvoicePriceFieldsService $calcInvoicePriceFieldsService
+    )
     {
-        $this->deleteItemService = $deleteItemService;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
     }
 
     public function __invoke(Invoice $invoice, Item $item)

@@ -7,11 +7,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexCreditTransactionService
 {
-    private CreditTransactionRepositoryInterface $creditTransactionRepository;
-
-    public function __construct(CreditTransactionRepositoryInterface $creditTransactionRepository)
+    public function __construct(private readonly CreditTransactionRepositoryInterface $creditTransactionRepository)
     {
-        $this->creditTransactionRepository = $creditTransactionRepository;
     }
 
     public function __invoke(int $clientId): LengthAwarePaginator

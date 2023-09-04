@@ -9,19 +9,12 @@ use App\Services\Transaction\FindTransactionByTrackingCodeService;
 
 class UpdateOfflineTransactionAction
 {
-    private UpdateOfflineTransactionService $updateOfflineTransactionService;
-    private UpdateTransactionService $updateTransactionService;
-    private FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService;
-
     public function __construct(
-        UpdateOfflineTransactionService      $updateOfflineTransactionService,
-        UpdateTransactionService             $updateTransactionService,
-        FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService
+        private readonly UpdateOfflineTransactionService      $updateOfflineTransactionService,
+        private readonly UpdateTransactionService             $updateTransactionService,
+        private readonly FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService
     )
     {
-        $this->updateOfflineTransactionService = $updateOfflineTransactionService;
-        $this->updateTransactionService = $updateTransactionService;
-        $this->findTransactionByTrackingCodeService = $findTransactionByTrackingCodeService;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction, array $data)

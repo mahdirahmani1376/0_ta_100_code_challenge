@@ -7,11 +7,8 @@ use App\Services\Profile\ClientCashout\StoreClientCashoutService;
 
 class StoreClientCashoutAction
 {
-    private StoreClientCashoutService $clientCashoutService;
-
-    public function __construct(StoreClientCashoutService $storeClientCashoutService)
+    public function __construct(private readonly StoreClientCashoutService $storeClientCashoutService)
     {
-        $this->clientCashoutService = $storeClientCashoutService;
     }
 
     public function __invoke(int $clientId, array $data)
@@ -19,6 +16,6 @@ class StoreClientCashoutAction
         $data['status'] = ClientCashout::STATUS_PENDING;
         $data['client_id'] = $clientId;
 
-        return ($this->clientCashoutService)($data);
+        return ($this->storeClientCashoutService)($data);
     }
 }

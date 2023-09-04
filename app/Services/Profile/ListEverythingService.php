@@ -11,19 +11,12 @@ use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 
 class ListEverythingService
 {
-    private InvoiceRepositoryInterface $invoiceRepository;
-    private TransactionRepositoryInterface $transactionRepository;
-    private CreditTransactionRepositoryInterface $creditTransactionRepository;
-
     public function __construct(
-        InvoiceRepositoryInterface           $invoiceRepository,
-        TransactionRepositoryInterface       $transactionRepository,
-        CreditTransactionRepositoryInterface $creditTransactionRepository,
+        private readonly InvoiceRepositoryInterface           $invoiceRepository,
+        private readonly TransactionRepositoryInterface       $transactionRepository,
+        private readonly CreditTransactionRepositoryInterface $creditTransactionRepository,
     )
     {
-        $this->invoiceRepository = $invoiceRepository;
-        $this->transactionRepository = $transactionRepository;
-        $this->creditTransactionRepository = $creditTransactionRepository;
     }
 
     public function __invoke(int $clientId, int $offset = null)

@@ -8,11 +8,8 @@ use Illuminate\Support\Str;
 
 class UpdateClientBankAccountAction
 {
-    private UpdateClientBankAccountService $updateClientBankAccountService;
-
-    public function __construct(UpdateClientBankAccountService $updateClientBankAccountService)
+    public function __construct(private readonly UpdateClientBankAccountService $updateClientBankAccountService)
     {
-        $this->updateClientBankAccountService = $updateClientBankAccountService;
     }
 
     public function __invoke(ClientBankAccount $clientBankAccount, array $data): ClientBankAccount
@@ -20,7 +17,7 @@ class UpdateClientBankAccountAction
         // TODO LOG
         // If user is updating its ClientBankAccount record status must change back to "pending"
         $data['status'] = ClientBankAccount::STATUS_PENDING;
-        if (!empty($data['sheba_number'])){
+        if (!empty($data['sheba_number'])) {
             $data['sheba_number'] = Str::upper($data['sheba_number']);
         }
 

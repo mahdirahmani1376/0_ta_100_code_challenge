@@ -6,11 +6,8 @@ use App\Services\Admin\OfflineTransaction\IndexOfflineTransactionService;
 
 class IndexOfflineTransactionAction
 {
-    private IndexOfflineTransactionService $offlineTransactionService;
-
-    public function __construct(IndexOfflineTransactionService $offlineTransactionService)
+    public function __construct(private readonly IndexOfflineTransactionService $offlineTransactionService)
     {
-        $this->offlineTransactionService = $offlineTransactionService;
     }
 
     public function __invoke(array $data)

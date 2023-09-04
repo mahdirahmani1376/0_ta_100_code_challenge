@@ -7,11 +7,8 @@ use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 
 class StoreCreditTransactionService
 {
-    private CreditTransactionRepositoryInterface $creditTransactionRepository;
-
-    public function __construct(CreditTransactionRepositoryInterface $creditTransactionRepository)
+    public function __construct(private readonly CreditTransactionRepositoryInterface $creditTransactionRepository)
     {
-        $this->creditTransactionRepository = $creditTransactionRepository;
     }
 
     public function __invoke(Wallet $wallet, array $data)

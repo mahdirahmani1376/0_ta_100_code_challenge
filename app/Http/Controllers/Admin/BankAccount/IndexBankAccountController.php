@@ -9,11 +9,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexBankAccountController
 {
-    private IndexBankAccountAction $indexBankAccountAction;
-
-    public function __construct(IndexBankAccountAction $indexBankAccountAction)
+    public function __construct(private readonly IndexBankAccountAction $indexBankAccountAction)
     {
-        $this->indexBankAccountAction = $indexBankAccountAction;
     }
 
     /**

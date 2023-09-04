@@ -10,35 +10,22 @@ use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
 use App\Services\Admin\Transaction\StoreRefundTransactionService;
 use App\Services\Admin\Wallet\StoreCreditTransactionForOfflineTransactionService;
 use App\Services\Invoice\CalcInvoicePaidAtService;
+use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Wallet\CalcWalletBalanceService;
 
 class ProcessInvoiceAction
 {
-    private ShowWalletAction $showWalletAction;
-    private StoreRefundTransactionService $storeRefundTransactionService;
-    private ChangeInvoiceStatusService $changeInvoiceStatusService;
-    private CalcInvoicePaidAtService $calcInvoicePaidAtService;
-    private StoreCreditTransactionAction $storeCreditTransactionAction;
-    private StoreCreditTransactionForOfflineTransactionService $storeCreditTransactionForOfflineTransactionService;
-    private CalcWalletBalanceService $calcWalletBalanceService;
-
     public function __construct(
-        ShowWalletAction                                   $showWalletAction,
-        StoreRefundTransactionService                      $storeRefundTransactionService,
-        ChangeInvoiceStatusService                         $changeInvoiceStatusService,
-        CalcInvoicePaidAtService                           $calcInvoicePaidAtService,
-        StoreCreditTransactionAction                       $storeCreditTransactionAction,
-        StoreCreditTransactionForOfflineTransactionService $storeCreditTransactionForOfflineTransactionService,
-        CalcWalletBalanceService                           $calcWalletBalanceService,
+        private readonly ShowWalletAction                                   $showWalletAction,
+        private readonly StoreRefundTransactionService                      $storeRefundTransactionService,
+        private readonly ChangeInvoiceStatusService                         $changeInvoiceStatusService,
+        private readonly CalcInvoicePaidAtService                           $calcInvoicePaidAtService,
+        private readonly StoreCreditTransactionAction                       $storeCreditTransactionAction,
+        private readonly StoreCreditTransactionForOfflineTransactionService $storeCreditTransactionForOfflineTransactionService,
+        private readonly CalcWalletBalanceService                           $calcWalletBalanceService,
+        private readonly CalcInvoicePriceFieldsService                      $calcInvoicePriceFieldsService,
     )
     {
-        $this->showWalletAction = $showWalletAction;
-        $this->storeRefundTransactionService = $storeRefundTransactionService;
-        $this->changeInvoiceStatusService = $changeInvoiceStatusService;
-        $this->calcInvoicePaidAtService = $calcInvoicePaidAtService;
-        $this->storeCreditTransactionAction = $storeCreditTransactionAction;
-        $this->storeCreditTransactionForOfflineTransactionService = $storeCreditTransactionForOfflineTransactionService;
-        $this->calcWalletBalanceService = $calcWalletBalanceService;
     }
     // TODO check ProcessInvoiceAction logic - e.g. balance == 0 ?
     // TODO check usage of this action
@@ -52,6 +39,7 @@ class ProcessInvoiceAction
                 'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
             ]);
             ($this->storeRefundTransactionService)($invoice);
+            ($this->calcInvoicePriceFieldsService)($invoice);
         }
 
         // Change status to paid unless it is a REFUND invoice

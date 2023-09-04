@@ -9,11 +9,8 @@ use App\Models\ClientCashout;
 
 class UpdateClientCashoutController
 {
-    private UpdateClientCashoutAction $updateClientCashoutAction;
-
-    public function __construct(UpdateClientCashoutAction $updateClientCashoutAction)
+    public function __construct(private readonly UpdateClientCashoutAction $updateClientCashoutAction)
     {
-        $this->updateClientCashoutAction = $updateClientCashoutAction;
     }
 
     /**

@@ -13,11 +13,8 @@ use App\Models\Invoice;
 
 class SplitInvoiceController
 {
-    private SplitInvoiceAction $splitInvoiceAction;
-
-    public function __construct(SplitInvoiceAction $splitInvoiceAction)
+    public function __construct(private readonly SplitInvoiceAction $splitInvoiceAction)
     {
-        $this->splitInvoiceAction = $splitInvoiceAction;
     }
 
     /**

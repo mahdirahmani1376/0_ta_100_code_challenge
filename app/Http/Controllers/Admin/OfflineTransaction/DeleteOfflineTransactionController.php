@@ -9,11 +9,8 @@ use Illuminate\Http\Response;
 
 class DeleteOfflineTransactionController
 {
-    private DeleteOfflineTransactionAction $deleteOfflineTransactionAction;
-
-    public function __construct(DeleteOfflineTransactionAction $deleteOfflineTransactionAction)
+    public function __construct(private readonly DeleteOfflineTransactionAction $deleteOfflineTransactionAction)
     {
-        $this->deleteOfflineTransactionAction = $deleteOfflineTransactionAction;
     }
 
     /**

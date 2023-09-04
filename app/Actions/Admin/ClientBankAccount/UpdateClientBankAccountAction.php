@@ -7,11 +7,8 @@ use App\Services\Admin\ClientBankAccount\UpdateClientBankAccountService;
 
 class UpdateClientBankAccountAction
 {
-    private UpdateClientBankAccountService $updateClientBankAccountService;
-
-    public function __construct(UpdateClientBankAccountService $updateClientBankAccountService)
+    public function __construct(private readonly UpdateClientBankAccountService $updateClientBankAccountService)
     {
-        $this->updateClientBankAccountService = $updateClientBankAccountService;
     }
 
     public function __invoke(ClientBankAccount $clientBankAccount, array $data): ClientBankAccount

@@ -7,11 +7,8 @@ use App\Services\Admin\OfflineTransaction\IndexSimilarOfflineTransactionService;
 
 class IndexSimilarOfflineTransactionAction
 {
-    private IndexSimilarOfflineTransactionService $indexSimilarOfflineTransactionService;
-
-    public function __construct(IndexSimilarOfflineTransactionService $indexSimilarOfflineTransactionService)
+    public function __construct(private readonly IndexSimilarOfflineTransactionService $indexSimilarOfflineTransactionService)
     {
-        $this->indexSimilarOfflineTransactionService = $indexSimilarOfflineTransactionService;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction)

@@ -8,13 +8,15 @@ use App\Http\Resources\Admin\Wallet\CreditTransactionResource;
 
 class StoreCreditTransactionController
 {
-    private StoreCreditTransactionAction $storeCreditTransactionAction;
-
-    public function __construct(StoreCreditTransactionAction $storeCreditTransactionAction)
+    public function __construct(private readonly StoreCreditTransactionAction $storeCreditTransactionAction)
     {
-        $this->storeCreditTransactionAction = $storeCreditTransactionAction;
     }
 
+    /**
+     * @param int $clientId
+     * @param StoreCreditTransactionRequest $request
+     * @return CreditTransactionResource
+     */
     public function __invoke(int $clientId, StoreCreditTransactionRequest $request)
     {
         $creditTransaction = ($this->storeCreditTransactionAction)($clientId, $request->validated());

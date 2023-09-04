@@ -9,11 +9,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexOfflineTransactionController
 {
-    private IndexOfflineTransactionAction $indexOfflineTransactionAction;
-
-    public function __construct(IndexOfflineTransactionAction $indexOfflineTransactionAction)
+    public function __construct(private readonly IndexOfflineTransactionAction $indexOfflineTransactionAction)
     {
-        $this->indexOfflineTransactionAction = $indexOfflineTransactionAction;
     }
 
     /**

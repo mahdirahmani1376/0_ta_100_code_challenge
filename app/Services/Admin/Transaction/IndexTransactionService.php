@@ -8,11 +8,8 @@ use Illuminate\Support\Collection;
 
 class IndexTransactionService
 {
-    private TransactionRepositoryInterface $transactionRepository;
-
-    public function __construct(TransactionRepositoryInterface $transactionRepository)
+    public function __construct(private readonly TransactionRepositoryInterface $transactionRepository)
     {
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function __invoke(array $data): LengthAwarePaginator|Collection

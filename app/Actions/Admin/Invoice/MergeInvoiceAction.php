@@ -8,22 +8,13 @@ use App\Services\Admin\Invoice\ValidateInvoicesBeforeMergeService;
 
 class MergeInvoiceAction
 {
-    private ValidateInvoicesBeforeMergeService $validateInvoicesBeforeMergeService;
-    private IndexItemsByInvoices $indexItemsByInvoices;
-    private StoreInvoiceAction $storeInvoiceAction;
-    private ChangeInvoiceStatusAction $changeInvoiceStatusAction;
-
     public function __construct(
-        ValidateInvoicesBeforeMergeService $validateInvoicesBeforeMergeService,
-        IndexItemsByInvoices               $indexItemsByInvoices,
-        StoreInvoiceAction                 $storeInvoiceAction,
-        ChangeInvoiceStatusAction          $changeInvoiceStatusAction
+        private readonly ValidateInvoicesBeforeMergeService $validateInvoicesBeforeMergeService,
+        private readonly IndexItemsByInvoices               $indexItemsByInvoices,
+        private readonly StoreInvoiceAction                 $storeInvoiceAction,
+        private readonly ChangeInvoiceStatusAction          $changeInvoiceStatusAction
     )
     {
-        $this->validateInvoicesBeforeMergeService = $validateInvoicesBeforeMergeService;
-        $this->indexItemsByInvoices = $indexItemsByInvoices;
-        $this->storeInvoiceAction = $storeInvoiceAction;
-        $this->changeInvoiceStatusAction = $changeInvoiceStatusAction;
     }
 
     public function __invoke(array $data)

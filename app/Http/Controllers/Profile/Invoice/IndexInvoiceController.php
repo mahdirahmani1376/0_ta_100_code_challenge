@@ -9,11 +9,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IndexInvoiceController
 {
-    private IndexInvoiceAction $indexInvoiceAction;
-
-    public function __construct(IndexInvoiceAction $indexInvoiceAction)
+    public function __construct(private readonly IndexInvoiceAction $indexInvoiceAction)
     {
-        $this->indexInvoiceAction = $indexInvoiceAction;
     }
 
     /**

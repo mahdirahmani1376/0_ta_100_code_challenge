@@ -15,13 +15,8 @@ class GenerateInvoiceNumberJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $type;
-    public string $fiscalYear;
-
-    public function __construct(string $type, string $fiscalYear)
+    public function __construct(private readonly string $type, private readonly string $fiscalYear)
     {
-        $this->type = $type;
-        $this->fiscalYear = $fiscalYear;
     }
 
     public function handle(InvoiceNumberRepositoryInterface $invoiceNumberRepository): void

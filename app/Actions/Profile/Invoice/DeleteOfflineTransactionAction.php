@@ -12,19 +12,12 @@ use App\Services\Transaction\FindTransactionByTrackingCodeService;
 
 class DeleteOfflineTransactionAction
 {
-    private UpdateTransactionService $updateTransactionService;
-    private DeleteOfflineTransactionService $deleteOfflineTransactionService;
-    private FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService;
-
     public function __construct(
-        UpdateTransactionService        $updateTransactionService,
-        DeleteOfflineTransactionService $deleteOfflineTransactionService,
-        FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService,
+        private readonly UpdateTransactionService             $updateTransactionService,
+        private readonly DeleteOfflineTransactionService      $deleteOfflineTransactionService,
+        private readonly FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService,
     )
     {
-        $this->updateTransactionService = $updateTransactionService;
-        $this->deleteOfflineTransactionService = $deleteOfflineTransactionService;
-        $this->findTransactionByTrackingCodeService = $findTransactionByTrackingCodeService;
     }
 
     public function __invoke(OfflineTransaction $offlineTransaction)

@@ -5,24 +5,16 @@ namespace App\Actions\Admin\OfflineTransaction;
 use App\Models\Transaction;
 use App\Services\Admin\OfflineTransaction\StoreOfflineTransactionService;
 use App\Services\Admin\Transaction\StoreTransactionService;
-use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\FindInvoiceByIdService;
 
 class StoreOfflineTransactionAction
 {
-    private StoreOfflineTransactionService $storeOfflineTransactionService;
-    private StoreTransactionService $storeTransactionService;
-    private FindInvoiceByIdService $findInvoiceByIdService;
-
     public function __construct(
-        FindInvoiceByIdService         $findInvoiceByIdService,
-        StoreOfflineTransactionService $storeOfflineTransactionService,
-        StoreTransactionService        $storeTransactionService,
+        private readonly FindInvoiceByIdService         $findInvoiceByIdService,
+        private readonly StoreOfflineTransactionService $storeOfflineTransactionService,
+        private readonly StoreTransactionService        $storeTransactionService,
     )
     {
-        $this->storeOfflineTransactionService = $storeOfflineTransactionService;
-        $this->storeTransactionService = $storeTransactionService;
-        $this->findInvoiceByIdService = $findInvoiceByIdService;
     }
 
     public function __invoke(array $data)

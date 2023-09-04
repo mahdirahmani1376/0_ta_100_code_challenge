@@ -6,11 +6,8 @@ use App\Services\Admin\BankAccount\IndexBankAccountService;
 
 class IndexBankAccountAction
 {
-    private IndexBankAccountService $indexBankAccountService;
-
-    public function __construct(IndexBankAccountService $indexBankAccountService)
+    public function __construct(private readonly IndexBankAccountService $indexBankAccountService)
     {
-        $this->indexBankAccountService = $indexBankAccountService;
     }
 
     public function __invoke(array $data)

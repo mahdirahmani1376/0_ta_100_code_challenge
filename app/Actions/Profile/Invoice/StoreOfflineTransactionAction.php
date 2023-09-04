@@ -10,19 +10,12 @@ use App\Services\Profile\Invoice\StoreTransactionService;
 
 class StoreOfflineTransactionAction
 {
-    private StoreOfflineTransactionService $storeOfflineTransactionService;
-    private StoreTransactionService $storeTransactionService;
-    private CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService;
-
     public function __construct(
-        StoreOfflineTransactionService $storeOfflineTransactionService,
-        StoreTransactionService        $storeTransactionService,
-        CalcInvoicePriceFieldsService  $calcInvoicePriceFieldsService,
+        private readonly StoreOfflineTransactionService $storeOfflineTransactionService,
+        private readonly StoreTransactionService        $storeTransactionService,
+        private readonly CalcInvoicePriceFieldsService  $calcInvoicePriceFieldsService,
     )
     {
-        $this->storeOfflineTransactionService = $storeOfflineTransactionService;
-        $this->storeTransactionService = $storeTransactionService;
-        $this->calcInvoicePriceFieldsService = $calcInvoicePriceFieldsService;
     }
 
     public function __invoke(Invoice $invoice, array $data)

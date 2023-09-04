@@ -7,11 +7,8 @@ use App\Repositories\ClientCashout\Interface\ClientCashoutRepositoryInterface;
 
 class StoreClientCashoutService
 {
-    private ClientCashoutRepositoryInterface $clientCashoutRepository;
-
-    public function __construct(ClientCashoutRepositoryInterface $clientCashoutRepository)
+    public function __construct(private readonly ClientCashoutRepositoryInterface $clientCashoutRepository)
     {
-        $this->clientCashoutRepository = $clientCashoutRepository;
     }
 
     public function __invoke(array $data): ClientCashout

@@ -9,16 +9,11 @@ use App\Services\Admin\Transaction\VerifyTransactionService;
 
 class VerifyTransactionAction
 {
-    private VerifyTransactionService $verifyTransactionService;
-    private ProcessInvoiceAction $processInvoiceAction;
-
     public function __construct(
-        VerifyTransactionService $verifyTransactionService,
-        ProcessInvoiceAction     $processInvoiceAction
+        private readonly VerifyTransactionService $verifyTransactionService,
+        private readonly ProcessInvoiceAction     $processInvoiceAction
     )
     {
-        $this->verifyTransactionService = $verifyTransactionService;
-        $this->processInvoiceAction = $processInvoiceAction;
     }
 
     public function __invoke(Transaction $transaction)

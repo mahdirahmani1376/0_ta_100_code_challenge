@@ -11,11 +11,8 @@ use App\Models\OfflineTransaction;
 
 class VerifyOfflineTransactionController
 {
-    private VerifyOfflineTransactionAction $offlineTransactionAction;
-
-    public function __construct(VerifyOfflineTransactionAction $offlineTransactionAction)
+    public function __construct(private readonly VerifyOfflineTransactionAction $offlineTransactionAction)
     {
-        $this->offlineTransactionAction = $offlineTransactionAction;
     }
 
     /**

@@ -5,15 +5,12 @@ namespace App\Services\Admin\Invoice;
 use App\Exceptions\SystemException\MergeInvoiceException;
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class ValidateInvoicesBeforeMergeService
 {
-    private InvoiceRepositoryInterface $invoiceRepository;
-
-    public function __construct(InvoiceRepositoryInterface $invoiceRepository)
+    public function __construct(private readonly InvoiceRepositoryInterface $invoiceRepository)
     {
-        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function __invoke(array $invoiceIds): Collection

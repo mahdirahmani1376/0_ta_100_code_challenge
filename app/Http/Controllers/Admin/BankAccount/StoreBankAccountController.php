@@ -8,11 +8,8 @@ use App\Http\Resources\Admin\BankAccount\BankAccountResource;
 
 class StoreBankAccountController
 {
-    private StoreBankAccountAction $storeBankAccountAction;
-
-    public function __construct(StoreBankAccountAction $storeBankAccountAction)
+    public function __construct(private readonly StoreBankAccountAction $storeBankAccountAction)
     {
-        $this->storeBankAccountAction = $storeBankAccountAction;
     }
 
     /**

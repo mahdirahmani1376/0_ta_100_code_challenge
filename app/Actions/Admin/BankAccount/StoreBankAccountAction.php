@@ -6,11 +6,8 @@ use App\Services\Admin\BankAccount\StoreBankAccountService;
 
 class StoreBankAccountAction
 {
-    private StoreBankAccountService $storeBankAccountService;
-
-    public function __construct(StoreBankAccountService $storeBankAccountService)
+    public function __construct(private readonly StoreBankAccountService $storeBankAccountService)
     {
-        $this->storeBankAccountService = $storeBankAccountService;
     }
 
     public function __invoke(array $data)

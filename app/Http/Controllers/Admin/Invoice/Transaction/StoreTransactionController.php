@@ -9,11 +9,8 @@ use App\Models\Invoice;
 
 class StoreTransactionController
 {
-    private StoreTransactionAction $storeTransactionAction;
-
-    public function __construct(StoreTransactionAction $storeTransactionAction)
+    public function __construct(private readonly StoreTransactionAction $storeTransactionAction)
     {
-        $this->storeTransactionAction = $storeTransactionAction;
     }
 
     /**

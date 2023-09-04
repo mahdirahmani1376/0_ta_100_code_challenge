@@ -7,11 +7,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexOfflineTransactionService
 {
-    private OfflineTransactionRepositoryInterface $offlineTransactionRepository;
-
-    public function __construct(OfflineTransactionRepositoryInterface $offlineTransactionRepository)
+    public function __construct(private readonly OfflineTransactionRepositoryInterface $offlineTransactionRepository)
     {
-        $this->offlineTransactionRepository = $offlineTransactionRepository;
     }
 
     public function __invoke(array $data): LengthAwarePaginator
