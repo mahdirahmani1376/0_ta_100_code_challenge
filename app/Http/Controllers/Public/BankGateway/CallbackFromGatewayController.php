@@ -12,8 +12,8 @@ class CallbackFromGatewayController
     {
     }
 
-    public function __invoke(Transaction $transaction, string $gateway, ?string $source, Request $request)
+    public function __invoke(string $gateway, Transaction $transaction, string $source = null)
     {
-        return ($this->callbackFromGatewayAction)($transaction, $gateway, $source, $request->all());
+        return ($this->callbackFromGatewayAction)($transaction, $gateway, $source, request()->all());
     }
 }

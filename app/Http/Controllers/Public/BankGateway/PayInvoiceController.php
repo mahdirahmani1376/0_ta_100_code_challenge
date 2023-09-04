@@ -11,8 +11,10 @@ class PayInvoiceController
     {
     }
 
-    public function __invoke(Invoice $invoice, string $gateway, ?string $source)
+    public function __invoke(string $gateway, Invoice $invoice, string $source = null)
     {
-        return ($this->payInvoiceAction)($invoice, $gateway, $source);
+        $redirectUrl = ($this->payInvoiceAction)($invoice, $gateway, $source);
+
+        return response()->json(['redirect_url' => $redirectUrl,]);
     }
 }
