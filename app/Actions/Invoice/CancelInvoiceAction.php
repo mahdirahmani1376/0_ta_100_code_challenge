@@ -21,7 +21,7 @@ class CancelInvoiceAction
     {
         check_rahkaran($invoice);
 
-        if ($invoice->status != Invoice::STATUS_UNPAID) {
+        if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_DRAFT])) {
             return $invoice;
         }
 

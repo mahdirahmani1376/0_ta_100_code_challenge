@@ -55,10 +55,10 @@ class AssignInvoiceNumberService
         $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear);
 
         // No available InvoiceNumber, generate 100 available InvoiceNumbers
-        // Normally this if-clause MUST NOT be executed if it keeps executing something is wrong and needs investigation
+        // Normally this if-clause MUST NOT be executed otherwise something is wrong(race condition) and needs investigation
         if ($affectedRecordCount == 0) {
             info('Could not assign InvoiceNumber to invoice: ' . $invoice->id);
-            info('Generating 100 InvoiceNumbers');
+            info('Generating 100 InvoiceNumbers'); // TODO alert/warn devTeam
             $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
             $hundredAvailableInvoiceNumbers = [];
             $now = now();

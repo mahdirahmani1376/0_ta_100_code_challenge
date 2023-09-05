@@ -64,7 +64,7 @@ class BaseRepository implements EloquentRepositoryInterface
     /**
      * @throws BindingResolutionException
      */
-    public function find(int $id): Model
+    public function find(int $id): ?Model
     {
         return self::newQuery()->find($id);
     }

@@ -11,7 +11,7 @@ class FindInvoiceByIdService
     {
     }
 
-    public function __invoke(int $invoiceId): Invoice
+    public function __invoke(int $invoiceId): ?Invoice
     {
         return $this->invoiceRepository->find($invoiceId);
     }

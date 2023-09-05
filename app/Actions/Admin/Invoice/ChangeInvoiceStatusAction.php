@@ -2,15 +2,16 @@
 
 namespace App\Actions\Admin\Invoice;
 
+use App\Actions\Invoice\CancelInvoiceAction;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
-use App\Services\Invoice\CalcInvoicePaidAtService;
 
 class ChangeInvoiceStatusAction
 {
     public function __construct(
         private readonly ChangeInvoiceStatusService $changeInvoiceStatusService,
-        private readonly CalcInvoicePaidAtService   $calcInvoicePaidAtService
+        private readonly CancelInvoiceAction        $cancelInvoiceAction,
+        private readonly ProcessInvoiceAction       $processInvoiceAction,
     )
     {
     }
@@ -20,9 +21,16 @@ class ChangeInvoiceStatusAction
         // TODO AdminLog
         check_rahkaran($invoice);
 
-        $invoice = ($this->changeInvoiceStatusService)($invoice, $status);
-        // TODO Run ProcessInvoiceAction instead if its paid
-        // TODO run CancelInvoiceAction if its cancelled
-        return ($this->calcInvoicePaidAtService)($invoice);
+        if ($status == Invoice::STATUS_CANCELED) {
+            $invoice = ($this->cancelInvoiceAction)($invoice);
+        } else {
+            $invoice = ($this->changeInvoiceStatusService)($invoice, $status);
+        }
+
+        if (in_array($status, [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS])) {
+            $invoice = ($this->processInvoiceAction)($invoice);
+        }
+
+        return $invoice;
     }
 }
