@@ -4,6 +4,7 @@ namespace App\Repositories\OfflineTransaction;
 
 use App\Models\Invoice;
 use App\Models\OfflineTransaction;
+use App\Models\Transaction;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -67,5 +68,13 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
             ->where('invoice_id', $invoice->getKey())
             ->where('status', OfflineTransaction::STATUS_CONFIRMED)
             ->sum('amount');
+    }
+
+    public function findByTransaction(Transaction $transaction): ?OfflineTransaction
+    {
+        return self::newQuery()
+            ->where('tracking_code', $transaction->tracking_code)
+            ->where('invoice_id', $transaction->invoice_id)
+            ->first();
     }
 }

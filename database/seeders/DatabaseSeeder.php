@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Integrations\MainApp\MainAppService;
+use App\Integrations\MainApp\MainAppAPIService;
 use App\Models\BankAccount;
 use App\Models\BankGateway;
 use App\Models\InvoiceNumber;
@@ -48,9 +48,9 @@ class DatabaseSeeder extends Seeder
             'type' => InvoiceNumber::TYPE_REFUND,
         ]);
 
-        MainAppService::storeConfig('CRON_AUTO_INVOICE_CANCELLATION_DAYS', 1);
-        MainAppService::storeConfig('CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS', 1);
-        MainAppService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_1', 1);
-        MainAppService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_2', 1);
+        MainAppAPIService::storeConfig('CRON_AUTO_INVOICE_CANCELLATION_DAYS', 1);
+        MainAppAPIService::storeConfig('CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS', 1);
+        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_1', 1);
+        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_2', 1);
     }
 }

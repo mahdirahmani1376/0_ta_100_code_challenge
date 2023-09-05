@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Integrations\MainApp\MainAppService;
+use App\Integrations\MainApp\MainAppAPIService;
+use App\Integrations\Rahkaran\RahkaranService;
+use App\Integrations\Rahkaran\ValueObjects\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
@@ -18,8 +20,11 @@ class ImportClientsToRahkaranCommand extends Command
 
     protected int $errors = 0;
 
+    private RahkaranService $rahkaranService;
+
     public function handle(): int
     {
+        $this->rahkaranService = app(RahkaranService::class);
         App::setLocale('fa');
         $this->alert('Import clients into Rahkaran Date Time ' . now()->toDateTimeString());
 
@@ -28,7 +33,7 @@ class ImportClientsToRahkaranCommand extends Command
         $bar = $this->output->createProgressBar($clients->count());
 
         foreach ($clients as $client) {
-//            $this->import($client, [], true);
+            $this->import($client, [], true);
             $bar->advance();
         }
 
@@ -48,7 +53,7 @@ class ImportClientsToRahkaranCommand extends Command
             $clientIds = array_merge($clientIds, $this->argument('clients'));
         }
         $this->info('Fetching client data from MainApp for: ' . implode(',', $clientIds));
-        $clients = MainAppService::getClients($clientIds);
+        $clients = MainAppAPIService::getClients($clientIds);
         $this->info('Clients received, count:' . count($clients));
 
         return collect($clients);
@@ -138,7 +143,7 @@ class ImportClientsToRahkaranCommand extends Command
     protected function importClient(Client $client, array $ignore_fields = []): ?array
     {
         try {
-            $this->rahkaranService()->createClientParty($client, $ignore_fields);
+            $this->rahkaranService->createClientParty($client, $ignore_fields);
 
             return null;
 

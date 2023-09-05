@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property InvoiceNumber invoiceNumber
  * @property Collection transactions
  * @property Collection offlineTransactions
+ * @property Client $client
  */
 class Invoice extends Model
 {

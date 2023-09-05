@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helpers\JalaliCalender;
-use App\Integrations\MainApp\MainAppService;
+use App\Integrations\MainApp\MainAppAPIService;
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Console\Command;
@@ -47,7 +47,7 @@ class InvoiceReminderCommand extends Command
         try {
             if (empty($this->option('threshold1'))) {
                 $this->info("No 'threshold1' argument provided, fetching from MainApp configs...");
-                $this->threshold1 = MainAppService::getConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_1');
+                $this->threshold1 = MainAppAPIService::getConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_1');
                 $this->info("'threshold1' config received from MainApp: " . $this->threshold1);
             } else {
                 $this->threshold1 = $this->option('threshold1');
@@ -55,7 +55,7 @@ class InvoiceReminderCommand extends Command
 
             if (empty($this->option('threshold2'))) {
                 $this->info("No 'threshold2' argument provided, fetching from MainApp configs...");
-                $this->threshold2 = MainAppService::getConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_2');
+                $this->threshold2 = MainAppAPIService::getConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_2');
                 $this->info("'threshold2' value received from MainApp: " . $this->threshold2);
             } else {
                 $this->threshold2 = $this->option('threshold2');
