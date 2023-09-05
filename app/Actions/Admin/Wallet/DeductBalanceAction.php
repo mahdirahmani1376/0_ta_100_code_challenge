@@ -15,6 +15,7 @@ class DeductBalanceAction
         if ($data['amount'] >= 1) {
             $data['amount'] = $data['amount'] * -1;
         }
+
         return ($this->storeCreditTransactionAction)($clientId, $data);
     }
 }
