@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Internal\Cloud\Invoice\ChargeWalletInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Invoice\IndexInvoiceController;
+use App\Http\Controllers\Internal\Cloud\Invoice\IndexMyInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Invoice\MonthlyStoreInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Invoice\ShowInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Invoice\StoreInvoiceController;
@@ -25,9 +26,10 @@ Route::namespace('Cloud')
         Route::namespace('Invoice')
             ->prefix('invoice')
             ->group(function () {
+                Route::get('/', IndexInvoiceController::class);
                 Route::post('/', StoreInvoiceController::class);
                 Route::post('monthly', MonthlyStoreInvoiceController::class);
-                Route::get('/', IndexInvoiceController::class);
+                Route::get('my-invoice', IndexMyInvoiceController::class);
                 Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
                 Route::get('{invoice}', ShowInvoiceController::class);
             });
