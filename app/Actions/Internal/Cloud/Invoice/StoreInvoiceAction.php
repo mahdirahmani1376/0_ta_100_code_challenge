@@ -7,31 +7,25 @@ use App\Actions\Admin\Invoice\StoreInvoiceAction as AdminStoreInvoiceAction;
 use App\Actions\Admin\Invoice\Transaction\StoreTransactionAction;
 use App\Models\Invoice;
 use App\Models\Transaction;
-use App\Services\Admin\Invoice\Item\StoreItemService;
-use App\Services\Admin\Invoice\StoreInvoiceService;
-use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Wallet\FindCreditTransactionByIdService;
 use App\Services\Wallet\UpdateCreditTransactionService;
 use Illuminate\Support\Arr;
 
-class StoreInvoiceAction extends AdminStoreInvoiceAction
+class StoreInvoiceAction
 {
     public function __construct(
-        StoreInvoiceService                               $storeInvoiceService,
-        StoreItemService                                  $storeItemService,
-        CalcInvoicePriceFieldsService                     $calcInvoicePriceFieldsService,
         private readonly ProcessInvoiceAction             $processInvoiceAction,
         private readonly UpdateCreditTransactionService   $updateCreditTransactionService,
         private readonly FindCreditTransactionByIdService $findCreditTransactionByIdService,
         private readonly StoreTransactionAction           $storeTransactionAction,
+        private readonly AdminStoreInvoiceAction          $adminStoreInvoiceAction,
     )
     {
-        parent::__construct($storeInvoiceService, $storeItemService, $calcInvoicePriceFieldsService, $processInvoiceAction);
     }
 
     public function __invoke(array $data)
     {
-        $invoice = parent::__invoke(Arr::add($data, 'admin_id', 1));
+        $invoice = ($this->adminStoreInvoiceAction)(Arr::add($data, 'admin_id', 1));
         if ($data['status'] == Invoice::STATUS_PAID) {
             if (!empty($data['credit_transaction_id'])) {
                 $creditTransaction = ($this->findCreditTransactionByIdService)($data['credit_transaction_id']);

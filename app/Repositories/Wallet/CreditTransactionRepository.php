@@ -80,4 +80,11 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             ->whereIn('id', $ids)
             ->delete();
     }
+
+    public function internalCloudSum(array $ids): int
+    {
+        return self::newQuery()
+            ->whereIn('id', $ids)
+            ->sum('amount');
+    }
 }
