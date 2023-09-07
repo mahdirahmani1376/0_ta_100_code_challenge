@@ -15,6 +15,9 @@ class StoreWalletService
     {
         return $this->walletRepository->create([
             'client_id' => $clientId,
+            'name' => Wallet::WALLET_DEFAULT_NAME,
+            'balance' => 0,
+            'is_active' => true,
         ]);
     }
 }
