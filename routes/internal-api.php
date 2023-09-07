@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Internal\Cloud\Invoice\ChargeWalletInvoiceController;
+use App\Http\Controllers\Internal\Cloud\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Invoice\ShowInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Invoice\StoreInvoiceController;
 use App\Http\Controllers\Internal\Cloud\Wallet\DeleteBulkCreditTransactionController;
@@ -24,8 +25,8 @@ Route::namespace('Cloud')
             ->prefix('invoice')
             ->group(function () {
                 Route::post('/', StoreInvoiceController::class);
+                Route::get('/', IndexInvoiceController::class);
                 Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
                 Route::get('{invoice}', ShowInvoiceController::class);
             });
     });
-
