@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int admin_id
  * @property float amount
  * @property string description
+ * @property Invoice invoice
  */
 class CreditTransaction extends Model
 {
