@@ -4,6 +4,7 @@ namespace App\Actions\Internal\Domain\Invoice;
 
 use App\Actions\Admin\Invoice\StoreInvoiceAction as AdminStoreInvoiceActionAlias;
 use App\Models\Invoice;
+use App\Models\Item;
 use App\Services\Invoice\IndexInvoiceService;
 
 class StoreInvoiceAction
@@ -28,7 +29,7 @@ class StoreInvoiceAction
                 'client_id' => $data['client_id'],
                 'status' => Invoice::STATUS_UNPAID,
                 'invoiceable_id' => $item['invoiceable_id'],
-                'invoiceable_type' => $item['invoiceable_type'],
+                'invoiceable_type' => Item::TYPE_DOMAIN_SERVICE,
             ]);
             if ($unpaidInvoices->isNotEmpty()) {
                 unset($data['items'][$index]);
@@ -38,7 +39,7 @@ class StoreInvoiceAction
             return null;
         }
 
-        $data['status'] = Invoice::STATUS_UNPAID;
+        $data['status'] = $data['status'] ?? Invoice::STATUS_UNPAID;
         $data['payment_method'] = Invoice::PAYMENT_METHOD_CREDIT;
         $data['tax_rate'] = Invoice::DEFAULT_TAX_RATE;
 

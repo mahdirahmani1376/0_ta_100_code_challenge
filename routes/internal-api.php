@@ -34,5 +34,6 @@ Route::namespace('Domain')
                 Route::post('/', 'StoreInvoiceController');
                 Route::get('{invoice}', 'ShowInvoiceController');
                 Route::post('{invoice}/item', 'StoreItemController');
+                Route::get('unpaid/{domain}', 'ShowUnpaidInvoiceByDomainController');
             });
     });
