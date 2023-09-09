@@ -20,7 +20,13 @@ class StoreInvoiceAction
         // Check if any unpaid invoice exists for any Domains
         // If there was any, exclude that Domain to be added as an Invoice Item
         foreach ($data['items'] as $index => $item) {
-            if ((($this->indexInvoiceService)($item))->isNotEmpty()) {
+            $unpaidInvoices = ($this->indexInvoiceService)([
+                'client_id' => $data['client_id'],
+                'status' => Invoice::STATUS_UNPAID,
+                'invoiceable_id' => $item['invoiceable_id'],
+                'invoiceable_type' => $item['invoiceable_type'],
+            ]);
+            if ($unpaidInvoices->isNotEmpty()) {
                 unset($data['items'][$index]);
             }
         }

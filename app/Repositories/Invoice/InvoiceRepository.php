@@ -141,6 +141,12 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
     public function internalIndex(array $data): Collection
     {
         return self::newQuery()
+            ->when(!empty($data['client_id']), function (Builder $builder) use ($data) {
+                $builder->where('client_id', $data['client_id']);
+            })
+            ->when(!empty($data['status']), function (Builder $builder) use ($data) {
+                $builder->where('status', $data['status']);
+            })
             ->whereHas('items', function (Builder $builder) use ($data) {
                 $builder->where('invoiceable_id', $data['invoiceable_id']);
                 $builder->where('invoiceable_type', $data['invoiceable_type']);
