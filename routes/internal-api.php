@@ -1,15 +1,5 @@
 <?php
 
-use App\Http\Controllers\Internal\Cloud\Invoice\ChargeWalletInvoiceController;
-use App\Http\Controllers\Internal\Cloud\Invoice\IndexInvoiceController;
-use App\Http\Controllers\Internal\Cloud\Invoice\IndexMyInvoiceController;
-use App\Http\Controllers\Internal\Cloud\Invoice\MonthlyStoreInvoiceController;
-use App\Http\Controllers\Internal\Cloud\Invoice\ShowInvoiceController;
-use App\Http\Controllers\Internal\Cloud\Invoice\StoreInvoiceController;
-use App\Http\Controllers\Internal\Cloud\Wallet\DeleteBulkCreditTransactionController;
-use App\Http\Controllers\Internal\Cloud\Wallet\ShowCreditTransactionController;
-use App\Http\Controllers\Internal\Cloud\Wallet\ShowWalletController;
-use App\Http\Controllers\Internal\Cloud\Wallet\StoreCreditTransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::namespace('Cloud')
@@ -18,19 +8,31 @@ Route::namespace('Cloud')
         Route::namespace('Wallet')
             ->prefix('wallet')
             ->group(function () {
-                Route::get('{client}', ShowWalletController::class);
-                Route::post('credit-transaction', StoreCreditTransactionController::class);
-                Route::get('credit-transaction/{creditTransaction}', ShowCreditTransactionController::class);
-                Route::delete('bulk-delete', DeleteBulkCreditTransactionController::class);
+                Route::get('{client}', 'ShowWalletController');
+                Route::post('credit-transaction', 'StoreCreditTransactionController');
+                Route::get('credit-transaction/{creditTransaction}', 'ShowCreditTransactionController');
+                Route::delete('bulk-delete', 'DeleteBulkCreditTransactionController');
             });
         Route::namespace('Invoice')
             ->prefix('invoice')
             ->group(function () {
-                Route::get('/', IndexInvoiceController::class);
-                Route::post('/', StoreInvoiceController::class);
-                Route::post('monthly', MonthlyStoreInvoiceController::class);
-                Route::get('my-invoice', IndexMyInvoiceController::class);
-                Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
-                Route::get('{invoice}', ShowInvoiceController::class);
+                Route::get('/', 'IndexInvoiceController');
+                Route::post('/', 'StoreInvoiceController');
+                Route::post('monthly', 'MonthlyStoreInvoiceController');
+                Route::get('my-invoice', 'IndexMyInvoiceController');
+                Route::post('charge-wallet-invoice', 'ChargeWalletInvoiceController');
+                Route::get('{invoice}', 'ShowInvoiceController');
+            });
+    });
+
+Route::namespace('Domain')
+    ->prefix('domain')
+    ->group(function () {
+        Route::namespace('Invoice')
+            ->prefix('invoice')
+            ->group(function () {
+                Route::post('/', 'StoreInvoiceController');
+                Route::get('{invoice}', 'ShowInvoiceController');
+                Route::post('{invoice}/item', 'StoreItemController');
             });
     });

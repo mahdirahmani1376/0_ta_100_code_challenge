@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin\Invoice\Item;
+namespace App\Http\Requests\Internal\Domain\Invoice;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +14,7 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required',],
+            'description' => ['required', 'string',],
             'amount' => ['required', 'numeric',],
         ];
     }
