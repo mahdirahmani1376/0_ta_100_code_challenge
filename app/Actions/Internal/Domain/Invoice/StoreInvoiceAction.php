@@ -20,6 +20,10 @@ class StoreInvoiceAction
         // Check if any unpaid invoice exists for any Domains
         // If there was any, exclude that Domain to be added as an Invoice Item
         foreach ($data['items'] as $index => $item) {
+            // If invoiceable_id is 0, this is probably a GraceInvoice, so we do not care about duplicates
+            if ($item['invoiceable_id'] == 0) {
+                continue;
+            }
             $unpaidInvoices = ($this->indexInvoiceService)([
                 'client_id' => $data['client_id'],
                 'status' => Invoice::STATUS_UNPAID,
