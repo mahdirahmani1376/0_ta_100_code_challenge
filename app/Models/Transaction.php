@@ -29,6 +29,7 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    public const PREFIX_CREDIT_TRANSACTION = 'CREDIT_TRANSACTION_';
     const PAYMENT_METHOD_OFFLINE = 'offline';
     const PAYMENT_METHOD_WALLET_BALANCE = 'wallet_balance';
     const PAYMENT_METHOD_BARTER = 'barter';

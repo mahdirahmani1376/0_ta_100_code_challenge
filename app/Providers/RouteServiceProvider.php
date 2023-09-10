@@ -31,6 +31,11 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->routes(function () {
             Route::middleware('api')
+                ->prefix('api/internal')
+                ->namespace('App\Http\Controllers\Internal')
+                ->group(base_path('routes/internal-api.php'));
+
+            Route::middleware('api')
                 ->prefix('api/profile')
                 ->namespace('App\Http\Controllers\Profile')
                 ->group(base_path('routes/profile-api.php'));

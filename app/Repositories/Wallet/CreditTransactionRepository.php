@@ -73,4 +73,18 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             })
             ->get(['id', 'created_at', 'updated_at', 'invoice_id', 'amount', 'description',]);
     }
+
+    public function internalCloudBulkDelete(array $ids): int
+    {
+        return self::newQuery()
+            ->whereIn('id', $ids)
+            ->delete();
+    }
+
+    public function internalCloudSum(array $ids): int
+    {
+        return self::newQuery()
+            ->whereIn('id', $ids)
+            ->sum('amount');
+    }
 }

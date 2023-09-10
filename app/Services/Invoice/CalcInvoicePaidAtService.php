@@ -18,15 +18,16 @@ class CalcInvoicePaidAtService
 
     public function __invoke(Invoice $invoice): Invoice
     {
-        // Do not change paid_at
         if ($invoice->balance != 0) {
             return $invoice;
         }
-        // Do not change paid_at
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
             Invoice::STATUS_REFUNDED,
         ])) {
+            return $invoice;
+        }
+        if (!is_null($invoice->paid_at)) {
             return $invoice;
         }
 

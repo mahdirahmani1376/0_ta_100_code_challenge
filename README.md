@@ -9,7 +9,7 @@ This application developed and customized by [Laravel Framework](https://laravel
    3. If you'd like to change the default port for application change `APP_PORT` default is `80`
 2. RUN `docker-compose build` to build your project
 3. RUN `docker-compose up -d` to bring up your containers
-4. RUN ` docker-compose exec --user root app .docker-compose/commands/bootup`
+4. RUN ` docker-compose exec --user {WWWUSER} app .docker-compose/commands/bootup`
 5. OPEN `http://localhost` to check if everything is working
 6. Make sure config values are set in MainApp refer to `Commands/Cron` section of this readme
 

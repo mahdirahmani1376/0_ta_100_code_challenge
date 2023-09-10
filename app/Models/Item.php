@@ -39,6 +39,7 @@ class Item extends Model
     public const TYPE_HOSTING = 'Hosting';
     public const TYPE_ADMIN_TIME = 'AdminTime';
     public const TYPE_CLOUD = 'Cloud';
+    public const TYPE_REFUND_DOMAIN = 'RefundDomain';
     protected $casts = [
         'deleted_at' => 'datetime',
         'from_date' => 'datetime',

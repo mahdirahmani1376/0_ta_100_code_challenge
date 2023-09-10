@@ -15,4 +15,8 @@ interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
     public function profileListEverything(int $clientId): Collection;
 
     public function prepareInvoicesForMassPayment(array $data): Collection;
+
+    public function internalIndex(array $data): Collection;
+
+    public function internalIndexMyInvoice(array $data): LengthAwarePaginator;
 }

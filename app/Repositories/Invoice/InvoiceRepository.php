@@ -3,6 +3,7 @@
 namespace App\Repositories\Invoice;
 
 use App\Models\Invoice;
+use App\Models\Item;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -135,5 +136,55 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->where('is_mass_payment', false)
             ->whereIn('id', $data['invoice_ids'])
             ->get();
+    }
+
+    public function internalIndex(array $data): Collection
+    {
+        return self::newQuery()
+            ->when(!empty($data['client_id']), function (Builder $builder) use ($data) {
+                $builder->where('client_id', $data['client_id']);
+            })
+            ->when(!empty($data['status']), function (Builder $builder) use ($data) {
+                $builder->where('status', $data['status']);
+            })
+            ->whereHas('items', function (Builder $builder) use ($data) {
+                $builder->where('invoiceable_id', $data['invoiceable_id']);
+                $builder->where('invoiceable_type', $data['invoiceable_type']);
+            })
+            ->get();
+    }
+
+    public function internalIndexMyInvoice(array $data): LengthAwarePaginator
+    {
+        $query = self::newQuery()
+            ->where(function (Builder $builder) use ($data) {
+                $builder->whereHas('items', function (Builder $builder) use ($data) {
+                    $builder->whereIn('invoiceable_id', $data['invoiceable_ids']);
+                    $builder->where('invoiceable_type', Item::TYPE_CLOUD);
+                });
+            })
+            ->orWhere(function (Builder $builder) use ($data) {
+                $builder->whereHas('items', function (Builder $builder) use ($data) {
+                    $builder->whereIn('invoiceable_id', $data['invoiceable_ids']);
+                    $builder->where('invoiceable_type', Item::TYPE_ADD_CLOUD_CREDIT);
+                });
+            })
+            ->orWhere(function (Builder $builder) use ($data) {
+                $builder->where('is_credit', true);
+                $builder->where('client_id', $data['client_id']);
+            });
+        if (!empty($data['search'])) {
+            $query->where('id', $data['search']);
+        }
+        if (!empty($data['status'])) {
+            $query->where('status', $data['status']);
+        }
+
+        $query->orderBy(
+            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
+            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
+        );
+
+        return self::paginate($query);
     }
 }

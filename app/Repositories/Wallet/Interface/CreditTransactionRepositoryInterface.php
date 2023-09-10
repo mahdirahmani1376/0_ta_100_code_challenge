@@ -15,4 +15,9 @@ interface CreditTransactionRepositoryInterface extends EloquentRepositoryInterfa
     public function adminIndex(array $data): LengthAwarePaginator;
 
     public function profileListEverything(int $clientId): Collection;
+
+    public function internalCloudBulkDelete(array $ids): int;
+
+    public function internalCloudSum(array $ids): int;
+
 }

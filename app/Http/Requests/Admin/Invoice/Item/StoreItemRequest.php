@@ -16,8 +16,6 @@ class StoreItemRequest extends FormRequest
         return [
             'description' => ['required',],
             'amount' => ['required', 'numeric',],
-            'from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
         ];
     }
 }

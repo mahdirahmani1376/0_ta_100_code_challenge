@@ -37,6 +37,8 @@ class ProcessInvoiceAction
     // TODO if invoice status is changing from "collection" to "paid" make sure to not rerun all of the processInvoiceAction
     public function __invoke(Invoice $invoice, bool $usedToBeCollection = false): Invoice
     {
+        $invoice->refresh();
+
         if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
             throw new BadRequestException('Can not Process non-collection Invoice with positive balance, invoiceId: ' . $invoice->getKey());
         }
