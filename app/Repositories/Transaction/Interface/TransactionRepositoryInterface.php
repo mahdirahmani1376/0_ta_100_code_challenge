@@ -12,7 +12,7 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
 {
     public function refundSuccessfulTransactions(Invoice $invoice);
 
-    public function sumOfPaidTransactions(Invoice $invoice): int;
+    public function sumOfPaidTransactions(Invoice $invoice);
 
     public function getLastSuccessfulTransaction(Invoice $invoice);
 

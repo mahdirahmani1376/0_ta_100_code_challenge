@@ -7,6 +7,8 @@ use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranExce
 use App\Exceptions\SystemException\MaxDateIsOutOfRangeFiscalYearException;
 use App\Exceptions\SystemException\MinDateIsOutOfRangeFiscalYearException;
 use App\Helpers\JalaliCalender;
+use App\Integrations\Rahkaran\RahkaranService;
+use App\Models\ClientCashout;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use Illuminate\Console\Command;
@@ -31,19 +33,15 @@ class ImportInvoicesToRahkaranCommand extends Command
 
     protected $description = 'Imports invoices to rahkaran';
 
-    /**
-     * @return int
-     * @throws MaxDateIsOutOfRangeFiscalYearException
-     * @throws MinDateIsOutOfRangeFiscalYearException
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
-     * @throws ModelNotFoundException
-     */
+    private RahkaranService $rahkaranService;
+
     public function handle(): int
     {
+        $this->rahkaranService = app(RahkaranService::class);
         $this->info('Date Time ' . Carbon::now()->toString());
         $this->info('Importing invoices to rahkaran...');
 
-        $max_rounding_amount = $this->option('max-rounding-amount') > 0 ? $this->option('max-rounding-amount') : $this->financeService()->getSuperUnitMultiplier();
+        $max_rounding_amount = $this->option('max-rounding-amount') ?? 10;
 
         [$this->fromDate, $this->toDate] = JalaliCalender::getRange(
             $this->option('year'),
@@ -58,7 +56,7 @@ class ImportInvoicesToRahkaranCommand extends Command
 
         App::setLocale('fa');
 
-//        $this->checkFiscalYear();
+        $this->checkFiscalYear();
 
         Log::info(
             "ImportInvoicesToRahkaranCommand Invoices from {JalaliCalender::getJalaliString($this->fromDate)} to {JalaliCalender::getJalaliString($this->toDate)}",
@@ -71,28 +69,23 @@ class ImportInvoicesToRahkaranCommand extends Command
         );
 
         // Import Transactions In range
-//        $this->importTransactions();
+        $this->importTransactions();
 
         // Import Invoices In range
-//        $this->importInvoices($max_rounding_amount);
+        $this->importInvoices($max_rounding_amount);
 
         // Import CashOuts
-//        $this->importCashOuts();
+        $this->importCashOuts();
 
         $this->info('Completed...');
         $this->info('Date Time ' . Carbon::now()->toString());
         return 1;
     }
 
-    /**
-     * Imports Transactions to Rahkaran
-     */
     private function importTransactions()
     {
-        $bar = null;
         $total_transactions = $this->getTransactionQuery()->count();
         Log::info("ImportInvoicesToRahkaranCommand Total Transactions: {$total_transactions}");
-
 
         $this->newLine(2);
         $this->info("Total Transactions: {$total_transactions}");
@@ -103,28 +96,22 @@ class ImportInvoicesToRahkaranCommand extends Command
         $errors = 0;
         $index = 0;
 
+        /**
+         * @var Transaction $transaction
+         */
         foreach ($this->getTransactionQuery()->cursor() as $transaction) {
-            /**
-             * @var Transaction $transaction
-             */
-
             $index++;
             try {
-
-                $this->rahkaranService()->createTransaction($transaction);
-
+                $this->rahkaranService->createTransaction($transaction);
                 Log::info("ImportInvoicesToRahkaranCommand Transaction #{$transaction->id} imported");
-
             } catch (Throwable $exception) {
                 $errors++;
-
                 $this->error($exception->getMessage());
                 $this->logError('transactions', $index, $transaction->id, $exception->getMessage());
                 Log::error("ImportInvoicesToRahkaranCommand Transaction #{$transaction->id} failed, {$exception->getMessage()}");
             }
 
             $bar->advance();
-
         }
 
         $this->newLine();
@@ -132,12 +119,6 @@ class ImportInvoicesToRahkaranCommand extends Command
         $this->info("Failed transactions: {$errors}");
     }
 
-    /**
-     * Imports Invoices to Rahkaran
-     * @param int $max_rounding_amount
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
-     * @throws ModelNotFoundException
-     */
     private function importInvoices($max_rounding_amount = 10)
     {
         $total_invoices = $this->getInvoicesQuery()->count();
@@ -164,7 +145,7 @@ class ImportInvoicesToRahkaranCommand extends Command
 
             $jalali_date = JalaliCalender::carbonToJalali($invoices->first()->paid_date ?? $invoices->first()->invoice_date);
 
-            $this->rahkaranService()->createBulkInvoice($invoices, $max_rounding_amount, $jalali_date);
+            $this->rahkaranService->createBulkInvoice($invoices, $max_rounding_amount, $jalali_date);
             Log::info("ImportInvoicesToRahkaranCommand Invoices on {$jalali_date} imported successfully");
 
             $this->fromDate->addDay();
@@ -179,7 +160,7 @@ class ImportInvoicesToRahkaranCommand extends Command
 
         if ($cashOuts->count() > 0 && $ask == 'y') {
             $jalali_date = JalaliCalender::carbonToJalali($this->orginalDate[1]);
-            $this->rahkaranService()->createZarinpalPaymentsFee($cashOuts->get(), $jalali_date);
+            $this->rahkaranService->createZarinpalPaymentsFee($cashOuts->get(), $jalali_date);
         } else {
             $this->warn('Import cash outs skipped!');
         }
@@ -202,18 +183,18 @@ class ImportInvoicesToRahkaranCommand extends Command
 
         $query = Invoice::query()->where(function (Builder $query) use ($from, $to) {
             $query->orWhere(function (Builder $status_query) use ($from, $to) {
-                $status_query->whereDate('invoice_date', '>=', $from);
-                $status_query->whereDate('invoice_date', '<=', $to);
+                $status_query->whereDate('created_at', '>=', $from);
+                $status_query->whereDate('created_at', '<=', $to);
                 $status_query->where('status', Invoice::STATUS_COLLECTIONS);
             });
             $query->orWhere(function (Builder $status_query) use ($from, $to) {
-                $status_query->whereDate('paid_date', '>=', $from);
-                $status_query->whereDate('paid_date', '<=', $to);
+                $status_query->whereDate('paid_at', '>=', $from);
+                $status_query->whereDate('paid_at', '<=', $to);
             });
         });
 
         // Only paid or refunded invoices can be imported
-        $query->status([
+        $query->whereIn('status', [
             Invoice::STATUS_PAID,
             Invoice::STATUS_COLLECTIONS,
             Invoice::STATUS_REFUNDED,
@@ -222,7 +203,7 @@ class ImportInvoicesToRahkaranCommand extends Command
         $query->where('is_mass_payment', 0);
         $query->where('is_credit', 0);
 
-        $query->where('tax1', '>', 0);
+        $query->where('tax', '>', 0);
 
         // Filters out imported invoices
         $query->whereNull('rahkaran_id');
@@ -238,8 +219,8 @@ class ImportInvoicesToRahkaranCommand extends Command
         return ClientCashout::query()
             ->where('updated_at', '>=', $this->orginalDate[0])
             ->where('updated_at', '<=', $this->orginalDate[1])
-            ->where('status', ClientCashout::ACTIVE_STATUS)
-            ->orderBy('updated_at', 'DESC');
+            ->where('status', ClientCashout::STATUS_ACTIVE)
+            ->orderByDesc('updated_at');
     }
 
     /**
@@ -268,13 +249,11 @@ class ImportInvoicesToRahkaranCommand extends Command
                 ]);
             })->whereIn('status', [
                 Transaction::STATUS_SUCCESS,
-                Transaction::STATUS_IPG_PAID,
-                Transaction::STATUS_OPG_PAID
             ]);
 
             $q->orWhereHas('invoice', function ($qe) {
-                $qe->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELLED]);
-            })->where('status', Transaction::STATUS_REFUNDED)->where('payment_method', '<>', 'client_credit');
+                $qe->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
+            })->where('status', Transaction::STATUS_REFUND)->where('payment_method', '<>', 'client_credit');
 
 
         });
@@ -289,8 +268,6 @@ class ImportInvoicesToRahkaranCommand extends Command
         // Rahkaran handles refunded invoice transactions internally by invoice items
         $query->whereNull('credit_transaction_id');
 
-        $query->withoutRounding();
-
         return $query;
     }
 
@@ -300,7 +277,7 @@ class ImportInvoicesToRahkaranCommand extends Command
      */
     protected function checkFiscalYear()
     {
-        $fiscal_year = $this->option('year') ?? $this->invoiceNumberRepository()->getCurrentFiscalYear();
+        $fiscal_year = $this->option('year') ?? config('payment.invoice_number.current_fiscal_year'); // TODO
 
         $this->info("Current Fiscal Year: {$fiscal_year}");
 

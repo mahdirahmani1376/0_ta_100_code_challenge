@@ -19,7 +19,9 @@ use App\Integrations\Rahkaran\ValueObjects\ReceiptDeposit;
 use App\Integrations\Rahkaran\ValueObjects\Voucher;
 use App\Integrations\Rahkaran\ValueObjects\VoucherItem;
 use App\Models\ClientCashout;
+use App\Models\CreditTransaction;
 use App\Models\Invoice;
+use App\Models\Item;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
@@ -193,7 +195,7 @@ class RahkaranService
     public function createTransaction(Transaction $transaction): Transaction|Model
     {
         /** @var Client $client */
-        $client = MainAppAPIService::getClients([$transaction->invoice->client_id])[0];
+        $client = MainAppAPIService::getClients($transaction->invoice->client_id)[0];
 
         if (!$transaction->invoice || !$transaction->invoice->client = $client) {
             throw new ModelNotFoundException('rahkaran');
@@ -532,7 +534,7 @@ class RahkaranService
         foreach ($processInvoices as $invoice) {
 
             $is_refund = $invoice->status == Invoice::STATUS_REFUNDED;
-            $invoice->client = MainAppAPIService::getClients([$invoice->client_id])[0];
+            $invoice->client = MainAppAPIService::getClients($invoice->client_id)[0];
             $client_dl_code = $this->getClientDl($invoice->client)->Code;
 
             $items = $invoice->items;
@@ -1307,7 +1309,7 @@ class RahkaranService
     // ########## ########## ##########
     // ####### Voucher Items Methods #######
     // ########## ########## ##########
-    private function getAllTypesVoucherItem(InvoiceItem $item, bool $is_refund): VoucherItem
+    private function getAllTypesVoucherItem(Item $item, bool $is_refund): VoucherItem
     {
         if ($item->amount < 0) {
             throw new BadRequestException("Rahkaran negative service item {$item->invoice_id}");
@@ -1318,24 +1320,24 @@ class RahkaranService
         $level_4 = null;
         $level_5 = null;
 
-        switch ($item->type) {
-            case InvoiceItem::TYPE_HOSTING:
-                $service = $this->whmcsServiceRepository()->getOrSyncService($item->rel_id);
-                if ($service) {
-                    $level_5 = $this->getProductLevel5Dl($service->product);
-                    $level_4 = $this->getProductLevel4Dl($service->product);
+        switch ($item->invoiceable_type) {
+            case Item::TYPE_HOSTING:
+                $product = MainAppAPIService::getProduct($item->invoiceable_id);
+                if ($product) {
+                    $level_5 = $this->getProductLevel5Dl($product);
+                    $level_4 = $this->getProductLevel4Dl($product);
                 }
                 break;
-            case InvoiceItem::TYPE_DOMAIN_SERVICE:
+            case Item::TYPE_DOMAIN_SERVICE:
                 // Todo: Load domain tld to find region
                 $level_5 = $this->getDomainLevel5Dl('com');
                 $level_4 = $this->getDomainLevel4Dl();
                 break;
-            case InvoiceItem::TYPE_ADMIN_TIME:
+            case Item::TYPE_ADMIN_TIME:
                 $level_5 = $this->getAdminTimeLevel5Dl();
                 $level_4 = $this->getAdminTimeLevel4Dl();
                 break;
-            case InvoiceItem::TYPE_CLOUD :
+            case Item::TYPE_CLOUD :
                 $level_5 = $this->getCloudLevel5Dl();
                 $level_4 = $this->getCloudLevel4Dl();
                 break;
@@ -1388,10 +1390,10 @@ class RahkaranService
     }
 
     /**
-     * @param InvoiceItem $item
+     * @param Item $item
      * @return int|null
      */
-    private function getItemTax(InvoiceItem $item): ?int
+    private function getItemTax(Item $item): ?int
     {
         if ($item->amount == 0)
             return 0;
@@ -1408,10 +1410,10 @@ class RahkaranService
     }
 
     /**
-     * @param InvoiceItem $item
+     * @param Item $item
      * @return int|null
      */
-    private function getItemToll(InvoiceItem $item): ?int
+    private function getItemToll(Item $item): ?int
     {
         if ($item->amount == 0)
             return 0;
@@ -1430,41 +1432,31 @@ class RahkaranService
      * @param Invoice $invoice
      * @param null $client_rahkaran_id
      * @return VoucherItem|null
-     * @throws RepositoryModelNotFoundException
      */
     private function getNewTaxVoucherItem(Invoice $invoice, $client_rahkaran_id = null): ?VoucherItem
     {
-        $totalTax = $this->financeService()->getRawInvoiceTotalTax($invoice);
-        $tax = $this->financeService()->getRawInvoiceTax($invoice);
-        $troll = $this->financeService()->getRawInvoiceToll($invoice);
-
-        if ($totalTax <= 0) {
-            var_dump('No Troll found for invoice: ' . $invoice->invoice_id);
+        if ($invoice->total <= 0) {
+            var_dump('No Troll found for invoice: ' . $invoice->id);
         }
 
         $voucher_item = new VoucherItem();
-
         $voucher_item->SLCode = $this->config->newTaxSl;
-
         $voucher_item->Description = trans('rahkaran.tax.newTax');
 
         if ($client_rahkaran_id) {
             $voucher_item->PartyRef = $client_rahkaran_id;
-            $voucher_item->TaxAmount = $tax;
-            $voucher_item->TollAmount = $troll;
+            $voucher_item->TaxAmount = $invoice->tax; // TODO check this
+            $voucher_item->TollAmount = $invoice->tax;
             $voucher_item->TaxStateType = 1;
             $voucher_item->PurchaseOrSale = 1;
             $voucher_item->ItemOrService = 2;
             $voucher_item->TransactionType = 1;
         }
 
-        if ($invoice->hasStatus(Invoice::STATUS_REFUNDED)) {
-
-            $voucher_item->Debit = $totalTax;
-
+        if ($invoice->status == Invoice::STATUS_REFUNDED) {
+            $voucher_item->Debit = $invoice->total;
         } else {
-
-            $voucher_item->Credit = $totalTax;
+            $voucher_item->Credit = $invoice->total;
         }
 
         return $voucher_item;
@@ -1474,11 +1466,10 @@ class RahkaranService
      * @param int $client_dl_code
      * @param Invoice $invoice
      * @return null|VoucherItem
-     * @throws RepositoryModelNotFoundException
      */
     private function getRefundVoucherItem(int $client_dl_code, Invoice $invoice): ?VoucherItem
     {
-        $amount = round($this->financeService()->getRawInvoicePaymentsAmount($invoice, false), 0, PHP_ROUND_HALF_DOWN);
+        $amount = round($this->transactionRepository->sumOfPaidTransactions($invoice), 0, PHP_ROUND_HALF_DOWN);
 
         if ($amount <= 0) {
             return null;
@@ -1497,11 +1488,10 @@ class RahkaranService
      * @param int $client_dl_code
      * @param Invoice $invoice
      * @return null|VoucherItem
-     * @throws RepositoryModelNotFoundException
      */
     private function getCollectionVoucherItem(int $client_dl_code, Invoice $invoice): ?VoucherItem
     {
-        $amount = round($this->financeService()->getRawInvoiceBalance($invoice, true));
+        $amount = round($invoice->balance);
 
         if ($amount <= 0) {
             return null;
@@ -1761,6 +1751,7 @@ class RahkaranService
      */
     private function createRequestLog($method, $url, $requestBody, $headers): ?AbstractBaseLog
     {
+        return null; // TODO revert once logging is implemented
         $requestBody = $requestBody && is_string($requestBody) && is_json($requestBody) ? json_decode($requestBody, true) : $requestBody;
 
         return LogService::store((new SystemLog()), [
@@ -1783,6 +1774,7 @@ class RahkaranService
      */
     private function updateRequestLog($systemLog, $responseBody, array $getHeaders, int $getStatusCode): void
     {
+        return; // TODO revert once logging is implemented
         if ($systemLog instanceof AbstractBaseLog) {
             $responseBody = $responseBody && is_string($responseBody) && is_json($responseBody) ? json_decode($responseBody, true) : $responseBody;
 
@@ -1805,7 +1797,8 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client_party_dl = $this->getClientDl($credit_transaction->client);
+        $client = MainAppAPIService::getClients($credit_transaction->client_id)[0];
+        $client_party_dl = $this->getClientDl($client);
 
         $receipt = new Receipt();
         $receipt->BranchID = $config->bankBranchId;
@@ -1818,7 +1811,6 @@ class RahkaranService
 
         $receipt_deposit->Amount = $credit_transaction->amount;
 
-        $receipt_deposit->BankAccountID = $config->zibalBankId;
         $receipt_deposit->AccountingOperationID = $config->receiptAccountingOperationID;
         $receipt_deposit->CashFlowFactorID = $config->receiptCashFlowFactorID;
         $receipt_deposit->BankAccountID = $config->creditBankId;
@@ -1877,7 +1869,8 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client_party_dl = $this->getClientDl($credit_transaction->client);
+        $client = MainAppAPIService::getClients($credit_transaction->client_id)[0];
+        $client_party_dl = $this->getClientDl($client);
 
         $payment = new Payment();
         $payment->BranchID = $config->bankBranchId;
@@ -1890,7 +1883,6 @@ class RahkaranService
 
         $payment_deposit->Amount = abs($credit_transaction->amount);
 
-        $payment_deposit->BankAccountID = $config->zibalBankId;
         $payment_deposit->AccountingOperationID = $config->paymentAccountingOperationID;
         $payment_deposit->CashFlowFactorID = $config->paymentCashFlowFactorID;
         $payment_deposit->BankAccountID = $config->creditBankId;

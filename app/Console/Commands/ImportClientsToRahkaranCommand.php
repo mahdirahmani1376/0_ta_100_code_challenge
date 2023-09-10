@@ -53,13 +53,10 @@ class ImportClientsToRahkaranCommand extends Command
             $clientIds = array_merge($clientIds, $this->argument('clients'));
         }
         $this->info('Fetching client data from MainApp for: ' . implode(',', $clientIds));
-        $clients = MainAppAPIService::getClients($clientIds);
+        $clients = MainAppAPIService::getClients($clientIds, true);
         $this->info('Clients received, count:' . count($clients));
 
         return collect($clients);
-//	    return Client::query()->whereIn('id', [
-//		    127625,
-//	    ])->whereNull('rahkaran_id');
     }
 
     protected function import(Client $client, array $ignore_fields = [], bool $retry = false)
@@ -144,7 +141,6 @@ class ImportClientsToRahkaranCommand extends Command
     {
         try {
             $this->rahkaranService->createClientParty($client, $ignore_fields);
-
             return null;
 
         } catch (Throwable $exception) {

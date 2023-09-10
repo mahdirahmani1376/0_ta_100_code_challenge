@@ -22,11 +22,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int client_id
  * @property int rahkaran_id
  * @property string payment_method
- * @property int balance
- * @property int total
- * @property int sub_total
+ * @property double balance
+ * @property double total
+ * @property double sub_total
  * @property int tax_rate
- * @property int tax
+ * @property double tax
  * @property string status
  * @property boolean is_mass_payment
  * @property int admin_id

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Integrations\Rahkaran\ValueObjects;
+use stdClass;
+
 /**
  * Class Client
  * @package App\Entities
@@ -61,7 +63,7 @@ namespace App\Integrations\Rahkaran\ValueObjects;
  * @property  int ticket_profile_id
  * @property  int product_profile_id
  **/
-class Client extends \stdClass
+class Client extends stdClass
 {
 
 }
