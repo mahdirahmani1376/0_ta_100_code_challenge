@@ -4,6 +4,7 @@ namespace App\Actions\Admin\Invoice;
 
 use App\Actions\Admin\Wallet\ShowWalletAction;
 use App\Actions\Admin\Wallet\StoreCreditTransactionAction;
+use App\Events\InvoiceProcessed;
 use App\Exceptions\Http\BadRequestException;
 use App\Jobs\AssignInvoiceNumberJob;
 use App\Models\Invoice;
@@ -84,11 +85,9 @@ class ProcessInvoiceAction
                 }
             });
         }
+        // TODO do we need to check for balance==0 ?
         if (!$usedToBeCollection) {
-            // Dispatch jobs TODO
-            // Probably have to call an API from MainApp or something
-            //DomainAfterPaymentJob::dispatch($invoice);
-            //ServiceAfterPaymentJob::dispatch($invoice);
+            InvoiceProcessed::dispatch($invoice);
             // TODO Invoice Affiliation ?
         }
 

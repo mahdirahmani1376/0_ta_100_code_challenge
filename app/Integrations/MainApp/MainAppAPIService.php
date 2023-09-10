@@ -5,6 +5,7 @@ namespace App\Integrations\MainApp;
 use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Integrations\Rahkaran\ValueObjects\Product;
+use App\Models\Invoice;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -166,6 +167,33 @@ class MainAppAPIService extends BaseMainAppAPIService
             }
             if ($response->status() == Response::HTTP_NOT_FOUND) {
                 return null;
+            }
+
+            Log::error('MainApp internal api error', [
+                'url' => $url,
+                'param' => json_encode($data),
+                'response' => $response->body(),
+            ]);
+
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        } catch (\Exception $exception) {
+            if ($exception instanceof MainAppInternalAPIException) {
+                throw $exception;
+            }
+
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
+    }
+    public static function signalMainAppToProcessInvoice(Invoice $invoice)
+    {
+        $url = '/api/internal/finance/after-payment';
+        $data = ['items' => $invoice->items,];
+
+        try {
+            $response = self::makeRequest('post', $url, $data);
+
+            if ($response->status() == Response::HTTP_OK) {
+                return;
             }
 
             Log::error('MainApp internal api error', [

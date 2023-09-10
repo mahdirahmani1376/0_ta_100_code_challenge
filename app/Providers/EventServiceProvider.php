@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use App\Events\InvoiceProcessed;
+use App\Listeners\SignalMainAppToProcessInvoice;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Queue\Events\QueueBusy;
 use Illuminate\Support\Facades\Event;
@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Event;
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
+        InvoiceProcessed::class => [
+            SignalMainAppToProcessInvoice::class,
         ],
     ];
 
