@@ -15,7 +15,10 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
     supervisor \
-    libcap2-bin
+    libcap2-bin \
+    libcurl4-openssl-dev \
+    pkg-config \
+    libssl-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -30,7 +33,19 @@ RUN docker-php-ext-install gd
 RUN docker-php-ext-install zip
 
 #installing redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+RUN printf "\n" | curl 'http://pecl.php.net/get/redis-5.3.7.tgz' -o redis-5.3.7.tgz
+RUN pecl install redis-5.3.7.tgz \
+    &&  rm -rf redis-5.3.7.tgz \
+    &&  rm -rf /tmp/pear \
+    &&  docker-php-ext-enable redis
+#Installing mongodb
+RUN printf "\n" | curl 'http://pecl.php.net/get/mongodb-1.16.2.tgz' -o mongodb-1.16.2.tgz
+RUN pecl install mongodb-1.16.2.tgz \
+    &&  rm -rf mongodb-1.16.2.tgz \
+    &&  rm -rf /tmp/pear \
+    &&  docker-php-ext-enable mongodb
+
+#RUN pecl install mongodb && docker-php-ext-enable mongodb
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

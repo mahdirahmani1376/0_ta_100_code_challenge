@@ -1,13 +1,14 @@
 <?php
 
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Models\AdminLog;
 use App\Models\Invoice;
 
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
     {
-        $perPage = \request()->get('perPage');
-        $page = \request()->get('page');
+        $perPage = request()->get('perPage');
+        $page = request()->get('page');
 
         if (empty($perPage) || is_array($perPage) || is_object($perPage) || (int)$perPage < 0 || (int)$perPage > 200) {
             $perPage = 10;
@@ -80,5 +81,23 @@ if (!function_exists('clean_ir_mobile')) {
         }
 
         return false;
+    }
+}
+
+if (!function_exists('admin_log')) {
+    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null): void
+    {
+        if (!is_array($oldState)) {
+            $oldState = $oldState?->toArray();
+        }
+        AdminLog::query()->create([
+            'admin_id' => $adminId ?? request('admin_id'),
+            'action' => $action,
+            'model_id' => $model?->id,
+            'model_class' => $model ? get_class($model) : null,
+            'changes' => $changes,
+            'old_state' => $oldState,
+            'validated_data' => $validatedData,
+        ]);
     }
 }
