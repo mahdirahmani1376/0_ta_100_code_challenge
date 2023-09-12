@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Wallet;
 
+use App\Models\AdminLog;
 use App\Models\CreditTransaction;
 use App\Services\Admin\Wallet\StoreCreditTransactionService;
 use App\Services\Wallet\CalcWalletBalanceService;
@@ -21,6 +22,8 @@ class StoreCreditTransactionAction
         $wallet = ($this->showWalletAction)($clientId);
         $creditTransaction = ($this->storeCreditTransactionService)($wallet, $data); // TODO import into Rahkaran 'storeReceipt'
         ($this->calcWalletBalanceService)($wallet);
+
+        admin_log(AdminLog::STORE_CREDIT_TRANSACTION, $creditTransaction, validatedData: $data);
 
         return $creditTransaction;
     }

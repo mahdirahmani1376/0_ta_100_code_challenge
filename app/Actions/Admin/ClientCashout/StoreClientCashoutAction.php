@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\ClientCashout;
 
+use App\Models\AdminLog;
 use App\Models\ClientCashout;
 use App\Services\Admin\ClientCashout\StoreClientCashoutService;
 
@@ -15,6 +16,10 @@ class StoreClientCashoutAction
     {
         $data['status'] = $data['status'] ?? ClientCashout::STATUS_PENDING;
 
-        return ($this->clientCashoutService)($data);
+        $clientCashout =  ($this->clientCashoutService)($data);
+
+        admin_log(AdminLog::CREATE_CASHOUT, $clientCashout, validatedData: $data);
+
+        return $clientCashout;
     }
 }

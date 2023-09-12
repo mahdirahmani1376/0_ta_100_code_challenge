@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Invoice;
 
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\Item\StoreItemService;
 use App\Services\Admin\Invoice\StoreInvoiceService;
@@ -34,6 +35,8 @@ class StoreInvoiceAction
         if ($invoice->status == Invoice::STATUS_REFUNDED) {
             ($this->processInvoiceAction)($invoice);
         }
+
+        admin_log(AdminLog::CREATE_INVOICE, $invoice, validatedData: $data);
 
         return $invoice;
     }

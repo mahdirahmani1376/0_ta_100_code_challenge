@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\BankGateway;
 
+use App\Models\AdminLog;
 use App\Services\Admin\BankGateway\StoreBankGatewayService;
 
 class StoreBankGatewayAction
@@ -12,6 +13,10 @@ class StoreBankGatewayAction
 
     public function __invoke(array $data)
     {
-        return ($this->storeBankGatewayService)($data);
+        $bankGateway = ($this->storeBankGatewayService)($data);
+
+        admin_log(AdminLog::CREATE_BANK_GATEWAY, $bankGateway, validatedData: $data);
+
+        return $bankGateway;
     }
 }

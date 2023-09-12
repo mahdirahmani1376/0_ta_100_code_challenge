@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Invoice\Transaction;
 
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Services\Admin\Transaction\StoreTransactionService;
@@ -26,6 +27,8 @@ class StoreTransactionAction
         if ($data['status'] == Transaction::STATUS_SUCCESS) {
             ($this->calcInvoicePriceFieldsService)($invoice);
         }
+
+        admin_log(AdminLog::ADD_INVOICE_TRANSACTION, $transaction, validatedData: $data);
 
         return $transaction;
     }

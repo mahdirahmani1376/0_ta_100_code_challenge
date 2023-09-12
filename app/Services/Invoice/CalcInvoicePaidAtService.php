@@ -2,6 +2,7 @@
 
 namespace App\Services\Invoice;
 
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
@@ -30,23 +31,30 @@ class CalcInvoicePaidAtService
         if (!is_null($invoice->paid_at)) {
             return $invoice;
         }
-
+        $oldState = $invoice->toArray();
         // Try to find the last successful transaction and use its 'created_at' timestamp as when invoice was paid at
         /** @var Transaction $lastSuccessfulTransaction */
         $lastSuccessfulTransaction = $this->transactionRepository->getLastSuccessfulTransaction($invoice);
         if (!is_null($lastSuccessfulTransaction)) {
-            return $this->invoiceRepository->update(
+            $invoice = $this->invoiceRepository->update(
                 $invoice,
                 ['paid_at' => $lastSuccessfulTransaction->created_at,],
                 ['paid_at',]
             );
+
+            admin_log(AdminLog::SET_INVOICE_PAID_AT, $invoice, $invoice->getChanges(), $oldState, ['paid_at' => $lastSuccessfulTransaction->created_at]);
+
+            return $invoice;
         }
 
         // If of the above happened use invoice's created_at as for when it was paid at !!
-        return $this->invoiceRepository->update(
+        $invoice = $this->invoiceRepository->update(
             $invoice,
             ['paid_at' => $invoice->created_at,],
             ['paid_at',]
         );
+        admin_log(AdminLog::SET_INVOICE_PAID_AT, $invoice, $invoice->getChanges(), $oldState, ['paid_at' => $invoice->created_at]);
+
+        return $invoice;
     }
 }

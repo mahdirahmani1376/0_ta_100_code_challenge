@@ -47,13 +47,16 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
             ->first();
     }
 
-    public function use(Invoice $invoice, string $type, string $fiscalYear): int
+    public function use(Invoice $invoice, string $type, string $fiscalYear, $invoiceNumber = null): int
     {
         return self::newQuery()
             ->whereNull('invoice_id')
             ->where('type', $type)
             ->where('fiscal_year', $fiscalYear)
             ->where('status', InvoiceNumber::STATUS_UNUSED)
+            ->when($invoiceNumber, function (Builder $query) use ($invoiceNumber) {
+                $query->where('invoice_number', $invoiceNumber);
+            })
             ->limit(1)
             ->update([
                 'invoice_id' => $invoice->id,

@@ -1,8 +1,9 @@
 <?php
-
+// todo move this class into the general namespace
 namespace App\Services\Admin\Invoice;
 
 use App\Jobs\GenerateInvoiceNumberJob;
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
@@ -13,7 +14,7 @@ class AssignInvoiceNumberService
     {
     }
 
-    public function __invoke(Invoice $invoice): ?InvoiceNumber
+    public function __invoke(Invoice $invoice, $invoiceNumber = null): ?InvoiceNumber
     {
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
@@ -34,7 +35,7 @@ class AssignInvoiceNumberService
         }
 
         // Cant assign InvoiceNumber to Invoices with zero total/sub_total
-        if ($invoice->total === 0 && $invoice->sub_total === 0) {
+        if ($invoice->total == 0 && $invoice->sub_total == 0) {
             return null;
         }
 
@@ -43,16 +44,16 @@ class AssignInvoiceNumberService
             return null;
         }
 
-        $invoiceNumber = $this->invoiceNumberRepository->findByInvoice($invoice);
+        $invoiceNumberModel = $this->invoiceNumberRepository->findByInvoice($invoice);
         // If Invoice already has an InvoiceNumber do nothing
-        if (!is_null($invoiceNumber)) {
-            return $invoiceNumber;
+        if (!is_null($invoiceNumberModel)) {
+            return $invoiceNumberModel;
         }
 
         $type = $invoice->status == Invoice::STATUS_REFUNDED ? InvoiceNumber::TYPE_REFUND : InvoiceNumber::TYPE_PAID;
 
         $fiscalYear = config('payment.invoice_number.current_fiscal_year'); // TODO
-        $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear);
+        $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear, $invoiceNumber);
 
         // No available InvoiceNumber, generate 100 available InvoiceNumbers
         // Normally this if-clause MUST NOT be executed otherwise something is wrong(race condition) and needs investigation

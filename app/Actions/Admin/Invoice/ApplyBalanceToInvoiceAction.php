@@ -8,6 +8,7 @@ use App\Actions\Admin\Wallet\ShowWalletAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
 
@@ -17,6 +18,7 @@ class ApplyBalanceToInvoiceAction
         private readonly ShowWalletAction       $showWalletAction,
         private readonly DeductBalanceAction    $deductBalanceAction,
         private readonly StoreTransactionAction $storeTransactionAction,
+        private readonly ProcessInvoiceAction $processInvoiceAction,
     )
     {
     }
@@ -24,6 +26,8 @@ class ApplyBalanceToInvoiceAction
     public function __invoke(Invoice $invoice, array $data)
     {
         check_rahkaran($invoice);
+
+        $oldState = $invoice->toArray();
 
         if (!in_array($invoice->status, [
             Invoice::STATUS_UNPAID,
@@ -34,7 +38,7 @@ class ApplyBalanceToInvoiceAction
         }
 
         if ($data['amount'] > $invoice->balance) {
-            throw AmountIsMoreThanInvoiceBalanceException::make($invoice->client_id);
+            throw AmountIsMoreThanInvoiceBalanceException::make();
         }
 
         if ($invoice->is_credit) {
@@ -58,7 +62,12 @@ class ApplyBalanceToInvoiceAction
             'status' => Transaction::STATUS_SUCCESS,
         ]);
 
-        // TODO ProcessInvoiceAction
+        admin_log(AdminLog::ADD_CREDIT_TO_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
+
+        $invoice->refresh();
+        if ($invoice->balance == 0) {
+            ($this->processInvoiceAction)($invoice);
+        }
 
         return $invoice;
     }

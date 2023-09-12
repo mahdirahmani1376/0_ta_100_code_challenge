@@ -3,6 +3,7 @@
 namespace App\Actions\Admin\Invoice;
 
 use App\Exceptions\Http\BadRequestException;
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\AssignInvoiceNumberService;
 
@@ -45,8 +46,11 @@ class DownloadInvoiceBillAction
             $invoice->invoiceNumber()->doesntExist() &&
             $invoiceDate->greaterThan('2021-03-21')
         ) {
-            ($this->assignInvoiceNumberService)($invoice);
+            $invoiceNumber = ($this->assignInvoiceNumberService)($invoice);
+            admin_log(AdminLog::DOWNLOAD_INVOICE_OFFICIAL_BILL, $invoiceNumber);
         }
+
+        admin_log(AdminLog::DOWNLOAD_INVOICE_OFFICIAL_BILL, $invoice, $invoice->getChanges(), validatedData: $invoice->getChanges());
 
         return $invoice;
     }

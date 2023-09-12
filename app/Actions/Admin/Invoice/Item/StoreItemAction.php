@@ -3,6 +3,7 @@
 namespace App\Actions\Admin\Invoice\Item;
 
 
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\Item\StoreItemService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
@@ -26,6 +27,7 @@ class StoreItemAction
         if ($data['amount'] != 0) {
             ($this->calcInvoicePriceFieldsService)($invoice);
         }
+        admin_log(AdminLog::ADD_INVOICE_ITEM, $item, validatedData: $data);
 
         return $item;
     }

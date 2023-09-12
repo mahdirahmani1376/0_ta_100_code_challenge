@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\OfflineTransaction;
 
+use App\Models\AdminLog;
 use App\Models\Transaction;
 use App\Services\Admin\OfflineTransaction\StoreOfflineTransactionService;
 use App\Services\Admin\Transaction\StoreTransactionService;
@@ -27,6 +28,8 @@ class StoreOfflineTransactionAction
         $data['payment_method'] = Transaction::PAYMENT_METHOD_OFFLINE;
         $data['status'] = Transaction::STATUS_PENDING;
         ($this->storeTransactionService)($invoice, $data);
+
+        admin_log(AdminLog::CREATE_OFFLINE_TRANSACTION, $offlineTransaction, validatedData: $data);
 
         return $offlineTransaction;
     }

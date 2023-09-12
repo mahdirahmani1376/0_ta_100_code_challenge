@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\OfflineTransaction;
 
+use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Admin\OfflineTransaction\UpdateOfflineTransactionService;
 use App\Services\Admin\Transaction\UpdateTransactionService;
@@ -23,6 +24,7 @@ class UpdateOfflineTransactionAction
 
         $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
 
+        $oldState = $offlineTransaction->toArray();
         $offlineTransaction = ($this->updateOfflineTransactionService)($offlineTransaction, $data);
 
         $transactionData = [
@@ -30,6 +32,8 @@ class UpdateOfflineTransactionAction
             'tracking_code' => $data['tracking_code']
         ];
         ($this->updateTransactionService)($transaction, $transactionData);
+
+        admin_log(AdminLog::UPDATE_OFFLINE_TRANSACTION , $offlineTransaction, $offlineTransaction->getChanges(), $oldState, $data);
 
         return $offlineTransaction;
     }

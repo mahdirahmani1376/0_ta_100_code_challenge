@@ -3,6 +3,7 @@
 namespace App\Actions\Admin\Invoice;
 
 use App\Actions\Invoice\CancelInvoiceAction;
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
 
@@ -21,6 +22,8 @@ class ChangeInvoiceStatusAction
         // TODO AdminLog
         check_rahkaran($invoice);
 
+        $oldState = $invoice->toArray();
+
         if ($status == Invoice::STATUS_CANCELED) {
             $invoice = ($this->cancelInvoiceAction)($invoice);
         } else {
@@ -30,6 +33,8 @@ class ChangeInvoiceStatusAction
         if (in_array($status, [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS])) {
             $invoice = ($this->processInvoiceAction)($invoice);
         }
+
+        admin_log(AdminLog::UPDATE_INVOICE_STATUS, $invoice, $invoice->getChanges(), $oldState, ['status' => $status]);
 
         return $invoice;
     }

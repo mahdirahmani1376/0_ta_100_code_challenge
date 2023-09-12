@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\Invoice;
 
+use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Item;
 
@@ -28,6 +29,10 @@ class ChargeWalletInvoiceAction
             ]
         ];
 
-        return ($this->storeInvoiceAction)($invoiceData);
+        $invoice = ($this->storeInvoiceAction)($invoiceData);
+
+        admin_log(AdminLog::CREATE_INVOICE, $invoice, validatedData: $data);
+
+        return $invoice;
     }
 }

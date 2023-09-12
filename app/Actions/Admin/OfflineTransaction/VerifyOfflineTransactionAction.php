@@ -7,6 +7,7 @@ use App\Actions\Admin\Invoice\ChargeWalletInvoiceAction;
 use App\Actions\Admin\Invoice\Item\UpdateItemAction;
 use App\Actions\Admin\Invoice\ProcessInvoiceAction;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
+use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Admin\Invoice\Item\FindAddCreditItemService;
 use App\Services\Admin\OfflineTransaction\AttachOfflineTransactionToNewInvoiceService;
@@ -73,6 +74,8 @@ class VerifyOfflineTransactionAction
             ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $offlineTransaction->amount]);
             ($this->processInvoiceAction)($invoice);
         }
+
+        admin_log(AdminLog::VERIFY_OFFLINE_TRANSACTION,$offlineTransaction);
 
         return $offlineTransaction;
     }
