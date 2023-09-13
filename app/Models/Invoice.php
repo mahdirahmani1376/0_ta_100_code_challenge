@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Carbon updated_at
  * @property Carbon due_date
  * @property Carbon paid_at
+ * @property Carbon processed_at
  * @property int client_id
  * @property int rahkaran_id
  * @property string payment_method
@@ -89,6 +90,7 @@ class Invoice extends Model
     protected $casts = [
         'due_date' => 'datetime',
         'paid_at' => 'datetime',
+        'processed_at' => 'datetime',
     ];
 
     public function items(): HasMany

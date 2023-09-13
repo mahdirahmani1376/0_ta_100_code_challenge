@@ -4,8 +4,8 @@ namespace App\Actions\Admin\Invoice;
 
 use App\Models\AdminLog;
 use App\Models\Invoice;
-use App\Services\Admin\Invoice\AssignInvoiceNumberService;
 use App\Services\Admin\Invoice\UpdateInvoiceService;
+use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 
 class UpdateInvoiceAction
@@ -31,7 +31,7 @@ class UpdateInvoiceAction
         }
 
         if (!empty($data['invoice_number'])) {
-            ($this->assignInvoiceNumberService)($invoice, $data['invoice_number']);
+            ($this->assignInvoiceNumberService)($invoice, $data['invoice_number'], $data['fiscal_year']);
         }
 
         admin_log(AdminLog::UPDATE_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);

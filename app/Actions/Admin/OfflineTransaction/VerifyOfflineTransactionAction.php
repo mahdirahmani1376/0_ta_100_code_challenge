@@ -5,7 +5,7 @@ namespace App\Actions\Admin\OfflineTransaction;
 use App\Actions\Admin\Invoice\ApplyBalanceToInvoiceAction;
 use App\Actions\Admin\Invoice\ChargeWalletInvoiceAction;
 use App\Actions\Admin\Invoice\Item\UpdateItemAction;
-use App\Actions\Admin\Invoice\ProcessInvoiceAction;
+use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
 use App\Models\AdminLog;
 use App\Models\OfflineTransaction;

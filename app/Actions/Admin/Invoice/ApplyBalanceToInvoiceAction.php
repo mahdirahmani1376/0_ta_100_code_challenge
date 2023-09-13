@@ -5,6 +5,7 @@ namespace App\Actions\Admin\Invoice;
 use App\Actions\Admin\Invoice\Transaction\StoreTransactionAction;
 use App\Actions\Admin\Wallet\DeductBalanceAction;
 use App\Actions\Admin\Wallet\ShowWalletAction;
+use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;

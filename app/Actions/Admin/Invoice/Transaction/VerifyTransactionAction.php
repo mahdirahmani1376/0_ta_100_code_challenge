@@ -2,7 +2,7 @@
 
 namespace App\Actions\Admin\Invoice\Transaction;
 
-use App\Actions\Admin\Invoice\ProcessInvoiceAction;
+use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Models\AdminLog;
 use App\Models\Transaction;
@@ -31,7 +31,7 @@ class VerifyTransactionAction
         }
 
         ($this->verifyTransactionService)($transaction);
-        ($this->processInvoiceAction)($transaction->invoice); // TODO check
+        ($this->processInvoiceAction)($transaction->invoice);
 
         admin_log(AdminLog::VERIFY_TRANSACTION, $transaction, $transaction->getChanges(), $oldState);
 

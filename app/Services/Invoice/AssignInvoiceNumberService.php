@@ -1,9 +1,7 @@
 <?php
-// todo move this class into the general namespace
-namespace App\Services\Admin\Invoice;
+namespace App\Services\Invoice;
 
 use App\Jobs\GenerateInvoiceNumberJob;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
@@ -14,7 +12,7 @@ class AssignInvoiceNumberService
     {
     }
 
-    public function __invoke(Invoice $invoice, $invoiceNumber = null): ?InvoiceNumber
+    public function __invoke(Invoice $invoice, $invoiceNumber = null, $fiscalYear = null): ?InvoiceNumber
     {
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
@@ -52,7 +50,7 @@ class AssignInvoiceNumberService
 
         $type = $invoice->status == Invoice::STATUS_REFUNDED ? InvoiceNumber::TYPE_REFUND : InvoiceNumber::TYPE_PAID;
 
-        $fiscalYear = config('payment.invoice_number.current_fiscal_year'); // TODO
+        $fiscalYear = $fiscalYear ?? config('payment.invoice_number.current_fiscal_year'); // TODO
         $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear, $invoiceNumber);
 
         // No available InvoiceNumber, generate 100 available InvoiceNumbers

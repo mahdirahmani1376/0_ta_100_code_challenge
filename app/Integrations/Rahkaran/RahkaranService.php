@@ -25,7 +25,7 @@ use App\Models\Item;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
-use App\Services\Admin\Invoice\AssignInvoiceNumberService;
+use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\OfflineTransaction\FindOfflineTransactionByTransactionService;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;

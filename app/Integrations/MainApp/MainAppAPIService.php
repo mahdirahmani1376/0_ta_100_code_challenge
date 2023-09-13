@@ -1,5 +1,4 @@
 <?php
-// TODO rethink exception handling
 namespace App\Integrations\MainApp;
 
 use App\Exceptions\SystemException\MainAppInternalAPIException;
@@ -7,7 +6,6 @@ use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Integrations\Rahkaran\ValueObjects\Product;
 use App\Models\Invoice;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class MainAppAPIService extends BaseMainAppAPIService
 {
@@ -25,19 +23,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_OK) {
                 return $response->json('data');
             }
-
-            Log::error('MainApp internal api error', [
-                'url' => $url,
-                'param' => json_encode($param),
-                'response' => $response->body(),
-            ]);
-
-            throw MainAppInternalAPIException::make($url, json_encode($param));
         } catch (\Exception $exception) {
-            if ($exception instanceof MainAppInternalAPIException) {
-                throw $exception;
-            }
-
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
@@ -59,19 +45,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->successful()) {
                 return $response->json('data');
             }
-
-            Log::error('MainApp internal api error', [
-                'url' => $url,
-                'param' => json_encode($param),
-                'response' => $response->body(),
-            ]);
-
-            throw MainAppInternalAPIException::make($url, json_encode($param));
         } catch (\Exception $exception) {
-            if ($exception instanceof MainAppInternalAPIException) {
-                throw $exception;
-            }
-
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
@@ -105,19 +79,7 @@ class MainAppAPIService extends BaseMainAppAPIService
 
                 return $clients;
             }
-
-            Log::error('MainApp internal api error', [
-                'url' => $url,
-                'param' => json_encode($param),
-                'response' => $response->body(),
-            ]);
-
-            throw MainAppInternalAPIException::make($url, json_encode($param));
         } catch (\Exception $exception) {
-            if ($exception instanceof MainAppInternalAPIException) {
-                throw $exception;
-            }
-
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
@@ -132,19 +94,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_OK) {
                 return $response->json('data');
             }
-
-            Log::error('MainApp internal api error', [
-                'url' => $url,
-                'param' => json_encode($data),
-                'response' => $response->body(),
-            ]);
-
-            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
-            if ($exception instanceof MainAppInternalAPIException) {
-                throw $exception;
-            }
-
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -168,19 +118,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_NOT_FOUND) {
                 return null;
             }
-
-            Log::error('MainApp internal api error', [
-                'url' => $url,
-                'param' => json_encode($data),
-                'response' => $response->body(),
-            ]);
-
-            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
-            if ($exception instanceof MainAppInternalAPIException) {
-                throw $exception;
-            }
-
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -195,19 +133,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_OK) {
                 return;
             }
-
-            Log::error('MainApp internal api error', [
-                'url' => $url,
-                'param' => json_encode($data),
-                'response' => $response->body(),
-            ]);
-
-            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
-            if ($exception instanceof MainAppInternalAPIException) {
-                throw $exception;
-            }
-
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }

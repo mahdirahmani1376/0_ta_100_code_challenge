@@ -2,8 +2,23 @@
 
 namespace App\Http\Resources\Profile\Wallet;
 
-use App\Http\Resources\Admin\Wallet\ShowWalletResource as AdminShowWalletResourceAlias;
+use App\Models\Wallet;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class WalletResource extends AdminShowWalletResourceAlias
+class WalletResource extends JsonResource
 {
+    public function toArray(Request $request): array
+    {
+        /** @var Wallet $this */
+        return [
+            'id' => $this->id,
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
+            'client_id' => $this->client_id,
+            'name' => $this->name,
+            'balance' => $this->balance,
+            'is_active' => $this->is_active,
+        ];
+    }
 }

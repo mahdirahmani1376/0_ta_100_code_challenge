@@ -14,26 +14,8 @@ return [
     ],
     'bank_gateway' => [ // TODO callback urls should be main-app urls
         'callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/{transaction}/{gateway}/{source}',
-        'cloud_callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/{transaction}/{gateway}/{source}', // TODO maybe remove cloud url?
+        'cloud_callback_url' => 'http://localhost:6051/api/finance-service/public/gateway/callback/{transaction}/{gateway}/{source}',
         'result_redirect_url' => 'redirect',
         'result_cloud_redirect_url' => 'cloud-redirect',
     ],
 ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

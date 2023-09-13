@@ -2,19 +2,15 @@
 
 namespace App\Http\Resources\Admin\Invoice;
 
+use App\Models\InvoiceNumber;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class InvoiceNumberResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        /** @var \App\Models\InvoiceNumber $this */
+        /** @var InvoiceNumber $this */
         return [
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),

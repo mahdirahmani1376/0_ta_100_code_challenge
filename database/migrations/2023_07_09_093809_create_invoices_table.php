@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->timestamp('due_date')->nullable();
             $table->timestamp('paid_at')->nullable();
+            $table->timestamp('processed_at')->nullable();
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('rahkaran_id')->nullable();
             $table->string('payment_method');

@@ -1,10 +1,9 @@
 <?php
-// TODO low priority - reconsider this Action's namespace, i think it should be moved under public namespace but then what about its dependencies ?!
-namespace App\Actions\Admin\Invoice;
+
+namespace App\Actions\Invoice;
 
 use App\Actions\Admin\Wallet\StoreCreditTransactionAction;
 use App\Events\InvoiceProcessed;
-use App\Exceptions\Http\BadRequestException;
 use App\Jobs\AssignInvoiceNumberJob;
 use App\Models\Invoice;
 use App\Models\Item;
@@ -12,30 +11,39 @@ use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
 use App\Services\Admin\Transaction\StoreRefundTransactionService;
 use App\Services\Invoice\CalcInvoicePaidAtService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
+use App\Services\Invoice\CalcInvoiceProcessedAtService;
 use App\Services\Invoice\FindInvoiceByIdService;
 
 class ProcessInvoiceAction
 {
     public function __construct(
-        private readonly StoreRefundTransactionService                         $storeRefundTransactionService,
-        private readonly ChangeInvoiceStatusService                            $changeInvoiceStatusService,
-        private readonly CalcInvoicePaidAtService                              $calcInvoicePaidAtService,
-        private readonly StoreCreditTransactionAction                          $storeCreditTransactionAction,
-        private readonly CalcInvoicePriceFieldsService                         $calcInvoicePriceFieldsService,
-        private readonly FindInvoiceByIdService                                $findInvoiceByIdService,
+        private readonly StoreRefundTransactionService $storeRefundTransactionService,
+        private readonly ChangeInvoiceStatusService    $changeInvoiceStatusService,
+        private readonly CalcInvoicePaidAtService      $calcInvoicePaidAtService,
+        private readonly StoreCreditTransactionAction  $storeCreditTransactionAction,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
+        private readonly FindInvoiceByIdService        $findInvoiceByIdService,
+        private readonly CalcInvoiceProcessedAtService $calcInvoiceProcessedAtService,
     )
     {
     }
-    // TODO check ProcessInvoiceAction logic - e.g. balance == 0 ?
     // TODO check usage of this action
-    // TODO make sure to not process an already processed Invoice twice
-    // TODO if invoice status is changing from "collection" to "paid" make sure to not rerun all of the processInvoiceAction
-    public function __invoke(Invoice $invoice, bool $usedToBeCollection = false): Invoice
+    public function __invoke(Invoice $invoice): Invoice
     {
         $invoice->refresh();
-
+        // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
+        // so we only change its status to paid and nothing else, this is done in another service
+        if (!is_null($invoice->processed_at)) {
+            return $invoice;
+        }
+        // Normal Invoices must have zero balance to be processed
         if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
-            throw new BadRequestException('Can not Process non-collection Invoice with positive balance, invoiceId: ' . $invoice->getKey());
+            return $invoice;
+        }
+        // Collection Invoices can have positive balance and still be processed,
+        // but if an Invoice is not Collection then it MUST have zero balance otherwise cannot be processed until it's paid in full
+        if ($invoice->status != Invoice::STATUS_COLLECTIONS && $invoice->balance > 0) {
+            return $invoice;
         }
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
         if ($invoice->status === Invoice::STATUS_REFUNDED) {
@@ -80,11 +88,10 @@ class ProcessInvoiceAction
                 }
             });
         }
-        // TODO do we need to check for balance==0 ?
-        if (!$usedToBeCollection) {
-            InvoiceProcessed::dispatch($invoice);
-            // TODO Invoice Affiliation ?
-        }
+
+        ($this->calcInvoiceProcessedAtService)($invoice);
+        InvoiceProcessed::dispatch($invoice);
+        // TODO Invoice Affiliation ?
 
         return $invoice;
     }

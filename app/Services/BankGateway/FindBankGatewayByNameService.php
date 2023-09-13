@@ -16,14 +16,8 @@ class FindBankGatewayByNameService
     {
         $bankGatewayModel = $this->bankGatewayRepository->findByName($name);
 
-        try {
-            $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($name);
+        $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($name);
 
-            return $provider::make($bankGatewayModel);
-        } catch (\Exception $e) {
-            // TODO make proper exception
-            info($e->getTrace());
-            info($e->getMessage());
-        }
+        return $provider::make($bankGatewayModel);
     }
 }

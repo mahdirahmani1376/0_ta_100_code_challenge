@@ -15,7 +15,7 @@ class RejectTransactionService
     {
         return $this->transactionRepository->update(
             $transaction,
-            ['status' => Transaction::STATUS_FAIL,], // TODO should we use fail or rejected status
+            ['status' => Transaction::STATUS_FAIL,],
             ['status',]
         );
     }

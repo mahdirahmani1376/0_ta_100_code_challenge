@@ -5,7 +5,7 @@ namespace App\Actions\Admin\Invoice;
 use App\Exceptions\Http\BadRequestException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
-use App\Services\Admin\Invoice\AssignInvoiceNumberService;
+use App\Services\Invoice\AssignInvoiceNumberService;
 
 class DownloadInvoiceBillAction
 {

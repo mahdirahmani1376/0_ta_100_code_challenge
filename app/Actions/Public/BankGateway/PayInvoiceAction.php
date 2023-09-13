@@ -2,7 +2,7 @@
 
 namespace App\Actions\Public\BankGateway;
 
-use App\Actions\Admin\Invoice\ProcessInvoiceAction;
+use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Services\BankGateway\FindBankGatewayByNameService;

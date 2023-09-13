@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Profile\Invoice;
+namespace App\Services\Profile\Invoice;
 
 use App\Exceptions\Http\BadRequestException;
 use App\Models\Invoice;

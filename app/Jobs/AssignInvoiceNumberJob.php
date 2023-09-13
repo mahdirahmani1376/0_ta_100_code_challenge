@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Invoice;
-use App\Services\Admin\Invoice\AssignInvoiceNumberService;
+use App\Services\Invoice\AssignInvoiceNumberService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -2,9 +2,9 @@
 
 namespace App\Actions\Internal\Cloud\Invoice;
 
-use App\Actions\Admin\Invoice\ProcessInvoiceAction;
 use App\Actions\Admin\Invoice\StoreInvoiceAction as AdminStoreInvoiceAction;
 use App\Actions\Admin\Invoice\Transaction\StoreTransactionAction;
+use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Services\Wallet\FindCreditTransactionByIdService;

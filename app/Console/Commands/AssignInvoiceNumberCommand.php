@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Admin\Invoice\AssignInvoiceNumberService;
+use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\Invoice\FindInvoiceByIdService;
 use Illuminate\Console\Command;
 
