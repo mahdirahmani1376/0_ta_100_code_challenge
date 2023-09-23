@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Integrations\MainApp;
 
 use App\Exceptions\SystemException\MainAppInternalAPIException;
@@ -79,6 +80,10 @@ class MainAppAPIService extends BaseMainAppAPIService
 
                 return $clients;
             }
+
+            if ($response->status() == Response::HTTP_NOT_FOUND) {
+                return [];
+            }
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
@@ -122,10 +127,15 @@ class MainAppAPIService extends BaseMainAppAPIService
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
+
     public static function signalMainAppToProcessInvoice(Invoice $invoice)
     {
         $url = '/api/internal/finance/after-payment';
-        $data = ['items' => $invoice->items,];
+        $data = [
+            'id' => $invoice->id,
+            'client_id' => $invoice->client_id,
+            'items' => $invoice->items,
+        ];
 
         try {
             $response = self::makeRequest('post', $url, $data);
