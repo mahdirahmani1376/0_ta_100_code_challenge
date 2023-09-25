@@ -281,7 +281,12 @@ class DataMigration extends Command
 //                        'client_id' => $row['client_id'],
 //                        'balance' => 0,
 //                    ])->getKey();
-                $newRow['wallet_id'] = Wallet::query()->where('client_id', $row['client_id'])->firstOrFail()->getKey();
+                $newRow['wallet_id'] = Wallet::query()->where('client_id', $row['client_id'])->firstOrCreate([
+                    'client_id' => $row['client_id'],
+                    'name' => Wallet::WALLET_DEFAULT_NAME,
+                    'balance' => 0,
+                    'is_active' => true,
+                ])->getKey();
                 $newRow['invoice_id'] = $row['invoice_id'];
                 $newRow['admin_id'] = $row['admin_user_id'];
                 $newRow['amount'] = $row['amount'];
@@ -553,6 +558,8 @@ class DataMigration extends Command
                     $newRow['status'] = Transaction::STATUS_SUCCESS;
                 } elseif ($row['status'] == 2) {
                     $newRow['status'] = Transaction::STATUS_FAIL;
+                } elseif ($row['status'] == 10) {
+                    $newRow['status'] = Transaction::STATUS_FAIL;
                 } elseif ($row['status'] == 30) {
                     $newRow['status'] = Transaction::STATUS_REFUND;
                 } elseif ($row['status'] == 20) { // 20 = STATUS_IPG_FAILED_TO_START
@@ -587,6 +594,7 @@ class DataMigration extends Command
             dump($e);
         }
     }
+
     private function migrateInoiceNumber(): void
     {
         $tableName = (new InvoiceNumber())->getTable();
