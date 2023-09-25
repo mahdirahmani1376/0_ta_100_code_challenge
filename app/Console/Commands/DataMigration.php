@@ -8,6 +8,7 @@ use App\Models\ClientBankAccount;
 use App\Models\ClientCashout;
 use App\Models\CreditTransaction;
 use App\Models\Invoice;
+use App\Models\InvoiceNumber;
 use App\Models\Item;
 use App\Models\OfflineTransaction;
 use App\Models\Transaction;
@@ -23,6 +24,8 @@ class DataMigration extends Command
 
     protected $description = 'Command description';
 
+    protected int $chunkSize = 2000;
+
     public function handle()
     {
         self::migrateBankAccount();
@@ -35,6 +38,7 @@ class DataMigration extends Command
         self::migrateItem();
         self::migrateOfflineTransaction();
         self::migrateTransaction();
+        self::migrateInoiceNumber();
         // TODO InvoiceNumber
     }
 
@@ -212,10 +216,10 @@ class DataMigration extends Command
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
-            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
                 $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += 5000;
+                $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -291,10 +295,10 @@ class DataMigration extends Command
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
-            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
                 $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += 5000;
+                $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -362,10 +366,10 @@ class DataMigration extends Command
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
-            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
                 $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += 5000;
+                $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -410,10 +414,10 @@ class DataMigration extends Command
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
-            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
                 $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += 5000;
+                $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -491,10 +495,10 @@ class DataMigration extends Command
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
-            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
                 $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += 5000;
+                $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -572,10 +576,54 @@ class DataMigration extends Command
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
-            collect($mappedData)->chunk(5000)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                 DB::table($tableName)->insert($rows->toArray());
                 $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += 5000;
+                $counter += $this->chunkSize;
+            });
+            $this->info("End of data migrate for $tableName");
+        } catch (\Exception $e) {
+            $this->error("Something went wrong when migrating $tableName");
+            dump($e);
+        }
+    }
+    private function migrateInoiceNumber(): void
+    {
+        $tableName = (new InvoiceNumber())->getTable();
+        $this->alert("Beginning to migrate $tableName");
+        try {
+            $oldData = DB::connection('mainapp')
+                ->select('SELECT *
+                                FROM `invoice_numbers`
+                                WHERE EXISTS(SELECT * FROM `invoices` WHERE `invoice_numbers`.`invoice_id` = `invoices`.`invoice_id`)
+                                ');
+            $this->info('Fetched data');
+            $mappedData = Arr::map($oldData, function ($row) {
+                $row = (array)$row;
+                $newRow = [];
+
+                $newRow['id'] = $row['id'];
+                $newRow['created_at'] = $row['created_at'];
+                $newRow['updated_at'] = $row['updated_at'];
+                $newRow['deleted_at'] = $row['deleted_at'];
+                $newRow['invoice_number'] = $row['invoice_number'];
+                $newRow['fiscal_year'] = $row['fiscal_year'];
+                $newRow['type'] = $row['type'];
+                $newRow['status'] = $row['status'];
+                $newRow['invoice_id'] = $row['invoice_id'];
+
+                return $newRow;
+            });
+            $this->info('Mapping done');
+//            DB::table($tableName)->truncate();
+            $this->info("Truncated $tableName");
+            $this->info("Inserting mapped data into $tableName");
+            $mappedDataCount = count($mappedData);
+            $counter = 0;
+            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+                DB::table($tableName)->insert($rows->toArray());
+                $this->info("Inserted $counter out of $mappedDataCount items.");
+                $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
