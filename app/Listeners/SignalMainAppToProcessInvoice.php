@@ -11,6 +11,6 @@ class SignalMainAppToProcessInvoice implements ShouldQueue
 {
     public function handle(InvoiceProcessed $event): void
     {
-        MainAppAPIService::signalMainAppToProcessInvoice($event->invoice);
+        MainAppAPIService::invoicePostProcess($event->invoice);
     }
 }

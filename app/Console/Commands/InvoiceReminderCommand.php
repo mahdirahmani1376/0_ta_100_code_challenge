@@ -4,24 +4,28 @@ namespace App\Console\Commands;
 
 use App\Helpers\JalaliCalender;
 use App\Integrations\MainApp\MainAppAPIService;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 
 class InvoiceReminderCommand extends Command
 {
     protected $signature = 'cron:invoice-reminder
                             {--test : Run in test mode}
-                            {--threshold1=0 : First reminder threshold in days}
-                            {--threshold2=0 : Second reminder threshold in days}';
+                            {--email-threshold1=0 : First email reminder threshold in days}
+                            {--email-threshold2=0 : Second email reminder threshold in days}
+                            {--email-threshold3=0 : Third email reminder threshold in days}
+                            {--sms-threshold1=0 : First sms reminder threshold in days}
+                            {--sms-threshold2=0 : Second sms reminder threshold in days}';
 
-    protected $description = 'Send reminder notification to clients for their Invoices to pay them before due date';
+    protected $description = 'Send notification to clients to remind them to pay their Invoices before due date';
     private bool $test;
     private InvoiceRepositoryInterface $invoiceRepository;
-    private int $threshold1;
-    private int $threshold2;
+
+    private array $emailThresholds = [];
+    private array $smsThresholds = [];
 
     public function handle(InvoiceRepositoryInterface $invoiceRepository)
     {
@@ -36,7 +40,8 @@ class InvoiceReminderCommand extends Command
         $this->alert('Invoice reminder , now: ' . JalaliCalender::getJalaliString(now()) . '  ' . now()->toDateTimeString());
 
         $this->prepareThresholdValues();
-        $this->sendReminder();
+        $this->sendEmailReminder();
+        $this->sendSMSReminder();
 
         $this->newLine(2);
         $this->info('Completed');
@@ -45,20 +50,44 @@ class InvoiceReminderCommand extends Command
     private function prepareThresholdValues(): void
     {
         try {
-            if (empty($this->option('threshold1'))) {
-                $this->info("No 'threshold1' argument provided, fetching from MainApp configs...");
-                $this->threshold1 = MainAppAPIService::getConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_1');
-                $this->info("'threshold1' config received from MainApp: " . $this->threshold1);
+            // --------------- EMAIL ---------------------------
+            if (empty($this->option('email-threshold1'))) {
+                $this->info("No 'email-threshold1' argument provided, fetching from MainApp configs...");
+                $this->emailThresholds[] = $t = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_1);
+                $this->info("'email-threshold1' config received from MainApp: " . $t);
             } else {
-                $this->threshold1 = $this->option('threshold1');
+                $this->emailThresholds[] = $this->option('email-threshold1');
             }
 
-            if (empty($this->option('threshold2'))) {
-                $this->info("No 'threshold2' argument provided, fetching from MainApp configs...");
-                $this->threshold2 = MainAppAPIService::getConfig('CRON_FINANCE_INVOICE_REMINDER_DAYS_2');
-                $this->info("'threshold2' value received from MainApp: " . $this->threshold2);
+            if (empty($this->option('email-threshold2'))) {
+                $this->info("No 'email-threshold2' argument provided, fetching from MainApp configs...");
+                $this->emailThresholds[] = $t = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_2);
+                $this->info("'email-threshold2' value received from MainApp: " . $t);
             } else {
-                $this->threshold2 = $this->option('threshold2');
+                $this->emailThresholds[] = $this->option('email-threshold2');
+            }
+
+            if (empty($this->option('email-threshold3'))) {
+                $this->info("No 'email-threshold3' argument provided, fetching from MainApp configs...");
+                $this->emailThresholds[] = $t = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_3);
+                $this->info("'email-threshold3' value received from MainApp: " . $t);
+            } else {
+                $this->emailThresholds[] = $this->option('email-threshold3');
+            }
+            // --------------- SMS ---------------------
+            if (empty($this->option('sms-threshold1'))) {
+                $this->info("No 'sms-threshold1' argument provided, fetching from MainApp configs...");
+                $this->smsThresholds[] = $t = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_SMS_1);
+                $this->info("'sms-threshold1' value received from MainApp: " . $t);
+            } else {
+                $this->smsThresholds[] = $this->option('sms-threshold1');
+            }
+            if (empty($this->option('sms-threshold2'))) {
+                $this->info("No 'sms-threshold2' argument provided, fetching from MainApp configs...");
+                $this->smsThresholds[] = $t = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_SMS_2);
+                $this->info("'sms-threshold2' value received from MainApp: " . $t);
+            } else {
+                $this->smsThresholds[] = $this->option('sms-threshold2');
             }
         } catch (\Exception $exception) {
             \Log::error('Failed to fetch config values from MainApp', [
@@ -71,25 +100,69 @@ class InvoiceReminderCommand extends Command
         }
     }
 
-    private function sendReminder()
+    private function sendEmailReminder()
     {
-        $invoices = $this->invoiceRepository->newQuery()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->where(function (Builder $query) {
-                $query->whereDate('due_date', '=', now()->subDays($this->threshold1)->toDateString());
-                $query->orWhereDate('due_date', '=', now()->subDays($this->threshold2)->toDateString());
-            })
-            ->get();
+        foreach ($this->emailThresholds as $emailThreshold) {
+            $invoices = $this->invoiceRepository->newQuery()
+                ->where('status', Invoice::STATUS_UNPAID)
+                ->whereDate('due_date', '=', now()->addDays($emailThreshold)->toDateString())
+                ->get(['id', 'client_id']);
 
-        $this->info('Invoice count: ' . $invoices->count());
+            $this->info('Invoice count: ' . $invoices->count());
 
-        $groupedByClient = $invoices->groupBy('client_id');
-        $groupedByClient->each(function (Invoice $invoice) {
-            if (!$this->test) {
-                // todo send notification
+            if ($invoices->count() == 0) {
+                $this->info('No Invoices found.');
+
+                continue;
             }
 
-            $this->info("Invoice Reminder #{$invoice->getKey()} sent successfully.");
-        });
+            $reminders = [];
+            $invoices->groupBy('client_id')
+                ->each(function ($item, $index) use (&$reminders) {
+                    $reminders[] = [
+                        'client_id' => $index,
+                        'invoice_ids' => $item->pluck('id')->toArray(),
+                    ];
+
+                    $this->info("Email Invoice Reminder for client #$index sent successfully.");
+                });
+
+            if (!$this->test) {
+                MainAppAPIService::sendInvoiceReminder($reminders, 'email');
+            }
+        }
+    }
+
+    private function sendSMSReminder()
+    {
+        foreach ($this->smsThresholds as $smsThreshold) {
+            $invoices = $this->invoiceRepository->newQuery()
+                ->where('status', Invoice::STATUS_UNPAID)
+                ->whereDate('due_date', '=', now()->addDays($smsThreshold)->toDateString())
+                ->get(['id', 'client_id']);
+
+            $this->info('Invoice count: ' . $invoices->count());
+
+            if ($invoices->count() == 0) {
+                $this->info('No Invoices found.');
+
+                continue;
+            }
+
+            $reminders = [];
+            $invoices->groupBy('client_id')
+                ->each(function ($item, $index) use (&$reminders) {
+                    $reminders[] = [
+                        'client_id' => $index,
+                        'invoice_ids' => $item->pluck('id')->toArray(),
+                    ];
+
+                    $this->info("SMS Invoice Reminder for client #$index sent successfully.");
+                });
+
+            if (!$this->test) {
+                MainAppAPIService::sendInvoiceReminder($reminders, 'sms');
+            }
+        }
     }
 }

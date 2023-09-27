@@ -128,15 +128,34 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function signalMainAppToProcessInvoice(Invoice $invoice)
+    public static function invoicePostProcess(Invoice $invoice)
     {
-        $url = '/api/internal/finance/after-payment';
+        $url = '/api/internal/finance/invoice/post-process';
         $data = [
             'id' => $invoice->id,
             'client_id' => $invoice->client_id,
+            'total' => $invoice->total,
             'items' => $invoice->items,
         ];
 
+        try {
+            $response = self::makeRequest('post', $url, $data);
+
+            if ($response->status() == Response::HTTP_OK) {
+                return;
+            }
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
+    }
+
+    public static function sendInvoiceReminder(array $reminders, $channel = 'email')
+    {
+        $url = '/api/internal/finance/invoice/reminder';
+        $data = [
+            'channel' => $channel,
+            'reminders' => $reminders,
+        ];
         try {
             $response = self::makeRequest('post', $url, $data);
 
