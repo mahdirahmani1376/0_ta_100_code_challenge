@@ -21,14 +21,17 @@ class CancelOverDueInvoiceCommand extends Command
     protected $signature = 'cron:overdue-invoice
                             {--test : Run in test mode, will not commit anything into DB}
                             {--threshold=0 : Threshold for how old an Invoice should be in day}
-                            {--threshold-domain=0 : Threshold for how old a Domain Invoice should be in day}';
+                            {--threshold-domain=0 : Threshold for how old a Domain Invoice should be in day}
+                            {--threshold-cloud=0 : Threshold for how old a Cloud Invoice should be in day}';
 
     protected $description = 'Cancel overdue Invoices';
 
     private int $threshold = 0;
     private int $thresholdDomain = 0;
+    private int $thresholdCloud = 0;
     private Carbon $dueDate;
     private Carbon $dueDateDomain;
+    private Carbon $dueDateCloud;
     private CancelInvoiceAction $cancelInvoiceAction;
     private InvoiceRepositoryInterface $invoiceRepository;
     private bool $test;
@@ -50,6 +53,7 @@ class CancelOverDueInvoiceCommand extends Command
 
         $this->cancelUnpaidInvoices();
         $this->cancelUnpaidDomainInvoices();
+        $this->cancelUnpaidCloudInvoices();
         $this->cancelMassPaymentInvoices();
 
         $this->newLine(2);
@@ -73,6 +77,7 @@ class CancelOverDueInvoiceCommand extends Command
             ->whereDate('due_date', '<', $this->dueDate)
             ->whereHas('items', function ($query) {
                 $query->where('invoiceable_type', '<>', Item::TYPE_DOMAIN_SERVICE);
+                $query->where('invoiceable_type', '<>', Item::TYPE_CLOUD);
             })
             ->get();
 
@@ -96,6 +101,29 @@ class CancelOverDueInvoiceCommand extends Command
             ->whereDate('due_date', '<', $this->dueDateDomain)
             ->whereHas('items', function ($query) {
                 $query->where('invoiceable_type', '=', Item::TYPE_DOMAIN_SERVICE);
+            })
+            ->get();
+
+        $this->cancelInvoices($overDueInvoices);
+    }
+
+    private function cancelUnpaidCloudInvoices()
+    {
+        $this->info('-------- Canceling every Invoice that is a Cloud ------');
+
+        $this->dueDateCloud = now()
+            ->second(0)
+            ->minute(0)
+            ->subDays($this->thresholdCloud);
+        $this->info('Due Date Cloud: ' . JalaliCalender::getJalaliString($this->dueDateCloud) . ' ' . $this->dueDateCloud->format('H:i:s'));
+
+        $overDueInvoices = $this->invoiceRepository->newQuery()
+            ->where('status', Invoice::STATUS_UNPAID)
+            ->where('is_mass_payment', 0)
+            ->where('is_credit', 0)
+            ->whereDate('due_date', '<', $this->dueDateCloud)
+            ->whereHas('items', function ($query) {
+                $query->where('invoiceable_type', '=', Item::TYPE_CLOUD);
             })
             ->get();
 
@@ -135,7 +163,7 @@ class CancelOverDueInvoiceCommand extends Command
         try {
             if (empty($this->option('threshold'))) {
                 $this->info("No 'threshold' argument provided, fetching from MainApp configs...");
-                $this->threshold = MainAppConfig::get('CRON_AUTO_INVOICE_CANCELLATION_DAYS');
+                $this->threshold = MainAppConfig::get(MainAppConfig::CRON_AUTO_INVOICE_CANCELLATION_DAYS);
                 $this->info("'threshold' config received from MainApp: " . $this->threshold);
             } else {
                 $this->threshold = $this->option('threshold');
@@ -143,10 +171,18 @@ class CancelOverDueInvoiceCommand extends Command
 
             if (empty($this->option('threshold-domain'))) {
                 $this->info("No 'threshold-domain' argument provided, fetching from MainApp configs...");
-                $this->thresholdDomain = MainAppConfig::get('CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS');
+                $this->thresholdDomain = MainAppConfig::get(MainAppConfig::CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS);
                 $this->info("'threshold-Domain' value received from MainApp: " . $this->thresholdDomain);
             } else {
                 $this->thresholdDomain = $this->option('threshold-domain');
+            }
+
+            if (empty($this->option('threshold-cloud'))) {
+                $this->info("No 'threshold-cloud' argument provided, fetching from MainApp configs...");
+                $this->thresholdCloud = MainAppConfig::get(MainAppConfig::CRON_AUTO_CLOUD_INVOICE_CANCELLATION_DAYS);
+                $this->info("'threshold-cloud' value received from MainApp: " . $this->thresholdCloud);
+            } else {
+                $this->thresholdCloud = $this->option('threshold-cloud');
             }
         } catch (\Exception $exception) {
             \Log::error('Failed to fetch config values from MainApp', [
