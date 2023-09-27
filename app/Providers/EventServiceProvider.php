@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Events\InvoiceProcessed;
-use App\Listeners\SendInvoiceProcessedMail;
 use App\Listeners\SignalMainAppToProcessInvoice;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Queue\Events\QueueBusy;
@@ -14,7 +13,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         InvoiceProcessed::class => [
             SignalMainAppToProcessInvoice::class,
-            SendInvoiceProcessedMail::class,
         ],
     ];
 
