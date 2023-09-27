@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Integrations\MainApp\MainAppAPIService;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\BankAccount;
 use App\Models\BankGateway;
 use App\Models\InvoiceNumber;
@@ -35,25 +36,25 @@ class DatabaseSeeder extends Seeder
 //                'terminal_id' => '2408938',
 //            ],
 //        ]);
-        InvoiceNumber::create([
-            'invoice_number' => 1,
-            'fiscal_year' => 1402,
-            'status' => InvoiceNumber::STATUS_UNUSED,
-            'type' => InvoiceNumber::TYPE_PAID,
-        ]);
-        InvoiceNumber::create([
-            'invoice_number' => 1,
-            'fiscal_year' => 1402,
-            'status' => InvoiceNumber::STATUS_UNUSED,
-            'type' => InvoiceNumber::TYPE_REFUND,
-        ]);
+//        InvoiceNumber::create([
+//            'invoice_number' => 1,
+//            'fiscal_year' => 1402,
+//            'status' => InvoiceNumber::STATUS_UNUSED,
+//            'type' => InvoiceNumber::TYPE_PAID,
+//        ]);
+//        InvoiceNumber::create([
+//            'invoice_number' => 1,
+//            'fiscal_year' => 1402,
+//            'status' => InvoiceNumber::STATUS_UNUSED,
+//            'type' => InvoiceNumber::TYPE_REFUND,
+//        ]);
 
-        MainAppAPIService::storeConfig('CRON_AUTO_INVOICE_CANCELLATION_DAYS', 1);
-        MainAppAPIService::storeConfig('CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS', 1);
-        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_EMAIL_1', 1);
-        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_EMAIL_2', 5);
-        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_EMAIL_3', 10);
-        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_SMS_1', 5);
-        MainAppAPIService::storeConfig('CRON_FINANCE_INVOICE_REMINDER_SMS_2', 15);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_INVOICE_CANCELLATION_DAYS, 1);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS, 1);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_1, 1);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_2, 5);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_3, 10);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_SMS_1, 5);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_SMS_2, 15);
     }
 }
