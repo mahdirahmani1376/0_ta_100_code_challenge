@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Actions\Invoice\CancelInvoiceAction;
 use App\Helpers\JalaliCalender;
 use App\Integrations\MainApp\MainAppAPIService;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
@@ -134,7 +135,7 @@ class CancelOverDueInvoiceCommand extends Command
         try {
             if (empty($this->option('threshold'))) {
                 $this->info("No 'threshold' argument provided, fetching from MainApp configs...");
-                $this->threshold = MainAppAPIService::getConfig('CRON_AUTO_INVOICE_CANCELLATION_DAYS');
+                $this->threshold = MainAppConfig::get('CRON_AUTO_INVOICE_CANCELLATION_DAYS');
                 $this->info("'threshold' config received from MainApp: " . $this->threshold);
             } else {
                 $this->threshold = $this->option('threshold');
@@ -142,7 +143,7 @@ class CancelOverDueInvoiceCommand extends Command
 
             if (empty($this->option('threshold-domain'))) {
                 $this->info("No 'threshold-domain' argument provided, fetching from MainApp configs...");
-                $this->thresholdDomain = MainAppAPIService::getConfig('CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS');
+                $this->thresholdDomain = MainAppConfig::get('CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS');
                 $this->info("'threshold-Domain' value received from MainApp: " . $this->thresholdDomain);
             } else {
                 $this->thresholdDomain = $this->option('threshold-domain');
