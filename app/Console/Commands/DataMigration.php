@@ -40,7 +40,6 @@ class DataMigration extends Command
         self::migrateOfflineTransaction();
         self::migrateTransaction();
         self::migrateInvoiceNumber();
-        // TODO InvoiceNumber
     }
 
     private function migrateBankAccount(): void
