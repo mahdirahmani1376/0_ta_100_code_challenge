@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
 
         MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_INVOICE_CANCELLATION_DAYS, 1);
         MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS, 1);
+        MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_CLOUD_INVOICE_CANCELLATION_DAYS, 1);
         MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_1, 1);
         MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_2, 5);
         MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_3, 10);
