@@ -40,11 +40,10 @@ This application developed and customized by [Laravel Framework](https://laravel
       - return InvoiceResource($invoice)
 
 
-## Commands/Cron
+## Config
     Required config values in main app:
-    - CRON_AUTO_INVOICE_CANCELLATION_DAYS
-    - CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS
-    - CRON_FINANCE_INVOICE_REMINDER_DAYS_1
-    - CRON_FINANCE_INVOICE_REMINDER_DAYS_2
+    - REFER TO MainAppConfig.php and DatabaseSeeder.php
+## Commands/Cron
+    - TODO complete later
 ### Author
 * **Esmaeel Cheshmeh Khavar** ([Gmail](mailto:e.cheshmehkhavar@gmail.com))
