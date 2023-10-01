@@ -23,4 +23,12 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
     public function profileIndex(array $data): Collection|LengthAwarePaginator;
 
     public function profileListEverything(int $clientId): Collection;
+
+    public function count(): int;
+
+    public function successCount(): int;
+
+    public function failCount(): int;
+
+    public function reportLatest(): Collection;
 }

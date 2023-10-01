@@ -18,4 +18,10 @@ interface OfflineTransactionRepositoryInterface extends EloquentRepositoryInterf
     public function sumOfVerifiedOfflineTransactions(Invoice $invoice): Collection;
 
     public function findByTransaction(Transaction $transaction): ?OfflineTransaction;
+
+    public function countToday(): int;
+
+    public function countRejected(): int;
+
+    public function reportLatest(): Collection;
 }

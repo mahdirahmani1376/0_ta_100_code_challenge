@@ -77,4 +77,27 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
             ->where('invoice_id', $transaction->invoice_id)
             ->first();
     }
+
+    public function countToday(): int
+    {
+        return self::newQuery()
+            ->whereDate('paid_at', now())
+            ->count();
+    }
+
+    public function countRejected(): int
+    {
+        return self::newQuery()
+            ->where('status', OfflineTransaction::STATUS_REJECTED)
+            ->count();
+    }
+
+    public function reportLatest(): Collection
+    {
+        return self::newQuery()
+            ->where('status', OfflineTransaction::STATUS_PENDING)
+            ->limit(15)
+            ->orderByDesc('id')
+            ->get();
+    }
 }

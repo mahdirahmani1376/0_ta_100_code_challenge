@@ -187,4 +187,42 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
 
         return self::paginate($query);
     }
+
+    public function count(): int
+    {
+        return self::newQuery()
+            ->count();
+    }
+
+    public function countToday(): int
+    {
+        return self::newQuery()
+            ->whereDate('created_at', now())
+            ->count();
+    }
+
+    public function countPaid(): int
+    {
+        return self::newQuery()
+            ->where('status', Invoice::STATUS_PAID)
+            ->count();
+    }
+
+    public function incomeToday(): float
+    {
+        return self::newQuery()
+            ->whereDate('paid_at', now())
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('total');
+    }
+
+    public function reportLatest(): Collection
+    {
+        return self::newQuery()
+            ->where('status', Invoice::STATUS_PAID)
+            ->limit(15)
+            ->orderByDesc('id')
+            ->get();
+    }
 }

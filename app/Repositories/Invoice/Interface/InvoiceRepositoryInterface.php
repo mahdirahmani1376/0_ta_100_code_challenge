@@ -19,4 +19,14 @@ interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
     public function internalIndex(array $data): Collection;
 
     public function internalIndexMyInvoice(array $data): LengthAwarePaginator;
+
+    public function count(): int;
+
+    public function countToday(): int;
+
+    public function countPaid(): int;
+
+    public function incomeToday(): float;
+
+    public function reportLatest(): Collection;
 }

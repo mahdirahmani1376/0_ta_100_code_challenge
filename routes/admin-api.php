@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ClientCashout\IndexClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\ShowClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\StoreClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\UpdateClientCashoutController;
+use App\Http\Controllers\Admin\FinanceServiceReportController;
 use App\Http\Controllers\Admin\Invoice\ApplyBalanceToInvoiceController;
 use App\Http\Controllers\Admin\Invoice\ChangeInvoiceStatusController;
 use App\Http\Controllers\Admin\Invoice\ChargeWalletInvoiceController;
@@ -149,3 +150,5 @@ Route::namespace('ClientCashout')
         Route::get('{clientCashout}', ShowClientCashoutController::class);
         Route::put('{clientCashout}', UpdateClientCashoutController::class);
     });
+
+Route::get('report', FinanceServiceReportController::class);

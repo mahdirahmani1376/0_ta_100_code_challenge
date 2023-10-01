@@ -138,4 +138,33 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where('amount', '>=', 50000)
             ->get(['id', 'updated_at', 'invoice_id', 'amount', 'description',]);
     }
+
+    public function count(): int
+    {
+        return self::newQuery()->count();
+    }
+
+    public function successCount(): int
+    {
+        return self::newQuery()
+            ->whereDate('created_at', now())
+            ->where('status', Transaction::STATUS_SUCCESS)
+            ->count();
+    }
+
+    public function failCount(): int
+    {
+        return self::newQuery()
+            ->whereDate('created_at', now())
+            ->where('status', Transaction::STATUS_FAIL)
+            ->count();
+    }
+
+    public function reportLatest(): Collection
+    {
+        return self::newQuery()
+            ->limit(15)
+            ->orderByDesc('id')
+            ->get();
+    }
 }
