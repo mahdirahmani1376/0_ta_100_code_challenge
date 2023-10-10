@@ -1,56 +1,39 @@
-version: '3.7'
+version: '3.5'
+
 services:
-    app:
+
+    finance_service:
         build:
-            context: .docker-compose
+            context: ./.docker-compose
             dockerfile: Dockerfile
             args:
-                USER: '${WWWUSER}'
-                UID: '${WWWUSERUID:-1000}'
+                - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
         volumes:
-            - '.:/var/www/'
-        restart: unless-stopped
-        container_name: 'finance-service-app'
-        networks:
-            - finance_service_network
-            - database_mysql_network
-        depends_on:
-            - redis
-    redis:
-        image: 'redis:alpine'
+            - ./src:/var/www/
+            - ./.docker-compose/php.ini:/usr/local/etc/php/php.ini
+        environment:
+            - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+            - EXCLUDE_PORTS=443
         ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
-        volumes:
-            - 'sail-redis:/data'
+            - 127.0.0.1:6090:80
+        dns:
+            - 172.29.0.100
+            - 172.29.2.100
+        restart: always
+        env_file:
+            - .env
         networks:
-            - finance_service_network
-        healthcheck:
-            test: [ "CMD", "redis-cli", "ping" ]
-            retries: 3
-            timeout: 5s
-    nginx:
-        image: nginx:1.17-alpine
-        container_name: 'finance_service_nginx'
-        restart: unless-stopped
-        ports:
-            - '${APP_PORT:-80}:80'
-        volumes:
-            - ./:/var/www
-            - ./.docker-compose/nginx:/etc/nginx/conf.d
+            - hostiran_system_network
+
+    finance_redis:
+        image: redis:alpine
+        expose:
+            - "6379"
+        restart: always
         networks:
-            - finance_service_network
-            - database_mysql_network
-    mailpit:
-        image: 'axllent/mailpit:latest'
-        ports:
-            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
-            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
-        networks:
-            - finance_service_network
+            - hostiran_system_network
+
+
 networks:
-    finance_service_network:
-        driver: bridge
-    database_mysql_network:
+    hostiran_system_network:
         external: true
-volumes:
-    sail-redis:
