@@ -21,7 +21,7 @@ services:
             - 172.29.2.100
         restart: always
         env_file:
-            - .env
+            - src/.env
         networks:
             - hostiran_system_network
 
