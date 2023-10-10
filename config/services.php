@@ -33,5 +33,6 @@ return [
 
     'main_app' => [
         'base_url' => env('MAINAPP_BASE_URL'),
+        'token' => env('MAINAPP_TOKEN'),
     ],
 ];
