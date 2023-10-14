@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon to_date
  * @property string description
  *
+ * @method ?string calculationType()
  * @property Invoice invoice
  */
 class Item extends Model
@@ -60,5 +61,24 @@ class Item extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function calculationType(): ?string
+    {
+        $hostingTypes = ["Hosting", "Upgrade", "PromoHosting"];
+        $domainTypes = ["Domain", "DomainRegister", "DomainAddonIDP", "DomainTransfer", "PromoDomain", "DomainAddonDNS", "DomainService"];
+        if (in_array($this->invoiceable_type, $hostingTypes)) {
+            $types = $hostingTypes;
+        } elseif (in_array($this->invoiceable_type, $domainTypes)) {
+            $types = $domainTypes;
+        } else {
+            return null;
+        }
+
+        return $this->newQuery()
+            ->where('id', '<', $this->id)
+            ->where('invoiceable_id', $this->invoiceable_id)
+            ->whereIn('invoiceable_type', $types)
+            ->count() == 0 ? 'register' : 'renew';
     }
 }
