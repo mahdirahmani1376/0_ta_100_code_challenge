@@ -34,7 +34,7 @@ class ShowInvoiceResource extends JsonResource
             'is_credit' => $this->is_credit,
             'invoice_number' => InvoiceNumberResource::make($this->invoiceNumber),
             'transactions' => TransactionResource::collection($this->transactions),
-            'items' => ItemResource::collection($this->items),
+            'items' => ShowItemResource::collection($this->items),
             'offline_transactions' => OfflineTransactionResource::collection($this->offlineTransactions),
         ];
     }
