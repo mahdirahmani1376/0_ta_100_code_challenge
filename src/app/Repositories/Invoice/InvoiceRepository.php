@@ -225,4 +225,200 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->orderByDesc('id')
             ->get();
     }
+
+    public function reportRevenue(): array
+    {
+        $dates = finance_report_dates();
+
+        $totalRevenue = self::newQuery()
+            ->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS])
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('total');
+        $currentMonthRevenue = self::newQuery()
+            ->where(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_PAID)
+                    ->whereDate('paid_at', '>=', $dates['start_of_current_month'])
+                    ->whereDate('paid_at', '<=', now());
+            })
+            ->orWhere(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_COLLECTIONS)
+                    ->whereDate('created_at', '>=', $dates['start_of_current_month'])
+                    ->whereDate('created_at', '<=', now());
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('total');
+        $currentYearRevenue = self::newQuery()
+            ->where(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_PAID)
+                    ->whereDate('paid_at', '>=', $dates['start_of_current_year'])
+                    ->whereDate('paid_at', '<=', now());
+            })
+            ->orWhere(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_COLLECTIONS)
+                    ->whereDate('created_at', '>=', $dates['start_of_current_year'])
+                    ->whereDate('created_at', '<=', now());
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('total');
+        $lastMonthRevenue = self::newQuery()
+            ->where(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_PAID)
+                    ->whereDate('paid_at', '>=', $dates['last_month']['from'])
+                    ->whereDate('paid_at', '<=', $dates['last_month']['to']);
+            })
+            ->orWhere(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_COLLECTIONS)
+                    ->whereDate('created_at', '>=', $dates['last_month']['from'])
+                    ->whereDate('created_at', '<=', $dates['last_month']['to']);
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('total');
+
+        return [
+            'total_revenue' => $totalRevenue,
+            'current_month_revenue' => $currentMonthRevenue,
+            'last_year_revenue' => $lastMonthRevenue,
+            'current_year_revenue' => $currentYearRevenue,
+        ];
+    }
+
+    public function reportTax(): array
+    {
+        $dates = finance_report_dates();
+
+        $totalTax = self::newQuery()
+            ->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS])
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+        $currentMonthTax = self::newQuery()
+            ->where(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_PAID)
+                    ->whereDate('paid_at', '>=', $dates['start_of_current_month'])
+                    ->whereDate('paid_at', '<=', now());
+            })
+            ->orWhere(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_COLLECTIONS)
+                    ->whereDate('created_at', '>=', $dates['start_of_current_month'])
+                    ->whereDate('created_at', '<=', now());
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+        $currentYearTax = self::newQuery()
+            ->where(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_PAID)
+                    ->whereDate('paid_at', '>=', $dates['start_of_current_year'])
+                    ->whereDate('paid_at', '<=', now());
+            })
+            ->orWhere(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_COLLECTIONS)
+                    ->whereDate('created_at', '>=', $dates['start_of_current_year'])
+                    ->whereDate('created_at', '<=', now());
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+        $lastMonthTax = self::newQuery()
+            ->where(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_PAID)
+                    ->whereDate('paid_at', '>=', $dates['last_month']['from'])
+                    ->whereDate('paid_at', '<=', $dates['last_month']['to']);
+            })
+            ->orWhere(function (Builder $query) use ($dates) {
+                $query->where('status', Invoice::STATUS_COLLECTIONS)
+                    ->whereDate('created_at', '>=', $dates['last_month']['from'])
+                    ->whereDate('created_at', '<=', $dates['last_month']['to']);
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+
+        return [
+            'total_tax' => $totalTax,
+            'current_month_tax' => $currentMonthTax,
+            'last_year_tax' => $lastMonthTax,
+            'current_year_tax' => $currentYearTax,
+        ];
+    }
+
+    public function reportCollection(): array
+    {
+        $dates = finance_report_dates();
+
+        $totalCollection = self::newQuery()
+            ->where('status', Invoice::STATUS_COLLECTIONS)
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+        $currentMonthCollection = self::newQuery()
+            ->where('status', Invoice::STATUS_COLLECTIONS)
+            ->whereDate('created_at', '>=', $dates['start_of_current_month'])
+            ->whereDate('created_at', '<=', now())
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+        $currentYearCollection = self::newQuery()
+            ->where('status', Invoice::STATUS_COLLECTIONS)
+            ->whereDate('created_at', '>=', $dates['start_of_current_year'])
+            ->whereDate('created_at', '<=', now())
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+        $lastMonthCollection = self::newQuery()
+            ->where('status', Invoice::STATUS_COLLECTIONS)
+            ->whereDate('created_at', '>=', $dates['last_month']['from'])
+            ->whereDate('created_at', '<=', $dates['last_month']['to'])
+            ->where('is_mass_payment', false)
+            ->sum('tax');
+
+        return [
+            'total_collection' => $totalCollection,
+            'current_month_collection' => $currentMonthCollection,
+            'last_year_collection' => $lastMonthCollection,
+            'current_year_collection' => $currentYearCollection,
+        ];
+    }
+
+    public function rahkaranQuery($from = null, $to = null): Builder
+    {
+        $dates = finance_report_dates();
+        if (is_null($from)) {
+            $from = $dates['start_of_current_month'];
+        }
+        if (is_null($to)) {
+            $to = now();
+        }
+        $query = self::newQuery()
+            ->where(function (Builder $query) use ($from, $to) {
+                $query->orWhere(function (Builder $status_query) use ($from, $to) {
+                    $status_query->whereDate('created_at', '>=', $from);
+                    $status_query->whereDate('created_at', '<=', $to);
+                    $status_query->where('status', Invoice::STATUS_COLLECTIONS);
+                });
+                $query->orWhere(function (Builder $status_query) use ($from, $to) {
+                    $status_query->whereDate('paid_at', '>=', $from);
+                    $status_query->whereDate('paid_at', '<=', $to);
+                });
+            });
+
+        // Only paid or refunded invoices can be imported
+        $query->whereIn('status', [
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_COLLECTIONS,
+            Invoice::STATUS_REFUNDED,
+        ]);
+
+        $query->where('is_mass_payment', 0);
+        $query->where('is_credit', 0);
+
+        $query->where('tax', '>', 0);
+
+        // Filters out imported invoices
+        $query->whereNull('rahkaran_id');
+
+        return $query;
+    }
 }

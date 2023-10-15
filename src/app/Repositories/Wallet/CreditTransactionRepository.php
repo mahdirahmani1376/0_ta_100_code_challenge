@@ -87,4 +87,30 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             ->whereIn('id', $ids)
             ->sum('amount');
     }
+
+    public function report(): array
+    {
+        $dates = finance_report_dates();
+
+        $total = self::newQuery()->sum('amount');
+        $currentMonth = self::newQuery()
+            ->whereDate('created_at', '>=', $dates['start_of_current_month'])
+            ->whereDate('created_at', '<=', now())
+            ->sum('amount');
+        $currentYear = self::newQuery()
+            ->whereDate('created_at', '>=', $dates['start_of_current_year'])
+            ->whereDate('created_at', '<=', now())
+            ->sum('amount');
+        $lastMonth = self::newQuery()
+            ->whereDate('created_at', '>=', $dates['last_month']['from'])
+            ->whereDate('created_at', '<=', $dates['last_month']['to'])
+            ->sum('amount');
+
+        return [
+            'total' => $total,
+            'current_month' => $currentMonth,
+            'current_year' => $currentYear,
+            'last_month' => $lastMonth,
+        ];
+    }
 }

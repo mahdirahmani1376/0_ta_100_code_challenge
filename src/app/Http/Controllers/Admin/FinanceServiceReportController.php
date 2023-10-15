@@ -13,7 +13,15 @@ class FinanceServiceReportController
 
     public function __invoke()
     {
-        return FinanceReportResource::make(($this->financeServiceReportAction)());
+        $view = request('view', 0);
+        $report = ($this->financeServiceReportAction)($view);
+
+        switch ($view) {
+            case 1:
+                return  $report;
+            default:
+                return FinanceReportResource::make($report);
+        }
     }
 }
 

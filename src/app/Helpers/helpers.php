@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Helpers\JalaliCalender;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 
@@ -99,5 +100,33 @@ if (!function_exists('admin_log')) {
             'old_state' => $oldState,
             'validated_data' => $validatedData,
         ]);
+    }
+}
+
+if (!function_exists('finance_report_dates')) {
+    function finance_report_dates(): array
+    {
+        [$j_year, $j_month, $j_day] = explode('/', JalaliCalender::getJalaliString(now()));
+
+        $startOfCurrentMonth = JalaliCalender::makeCarbonByJalali($j_year, $j_month, 1);
+        $startOfCurrentYear = JalaliCalender::makeCarbonByJalali($j_year, 1, 1);
+
+        [$startOfLastMonth, $to] = JalaliCalender::getRange($j_year, $j_month, $j_day, 'monthly', true);
+        [$to_j_year, $to_j_month] = explode('/', JalaliCalender::getJalaliString($to));
+
+        $lastMonthTo = JalaliCalender::makeCarbonByJalali(
+            $to_j_year,
+            $to_j_month,
+            $j_day > JalaliCalender::jalaaliMonthLength($to_j_year, $to_j_month) ? JalaliCalender::jalaaliMonthLength($to_j_year, $to_j_month) : $j_day
+        );
+
+        return [
+            'start_of_current_month' => $startOfCurrentMonth,
+            'start_of_current_year' => $startOfCurrentYear,
+            'last_month' => [
+                'from' => $startOfLastMonth,
+                'to' => $lastMonthTo,
+            ],
+        ];
     }
 }

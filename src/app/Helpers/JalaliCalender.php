@@ -5,7 +5,7 @@ namespace App\Helpers;
 use App\Exceptions\Http\FatalErrorException;
 use Carbon\Carbon;
 use Exception;
-use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 
 /**
  * Class JalaliCalender
