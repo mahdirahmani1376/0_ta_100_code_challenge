@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckInternalToken;
 use App\Http\Middleware\SetAppLanguage;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -44,6 +45,7 @@ class Kernel extends HttpKernel
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            CheckInternalToken::class,
         ],
     ];
 
