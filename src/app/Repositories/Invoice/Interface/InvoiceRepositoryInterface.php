@@ -31,11 +31,10 @@ interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
 
     public function reportLatest(): Collection;
 
-    public function reportRevenue(): array;
+    public function reportRevenue($from, $to): array;
+    public function reportRevenueBasedOnGateway($from, $to): array;
 
-    public function reportTax(): array;
+    public function reportCollection($from, $to): array;
 
-    public function reportCollection(): array;
-
-    public function rahkaranQuery(): Builder;
+    public function rahkaranQuery($from, $to): Builder;
 }

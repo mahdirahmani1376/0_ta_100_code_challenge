@@ -104,8 +104,12 @@ if (!function_exists('admin_log')) {
 }
 
 if (!function_exists('finance_report_dates')) {
-    function finance_report_dates(): array
+    function finance_report_dates($from = null, $to = null): array
     {
+        if ($from && $to) {
+            return [$from, $to];
+        }
+
         [$j_year, $j_month, $j_day] = explode('/', JalaliCalender::getJalaliString(now()));
 
         $startOfCurrentMonth = JalaliCalender::makeCarbonByJalali($j_year, $j_month, 1);
@@ -120,13 +124,6 @@ if (!function_exists('finance_report_dates')) {
             $j_day > JalaliCalender::jalaaliMonthLength($to_j_year, $to_j_month) ? JalaliCalender::jalaaliMonthLength($to_j_year, $to_j_month) : $j_day
         );
 
-        return [
-            'start_of_current_month' => $startOfCurrentMonth,
-            'start_of_current_year' => $startOfCurrentYear,
-            'last_month' => [
-                'from' => $startOfLastMonth,
-                'to' => $lastMonthTo,
-            ],
-        ];
+        return [$startOfCurrentMonth->toDateString(), now()->toDateString()];
     }
 }

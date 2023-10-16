@@ -207,79 +207,43 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         return $query;
     }
 
-    public function reportRevenueBasedOnGateway(): array
+    public function reportRevenueBasedOnGateway($from, $to): array
     {
-        $dates = finance_report_dates();
+        [$from, $to] = finance_report_dates($from, $to);
 
-        $offlineTotal = self::newQuery()
+        $offline = self::newQuery()
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
             ->where('payment_method', Transaction::PAYMENT_METHOD_OFFLINE)
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->sum('amount');
-        $offlineCurrentMonth = self::newQuery()
-            ->whereDate('created_at', '>=', $dates['start_of_current_month'])
-            ->whereDate('created_at', '<=', now())
-            ->where('payment_method', Transaction::PAYMENT_METHOD_OFFLINE)
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->sum('amount');
-        $offlineCurrentYear = self::newQuery()
-            ->whereDate('created_at', '>=', $dates['start_of_current_year'])
-            ->whereDate('created_at', '<=', now())
-            ->where('payment_method', Transaction::PAYMENT_METHOD_OFFLINE)
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->sum('amount');
-        $walletTotal = self::newQuery()
+            ->where('status', Transaction::STATUS_SUCCESS);
+        $wallet = self::newQuery()
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
             ->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE)
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->sum('amount');
-        $walletCurrentMonth = self::newQuery()
-            ->whereDate('created_at', '>=', $dates['start_of_current_month'])
-            ->whereDate('created_at', '<=', now())
-            ->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE)
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->sum('amount');
-        $walletCurrentYear = self::newQuery()
-            ->whereDate('created_at', '>=', $dates['start_of_current_year'])
-            ->whereDate('created_at', '<=', now())
-            ->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE)
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->sum('amount');
+            ->where('status', Transaction::STATUS_SUCCESS);
         $onlineTransactionsBasedOnGateway = [];
         foreach (BankGateway::cursor() as $bankGateway) {
-            $total = self::newQuery()
+            $query = self::newQuery()
+                ->whereDate('created_at', '>=', $from)
+                ->whereDate('created_at', '<=', $to)
                 ->where('payment_method', $bankGateway->name)
-                ->where('status', Transaction::STATUS_SUCCESS)
-                ->sum('amount');
-            $currentMonth = self::newQuery()
-                ->whereDate('created_at', '>=', $dates['start_of_current_month'])
-                ->whereDate('created_at', '<=', now())
-                ->where('payment_method', $bankGateway->name)
-                ->where('status', Transaction::STATUS_SUCCESS)
-                ->sum('amount');
-            $currentYear = self::newQuery()
-                ->whereDate('created_at', '>=', $dates['start_of_current_year'])
-                ->whereDate('created_at', '<=', now())
-                ->where('payment_method', $bankGateway->name)
-                ->where('status', Transaction::STATUS_SUCCESS)
-                ->sum('amount');
+                ->where('status', Transaction::STATUS_SUCCESS);
             $onlineTransactionsBasedOnGateway[$bankGateway->name] = [
-                'total' => $total,
-                'current_month' => $currentMonth,
-                'current_year' => $currentYear
+                'sum' => $query->sum('amount'),
+                'count' => $query->count(),
             ];
         }
 
         return [
             'offline' => [
-                'total' => $offlineTotal,
-                'current_month' => $offlineCurrentMonth,
-                'current_year' => $offlineCurrentYear,
+                'sum' => $offline->sum('amount'),
+                'count' => $offline->count(),
+            ],
+            'wallet' => [
+                'sum' => $wallet->sum('amount'),
+                'count' => $wallet->count(),
             ],
             'online' => $onlineTransactionsBasedOnGateway,
-            'wallet' => [
-                'total' => $walletTotal,
-                'current_month' => $walletCurrentMonth,
-                'current_year' => $walletCurrentYear,
-            ],
         ];
     }
 }

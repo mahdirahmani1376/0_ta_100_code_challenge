@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Admin\FinanceServiceReportAction;
+use App\Http\Requests\Admin\ReportRequest;
 use App\Http\Resources\Admin\FinanceReport\FinanceReportResource;
 
 class FinanceServiceReportController
@@ -11,12 +12,11 @@ class FinanceServiceReportController
     {
     }
 
-    public function __invoke()
+    public function __invoke(ReportRequest $request)
     {
-        $view = request('view', 0);
-        $report = ($this->financeServiceReportAction)($view);
+        $report = ($this->financeServiceReportAction)($request->validated());
 
-        switch ($view) {
+        switch ($request->validated('view')) {
             case 1:
                 return  $report;
             default:

@@ -20,5 +20,5 @@ interface CreditTransactionRepositoryInterface extends EloquentRepositoryInterfa
 
     public function internalCloudSum(array $ids): int;
 
-    public function report(): array;
+    public function report($from, $to): array;
 }

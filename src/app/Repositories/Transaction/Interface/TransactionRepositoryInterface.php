@@ -35,5 +35,5 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
 
     public function rahkaranQuery(): Builder;
 
-    public function reportRevenueBasedOnGateway(): array;
+    public function reportRevenueBasedOnGateway($from, $to): array;
 }

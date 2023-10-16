@@ -20,22 +20,22 @@ class FinanceReportService
     {
     }
 
-    public function __invoke(int $view = 0)
+    public function __invoke($data)
     {
         // TODO implement cache in some form redis or just a mysql table with json fields ?
-        return match ($view) {
+        return match ((int)$data['view']) {
             1 => [
-                'revenue' => $this->invoiceRepository->reportRevenue(),
-                'collection' => $this->invoiceRepository->reportCollection(),
-                'tax' => $this->invoiceRepository->reportTax(),
+                'revenue' => $this->invoiceRepository->reportRevenue($data['from'] ,$data['to']),
+                'collection' => $this->invoiceRepository->reportCollection($data['from'], $data['to']),
                 'wallet' => $this->walletRepository->reportSum(),
-                'credit_transaction' => $this->creditTransactionRepository->report(),
+                'credit_transaction' => $this->creditTransactionRepository->report($data['from'], $data['to']),
                 'rahkaran' => [
-                    'invoice' => $this->invoiceRepository->rahkaranQuery()->count(),
-                    'transaction' => $this->transactionRepository->rahkaranQuery()->count(),
+                    'invoice' => $this->invoiceRepository->rahkaranQuery($data['from'], $data['to'])->count(),
+                    'transaction' => $this->transactionRepository->rahkaranQuery($data['from'], $data['to'])->count(),
                 ],
                 'gateway' => [
-                    'transaction' => $this->transactionRepository->reportRevenueBasedOnGateway(),
+                    'transaction' => $this->transactionRepository->reportRevenueBasedOnGateway($data['from'], $data['to']),
+                    'invoice' => $this->invoiceRepository->reportRevenueBasedOnGateway($data['from'], $data['to']),
                 ],
             ],
             default => [

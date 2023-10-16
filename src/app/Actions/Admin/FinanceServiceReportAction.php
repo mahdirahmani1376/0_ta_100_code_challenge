@@ -10,9 +10,9 @@ class FinanceServiceReportAction
     {
     }
 
-    public function __invoke(int $view = 0)
+    public function __invoke(array $data)
     {
-        return ($this->financeReportService)($view);
+        return ($this->financeReportService)($data);
     }
 
 }
