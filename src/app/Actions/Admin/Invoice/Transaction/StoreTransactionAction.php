@@ -24,7 +24,7 @@ class StoreTransactionAction
 
         // We only need to re-calculate price fields if this transaction has STATUS_SUCCESS
         // otherwise nothing SHOULD be changed so invoking the CalcInvoicePriceFieldsService is NOT necessary
-        if ($data['status'] == Transaction::STATUS_SUCCESS) {
+        if ($transaction->status == Transaction::STATUS_SUCCESS) {
             ($this->calcInvoicePriceFieldsService)($invoice);
         }
 
