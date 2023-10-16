@@ -36,6 +36,9 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
         if (!empty($data['to_date'])) {
             $query->whereDate('created_at', '<=', $data['to_date']);
         }
+        if (!empty($data['status'])) {
+            $query->where('status', $data['status']);
+        }
 
         $query->orderBy(
             $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
