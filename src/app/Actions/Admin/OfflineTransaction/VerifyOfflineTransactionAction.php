@@ -6,6 +6,7 @@ use App\Actions\Admin\Invoice\ApplyBalanceToInvoiceAction;
 use App\Actions\Admin\Invoice\ChargeWalletInvoiceAction;
 use App\Actions\Admin\Invoice\Item\UpdateItemAction;
 use App\Actions\Invoice\ProcessInvoiceAction;
+use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
 use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
@@ -35,6 +36,9 @@ class VerifyOfflineTransactionAction
     {
         check_rahkaran($offlineTransaction->invoice);
 
+        if ($offlineTransaction->status === OfflineTransaction::STATUS_REJECTED) {
+            throw NotAuthorizedException::make();
+        }
         if ($offlineTransaction->status === OfflineTransaction::STATUS_CONFIRMED) {
             throw OfflinePaymentApplyException::make($offlineTransaction->getKey());
         }

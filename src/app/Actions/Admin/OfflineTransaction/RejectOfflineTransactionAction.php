@@ -2,6 +2,7 @@
 
 namespace App\Actions\Admin\OfflineTransaction;
 
+use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Admin\OfflineTransaction\RejectOfflineTransactionService;
@@ -21,6 +22,10 @@ class RejectOfflineTransactionAction
     public function __invoke(OfflineTransaction $offlineTransaction): OfflineTransaction
     {
         check_rahkaran($offlineTransaction->invoice);
+
+        if ($offlineTransaction->status != OfflineTransaction::STATUS_PENDING) {
+            throw NotAuthorizedException::make();
+        }
 
         $oldState = $offlineTransaction->toArray();
         ($this->rejectOfflineTransactionService)($offlineTransaction);

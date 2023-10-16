@@ -9,7 +9,7 @@ class VerifyOfflineTransactionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return request()->offlineTransaction->status == OfflineTransaction::STATUS_PENDING;
+        return true;
     }
 
     public function rules(): array
