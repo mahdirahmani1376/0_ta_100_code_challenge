@@ -18,4 +18,5 @@ return [
     ExceptionCodes::AMOUNT_IS_MORE_THAN_INVOICE_BALANCE => 'مبلغ وارد شده بیشتر از مبلغ فاکتور میباشد.',
     ExceptionCodes::OFFLINE_PAYMENT_APPLY => 'پرداخت افلاین شماره :offline_payment_id قبلا تایید شده است.',
     ExceptionCodes::INVOICE_CANCELLATION_FAILED => 'فاکتور شماره :invoice_id قابل کنسل کردن نمیباشد.',
+    ExceptionCodes::NOT_AUTHORIZED => 'درخواست غیر مجاز است.',
 ];

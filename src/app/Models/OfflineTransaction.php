@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon paid_at
  * @property int client_id
  * @property int invoice_id
+ * @property int transaction_id
  * @property int bank_account_id
  * @property int admin_id
  * @property string amount
@@ -28,11 +29,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string description
  *
  * @property Invoice invoice
+ * @property Transaction transaction
  * @property BankAccount bankAccount
  */
 class OfflineTransaction extends Model
 {
     use HasFactory;
+
     public const PAYMENT_GATEWAY_NAME = 'offline_bank';
 
     const PAYMENT_METHOD_OFFLINE_BANK = 'offline-bank';
@@ -75,6 +78,11 @@ class OfflineTransaction extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function transaction(): BelongsTo
+    {
+        return $this->belongsTo(Transaction::class);
     }
 
     public function bankAccount(): BelongsTo

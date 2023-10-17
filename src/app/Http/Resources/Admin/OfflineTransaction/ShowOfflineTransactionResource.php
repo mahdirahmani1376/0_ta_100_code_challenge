@@ -20,6 +20,7 @@ class ShowOfflineTransactionResource extends JsonResource
             'paid_at' => $this->paid_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'invoice_id' => $this->invoice_id,
+            'transaction_id' => $this->transaction_id,
             'bank_account' => ShowBankAccountResource::make($this->bankAccount),
             'admin_id' => $this->admin_id,
             'amount' => $this->amount,

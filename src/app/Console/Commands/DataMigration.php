@@ -37,8 +37,8 @@ class DataMigration extends Command
         self::migrateClientCashout();
         self::migrateCreditTransaction();
         self::migrateItem();
-        self::migrateOfflineTransaction();
         self::migrateTransaction();
+        self::migrateOfflineTransaction();
         self::migrateInvoiceNumber();
     }
 
@@ -486,6 +486,7 @@ class DataMigration extends Command
                     $newRow['paid_at'] = $row['paid_date'];
                     $newRow['client_id'] = $row['i_client_id'];
                     $newRow['invoice_id'] = $row['i_invoice_id'];
+                    $newRow['transaction_id'] = $row['transaction_id'];
                     $newRow['bank_account_id'] = $row['bank_account_id'];
                     $newRow['admin_id'] = $row['admin_user_id'];
                     $newRow['amount'] = strlen($row['amount']) > 0 ? $row['amount'] : 0;

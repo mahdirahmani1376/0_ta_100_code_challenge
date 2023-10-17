@@ -18,6 +18,7 @@ class OfflineTransactionResource extends JsonResource
             'paid_at' => $this->paid_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'invoice_id' => $this->invoice_id,
+            '$this->transaction_id' => $this->transaction_id,
             'bank_account_id' => $this->bank_account_id,
             'amount' => $this->amount,
             'status' => $this->status,
