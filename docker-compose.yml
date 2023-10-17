@@ -15,7 +15,7 @@ services:
             - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
             - EXCLUDE_PORTS=443
         ports:
-            - 127.0.0.1:6090:80
+          - 6090:80
         dns:
             - 172.29.0.100
             - 172.29.2.100
@@ -23,6 +23,7 @@ services:
         env_file:
             - .env
         networks:
+            - database_mysql_network
             - hostiran_system_network
 
     finance_redis:
@@ -31,9 +32,12 @@ services:
             - "6379"
         restart: always
         networks:
+            - database_mysql_network
             - hostiran_system_network
 
 
 networks:
-    hostiran_system_network:
+    database_mysql_network:
         external: true
+    hostiran_system_network:
+      external: true

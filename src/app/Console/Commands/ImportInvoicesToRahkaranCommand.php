@@ -2,8 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Exceptions\Repository\ModelNotFoundException;
-use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Exceptions\SystemException\MaxDateIsOutOfRangeFiscalYearException;
 use App\Exceptions\SystemException\MinDateIsOutOfRangeFiscalYearException;
 use App\Helpers\JalaliCalender;
@@ -11,6 +9,8 @@ use App\Integrations\Rahkaran\RahkaranService;
 use App\Models\ClientCashout;
 use App\Models\Invoice;
 use App\Models\Transaction;
+use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
+use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -131,21 +131,18 @@ class ImportInvoicesToRahkaranCommand extends Command
         $bar->setFormat(ProgressBar::FORMAT_VERY_VERBOSE);
 
         for ($i = 0; $this->fromDate < $this->toDate; $i++) {
-            $invoices = $this->getInvoicesQuery($this->fromDate)->get();
-            $this->info('Create voucher for ' . $this->fromDate->format('Y-m-d') . ' Invoice count: ' . $invoices->count());
+            $invoices = $this->getInvoicesQuery($this->fromDate);
+            $count = $invoices->count();
+            $this->info('Create voucher for ' . $this->fromDate->format('Y-m-d') . ' Invoice count: ' . $count);
 
-            if ($invoices->count() == 0) {
+            if ($count == 0) {
                 $this->fromDate->addDay();
                 continue;
             }
 
-            foreach ($invoices as $invoice) {
-                $this->financeService()->updateRoundingTransaction($invoice);
-            }
+            $jalali_date = JalaliCalender::carbonToJalali($invoices->first()->paid_at ?? $invoices->first()->created_at);
 
-            $jalali_date = JalaliCalender::carbonToJalali($invoices->first()->paid_date ?? $invoices->first()->invoice_date);
-
-            $this->rahkaranService->createBulkInvoice($invoices, $max_rounding_amount, $jalali_date);
+            $this->rahkaranService->createBulkInvoice($invoices->get(), $max_rounding_amount, $jalali_date);
             Log::info("ImportInvoicesToRahkaranCommand Invoices on {$jalali_date} imported successfully");
 
             $this->fromDate->addDay();
@@ -178,37 +175,13 @@ class ImportInvoicesToRahkaranCommand extends Command
     protected function getInvoicesQuery($date = null): Builder
     {
 
-        $from = isset($date) && !empty($date) ? $date->format('Y-m-d') . ' 00:00:00' : $this->fromDate;
-        $to = isset($date) && !empty($date) ? $date->format('Y-m-d') . ' 23:59:59' : $this->toDate;
+        $from = !empty($date) ? $date->format('Y-m-d') . ' 00:00:00' : $this->fromDate;
+        $to = !empty($date) ? $date->format('Y-m-d') . ' 23:59:59' : $this->toDate;
 
-        $query = Invoice::query()->where(function (Builder $query) use ($from, $to) {
-            $query->orWhere(function (Builder $status_query) use ($from, $to) {
-                $status_query->whereDate('created_at', '>=', $from);
-                $status_query->whereDate('created_at', '<=', $to);
-                $status_query->where('status', Invoice::STATUS_COLLECTIONS);
-            });
-            $query->orWhere(function (Builder $status_query) use ($from, $to) {
-                $status_query->whereDate('paid_at', '>=', $from);
-                $status_query->whereDate('paid_at', '<=', $to);
-            });
-        });
+        /** @var InvoiceRepositoryInterface $invoiceRepository */
+        $invoiceRepository = app(InvoiceRepositoryInterface::class);
 
-        // Only paid or refunded invoices can be imported
-        $query->whereIn('status', [
-            Invoice::STATUS_PAID,
-            Invoice::STATUS_COLLECTIONS,
-            Invoice::STATUS_REFUNDED,
-        ]);
-
-        $query->where('is_mass_payment', 0);
-        $query->where('is_credit', 0);
-
-        $query->where('tax', '>', 0);
-
-        // Filters out imported invoices
-        $query->whereNull('rahkaran_id');
-
-        return $query;
+        return $invoiceRepository->rahkaranQuery($from, $to);
     }
 
     /**
@@ -234,41 +207,10 @@ class ImportInvoicesToRahkaranCommand extends Command
      */
     protected function getTransactionQuery(): Builder
     {
+        /** @var TransactionRepositoryInterface $transactionRepository */
+        $transactionRepository = app(TransactionRepositoryInterface::class);
 
-        $query = Transaction::query()
-            ->whereDate('created_at', '>=', $this->fromDate)
-            ->whereDate('created_at', '<=', $this->toDate);
-
-
-        // Only successful transactions can be imported
-        $query->where(function ($q) {
-            $q->whereHas('invoice', function ($qe) {
-                $qe->whereIn('status', [
-                    Invoice::STATUS_PAID,
-                    Invoice::STATUS_COLLECTIONS
-                ]);
-            })->whereIn('status', [
-                Transaction::STATUS_SUCCESS,
-            ]);
-
-            $q->orWhereHas('invoice', function ($qe) {
-                $qe->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
-            })->where('status', Transaction::STATUS_REFUND)->where('payment_method', '<>', 'client_credit');
-
-
-        });
-
-        // Filters out imported transactions
-        $query->whereNull('rahkaran_id');
-
-        // Filter Barter Transactions
-        $query->where('payment_method', '<>', 'barter');
-
-        // Filters out all credit transactions
-        // Rahkaran handles refunded invoice transactions internally by invoice items
-        $query->whereNull('credit_transaction_id');
-
-        return $query;
+        return $transactionRepository->rahkaranQuery($this->fromDate, $this->toDate);
     }
 
     /**
@@ -330,9 +272,9 @@ class ImportInvoicesToRahkaranCommand extends Command
         );
 
         if (
-        $this->fromDate->isBefore(
-            $min_date->clone()->subSecond()
-        )
+            $this->fromDate->isBefore(
+                $min_date->clone()->subSecond()
+            )
         ) {
             throw MinDateIsOutOfRangeFiscalYearException::make(
                 JalaliCalender::getJalaliString($this->fromDate),
@@ -341,9 +283,9 @@ class ImportInvoicesToRahkaranCommand extends Command
         }
 
         if (
-        $this->toDate->greaterThanOrEqualTo(
-            $max_date
-        )
+            $this->toDate->greaterThanOrEqualTo(
+                $max_date
+            )
         ) {
             throw MaxDateIsOutOfRangeFiscalYearException::make(
                 JalaliCalender::getJalaliString($this->toDate),

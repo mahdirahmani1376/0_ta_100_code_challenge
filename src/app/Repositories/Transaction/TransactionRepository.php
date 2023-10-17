@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Transaction;
 
+use App\Models\BankGateway;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Base\BaseRepository;
@@ -166,5 +167,83 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->limit(15)
             ->orderByDesc('id')
             ->get();
+    }
+
+    public function rahkaranQuery($from = null, $to = null): Builder
+    {
+        $dates = finance_report_dates();
+        if (is_null($from)) {
+            $from = $dates['start_of_current_month'];
+        }
+        if (is_null($to)) {
+            $to = now();
+        }
+        // TODO check this query
+        $query = self::newQuery()
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->where(function (Builder $query) {
+                $query->whereHas('invoice', function (Builder $query) {
+                    $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS]);
+                    $query->where('is_credit', false);
+                });
+                $query->where('status', Transaction::STATUS_SUCCESS);
+            });
+        $query->orWhere(function (Builder $query) {
+            $query->whereHas('invoice', function (Builder $query) {
+                $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
+                $query->where('is_credit', false);
+            });
+            $query->where('status', Transaction::STATUS_REFUND);
+            $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_CREDIT);
+        });
+
+        // Filters out imported transactions
+        $query->whereNull('rahkaran_id');
+
+        // Filter Barter Transactions
+        $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_BARTER);
+
+        return $query;
+    }
+
+    public function reportRevenueBasedOnGateway($from, $to): array
+    {
+        [$from, $to] = finance_report_dates($from, $to);
+
+        $offline = self::newQuery()
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->where('payment_method', Transaction::PAYMENT_METHOD_OFFLINE)
+            ->where('status', Transaction::STATUS_SUCCESS);
+        $wallet = self::newQuery()
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE)
+            ->where('status', Transaction::STATUS_SUCCESS);
+        $onlineTransactionsBasedOnGateway = [];
+        foreach (BankGateway::cursor() as $bankGateway) {
+            $query = self::newQuery()
+                ->whereDate('created_at', '>=', $from)
+                ->whereDate('created_at', '<=', $to)
+                ->where('payment_method', $bankGateway->name)
+                ->where('status', Transaction::STATUS_SUCCESS);
+            $onlineTransactionsBasedOnGateway[$bankGateway->name] = [
+                'sum' => $query->sum('amount'),
+                'count' => $query->count(),
+            ];
+        }
+
+        return [
+            'offline' => [
+                'sum' => $offline->sum('amount'),
+                'count' => $offline->count(),
+            ],
+            'wallet' => [
+                'sum' => $wallet->sum('amount'),
+                'count' => $wallet->count(),
+            ],
+            'online' => $onlineTransactionsBasedOnGateway,
+        ];
     }
 }
