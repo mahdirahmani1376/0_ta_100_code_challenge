@@ -574,6 +574,8 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 1) {
                         $newRow['status'] = Transaction::STATUS_SUCCESS;
+                    }elseif ($row['status'] == 8) {
+                        $newRow['status'] = Transaction::STATUS_SUCCESS;
                     } elseif ($row['status'] == 2) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
                     } elseif ($row['status'] == 10) {
