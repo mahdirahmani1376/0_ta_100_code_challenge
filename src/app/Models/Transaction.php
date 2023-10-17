@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class Transaction
@@ -24,6 +25,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string ip
  * @property string tracking_code
  * @property string reference_id
+ *
+ * @property Invoice invoice
+ * @property OfflineTransaction offlineTransaction
  */
 class Transaction extends Model
 {
@@ -65,5 +69,10 @@ class Transaction extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function offlineTransaction(): HasOne
+    {
+        return $this->hasOne(OfflineTransaction::class);
     }
 }

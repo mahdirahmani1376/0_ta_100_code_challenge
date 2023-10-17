@@ -17,6 +17,7 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('invoice_id');
+            $table->unsignedBigInteger('transaction_id');
             $table->unsignedBigInteger('bank_account_id');
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->double('amount');
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->string('mobile')->nullable();
             $table->text('description')->nullable();
 
+            $table->foreign('transaction_id')->references('id')->on('transactions');
             $table->foreign('invoice_id')->references('id')->on('invoices');
             $table->foreign('bank_account_id')->references('id')->on('bank_accounts');
         });

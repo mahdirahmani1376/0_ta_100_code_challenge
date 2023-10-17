@@ -14,7 +14,6 @@ use App\Services\Admin\Invoice\Item\FindAddCreditItemService;
 use App\Services\Admin\OfflineTransaction\AttachOfflineTransactionToNewInvoiceService;
 use App\Services\Admin\OfflineTransaction\VerifyOfflineTransactionService;
 use App\Services\Admin\Transaction\AttachTransactionToNewInvoiceService;
-use App\Services\Transaction\FindTransactionByTrackingCodeService;
 
 class VerifyOfflineTransactionAction
 {
@@ -25,7 +24,6 @@ class VerifyOfflineTransactionAction
         private readonly ChargeWalletInvoiceAction                   $chargeWalletInvoiceAction,
         private readonly AttachOfflineTransactionToNewInvoiceService $attachOfflineTransactionToNewInvoiceService,
         private readonly AttachTransactionToNewInvoiceService        $attachTransactionToNewInvoiceService,
-        private readonly FindTransactionByTrackingCodeService        $findTransactionByTrackingCodeService,
         private readonly ApplyBalanceToInvoiceAction                 $applyBalanceToInvoiceAction,
         private readonly VerifyOfflineTransactionService             $verifyOfflineTransactionService,
     )
@@ -71,8 +69,7 @@ class VerifyOfflineTransactionAction
                 'amount' => $offlineTransaction->amount,
             ]);
             ($this->attachOfflineTransactionToNewInvoiceService)($offlineTransaction, $chargeWalletInvoice);
-            $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
-            ($this->attachTransactionToNewInvoiceService)($transaction, $chargeWalletInvoice);
+            ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $chargeWalletInvoice);
             ($this->processInvoiceAction)($chargeWalletInvoice);
 
             ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $offlineTransaction->amount]);

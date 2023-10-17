@@ -8,14 +8,12 @@ use App\Models\OfflineTransaction;
 use App\Models\Transaction;
 use App\Services\Profile\Invoice\DeleteOfflineTransactionService;
 use App\Services\Profile\Invoice\UpdateTransactionService;
-use App\Services\Transaction\FindTransactionByTrackingCodeService;
 
 class DeleteOfflineTransactionAction
 {
     public function __construct(
         private readonly UpdateTransactionService             $updateTransactionService,
         private readonly DeleteOfflineTransactionService      $deleteOfflineTransactionService,
-        private readonly FindTransactionByTrackingCodeService $findTransactionByTrackingCodeService,
     )
     {
     }
@@ -32,8 +30,7 @@ class DeleteOfflineTransactionAction
             throw new BadRequestException(__('finance.error.OnlyUnpaidInvoiceAllowed'));
         }
 
-        $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
-        ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_CANCELED]);
+        ($this->updateTransactionService)($offlineTransaction->transaction, ['status' => Transaction::STATUS_CANCELED]);
 
         return ($this->deleteOfflineTransactionService)($offlineTransaction);
     }

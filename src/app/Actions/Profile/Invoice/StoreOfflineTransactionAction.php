@@ -22,11 +22,12 @@ class StoreOfflineTransactionAction
     {
         check_rahkaran($invoice);
 
-        $offlineTransaction = ($this->storeOfflineTransactionService)($invoice, $data);
-
         $data['payment_method'] = Transaction::PAYMENT_METHOD_OFFLINE;
         $data['status'] = Transaction::STATUS_PENDING;
-        ($this->storeTransactionService)($invoice, $data);
+        $transaction = ($this->storeTransactionService)($invoice, $data);
+
+        $data['transaction_id'] = $transaction->id;
+        $offlineTransaction = ($this->storeOfflineTransactionService)($invoice, $data);
 
         ($this->calcInvoicePriceFieldsService)($invoice);
 

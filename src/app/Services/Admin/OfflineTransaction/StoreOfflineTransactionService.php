@@ -22,6 +22,7 @@ class StoreOfflineTransactionService
             'paid_at',
             'client_id',
             'invoice_id',
+            'transaction_id',
             'bank_account_id',
             'admin_id',
             'status',
