@@ -59,8 +59,7 @@ class VerifyOfflineTransactionAction
 
         if ($offlineTransaction->amount <= $invoice->balance || $invoice->is_credit) {
             ($this->verifyOfflineTransactionService)($offlineTransaction);
-            $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
-            ($this->verifyTransactionAction)($transaction);
+            ($this->verifyTransactionAction)($offlineTransaction->transaction);
         } else {
             // create a charge wallet invoice
             // attach this offlineTransaction and its transaction to the new invoice
