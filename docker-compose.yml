@@ -23,7 +23,7 @@ services:
         env_file:
             - .env
         networks:
-            - hostiran_system_network
+            - database_mysql_network
 
     finance_redis:
         image: redis:alpine
@@ -31,9 +31,9 @@ services:
             - "6379"
         restart: always
         networks:
-            - hostiran_system_network
+            - database_mysql_network
 
 
 networks:
-    hostiran_system_network:
+    database_mysql_network:
         external: true

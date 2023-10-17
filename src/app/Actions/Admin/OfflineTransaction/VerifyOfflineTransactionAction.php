@@ -5,6 +5,7 @@ namespace App\Actions\Admin\OfflineTransaction;
 use App\Actions\Admin\Invoice\ApplyBalanceToInvoiceAction;
 use App\Actions\Admin\Invoice\ChargeWalletInvoiceAction;
 use App\Actions\Admin\Invoice\Item\UpdateItemAction;
+use App\Actions\Admin\Invoice\Transaction\VerifyTransactionAction;
 use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
 use App\Models\AdminLog;
@@ -27,6 +28,7 @@ class VerifyOfflineTransactionAction
         private readonly FindTransactionByTrackingCodeService        $findTransactionByTrackingCodeService,
         private readonly ApplyBalanceToInvoiceAction                 $applyBalanceToInvoiceAction,
         private readonly VerifyOfflineTransactionService             $verifyOfflineTransactionService,
+        private readonly VerifyTransactionAction                     $verifyTransactionAction,
     )
     {
     }
@@ -55,7 +57,8 @@ class VerifyOfflineTransactionAction
 
         if ($offlineTransaction->amount <= $invoice->balance || $invoice->is_credit) {
             ($this->verifyOfflineTransactionService)($offlineTransaction);
-            ($this->processInvoiceAction)($invoice);
+            $transaction = ($this->findTransactionByTrackingCodeService)($offlineTransaction->tracking_code);
+            ($this->verifyTransactionAction)($transaction);
         } else {
             // create a charge wallet invoice
             // attach this offlineTransaction and its transaction to the new invoice
@@ -75,7 +78,7 @@ class VerifyOfflineTransactionAction
             ($this->processInvoiceAction)($invoice);
         }
 
-        admin_log(AdminLog::VERIFY_OFFLINE_TRANSACTION,$offlineTransaction);
+        admin_log(AdminLog::VERIFY_OFFLINE_TRANSACTION, $offlineTransaction);
 
         return $offlineTransaction;
     }

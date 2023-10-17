@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 interface TransactionRepositoryInterface extends EloquentRepositoryInterface
@@ -31,4 +32,8 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
     public function failCount(): int;
 
     public function reportLatest(): Collection;
+
+    public function rahkaranQuery(): Builder;
+
+    public function reportRevenueBasedOnGateway($from, $to): array;
 }

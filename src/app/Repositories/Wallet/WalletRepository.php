@@ -11,8 +11,15 @@ class WalletRepository extends BaseRepository implements Interface\WalletReposit
 
     public function findByClientId(int $clientId): Wallet|null
     {
-        return $this->newQuery()
+        return self::newQuery()
             ->where('client_id', $clientId)
             ->first();
+    }
+
+    public function reportSum(): array
+    {
+        return [
+            'total_wallet' => self::newQuery()->where('is_active', true)->sum('balance')
+        ];
     }
 }

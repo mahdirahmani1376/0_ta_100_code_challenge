@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Invoice;
 
+use App\Models\BankGateway;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Base\BaseRepository;
@@ -225,4 +226,127 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->orderByDesc('id')
             ->get();
     }
+
+    public function reportRevenue($from, $to): array
+    {
+        [$from, $to] = finance_report_dates($from, $to);
+
+        $revenue = self::newQuery()
+            ->where(function (Builder $query) use ($to, $from) {
+                $query->where(function (Builder $query) use ($from, $to) {
+                    $query->where('status', Invoice::STATUS_PAID)
+                        ->whereDate('paid_at', '>=', $from)
+                        ->whereDate('paid_at', '<=', $to);
+                });
+                $query->orWhere(function (Builder $query) use ($from, $to) {
+                    $query->where('status', Invoice::STATUS_COLLECTIONS)
+                        ->whereDate('created_at', '>=', $from)
+                        ->whereDate('created_at', '<=', $to);
+                });
+            })
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false);
+
+        return [
+            'count' => $revenue->count(),
+            'sum_total' => $revenue->sum('total'),
+            'sum_tax' => $revenue->sum('tax'),
+        ];
+    }
+
+    public function reportRevenueBasedOnGateway($from, $to): array
+    {
+        [$from, $to] = finance_report_dates($from, $to);
+
+        $credit = self::newQuery()
+            ->where(function (Builder $query) use ($to, $from) {
+                $query->where(function (Builder $query) use ($from, $to) {
+                    $query->where('status', Invoice::STATUS_PAID)
+                        ->whereDate('paid_at', '>=', $from)
+                        ->whereDate('paid_at', '<=', $to);
+                });
+                $query->orWhere(function (Builder $query) use ($from, $to) {
+                    $query->where('status', Invoice::STATUS_COLLECTIONS)
+                        ->whereDate('created_at', '>=', $from)
+                        ->whereDate('created_at', '<=', $to);
+                });
+            })
+            ->where('payment_method', Invoice::PAYMENT_METHOD_CREDIT)
+            ->where('is_mass_payment', false);
+        $onlineGateway = [];
+        foreach (BankGateway::cursor() as $bankGateway) {
+            $query = self::newQuery()
+                ->where(function (Builder $query) use ($to, $from) {
+                    $query->where(function (Builder $query) use ($from, $to) {
+                        $query->where('status', Invoice::STATUS_PAID)
+                            ->whereDate('paid_at', '>=', $from)
+                            ->whereDate('paid_at', '<=', $to);
+                    });
+                    $query->orWhere(function (Builder $query) use ($from, $to) {
+                        $query->where('status', Invoice::STATUS_COLLECTIONS)
+                            ->whereDate('created_at', '>=', $from)
+                            ->whereDate('created_at', '<=', $to);
+                    });
+                })
+                ->where('payment_method', $bankGateway->name)
+                ->where('is_mass_payment', false);
+            $onlineGateway[$bankGateway->name] = [
+                'sum' => $query->sum('total'),
+                'count' => $query->count(),
+            ];
+        }
+
+        return [
+            'online' => $onlineGateway,
+            'credit_sum' => $credit->sum('total'),
+            'credit_count' => $credit->count(),
+        ];
+    }
+
+    public function reportCollection($from, $to): array
+    {
+        [$from, $to] = finance_report_dates($from, $to);
+
+        $collection = self::newQuery()
+            ->whereDate('created_at', '>=', $from)
+            ->whereDate('created_at', '<=', $to)
+            ->where('status', Invoice::STATUS_COLLECTIONS)
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false);
+
+        return [
+            'count_collection' => $collection->count(),
+            'sum_collection' => $collection->sum('total'),
+        ];
+    }
+
+    public function rahkaranQuery($from = null, $to = null): Builder
+    {
+        [$from, $to] = finance_report_dates($from, $to);
+
+        $query = self::newQuery()
+            ->where(function (Builder $query) use ($to, $from) {
+                $query->where(function (Builder $query) use ($from, $to) {
+                    $query->where('status', Invoice::STATUS_PAID)
+                        ->whereDate('paid_at', '>=', $from)
+                        ->whereDate('paid_at', '<=', $to);
+                });
+                $query->orWhere(function (Builder $query) use ($from, $to) {
+                    $query->whereIn('status', [Invoice::STATUS_COLLECTIONS, Invoice::STATUS_REFUNDED])
+                        ->whereDate('created_at', '>=', $from)
+                        ->whereDate('created_at', '<=', $to);
+                });
+            });
+
+        $query->where('is_mass_payment', false);
+        $query->where('is_credit', false);
+
+        $query->where('tax', '>', 0);
+
+        // Filters out imported invoices
+        $query->whereNull('rahkaran_id');
+
+        return $query;
+    }
+
 }
