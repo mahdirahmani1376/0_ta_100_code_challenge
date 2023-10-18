@@ -16,10 +16,10 @@ class IndexBankGatewayRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => ['nullable', 'string','max:255'],
+            'search' => ['nullable', 'string', 'max:255'],
             'sort' => ['string', 'nullable', Rule::in(get_sortable_items((new BankGateway())->getFillable()))],
             'sortDirection' => ['string', 'nullable', Rule::in('desc', 'asc')],
-            'status' => ['string', 'nullable',],
+            'status' => ['string', 'nullable', Rule::in(BankGateway::STATUSES)],
         ];
     }
 }

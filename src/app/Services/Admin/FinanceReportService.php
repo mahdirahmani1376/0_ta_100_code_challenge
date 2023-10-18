@@ -22,8 +22,9 @@ class FinanceReportService
 
     public function __invoke($data)
     {
+        $view = $data['view'] ?? 0;
         // TODO implement cache in some form redis or just a mysql table with json fields ?
-        return match ((int)$data['view']) {
+        return match ($view) {
             1 => [
                 'revenue' => $this->invoiceRepository->reportRevenue($data['from'] ,$data['to']),
                 'collection' => $this->invoiceRepository->reportCollection($data['from'], $data['to']),
