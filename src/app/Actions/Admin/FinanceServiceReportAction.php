@@ -14,5 +14,4 @@ class FinanceServiceReportAction
     {
         return ($this->financeReportService)($data);
     }
-
 }
