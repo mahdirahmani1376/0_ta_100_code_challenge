@@ -32,6 +32,7 @@ class ShowInvoiceResource extends JsonResource
             'is_mass_payment' => $this->is_mass_payment,
             'admin_id' => $this->admin_id,
             'is_credit' => $this->is_credit,
+            'note' => $this->note,
             'invoice_number' => InvoiceNumberResource::make($this->invoiceNumber),
             'transactions' => TransactionResource::collection($this->transactions),
             'items' => ShowItemResource::collection($this->items),

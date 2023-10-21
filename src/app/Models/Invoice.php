@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property boolean is_mass_payment
  * @property int admin_id
  * @property boolean is_credit
+ * @property string note
  *
  * @property Collection items
  * @property InvoiceNumber invoiceNumber
@@ -81,6 +82,7 @@ class Invoice extends Model
         'is_mass_payment',
         'admin_id',
         'is_credit',
+        'note',
     ];
 
     protected $hidden = [
