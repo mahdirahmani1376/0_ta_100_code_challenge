@@ -14,7 +14,7 @@ class ApplyBalanceToInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:1'],
+            'amount' => ['nullable', 'numeric', 'min:1'],
             'admin_id' => ['required', 'numeric',],
         ];
     }

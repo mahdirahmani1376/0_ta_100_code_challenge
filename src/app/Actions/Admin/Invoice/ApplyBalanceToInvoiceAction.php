@@ -28,6 +28,10 @@ class ApplyBalanceToInvoiceAction
     {
         check_rahkaran($invoice);
 
+        if (is_null($data['amount'])) {
+            $data['amount'] = $invoice->balance;
+        }
+
         $oldState = $invoice->toArray();
 
         if (!in_array($invoice->status, [
