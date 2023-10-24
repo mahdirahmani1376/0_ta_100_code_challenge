@@ -149,19 +149,33 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function sendInvoiceReminder(array $reminders, $channel = 'email')
+    public static function sendInvoiceReminder(array $payload, $channel = 'email')
     {
         $url = '/api/internal/finance/invoice/reminder';
         $data = [
             'channel' => $channel,
-            'reminders' => $reminders,
+            'subject' => $payload['subject'] ?? null,
+            'reminders' => $payload['reminders'],
         ];
-        try {
-            $response = self::makeRequest('post', $url, $data);
 
-            if ($response->status() == Response::HTTP_OK) {
-                return;
-            }
+        try {
+            self::makeRequest('post', $url, $data);
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
+    }
+
+    public static function sendInvoiceCreateEmail(int $clientId,string $subject, string $message)
+    {
+        $url = '/api/internal/finance/invoice/create-email';
+        $data = [
+            'client_id' => $clientId,
+            'subject' => $subject,
+            'message' => $message,
+        ];
+
+        try {
+            self::makeRequest('post', $url, $data);
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }

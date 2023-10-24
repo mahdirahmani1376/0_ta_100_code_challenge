@@ -3,6 +3,7 @@
 namespace App\Actions\Admin\Invoice;
 
 use App\Actions\Invoice\ProcessInvoiceAction;
+use App\Events\InvoiceCreated;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Admin\Invoice\Item\StoreItemService;
@@ -32,6 +33,8 @@ class StoreInvoiceAction
         }
 
         $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
+
+        InvoiceCreated::dispatch($invoice);
 
         if ($invoice->status == Invoice::STATUS_REFUNDED) {
             ($this->processInvoiceAction)($invoice);

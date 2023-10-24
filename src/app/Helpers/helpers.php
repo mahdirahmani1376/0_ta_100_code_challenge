@@ -127,3 +127,14 @@ if (!function_exists('finance_report_dates')) {
         return [$startOfCurrentMonth->toDateString(), now()->toDateString()];
     }
 }
+
+if (!function_exists('parse_string')) {
+    function parse_string($string, $array): string
+    {
+        foreach ($array as $key => $value) {
+            $string = str_replace(":$key", $value, $string);
+        }
+
+        return $string;
+    }
+}

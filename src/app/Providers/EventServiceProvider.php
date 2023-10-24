@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\InvoiceCreated;
 use App\Events\InvoiceProcessed;
+use App\Listeners\SendInvoiceCreateEmail;
 use App\Listeners\SignalMainAppToProcessInvoice;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Queue\Events\QueueBusy;
@@ -13,6 +15,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         InvoiceProcessed::class => [
             SignalMainAppToProcessInvoice::class,
+        ],
+        InvoiceCreated::class => [
+            SendInvoiceCreateEmail::class,
         ],
     ];
 
