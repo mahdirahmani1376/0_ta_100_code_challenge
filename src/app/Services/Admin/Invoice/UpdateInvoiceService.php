@@ -13,13 +13,12 @@ class UpdateInvoiceService
 
     public function __invoke(Invoice $invoice, array $data): Invoice
     {
-        $attributes = [
-            'created_at' => $data['invoice_date'],
-            'due_date' => $data['due_date'],
-            'paid_at' => $data['paid_at'],
-            'tax_rate' => $data['tax_rate'],
-        ];
-
-        return $this->invoiceRepository->update($invoice, $attributes, array_keys($attributes));
+        return $this->invoiceRepository->update($invoice, $data, [
+            'created_at',
+            'due_date',
+            'paid_at',
+            'tax_rate',
+            'note',
+        ]);
     }
 }

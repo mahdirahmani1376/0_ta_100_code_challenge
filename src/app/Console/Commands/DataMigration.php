@@ -323,7 +323,7 @@ class DataMigration extends Command
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
-
+                    $id = $row['invoice_id'];
                     $newRow['id'] = $row['invoice_id'];
                     $newRow['created_at'] = $row['invoice_date'];
                     $newRow['updated_at'] = $row['updated_at'];
@@ -363,6 +363,7 @@ class DataMigration extends Command
                         $newRow['admin_id'] = null;
                     }
                     $newRow['is_credit'] = $row['is_credit'];
+                    $newRow['note'] = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
 
                     return $newRow;
                 });
