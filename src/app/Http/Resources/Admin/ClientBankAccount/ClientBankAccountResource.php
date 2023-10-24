@@ -13,8 +13,8 @@ class ClientBankAccountResource extends JsonResource
         /** @var ClientBankAccount $this */
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'zarinpal_bank_account_id' => $this->zarinpal_bank_account_id,
             'bank_name' => $this->bank_name,
