@@ -17,7 +17,6 @@ class ClientCashoutResource extends JsonResource
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'client_id' => $this->client_id,
-            'client_bank_account_id' => $this->client_bank_account_id,
             'client_bank_account' => ClientBankAccountResource::make($this->clientBankAccount),
             'zarinpal_payout_id' => $this->zarinpal_payout_id,
             'admin_id' => $this->admin_id,
