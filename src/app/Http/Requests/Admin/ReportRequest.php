@@ -14,7 +14,7 @@ class ReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'view' => ['nullable', 'numeric'],
+            'new_view' => ['nullable', 'bool'],
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date'],
         ];

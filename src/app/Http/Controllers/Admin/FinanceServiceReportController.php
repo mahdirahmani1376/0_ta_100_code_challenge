@@ -16,11 +16,10 @@ class FinanceServiceReportController
     {
         $report = ($this->financeServiceReportAction)($request->validated());
 
-        switch ($request->validated('view')) {
-            case 1:
-                return  $report;
-            default:
-                return FinanceReportResource::make($report);
+        if ($request->validated('new_view', false)) {
+            return $report;
+        } else {
+            return FinanceReportResource::make($report);
         }
     }
 }
