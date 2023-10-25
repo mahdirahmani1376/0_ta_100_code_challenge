@@ -27,7 +27,7 @@ class BankGatewayRepository extends BaseRepository implements BankGatewayReposit
             });
         }
         if (!empty($data['status'])) {
-            $query->whereJsonContains('config', ['status' => $data['status']]);
+            $query->where('status', $data['status']);
         }
         $query->orderBy(
             $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,

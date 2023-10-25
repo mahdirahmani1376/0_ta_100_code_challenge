@@ -104,8 +104,8 @@ class DataMigration extends Command
                 if ($row['status'] != 'active') {
                     $newRow['deleted_at'] = Carbon::now();
                 }
+                $newRow['status'] = $row['status'] == 'active' ? BankGateway::STATUS_ACTIVE : BankGateway::STATUS_INACTIVE;
                 $config = [];
-                $config['status'] = $row['status'];
                 if (!empty($row['merchant_id'])) {
                     $config['merchant_id'] = $row['merchant_id'];
                 }
