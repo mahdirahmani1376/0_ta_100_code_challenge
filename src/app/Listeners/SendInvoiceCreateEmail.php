@@ -12,15 +12,19 @@ class SendInvoiceCreateEmail implements ShouldQueue
 {
     public function handle(InvoiceCreated $event): void
     {
-        $subject = MainAppConfig::get(MainAppConfig::FINANCE_INVOICE_CREATE_SUBJECT);
-        $messageTemplate = MainAppConfig::get(MainAppConfig::FINANCE_INVOICE_CREATE_MESSAGE);
-        $client = MainAppAPIService::getClients($event->invoice->client_id)[0];
-        $message = parse_string($messageTemplate, [
-            'client_name' => $client->full_name,
-            'invoice_id' => $event->invoice->id,
-            'created_at' => JalaliCalender::carbonToJalali($event->invoice->created_at),
-        ]);
+        try {
+            $subject = MainAppConfig::get(MainAppConfig::FINANCE_INVOICE_CREATE_SUBJECT);
+            $messageTemplate = MainAppConfig::get(MainAppConfig::FINANCE_INVOICE_CREATE_MESSAGE);
+            $client = MainAppAPIService::getClients($event->invoice->client_id)[0];
+            $message = parse_string($messageTemplate, [
+                'client_name' => $client->full_name,
+                'invoice_id' => $event->invoice->id,
+                'created_at' => JalaliCalender::carbonToJalali($event->invoice->created_at),
+            ]);
 
-        MainAppAPIService::sendInvoiceCreateEmail($event->invoice->client_id, $subject, $message);
+            MainAppAPIService::sendInvoiceCreateEmail($event->invoice->client_id, $subject, $message);
+        } catch (\Exception $exception) {
+            // TODO log the error
+        }
     }
 }
