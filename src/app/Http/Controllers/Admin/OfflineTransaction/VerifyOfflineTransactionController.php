@@ -6,7 +6,7 @@ use App\Actions\Admin\OfflineTransaction\VerifyOfflineTransactionAction;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
 use App\Http\Requests\Admin\OfflineTransaction\VerifyOfflineTransactionRequest;
-use App\Http\Resources\Admin\OfflineTransaction\OfflineTransactionResource;
+use App\Http\Resources\Admin\OfflineTransaction\ShowOfflineTransactionResource;
 use App\Models\OfflineTransaction;
 
 class VerifyOfflineTransactionController
@@ -17,7 +17,7 @@ class VerifyOfflineTransactionController
 
     /**
      * @param OfflineTransaction $offlineTransaction
-     * @return OfflineTransactionResource
+     * @return ShowOfflineTransactionResource
      * @throws OfflinePaymentApplyException
      * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
@@ -25,6 +25,6 @@ class VerifyOfflineTransactionController
     {
         ($this->offlineTransactionAction)($offlineTransaction);
 
-        return OfflineTransactionResource::make($offlineTransaction);
+        return ShowOfflineTransactionResource::make($offlineTransaction);
     }
 }
