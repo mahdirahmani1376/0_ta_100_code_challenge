@@ -4,6 +4,7 @@ namespace App\Http\Resources\Admin\OfflineTransaction;
 
 use App\Http\Resources\Admin\BankAccount\ShowBankAccountResource;
 use App\Http\Resources\Admin\Invoice\InvoiceOfTransactionResource;
+use App\Http\Resources\Admin\Transaction\TransactionWithoutInvoiceResource;
 use App\Models\OfflineTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,7 +21,7 @@ class ShowOfflineTransactionResource extends JsonResource
             'paid_at' => $this->paid_at?->toDateTimeString(),
             'client_id' => $this->client_id,
             'invoice_id' => $this->invoice_id,
-            'transaction_id' => $this->transaction_id,
+            'transaction' => TransactionWithoutInvoiceResource::make($this->transaction),
             'bank_account' => ShowBankAccountResource::make($this->bankAccount),
             'admin_id' => $this->admin_id,
             'amount' => $this->amount,

@@ -17,6 +17,7 @@ class BankGatewayResource extends JsonResource
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'name' => $this->name,
             'name_fa' => $this->name_fa,
+            'status' => $this->status,
             'config' => $this->config,
         ];
     }
