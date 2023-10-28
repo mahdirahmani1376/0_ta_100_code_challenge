@@ -271,9 +271,9 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credit_transactions`')[0]->count;
+            $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `credit_transactions` LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -298,17 +298,12 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                $this->info('Mapping done');
-                $mappedDataCount = count($mappedData);
-                $counter = 0;
-                collect($mappedData)->filter(fn($value) => $value)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
-                    DB::table($tableName)->insert($rows->toArray());
-                    $this->info("Inserted $counter out of $mappedDataCount items.");
-                    $counter += $this->chunkSize;
+                collect($mappedData)->filter(fn($value) => $value)->each(function ($rows) use ($count, &$counter, $tableName) {
+                    DB::table($tableName)->insert($rows);
                 });
-                $this->info("Inserting mapped data into $tableName");
+                $progress->advance($this->chunkSize);
             }
-
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -322,13 +317,12 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoices`')[0]->count;
+            $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `invoices`  LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
-                    $id = $row['invoice_id'];
                     $newRow['id'] = $row['invoice_id'];
                     $newRow['created_at'] = $row['invoice_date'];
                     $newRow['updated_at'] = $row['updated_at'];
@@ -368,26 +362,20 @@ class DataMigration extends Command
                         $newRow['admin_id'] = null;
                     }
                     $newRow['is_credit'] = $row['is_credit'];
-//                    try {
-//                        $newRow['note'] = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
-//                    } catch (Exception $exception) {
-//                        $newRow['note'] = null;
-//                    }
+                    try {
+                        $id = $row['invoice_id'];
+                        $note = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
+                        $newRow['note'] = empty($note) ? null : $note;
+                    } catch (Exception $exception) {
+                        $newRow['note'] = null;
+                    }
 
                     return $newRow;
                 });
-                $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-                $this->info("Truncated $tableName");
-                $this->info("Inserting mapped data into $tableName");
-                $mappedDataCount = count($mappedData);
-                $counter = 0;
-                collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
-                    DB::table($tableName)->insert($rows->toArray());
-                    $this->info("Inserted $counter out of $mappedDataCount items.");
-                    $counter += $this->chunkSize;
-                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
             }
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -402,9 +390,9 @@ class DataMigration extends Command
         try {
             $invoiceIds = implode(',', Invoice::query()->select('id')->get()->pluck('id')->toArray());
             $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems` where `invoiceid` in ($invoiceIds)")[0]->count;
+            $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` where `invoiceid` in ($invoiceIds)  LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data, records: ' . count($oldData));
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     if (Invoice::query()->find($row['invoiceid']) == null) {
@@ -426,18 +414,10 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-                $this->info("Truncated $tableName");
-                $this->info("Inserting mapped data into $tableName");
-                $mappedDataCount = count($mappedData);
-                $counter = 0;
-                collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
-                    DB::table($tableName)->insert($rows->toArray());
-                    $this->info("Inserted $counter out of $mappedDataCount items.");
-                    $counter += $this->chunkSize;
-                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
             }
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -473,6 +453,7 @@ class DataMigration extends Command
                                                                 LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
                                                                 LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
                                                                 WHERE invoices.client_id IS NOT NULL')[0]->count;
+            $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')
                     ->select("SELECT offline_payments.* ,
@@ -485,7 +466,6 @@ class DataMigration extends Command
                                 LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
                                 WHERE invoices.client_id IS NOT NULL
                                  LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -519,18 +499,12 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-                $this->info("Truncated $tableName");
-                $this->info("Inserting mapped data into $tableName");
-                $mappedDataCount = count($mappedData);
-                $counter = 0;
-                collect($mappedData)->filter(fn($value) => $value)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+                collect($mappedData)->filter(fn($value) => $value)->chunk($this->chunkSize)->each(function ($rows) use ($count, &$counter, $tableName) {
                     DB::table($tableName)->insert($rows->toArray());
-                    $this->info("Inserted $counter out of $mappedDataCount items.");
-                    $counter += $this->chunkSize;
                 });
+                $progress->advance($this->chunkSize);
             }
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -561,6 +535,7 @@ class DataMigration extends Command
                                                                     FROM `transactions`
                                                                     LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
                                                                     WHERE invoices.client_id IS NOT NULL')[0]->count;
+            $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')
                     ->select("SELECT transactions.*,
@@ -570,7 +545,6 @@ class DataMigration extends Command
                                     LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
                                     WHERE invoices.client_id IS NOT NULL
                                     LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -587,7 +561,7 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 1) {
                         $newRow['status'] = Transaction::STATUS_SUCCESS;
-                    }elseif ($row['status'] == 8) {
+                    } elseif ($row['status'] == 8) {
                         $newRow['status'] = Transaction::STATUS_SUCCESS;
                     } elseif ($row['status'] == 2) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
@@ -612,18 +586,10 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-                $this->info("Truncated $tableName");
-                $this->info("Inserting mapped data into $tableName");
-                $mappedDataCount = count($mappedData);
-                $counter = 0;
-                collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
-                    DB::table($tableName)->insert($rows->toArray());
-                    $this->info("Inserted $counter out of $mappedDataCount items.");
-                    $counter += $this->chunkSize;
-                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
             }
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -639,13 +605,13 @@ class DataMigration extends Command
             $count = DB::connection('mainapp')->select('SELECT count(*) as count
                                                                     FROM `invoice_numbers`
                                                                     WHERE EXISTS(SELECT * FROM `invoices` WHERE `invoice_numbers`.`invoice_id` = `invoices`.`invoice_id`)')[0]->count;
+            $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')
                     ->select("SELECT *
                                 FROM `invoice_numbers`
                                 WHERE EXISTS(SELECT * FROM `invoices` WHERE `invoice_numbers`.`invoice_id` = `invoices`.`invoice_id`)
                                 LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -662,18 +628,10 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-                $this->info("Truncated $tableName");
-                $this->info("Inserting mapped data into $tableName");
-                $mappedDataCount = count($mappedData);
-                $counter = 0;
-                collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
-                    DB::table($tableName)->insert($rows->toArray());
-                    $this->info("Inserted $counter out of $mappedDataCount items.");
-                    $counter += $this->chunkSize;
-                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
             }
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
