@@ -14,6 +14,7 @@ use App\Models\OfflineTransaction;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -205,7 +206,8 @@ class DataMigration extends Command
                 $newRow['amount'] = $row['amount'];
                 $newRow['admin_note'] = $row['admin_note'];
                 $newRow['status'] = $row['status'];
-                if ($newRow['status'] == 'reject') $newRow['status'] = ClientBankAccount::STATUS_REJECTED;
+                if ($newRow['status'] == 'reject') $newRow['status'] = ClientCashout::STATUS_REJECTED;
+                if ($newRow['status'] == 'complete') $newRow['status'] = ClientCashout::STATUS_PAYOUT_COMPLETED;
                 $newRow['rejected_by_bank'] = $row['bank_rejected'];
 
                 return $newRow;
@@ -286,6 +288,9 @@ class DataMigration extends Command
                         'balance' => 0,
                         'is_active' => true,
                     ])->getKey();
+                    if (Invoice::where('id', $row['invoice_id'])->doesntExist()) {
+                        return false;
+                    }
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['admin_id'] = $row['admin_user_id'];
                     $newRow['amount'] = $row['amount'];
@@ -294,14 +299,14 @@ class DataMigration extends Command
                     return $newRow;
                 });
                 $this->info('Mapping done');
-                $this->info("Inserting mapped data into $tableName");
                 $mappedDataCount = count($mappedData);
                 $counter = 0;
-                collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+                collect($mappedData)->filter(fn($value) => $value)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                     DB::table($tableName)->insert($rows->toArray());
                     $this->info("Inserted $counter out of $mappedDataCount items.");
                     $counter += $this->chunkSize;
                 });
+                $this->info("Inserting mapped data into $tableName");
             }
 
             $this->info("End of data migrate for $tableName");
@@ -363,7 +368,11 @@ class DataMigration extends Command
                         $newRow['admin_id'] = null;
                     }
                     $newRow['is_credit'] = $row['is_credit'];
-                    $newRow['note'] = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
+                    try {
+                        $newRow['note'] = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
+                    } catch (Exception $exception) {
+                        $newRow['note'] = null;
+                    }
 
                     return $newRow;
                 });
@@ -487,6 +496,9 @@ class DataMigration extends Command
                     $newRow['paid_at'] = $row['paid_date'];
                     $newRow['client_id'] = $row['i_client_id'];
                     $newRow['invoice_id'] = $row['i_invoice_id'];
+                    if (Transaction::where('id', $row['transaction_id'])->doesntExist()) {
+                        return false;
+                    }
                     $newRow['transaction_id'] = $row['transaction_id'];
                     $newRow['bank_account_id'] = $row['bank_account_id'];
                     $newRow['admin_id'] = $row['admin_user_id'];
@@ -513,7 +525,7 @@ class DataMigration extends Command
                 $this->info("Inserting mapped data into $tableName");
                 $mappedDataCount = count($mappedData);
                 $counter = 0;
-                collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
+                collect($mappedData)->filter(fn($value) => $value)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
                     DB::table($tableName)->insert($rows->toArray());
                     $this->info("Inserted $counter out of $mappedDataCount items.");
                     $counter += $this->chunkSize;
