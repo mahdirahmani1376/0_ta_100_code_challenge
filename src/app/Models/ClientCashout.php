@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float amount
  * @property string admin_note
  * @property string status
+ * @property array actions
  * @property boolean rejected_by_bank
  */
 class ClientCashout extends Model
@@ -32,15 +33,20 @@ class ClientCashout extends Model
 
     const STATUS_ACTIVE = 'active';
     const STATUS_PENDING = 'pending';
-    const STATUS_PAYOUT_COMPLETE = 'complete';
+    const STATUS_PAYOUT_COMPLETED = 'completed';
     const STATUS_REJECTED = 'rejected';
 
     const STATUSES = [
         self::STATUS_ACTIVE,
         self::STATUS_PENDING,
-        self::STATUS_PAYOUT_COMPLETE,
+        self::STATUS_PAYOUT_COMPLETED,
         self::STATUS_REJECTED,
     ];
+
+    const ACTION_ACCEPT = 'accept';
+    const ACTION_REJECT = 'reject';
+    const ACTION_PENDING = 'pending';
+    const ACTION_REJECT_BANK = 'reject_bank';
 
     protected $fillable = [
         'client_id',
@@ -52,6 +58,16 @@ class ClientCashout extends Model
         'status',
         'rejected_by_bank',
     ];
+
+    public function getActionsAttribute(): array
+    {
+       if ($this->status === self::STATUS_REJECTED)
+            return [self::ACTION_REJECT];
+        elseif ($this->status === self::STATUS_PENDING)
+            return [self::ACTION_ACCEPT, self::ACTION_REJECT, self::ACTION_REJECT_BANK,];
+        else
+            return [];
+    }
 
     public function clientBankAccount(): BelongsTo
     {

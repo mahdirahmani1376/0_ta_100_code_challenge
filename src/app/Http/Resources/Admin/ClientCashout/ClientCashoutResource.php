@@ -23,6 +23,7 @@ class ClientCashoutResource extends JsonResource
             'amount' => $this->amount,
             'admin_note' => $this->admin_note,
             'status' => $this->status,
+            'actions' => $this->actions,
             'rejected_by_bank' => $this->rejected_by_bank,
         ];
     }

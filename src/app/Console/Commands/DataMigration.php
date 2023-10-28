@@ -205,7 +205,8 @@ class DataMigration extends Command
                 $newRow['amount'] = $row['amount'];
                 $newRow['admin_note'] = $row['admin_note'];
                 $newRow['status'] = $row['status'];
-                if ($newRow['status'] == 'reject') $newRow['status'] = ClientBankAccount::STATUS_REJECTED;
+                if ($newRow['status'] == 'reject') $newRow['status'] = ClientCashout::STATUS_REJECTED;
+                if ($newRow['status'] == 'complete') $newRow['status'] = ClientCashout::STATUS_PAYOUT_COMPLETED;
                 $newRow['rejected_by_bank'] = $row['bank_rejected'];
 
                 return $newRow;
