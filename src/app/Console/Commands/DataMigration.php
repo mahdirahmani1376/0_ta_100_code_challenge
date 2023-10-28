@@ -368,11 +368,11 @@ class DataMigration extends Command
                         $newRow['admin_id'] = null;
                     }
                     $newRow['is_credit'] = $row['is_credit'];
-                    try {
-                        $newRow['note'] = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
-                    } catch (Exception $exception) {
-                        $newRow['note'] = null;
-                    }
+//                    try {
+//                        $newRow['note'] = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
+//                    } catch (Exception $exception) {
+//                        $newRow['note'] = null;
+//                    }
 
                     return $newRow;
                 });
