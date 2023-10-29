@@ -91,15 +91,27 @@ if (!function_exists('admin_log')) {
         if (!is_array($oldState)) {
             $oldState = $oldState?->toArray();
         }
-        AdminLog::query()->create([
-            'admin_id' => $adminId ?? request('admin_id'),
-            'action' => $action,
-            'model_id' => $model?->id,
-            'model_class' => $model ? get_class($model) : null,
-            'changes' => $changes,
-            'old_state' => $oldState,
-            'validated_data' => $validatedData,
-        ]);
+        try {
+            AdminLog::query()->create([
+                'admin_id' => $adminId ?? request('admin_id'),
+                'action' => $action,
+                'model_id' => $model?->id,
+                'model_class' => $model ? get_class($model) : null,
+                'changes' => $changes,
+                'old_state' => $oldState,
+                'validated_data' => $validatedData,
+            ]);
+        } catch (Exception $exception) {
+            info('AdminLog failed', [
+                'admin_id' => $adminId ?? request('admin_id'),
+                'action' => $action,
+                'model_id' => $model?->id,
+                'model_class' => $model ? get_class($model) : null,
+                'changes' => $changes,
+                'old_state' => $oldState,
+                'validated_data' => $validatedData,
+            ]);
+        }
     }
 }
 
