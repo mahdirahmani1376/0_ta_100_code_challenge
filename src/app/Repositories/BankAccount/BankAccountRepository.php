@@ -38,4 +38,11 @@ class BankAccountRepository extends BaseRepository implements BankAccountReposit
 
         return self::paginate($query);
     }
+
+    public function publicIndex(array $data): LengthAwarePaginator
+    {
+        $data['status'] = BankAccount::STATUS_ACTIVE;
+
+        return self::adminIndex($data);
+    }
 }

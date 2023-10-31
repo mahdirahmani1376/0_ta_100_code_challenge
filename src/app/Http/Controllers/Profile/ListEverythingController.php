@@ -13,6 +13,9 @@ class ListEverythingController
 
     public function __invoke(ListEverythingRequest $request)
     {
-        return ($this->listEverythingAction)($request->get('client_id'), $request->get('offset', 0));
+        return [
+            'data' => ($this->listEverythingAction)($request->get('client_id'), $request->get('offset', 0)),
+            'perPage' => config('payment.profile_list_everything_limit')
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Exceptions\Base\BaseApplicationException;
 use App\Exceptions\Base\BaseSystemException;
+use App\Exceptions\Base\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Throwable;
@@ -37,6 +38,8 @@ class Handler extends ExceptionHandler
             return $this->generateJsonResponseForSystemException($e);
         } elseif ($e instanceof BaseApplicationException) {
             return $this->generateJsonResponseForApplicationException($e);
+        } elseif ($e instanceof HttpException) {
+            return $this->generateJsonResponseForHttpException($e);
         }
 
         return parent::render($request, $e);
@@ -58,6 +61,15 @@ class Handler extends ExceptionHandler
             'logRef' => $exception->getLogRef(),
             'errorCode' => $exception->getErrorCode(),
             'message' => __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams())
+        ], $exception->getCode());
+    }
+    protected function generateJsonResponseForHttpException(HttpException $exception): JsonResponse
+    {
+        return response()->json([
+            'code' => $exception->getCode(),
+            'logRef' => $exception->getLogRef(),
+            'errorCode' => $exception->getErrorCode(),
+            'message' => __($exception->getMessage())
         ], $exception->getCode());
     }
 }

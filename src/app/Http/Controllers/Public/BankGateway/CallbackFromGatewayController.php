@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Public\BankGateway;
 
 use App\Actions\Public\BankGateway\CallbackFromGatewayAction;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 
 class CallbackFromGatewayController
 {
@@ -14,6 +13,8 @@ class CallbackFromGatewayController
 
     public function __invoke(string $gateway, Transaction $transaction, string $source = null)
     {
-        return ($this->callbackFromGatewayAction)($transaction, $gateway, $source, request()->all());
+        $redirectUrl = ($this->callbackFromGatewayAction)($transaction, $gateway, $source, request()->all());
+
+        return response()->json(['redirect_url' => $redirectUrl,]);
     }
 }

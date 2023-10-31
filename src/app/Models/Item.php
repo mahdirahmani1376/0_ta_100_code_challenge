@@ -37,10 +37,11 @@ class Item extends Model
     const TYPE_ADD_CLIENT_CREDIT = 'AddClientCredit';
     public const TYPE_ADD_CLOUD_CREDIT = 'AddCloudCredit';
     public const TYPE_DOMAIN_SERVICE = 'DomainService';
-    public const TYPE_HOSTING = 'Hosting';
+    public const TYPE_HOSTING = 'Hosting'; // TODO => ProductService
     public const TYPE_ADMIN_TIME = 'AdminTime';
     public const TYPE_CLOUD = 'Cloud';
     public const TYPE_REFUND_DOMAIN = 'RefundDomain';
+
     protected $casts = [
         'deleted_at' => 'datetime',
         'from_date' => 'datetime',

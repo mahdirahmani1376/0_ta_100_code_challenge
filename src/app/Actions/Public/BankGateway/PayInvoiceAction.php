@@ -24,19 +24,20 @@ class PayInvoiceAction
         $redirectTo = $source == 'cloud' ?
             config('payment.bank_gateway.result_cloud_redirect_url') :
             config('payment.bank_gateway.result_redirect_url');
+        $resultUrl = callback_result_redirect_url($redirectTo, ['transaction' => 0]);
 
         // validate Invoice on Whether it should be redirected to bankGateway or not
         // Only Invoices with status of "unpaid","collection","pending" can get redirected to bankGateway
         // otherwise they are either "draft" or "paid" or ... so we will just redirect them to the "result" page
         if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
-            return $redirectTo;
+            return $resultUrl;
         }
         // If Invoice is already paid in full but for some reason its status is not set accordingly,  e.g. "paid"
         // then this Invoice should be processed and then redirected to result page
         if ($invoice->balance <= 0) {
             ($this->processInvoiceAction)($invoice);
 
-            return $redirectTo;
+            return $resultUrl;
         }
 
         // Start the BankGateway process:
@@ -51,9 +52,9 @@ class PayInvoiceAction
             'payment_method' => $gatewayName,
         ]);
         $callbackUrl = Str::swap([
-            'transaction' => $transaction->getKey(),
-            'gateway' => $gatewayName,
-            'source' => $source,
+            '{transaction}' => $transaction->getKey(),
+            '{gateway}' => $gatewayName,
+            '{source}' => $source,
         ], $source == 'cloud' ?
             config('payment.bank_gateway.cloud_callback_url') :
             config('payment.bank_gateway.callback_url'));
