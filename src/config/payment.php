@@ -18,4 +18,5 @@ return [
         'result_redirect_url' => env('FRONT_END_BASE_URL') . '/callback/{transaction}',
         'result_cloud_redirect_url' => env('FRONT_END_CLOUD_BASE_URL') . '/callback/{transaction}',
     ],
+    'profile_list_everything_limit' => env('PROFILE_LIST_EVERYTHING_LIMIT', 100),
 ];

@@ -54,10 +54,11 @@ class ListEverythingService
                     'description' => $creditTransaction->description,
                 ];
             });
+        $limit = config('payment.profile_list_everything_limit');
 
         return collect([...$invoices, ...$transactions, ...$creditTransaction])
             ->sortByDesc(fn($item) => $item['created_at'])
-            ->slice($offset ?? 0 * 100, 100)
+            ->slice($offset ?? 0 * $limit, $limit)
             ->values()
             ->toArray();
     }
