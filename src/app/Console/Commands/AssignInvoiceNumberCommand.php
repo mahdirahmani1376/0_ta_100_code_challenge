@@ -6,6 +6,9 @@ use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\Invoice\FindInvoiceByIdService;
 use Illuminate\Console\Command;
 
+/**
+ * This is for dev/debugging purposes only
+ */
 class AssignInvoiceNumberCommand extends Command
 {
     protected $signature = 'app:assign-invoice-number {invoice*}';

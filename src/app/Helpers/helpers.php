@@ -150,3 +150,12 @@ if (!function_exists('parse_string')) {
         return $string;
     }
 }
+
+if (!function_exists('callback_result_redirect_url')) {
+    function callback_result_redirect_url($url, $transactionId): string
+    {
+        return Str::swap([
+            '{transaction}' => $transactionId
+        ], $url);
+    }
+}
