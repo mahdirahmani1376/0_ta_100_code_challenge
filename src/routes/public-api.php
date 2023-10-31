@@ -19,3 +19,9 @@ Route::namespace('BankGateway')
         Route::get('{gateway}/pay/{invoice}/{source?}', PayInvoiceController::class);
         Route::any('{gateway}/callback/{transaction}/{source?}', CallbackFromGatewayController::class);
     });
+
+Route::namespace('BankAccount')
+    ->prefix('bank-account')
+    ->group(function () {
+        Route::get('/', IndexBankAccountController::class);
+    });
