@@ -88,10 +88,10 @@ if (!function_exists('clean_ir_mobile')) {
 if (!function_exists('admin_log')) {
     function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null): void
     {
-        if (!is_array($oldState)) {
-            $oldState = $oldState?->toArray();
-        }
         try {
+            if (!is_array($oldState)) {
+                $oldState = $oldState?->toArray();
+            }
             AdminLog::query()->create([
                 'admin_id' => $adminId ?? request('admin_id'),
                 'action' => $action,
@@ -102,15 +102,7 @@ if (!function_exists('admin_log')) {
                 'validated_data' => $validatedData,
             ]);
         } catch (Exception $exception) {
-            info('AdminLog failed', [
-                'admin_id' => $adminId ?? request('admin_id'),
-                'action' => $action,
-                'model_id' => $model?->id,
-                'model_class' => $model ? get_class($model) : null,
-                'changes' => $changes,
-                'old_state' => $oldState,
-                'validated_data' => $validatedData,
-            ]);
+            // TODO
         }
     }
 }
