@@ -17,8 +17,6 @@ abstract class BaseMainAppAPIService
             ...$header
         ];
 
-        $response = Http::withHeaders($headers)->$method($url, $body);
-
-        return $response;
+        return Http::withHeaders($headers)->$method($url, $body);
     }
 }

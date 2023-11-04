@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\BankGateway\UpdateBankGatewayController;
 use App\Http\Controllers\Admin\ClientBankAccount\IndexClientBankAccountController;
 use App\Http\Controllers\Admin\ClientBankAccount\StoreClientBankAccountController;
 use App\Http\Controllers\Admin\ClientBankAccount\UpdateClientBankAccountController;
+use App\Http\Controllers\Admin\ClientCashout\ActionOnClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\IndexClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\ShowClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\StoreClientCashoutController;
@@ -149,6 +150,7 @@ Route::namespace('ClientCashout')
         Route::post('/', StoreClientCashoutController::class);
         Route::get('{clientCashout}', ShowClientCashoutController::class);
         Route::put('{clientCashout}', UpdateClientCashoutController::class);
+        Route::get('{clientCashout}/{action}', ActionOnClientCashoutController::class);
     });
 
 Route::get('report', FinanceServiceReportController::class);

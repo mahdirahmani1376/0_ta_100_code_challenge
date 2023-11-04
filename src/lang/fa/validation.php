@@ -341,7 +341,7 @@ return [
     'domain_type_allowed_values' => 'مقدار دوره پرداخت باید یکی از مقادیر زیر باشد: [:values]',
     'alphanum' => ':attribute فقط میتواند شامل عدد و حروف باشد',
     'sheba_already_taken' => 'شناسه شبا در زرین پال تکراری است',
-    'invalid_cashout_action' => 'این عملیات مجار نمیباشد',
+    'invalid_cashout_action' => 'این اکشن مجار نمیباشد',
     'invalid_sheba' => 'شناسه شبا نامعتبر است',
     'bank_account_zarinpal_fail' => 'ساخت حساب بانکی در زرین پال با خطا مواجه شد',
     'cashout_zarinpal_fail' => 'تسهیم وجه در زرین پال با خطا مواجه شد',
