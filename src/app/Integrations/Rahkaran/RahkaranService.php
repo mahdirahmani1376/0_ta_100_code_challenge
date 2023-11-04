@@ -1908,6 +1908,46 @@ class RahkaranService
         return $payment;
     }
 
+    public function getPaymentInstanceForCashout(CreditTransaction $credit_transaction): Payment
+    {
+        $config = $this->getConfig();
+
+        // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
+        $client = MainAppAPIService::getClients($credit_transaction->client_id)[0];
+        $client_party_dl = $this->getClientDl($client);
+
+        $payment = new Payment();
+        $payment->BranchID = $config->bankBranchId;
+        $payment->IsApproved = true;
+        $payment->CounterPartDLCode = $client_party_dl->Code;
+        $payment->Date = $credit_transaction->created_at;
+
+        // Creates new PaymentDeposit instance
+        $payment_deposit = new PaymentDeposit();
+        $payment_deposit->Amount = abs($credit_transaction->amount);
+        $payment_deposit->AccountingOperationID = $config->paymentAccountingOperationID;
+        $payment_deposit->CashFlowFactorID = $config->paymentCashFlowFactorID;
+        $payment_deposit->BankAccountID = $config->zarinpalBankId;
+        $payment_deposit->CounterPartDLCode = $client_party_dl->Code;
+        $payment_deposit->Number = 'Credit-' . $credit_transaction->id;
+
+        // Uses given description or gets from translation
+        $description = $credit_transaction->description ? $credit_transaction->description : trans('rahkaran.payment.REMOVE_CREDIT');
+
+        $payment->Description = $description;
+        $payment->Description_En = $description;
+
+        $payment_deposit->Description = $description;
+        $payment_deposit->Description_En = $description;
+        $payment_deposit->Date = $credit_transaction->created_at;
+
+        $payment->PaymentDeposits = [
+            $payment_deposit
+        ];
+
+        return $payment;
+    }
+
     private function isRoundingTransaction(Transaction $transaction): bool
     {
         return $transaction->reference_id == 'ROUND-' . $transaction->invoice->id;

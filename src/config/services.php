@@ -35,4 +35,13 @@ return [
         'base_url' => env('MAINAPP_BASE_URL'),
         'token' => env('MAINAPP_TOKEN'),
     ],
+
+    'zarinpal' => [
+        'next' => [
+            'url' => env('ZARINPAL_NEXT_URL'),
+            'token' => env('ZARINPAL_NEXT_TOKEN'),
+            'terminal_id' => env('ZARINPAL_NEXT_TERMINAL_ID'),
+            'merchant_id' => env('ZARINPAL_NEXT_MERCHANT_ID'),
+        ],
+    ],
 ];

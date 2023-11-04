@@ -72,4 +72,136 @@ class Zarinpal implements BankGatewayInterface
             'reference_id' => $response->json('data.ref_id'),
         ]);
     }
+
+    public static function createBankAccount($iban, $name)
+    {
+        // TODO legacy code from MainApp , needs refactor
+
+        $url = config('services.zarinpal.next.url');
+        $token = config('services.zarinpal.next.token');
+
+        if (strlen($name) > 30) {
+            $name = Str::substr($name, 0, 30);
+        }
+
+        $body = '{"query":"\\nmutation BankAccountAdd($iban:String!, $is_legal: Boolean!, $name:String!, $type: BankAccountTypeEnum) \\n{\\n    BankAccountAdd(iban:$iban, is_legal:$is_legal, name:$name, type:$type) {    \\n        id\\n        iban \\n        name\\n        status\\n        type\\n        is_legal\\n        holder_name\\n        issuing_bank {\\n            name\\n            slug\\n        } \\n        expired_at deleted_at\\n    }\\n} \\n",
+                "variables":{"iban":"IR' . $iban . '","is_legal":false,"name":"' . $name . '","type":"SHARE"}}';
+
+        $headers = array(
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token
+        );
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_HTTPHEADER => $headers,
+        ));
+
+        $response = curl_exec($curl);
+
+        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        $response = json_decode($response, 1);
+
+        $errorMessage = data_get($response, 'errors.0.validation.0.message');
+
+        if (!empty($errorMessage)) {
+            switch ($errorMessage) {
+                case 'The provided iban is not valid.':
+                    throw new BadRequestException(trans('validation.invalid_sheba'));
+                case 'The iban has already been taken.':
+                    throw new BadRequestException(trans('validation.sheba_already_taken'));
+                default:
+                    throw new BadRequestException((string)$errorMessage);
+            }
+        }
+
+        $data = data_get($response, 'data.BankAccountAdd');
+        if (empty($data) || empty(data_get($data, 'id'))) {
+            throw new BadRequestException(trans('validation.bank_account_zarinpal_fail'));
+        }
+
+        return data_get($data, 'id');
+    }
+
+    public static function cashoutToAccount($amount, $zarinpalBankAccountId)
+    {
+        // TODO legacy code from MainApp , needs refactor
+
+        $url = config('services.zarinpal.next.url');
+        $token = config('services.zarinpal.next.token');
+        $terminalId = config('services.zarinpal.next.terminal_id');
+
+        $body = '{"query":"mutation PayoutAdd($terminal_id: ID!,$bank_account_id: ID!,$amount: BigInteger!,$description: String,$reconciliation_parts: ReconciliationPartsEnum) \\n{\\n    PayoutAdd(terminal_id:$terminal_id,bank_account_id:$bank_account_id,amount:$amount,description:$description,reconciliation_parts:$reconciliation_parts)\\n    { \\n        reconciliation_parts\\n        id\\n        description\\n        terminal{ preferred_bank_account_id id }\\n        bank_account{ id iban holder_name issuing_bank{ slug name } } \\n        status\\n        amount\\n        percent\\n        created_at\\n        updated_at\\n    }\\n}\\n","variables":{"amount":"' . $amount . '","bank_account_id":"' . $zarinpalBankAccountId . '","description":"برگشت وجه سیستمی","reconciliation_parts":"SINGLE","terminal_id":"' . $terminalId . '"}}';
+
+        $headers = array(
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token
+        );
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_HTTPHEADER => $headers
+        ));
+
+        $response = curl_exec($curl);
+
+        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        $response = json_decode($response, 1);
+
+        $errorMessage = data_get($response, 'errors.0.validation.0.message');
+
+        if (!empty($errorMessage))
+            switch ($errorMessage) {
+                case 'The amount must be at least 100000.':
+                    throw new BadRequestException(trans('validation.zarinpal_amount_be_least'));
+                default:
+                    throw new BadRequestException((string)$errorMessage);
+            }
+
+        $errorMessage = data_get($response, 'errors.0.message');
+
+        if (!empty($errorMessage)) {
+            switch ($errorMessage) {
+                case 'bank account not active,this bank account status is not active':
+                    throw new BadRequestException(trans('validation.zarinpal_bank_account_not_active'));
+                default:
+                    throw new BadRequestException((string)$errorMessage);
+            }
+        }
+
+        $data = data_get($response, 'data.PayoutAdd');
+        if (empty($data) || empty(data_get($data, 'data.PayoutAdd')) || !isset($data['data']['PayoutAdd']['id'])) {
+            throw new BadRequestException(trans('validation.cashout_zarinpal_fail'));
+        }
+
+        return $data['data']['PayoutAdd']['id'];
+    }
 }

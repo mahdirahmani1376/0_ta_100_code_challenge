@@ -44,4 +44,17 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
 
         return self::adminIndex($data);
     }
+
+    public function findSimilarWithZarinpalId(ClientBankAccount $clientBankAccount)
+    {
+        return self::newQuery()
+            ->where('client_id', $clientBankAccount->client_id)
+            ->where(function (Builder $query) use ($clientBankAccount) {
+                $query->where('sheba_number', $clientBankAccount->sheba_number);
+                $query->orWhere('card_number', $clientBankAccount->card_number);
+            })
+            ->whereNotNull('zarinpal_bank_account_id')
+            ->where('id', '<>', $clientBankAccount->id)
+            ->first();
+    }
 }
