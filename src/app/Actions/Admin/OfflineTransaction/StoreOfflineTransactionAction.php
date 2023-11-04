@@ -23,9 +23,11 @@ class StoreOfflineTransactionAction
         $invoice = ($this->findInvoiceByIdService)($data['invoice_id']);
         check_rahkaran($invoice);
 
-        $data['payment_method'] = Transaction::PAYMENT_METHOD_OFFLINE;
-        $data['status'] = Transaction::STATUS_PENDING;
-        $transaction = ($this->storeTransactionService)($invoice, $data);
+        $transaction = ($this->storeTransactionService)($invoice, [
+            ...$data,
+            'payment_method' => Transaction::PAYMENT_METHOD_OFFLINE,
+            'status' => Transaction::STATUS_PENDING,
+        ]);
 
         $data['transaction_id'] = $transaction->id;
         $offlineTransaction = ($this->storeOfflineTransactionService)($invoice, $data);
