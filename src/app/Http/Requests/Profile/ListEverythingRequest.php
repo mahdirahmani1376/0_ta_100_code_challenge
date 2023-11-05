@@ -16,6 +16,7 @@ class ListEverythingRequest extends FormRequest
         return [
             'client_id' => ['required', 'numeric',],
             'offset' => ['nullable', 'numeric',],
+            'perPage' => ['nullable', 'numeric',],
         ];
     }
 }
