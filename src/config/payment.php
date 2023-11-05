@@ -15,8 +15,8 @@ return [
     'bank_gateway' => [ // TODO callback urls should be main-app urls
         'callback_url' => env('MAINAPP_PUBLIC_BASE_URL') . '/api/finance-service/public/bank-gateway/{gateway}/callback/{transaction}/{source}',
         'cloud_callback_url' => env('MAINAPP_PUBLIC_BASE_URL') . '/api/finance-service/public/bank-gateway/{gateway}/callback/{transaction}/{source}',
-        'result_redirect_url' => env('FRONT_END_BASE_URL') . '/callback/{transaction}',
-        'result_cloud_redirect_url' => env('FRONT_END_CLOUD_BASE_URL') . '/callback/{transaction}',
+        'result_redirect_url' => env('FRONT_END_BASE_URL') . '/callback/{invoice}',
+        'result_cloud_redirect_url' => env('FRONT_END_CLOUD_BASE_URL') . '/callback/{invoice}',
     ],
     'profile_list_everything_limit' => env('PROFILE_LIST_EVERYTHING_LIMIT', 100),
 ];

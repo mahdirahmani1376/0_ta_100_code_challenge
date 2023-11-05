@@ -41,7 +41,7 @@ class ActionOnClientCashoutAction
         } elseif ($action === ClientCashout::ACTION_REJECT) {
             ($this->updateClientCashoutService)($clientCashout, [
                 'status' => ClientCashout::STATUS_REJECTED,
-                'admin_note' => $data['admin_note'] ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
+                'admin_note' => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
                 'admin_id' => $data['admin_id'],
             ]);
         } elseif ($action === ClientCashout::ACTION_REJECT_BANK) {
@@ -49,7 +49,7 @@ class ActionOnClientCashoutAction
             ($this->updateClientCashoutService)($clientCashout, [
                 'status' => ClientCashout::STATUS_REJECTED,
                 'rejected_by_bank' => true,
-                'admin_note' => $data['admin_note'] ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
+                'admin_note' => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
                 'admin_id' => $data['admin_id'],
             ]);
         }
@@ -98,7 +98,7 @@ class ActionOnClientCashoutAction
             ($this->updateClientCashoutService)($clientCashout, [
                 'zarinpal_payout_id ' => $payoutId,
                 'admin_id' => $data['admin_id'],
-                'admin_note' => $data['admin_note'] ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
+                'admin_note' => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
             ]);
         }
 

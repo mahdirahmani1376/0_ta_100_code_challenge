@@ -144,10 +144,10 @@ if (!function_exists('parse_string')) {
 }
 
 if (!function_exists('callback_result_redirect_url')) {
-    function callback_result_redirect_url($url, $transactionId): string
+    function callback_result_redirect_url($url, int $invoiceId): string
     {
         return Str::swap([
-            '{transaction}' => $transactionId
+            '{invoice}' => $invoiceId
         ], $url);
     }
 }

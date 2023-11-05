@@ -24,7 +24,7 @@ class PayInvoiceAction
         $redirectTo = $source == 'cloud' ?
             config('payment.bank_gateway.result_cloud_redirect_url') :
             config('payment.bank_gateway.result_redirect_url');
-        $resultUrl = callback_result_redirect_url($redirectTo, 0);
+        $resultUrl = callback_result_redirect_url($redirectTo, $invoice->id);
 
         // validate Invoice on Whether it should be redirected to bankGateway or not
         // Only Invoices with status of "unpaid","collection","pending" can get redirected to bankGateway
