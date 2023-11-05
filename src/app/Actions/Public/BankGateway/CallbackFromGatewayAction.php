@@ -20,7 +20,7 @@ class CallbackFromGatewayAction
         $rawUrl = $source == 'cloud' ?
             config('payment.bank_gateway.result_cloud_redirect_url') :
             config('payment.bank_gateway.result_redirect_url');
-        $redirectTo = callback_result_redirect_url($rawUrl, $transaction->id);
+        $redirectTo = callback_result_redirect_url($rawUrl, $transaction->invoice_id);
 
         // Transaction's status MUST be "STATUS_PENDING" or "STATUS_PENDING_BANK_VERIFY" in order to process callback from gateway,
         // otherwise ignore the request
