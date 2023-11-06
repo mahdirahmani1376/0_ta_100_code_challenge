@@ -349,4 +349,14 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         return $query;
     }
 
+    public function hourlyReport($from, $to): float
+    {
+        return self::newQuery()
+            ->where('status', Invoice::STATUS_PAID)
+            ->where('is_credit', false)
+            ->where('is_mass_payment', false)
+            ->where('paid_at', '>=', $from)
+            ->where('paid_at', '<=', $to)
+            ->sum('total');
+    }
 }
