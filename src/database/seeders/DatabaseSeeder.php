@@ -46,10 +46,6 @@ class DatabaseSeeder extends Seeder
 //            'type' => InvoiceNumber::TYPE_REFUND,
 //        ]);
 
-        MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_INVOICE_CANCELLATION_DAYS, 1);
-        MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS, 1);
-        MainAppAPIService::storeConfig(MainAppConfig::CRON_AUTO_CLOUD_INVOICE_CANCELLATION_DAYS, 1);
-
         MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_HOUR, 15);
         MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL, '1,5,10');
         MainAppAPIService::storeConfig(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_EMAIL_SUBJECT, 'ایمیل یاد اور');
