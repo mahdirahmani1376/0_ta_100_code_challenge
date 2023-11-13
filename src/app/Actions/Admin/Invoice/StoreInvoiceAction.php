@@ -26,6 +26,7 @@ class StoreInvoiceAction
     {
         $invoice = ($this->storeInvoiceService)($data);
 
+        // TODO refactor StoreInvoiceService to take an array or a single item so we have less indents in actions using this service
         if (!empty($data['items'])) {
             foreach ($data['items'] as $item) {
                 ($this->storeItemService)($invoice, $item);
