@@ -18,11 +18,11 @@ class StoreClientBankAccountRequest extends FormRequest
         return [
             'status' => ['nullable', 'string', Rule::in(ClientBankAccount::STATUSES),],
             'bank_name' => ['nullable', 'string',],
-            'card_number' => ['required_without:sheba_number',],
-            'sheba_number' => ['required_without:card_number', 'regex:/^(?:IR)?(?=.{24}$)[0-9]*$/',],
+            'card_number' => ['required',],
+            'sheba_number' => ['required', 'regex:/^(?:IR)?(?=.{24}$)[0-9]*$/',],
             'account_number' => ['nullable', 'max:255'],
             'client_id' => ['required', 'numeric',],
-            'owner_name' => ['nullable', 'max:255',],
+            'owner_name' => ['required', 'max:255',],
         ];
     }
 }

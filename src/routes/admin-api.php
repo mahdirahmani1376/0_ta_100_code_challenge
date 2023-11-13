@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ClientCashout\IndexClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\ShowClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\StoreClientCashoutController;
 use App\Http\Controllers\Admin\ClientCashout\UpdateClientCashoutController;
+use App\Http\Controllers\Admin\FinanceServiceHourlyReportController;
 use App\Http\Controllers\Admin\FinanceServiceReportController;
 use App\Http\Controllers\Admin\Invoice\ApplyBalanceToInvoiceController;
 use App\Http\Controllers\Admin\Invoice\ChangeInvoiceStatusController;
@@ -154,3 +155,4 @@ Route::namespace('ClientCashout')
     });
 
 Route::get('report', FinanceServiceReportController::class);
+Route::get('hourly-report', FinanceServiceHourlyReportController::class);

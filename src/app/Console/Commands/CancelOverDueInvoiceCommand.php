@@ -10,6 +10,8 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -19,22 +21,15 @@ use Throwable;
 class CancelOverDueInvoiceCommand extends Command
 {
     protected $signature = 'cron:overdue-invoice
-                            {--test : Run in test mode, will not commit anything into DB}
-                            {--threshold=0 : Threshold for how old an Invoice should be in day}
-                            {--threshold-domain=0 : Threshold for how old a Domain Invoice should be in day}
-                            {--threshold-cloud=0 : Threshold for how old a Cloud Invoice should be in day}';
+                            {--test : Run in test mode, will not commit anything into DB}';
 
     protected $description = 'Cancel overdue Invoices';
 
-    private int $threshold = 0;
-    private int $thresholdDomain = 0;
-    private int $thresholdCloud = 0;
-    private Carbon $dueDate;
-    private Carbon $dueDateDomain;
-    private Carbon $dueDateCloud;
+    private int $defaultThreshold = 0;
     private CancelInvoiceAction $cancelInvoiceAction;
     private InvoiceRepositoryInterface $invoiceRepository;
     private bool $test;
+    private array $thresholds = [];
 
     public function handle(CancelInvoiceAction $cancelInvoiceAction, InvoiceRepositoryInterface $invoiceRepository)
     {
@@ -52,156 +47,56 @@ class CancelOverDueInvoiceCommand extends Command
         $this->prepareThresholdValues();
 
         $this->cancelUnpaidInvoices();
-        $this->cancelUnpaidDomainInvoices();
-        $this->cancelUnpaidCloudInvoices();
-        $this->cancelMassPaymentInvoices();
 
-        $this->newLine(2);
         $this->info('Completed');
     }
 
-    private function cancelUnpaidInvoices()
+    private function cancelUnpaidInvoices(): void
     {
         $this->info('-------- Canceling every Invoice that is not a DomainService ------');
 
-        $this->dueDate = now()
-            ->second(0)
-            ->minute(0)
-            ->subDays($this->threshold);
-        $this->info('Due Date: ' . JalaliCalender::getJalaliString($this->dueDate) . ' ' . $this->dueDate->format('H:i:s'));
+        foreach (Arr::sort($this->thresholds) as $itemType => $thresholdInDays) {
+            $dueDate = now()
+                ->second(0)
+                ->minute(0)
+                ->subDays($thresholdInDays);
+            $this->info('Canceling Invoices with item type of: '. $itemType);
+            $this->info('Due Date: ' . JalaliCalender::getJalaliString($dueDate) . ' ' . $dueDate->format('H:i:s'));
 
-        $overDueInvoices = $this->invoiceRepository->newQuery()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 0)
-            ->where('is_credit', 0)
-            ->whereDate('due_date', '<', $this->dueDate)
-            ->whereHas('items', function ($query) {
-                $query->where('invoiceable_type', '<>', Item::TYPE_DOMAIN_SERVICE);
-                $query->where('invoiceable_type', '<>', Item::TYPE_CLOUD);
-            })
-            ->get();
+            $overDueInvoices = $this->invoiceRepository->newQuery()
+                ->where('status', Invoice::STATUS_UNPAID)
+//                ->where('is_mass_payment', 0) // TODO check this
+                ->where('is_credit', 0)
+                ->whereDate('due_date', '<', $dueDate)
+                ->whereHas('items', function ($query) use ($itemType) {
+                    $query->where('invoiceable_type', $itemType);
+                });
 
-        $this->cancelInvoices($overDueInvoices);
-    }
-
-    private function cancelUnpaidDomainInvoices()
-    {
-        $this->info('-------- Canceling every Invoice that is a DomainService ------');
-
-        $this->dueDateDomain = now()
-            ->second(0)
-            ->minute(0)
-            ->subDays($this->thresholdDomain);
-        $this->info('Due Date Domain: ' . JalaliCalender::getJalaliString($this->dueDateDomain) . ' ' . $this->dueDateDomain->format('H:i:s'));
-
-        $overDueInvoices = $this->invoiceRepository->newQuery()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 0)
-            ->where('is_credit', 0)
-            ->whereDate('due_date', '<', $this->dueDateDomain)
-            ->whereHas('items', function ($query) {
-                $query->where('invoiceable_type', '=', Item::TYPE_DOMAIN_SERVICE);
-            })
-            ->get();
-
-        $this->cancelInvoices($overDueInvoices);
-    }
-
-    private function cancelUnpaidCloudInvoices()
-    {
-        $this->info('-------- Canceling every Invoice that is a Cloud ------');
-
-        $this->dueDateCloud = now()
-            ->second(0)
-            ->minute(0)
-            ->subDays($this->thresholdCloud);
-        $this->info('Due Date Cloud: ' . JalaliCalender::getJalaliString($this->dueDateCloud) . ' ' . $this->dueDateCloud->format('H:i:s'));
-
-        $overDueInvoices = $this->invoiceRepository->newQuery()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 0)
-            ->where('is_credit', 0)
-            ->whereDate('due_date', '<', $this->dueDateCloud)
-            ->whereHas('items', function ($query) {
-                $query->where('invoiceable_type', '=', Item::TYPE_CLOUD);
-            })
-            ->get();
-
-        $this->cancelInvoices($overDueInvoices);
-    }
-
-    private function cancelMassPaymentInvoices()
-    {
-        $this->info('-------- Canceling Mass Payment invoices ------');
-
-        $this->info('Due Date Domain: ' . JalaliCalender::getJalaliString($this->dueDateDomain) . ' ' . $this->dueDateDomain->format('H:i:s'));
-
-        $overDueInvoices = $this->invoiceRepository->newQuery()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 1)
-            ->where('is_credit', 0)
-            ->whereDate('created_at', '<', now()->startOfDay()->format('Y-m-d H:i:s'))
-            ->get();
-
-        $success = 0;
-        $overDueInvoices->each(function (Invoice $invoice) use (&$success) {
-            try {
-                if (!$this->test) {
-                    ($this->cancelInvoiceAction)($invoice);
-                }
-                $this->info("Mass Invoice #{$invoice->getKey()} cancelled successfully.");
-                $success++;
-            } catch (Throwable $exception) {
-                $this->error("Cron Cancel Mass Invoice #{$invoice->getKey()} Failed, {$exception->getMessage()}");
-            }
-        });
-        $this->info("Mass Invoice Cancelled: " . $success);
-    }
-
-    private function prepareThresholdValues(): void
-    {
-        try {
-            if (empty($this->option('threshold'))) {
-                $this->info("No 'threshold' argument provided, fetching from MainApp configs...");
-                $this->threshold = MainAppConfig::get(MainAppConfig::CRON_AUTO_INVOICE_CANCELLATION_DAYS);
-                $this->info("'threshold' config received from MainApp: " . $this->threshold);
-            } else {
-                $this->threshold = $this->option('threshold');
-            }
-
-            if (empty($this->option('threshold-domain'))) {
-                $this->info("No 'threshold-domain' argument provided, fetching from MainApp configs...");
-                $this->thresholdDomain = MainAppConfig::get(MainAppConfig::CRON_AUTO_DOMAIN_INVOICE_CANCELLATION_DAYS);
-                $this->info("'threshold-Domain' value received from MainApp: " . $this->thresholdDomain);
-            } else {
-                $this->thresholdDomain = $this->option('threshold-domain');
-            }
-
-            if (empty($this->option('threshold-cloud'))) {
-                $this->info("No 'threshold-cloud' argument provided, fetching from MainApp configs...");
-                $this->thresholdCloud = MainAppConfig::get(MainAppConfig::CRON_AUTO_CLOUD_INVOICE_CANCELLATION_DAYS);
-                $this->info("'threshold-cloud' value received from MainApp: " . $this->thresholdCloud);
-            } else {
-                $this->thresholdCloud = $this->option('threshold-cloud');
-            }
-        } catch (\Exception $exception) {
-            \Log::error('Failed to fetch config values from MainApp', [
-                'class' => self::class,
-                'message' => $exception->getMessage(),
-            ]);
-            $this->error('Failed to fetch config values from MainApp');
-
-            exit(-1);
+            $this->cancelInvoices($overDueInvoices);
         }
+        $dueDate = now()
+            ->second(0)
+            ->minute(0)
+            ->subDays($this->defaultThreshold);
+        $this->info('Canceling Invoices with item type of: DEFAULT');
+        $this->info('Due Date: ' . JalaliCalender::getJalaliString($dueDate) . ' ' . $dueDate->format('H:i:s'));
+
+        $overDueInvoices = $this->invoiceRepository->newQuery()
+            ->where('status', Invoice::STATUS_UNPAID)
+            ->where('is_mass_payment', 0)
+            ->where('is_credit', 0)
+            ->whereDate('due_date', '<', $dueDate);
+
+        $this->cancelInvoices($overDueInvoices);
     }
 
-    public function cancelInvoices(Collection $overDueInvoices): void
+    public function cancelInvoices(Builder $overDueInvoices): void
     {
-        $this->info("Total Invoices: " . $overDueInvoices->count());
+        $this->info("Invoices to cancel count: " . $overDueInvoices->count());
 
         $success = 0;
         $errors = 0;
-        $overDueInvoices->each(function (Invoice $invoice) use (&$errors, &$success) {
+        foreach ($overDueInvoices->cursor() as $invoice) {
             try {
                 if (!$this->test) {
                     ($this->cancelInvoiceAction)($invoice);
@@ -214,8 +109,35 @@ class CancelOverDueInvoiceCommand extends Command
                 Log::error("Cron Cancel Invoice #{$invoice->getKey()} Failed, {$exception->getMessage()}", $exception->getTrace());
                 $this->error("[$errors] Cron Cancel Invoice #{$invoice->getKey()} Failed, {$exception->getMessage()}");
             }
-        });
+        }
         $this->info("Successfully cancelled invoices: " . $success);
         $this->info("Failed cancelled invoices: " . $errors);
+        $this->info('--------------------------------------');
+        $this->newLine();
+    }
+
+    private function prepareThresholdValues(): void
+    {
+        // Edit this list if needed
+        $this->thresholds = [
+            Item::TYPE_ADD_CLIENT_CREDIT => 10,
+            Item::TYPE_ADD_FUNDS => 2,
+            Item::TYPE_DOMAIN_SERVICE => 13,
+            Item::TYPE_PRODUCT_SERVICE => 3,
+            Item::TYPE_ADD_CLOUD_CREDIT => 1,
+            Item::TYPE_CLOUD => 1,
+            Item::TYPE_ITEM => 1,
+            Item::TYPE_PRODUCT_SERVICE_UPGRADE => 1,
+            Item::TYPE_MASS_PAYMENT_INVOICE => 1,
+            Item::TYPE_ADMIN_TIME => 1,
+            Item::TYPE_CHANGE_SERVICE => 1,
+            Item::TYPE_PARTNER_DISCOUNT => 1,
+            Item::TYPE_PARTNER_COMMISSION => 1,
+            Item::TYPE_PARTNER_PAYMENT => 1,
+            Item::TYPE_AFFILIATION => 1,
+        ];
+
+        // Default threshold, this will be used if an Invoice is overdue but doesn't have any Item with types defined above
+        $this->defaultThreshold = 10;
     }
 }
