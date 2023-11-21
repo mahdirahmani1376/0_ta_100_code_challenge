@@ -15,10 +15,12 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedInteger('client_id');
+            $table->unsignedBigInteger('profile_id');
             $table->string('name')->default(Wallet::WALLET_DEFAULT_NAME);
             $table->double('balance')->default(0);
             $table->boolean('is_active')->default(true);
+
+            $table->foreign('profile_id')->references('id')->on('profiles');
         });
     }
 

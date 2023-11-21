@@ -10,12 +10,12 @@ class DeductBalanceAction
     {
     }
 
-    public function __invoke(int $clientId, array $data): CreditTransaction
+    public function __invoke(int $profile_id, array $data): CreditTransaction
     {
         if ($data['amount'] >= 1) {
             $data['amount'] = $data['amount'] * -1;
         }
 
-        return ($this->storeCreditTransactionAction)($clientId, $data);
+        return ($this->storeCreditTransactionAction)($profile_id, $data);
     }
 }

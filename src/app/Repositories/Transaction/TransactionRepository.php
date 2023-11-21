@@ -78,8 +78,8 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         if (!empty($data['invoice_id'])) {
             $query->where('invoice_id', '=', $data['invoice_id']);
         }
-        if (!empty($data['client_id'])) {
-            $query->where('client_id', '=', $data['client_id']);
+        if (!empty($data['profile_id'])) {
+            $query->where('profile_id', '=', $data['profile_id']);
         }
         if (!empty($data['to_date'])) {
             $query->whereDate('created_at', '<=', $data['to_date']);
@@ -103,7 +103,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
     {
         $query = self::newQuery();
 
-        $query->where('client_id', $data['client_id']);
+        $query->where('profile_id', $data['profile_id']);
         if (!empty($data['search'])) {
             $query->where(function (Builder $query) use ($data) {
                 return $query->where('reference_id', 'LIKE', '%' . $data['search'] . '%')
@@ -127,10 +127,10 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         return $this->paginate($query);
     }
 
-    public function profileListEverything(int $clientId): Collection
+    public function profileListEverything(int $profileId): Collection
     {
         return self::newQuery()
-            ->where('client_id', $clientId)
+            ->where('profile_id', $profileId)
             ->where('status', Transaction::STATUS_SUCCESS)
             ->whereNotIn('payment_method', [
                 Transaction::PAYMENT_METHOD_WALLET_BALANCE,

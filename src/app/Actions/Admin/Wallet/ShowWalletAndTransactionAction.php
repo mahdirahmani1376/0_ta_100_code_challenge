@@ -13,10 +13,10 @@ class ShowWalletAndTransactionAction
     {
     }
 
-    public function __invoke(int $clientId)
+    public function __invoke(int $profileId)
     {
-        $wallet = ($this->showWalletAction)($clientId);
-        $creditTransactions = ($this->creditTransactionService)($clientId);
+        $wallet = ($this->showWalletAction)($profileId);
+        $creditTransactions = ($this->creditTransactionService)($profileId);
         $wallet->credit_transactions = $creditTransactions;
 
         return $wallet;

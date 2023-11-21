@@ -28,7 +28,7 @@ class MergeInvoiceAction
             'status' => Invoice::STATUS_UNPAID,
             'tax_rate' => $invoices->first()->tax_rate,
             'due_date' => $invoices->max('due_date'),
-            'client_id' => $invoices->first()->client_id,
+            'profile_id' => $invoices->first()->profile_id,
             'admin_id' => $data['admin_id'],
             'items' => $items->toArray(),
         ];

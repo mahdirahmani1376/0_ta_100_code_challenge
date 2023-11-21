@@ -14,18 +14,18 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
 {
     public string $model = CreditTransaction::class;
 
-    public function indexByClientId(int $clientId): LengthAwarePaginator
+    public function indexByProfileId(int $profileId): LengthAwarePaginator
     {
         return $this->paginate(
             $this->newQuery()
-                ->where('client_id', $clientId)
+                ->where('profile_id', $profileId)
         );
     }
 
-    public function sum(int $clientId): int
+    public function sum(int $profileId): int
     {
         return $this->newQuery()
-            ->where('client_id', $clientId)
+            ->where('profile_id', $profileId)
             ->sum('amount');
     }
 
@@ -51,8 +51,8 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
         if (!empty($data['date'])) {
             $query->whereDate('created_at', '=', $data['date']);
         }
-        if (!empty($data['client_id'])) {
-            $query->where('client_id', '=', $data['client_id']);
+        if (!empty($data['profile_id'])) {
+            $query->where('profile_id', '=', $data['profile_id']);
         }
 
         $query->orderBy(
@@ -63,10 +63,10 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
         return self::paginate($query);
     }
 
-    public function profileListEverything(int $clientId): Collection
+    public function profileListEverything(int $profileId): Collection
     {
         return self::newQuery()
-            ->where('client_id', $clientId)
+            ->where('profile_id', $profileId)
             ->where(function (Builder $builder) {
                 $builder->where('amount', '<=', -50000)
                     ->orWhere('amount', '>=', 50000);

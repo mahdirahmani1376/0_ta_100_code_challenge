@@ -11,10 +11,10 @@ class StoreClientCashoutAction
     {
     }
 
-    public function __invoke(int $clientId, array $data)
+    public function __invoke(int $profileId, array $data)
     {
         $data['status'] = ClientCashout::STATUS_PENDING;
-        $data['client_id'] = $clientId;
+        $data['profile_id'] = $profileId;
 
         return ($this->storeClientCashoutService)($data);
     }

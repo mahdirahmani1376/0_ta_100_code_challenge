@@ -13,13 +13,13 @@ class StoreCreditTransactionController
     }
 
     /**
-     * @param int $clientId
+     * @param int $profileId
      * @param StoreCreditTransactionRequest $request
      * @return CreditTransactionResource
      */
-    public function __invoke(int $clientId, StoreCreditTransactionRequest $request)
+    public function __invoke(int $profileId, StoreCreditTransactionRequest $request)
     {
-        $creditTransaction = ($this->storeCreditTransactionAction)($clientId, $request->validated());
+        $creditTransaction = ($this->storeCreditTransactionAction)($profileId, $request->validated());
 
         return CreditTransactionResource::make($creditTransaction);
     }

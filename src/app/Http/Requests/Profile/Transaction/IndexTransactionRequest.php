@@ -21,7 +21,7 @@ class IndexTransactionRequest extends FormRequest
             'sort' => ['string', 'nullable', Rule::in(get_sortable_items((new Transaction())->getFillable()))],
             'sortDirection' => ['string', 'nullable', Rule::in('desc', 'asc')],
             'search' => ['nullable', 'string'],
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
         ];
     }
 }

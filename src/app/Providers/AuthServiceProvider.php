@@ -14,9 +14,5 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Gate::define('access-invoice', function (Invoice $invoice) {
-            dd(request('client_id'));
-            return $invoice->client_id == request('client_id');
-        });
     }
 }

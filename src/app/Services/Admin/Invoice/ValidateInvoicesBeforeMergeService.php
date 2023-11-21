@@ -21,8 +21,8 @@ class ValidateInvoicesBeforeMergeService
             throw MergeInvoiceException::make(trans('finance.mergeInvoice.needMoreInvoice'));
         }
 
-        // Check if all invoices share the same client_id
-        if ($invoices->count() !== $invoices->where('client_id', $invoices->first()->client_id)->count()) {
+        // Check if all invoices share the same profile_id
+        if ($invoices->count() !== $invoices->where('profile_id', $invoices->first()->profile_id)->count()) {
             throw MergeInvoiceException::make(trans('finance.mergeInvoice.withDifferentClient'));
         }
         // Check if all invoices share the same tax_rate

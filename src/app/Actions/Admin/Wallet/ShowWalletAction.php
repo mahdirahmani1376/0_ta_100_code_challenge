@@ -3,23 +3,23 @@
 namespace App\Actions\Admin\Wallet;
 
 use App\Models\Wallet;
-use App\Services\Wallet\FindWalletByClientIdService;
+use App\Services\Wallet\FindWalletByProfileIdService;
 use App\Services\Wallet\StoreWalletService;
 
 class ShowWalletAction
 {
     public function __construct(
-        private readonly FindWalletByClientIdService $findWalletByClientIdService,
-        private readonly StoreWalletService          $storeWalletService
+        private readonly FindWalletByProfileIdService $findWalletByProfileIdService,
+        private readonly StoreWalletService           $storeWalletService
     )
     {
     }
 
-    public function __invoke(int $clientId): Wallet
+    public function __invoke(int $profileId): Wallet
     {
-        $wallet = ($this->findWalletByClientIdService)($clientId);
+        $wallet = ($this->findWalletByProfileIdService)($profileId);
         if (is_null($wallet)) {
-            $wallet = ($this->storeWalletService)($clientId);
+            $wallet = ($this->storeWalletService)($profileId);
         }
 
         return $wallet;

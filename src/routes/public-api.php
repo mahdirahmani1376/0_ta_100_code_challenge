@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Public\BankAccount\IndexBankAccountController;
 use App\Http\Controllers\Public\BankGateway\CallbackFromGatewayController;
 use App\Http\Controllers\Public\BankGateway\IndexBankGatewayController;
 use App\Http\Controllers\Public\BankGateway\PayInvoiceController;
 use App\Http\Controllers\Public\Invoice\ShowInvoiceStatusController;
+use App\Http\Controllers\Public\Profile\ShowProfileIdController;
 use Illuminate\Support\Facades\Route;
 
 Route::namespace('Invoice')
@@ -24,4 +26,10 @@ Route::namespace('BankAccount')
     ->prefix('bank-account')
     ->group(function () {
         Route::get('/', IndexBankAccountController::class);
+    });
+
+Route::namespace('Profile')
+    ->prefix('profile')
+    ->group(function () {
+        Route::get('{clientId}', ShowProfileIdController::class);
     });

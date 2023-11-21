@@ -59,7 +59,7 @@ class InvoiceReminderCommand extends Command
     {
         $hour = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_HOUR, noCache: true);
         if (now()->hour != $hour) {
-            $this->info('Hour miss match now: ' . now()->hour . ' config: ' . $hour . ' , existing.');
+            $this->info('Hour miss match now: ' . now()->hour . ' config: ' . $hour);
             exit();
         }
         try {
@@ -102,7 +102,7 @@ class InvoiceReminderCommand extends Command
             if (empty($emailThreshold)) {
                 continue;
             }
-            $this->info('----- Email threshold: ' . $emailThreshold);
+            $this->info('----- Email threshold: ' . $emailThreshold . ' days before due_date');
             $invoices = $this->prepareInvoices($emailThreshold);
 
             $this->info('Invoice count: ' . $invoices->count());
@@ -113,13 +113,13 @@ class InvoiceReminderCommand extends Command
                 continue;
             }
 
-            $invoices->groupBy('client_id')
+            $invoices->groupBy('profile_id')
                 ->each(function ($invoices, int $clientId) {
                     try {
                         $payload = [
                             'reminders' => [
                                 [
-                                    'client_id' => $clientId,
+                                    'profile_id' => $clientId,
                                     'message' => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->emailMessageTemplate, $this->emailLinkTemplate),
                                 ]
                             ],
@@ -140,7 +140,10 @@ class InvoiceReminderCommand extends Command
     private function sendSMSReminder()
     {
         foreach (explode(',', $this->smsThresholds) as $smsThreshold) {
-            $this->info('----- SMS threshold: ' . $smsThreshold);
+            if (empty($smsThreshold)) {
+                continue;
+            }
+            $this->info('----- SMS threshold: ' . $smsThreshold. ' days before due_date');
             $invoices = $this->prepareInvoices($smsThreshold);
 
             $this->info('Invoice count: ' . $invoices->count());
@@ -151,13 +154,13 @@ class InvoiceReminderCommand extends Command
                 continue;
             }
 
-            $invoices->groupBy('client_id')
+            $invoices->groupBy('profile_id')
                 ->each(function ($invoices, $clientId) {
                     try {
                         $payload = [
                             'reminders' => [
                                 [
-                                    'client_id' => $clientId,
+                                    'profile_id' => $clientId,
                                     'message' => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->smsMessageTemplate, $this->smsLinkTemplate),
                                 ],
                             ]
@@ -193,6 +196,6 @@ class InvoiceReminderCommand extends Command
         return $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
             ->whereDate('due_date', '=', now()->addDays($emailThreshold)->toDateString())
-            ->get(['id', 'client_id']);
+            ->get(['id', 'profile_id']);
     }
 }

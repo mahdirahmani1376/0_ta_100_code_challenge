@@ -17,7 +17,7 @@ class CalcWalletBalanceService
 
     public function __invoke(Wallet $wallet): Wallet
     {
-        $sumOfCreditTransactionsAmount = $this->creditTransactionRepository->sum($wallet->client_id);
+        $sumOfCreditTransactionsAmount = $this->creditTransactionRepository->sum($wallet->profile_id);
 
         return $this->walletRepository->update(
             $wallet,

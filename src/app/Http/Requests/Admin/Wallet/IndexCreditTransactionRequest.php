@@ -18,7 +18,7 @@ class IndexCreditTransactionRequest extends FormRequest
         return [
             'sort'          => ['string', 'nullable', Rule::in(get_sortable_items((new CreditTransaction())->getFillable()))],
             'sortDirection' => ['string', 'nullable', Rule::in('desc', 'asc')],
-            'client_id'     => 'nullable|string',
+            'profile_id'     => 'nullable|string',
             'search'        => 'nullable|string|max:255',
             'date'          => ['date_format:Y-m-d', 'nullable'],
             'from_date'     => ['nullable', 'date', 'date_format:Y-m-d', 'before_or_equal:to_date'],

@@ -18,7 +18,7 @@ class InvoiceResource extends JsonResource
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'due_date' => $this->due_date?->toDateTimeString(),
             'paid_at' => $this->paid_at?->toDateTimeString(),
-            'client_id' => $this->client_id,
+            'profile_id' => $this->profile_id,
             'rahkaran_id' => $this->rahkaran_id,
             'payment_method' => $this->payment_method,
             'balance' => $this->balance,

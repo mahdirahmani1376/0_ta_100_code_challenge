@@ -26,7 +26,7 @@ class StoreInvoiceAction
                 continue;
             }
             $unpaidInvoices = ($this->indexInvoiceService)([
-                'client_id' => $data['client_id'],
+                'profile_id' => $data['profile_id'],
                 'status' => Invoice::STATUS_UNPAID,
                 'invoiceable_id' => $item['invoiceable_id'],
                 'invoiceable_type' => Item::TYPE_DOMAIN_SERVICE,

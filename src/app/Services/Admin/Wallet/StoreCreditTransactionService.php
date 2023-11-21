@@ -13,13 +13,13 @@ class StoreCreditTransactionService
 
     public function __invoke(Wallet $wallet, array $data)
     {
-        $data['client_id'] = $wallet->client_id;
+        $data['profile_id'] = $wallet->profile_id;
         $data['wallet_id'] = $wallet->getKey();
         $data['created_at'] = $data['date'] ?? now();
         $data['admin_id'] = request('admin_id');
 
         return $this->creditTransactionRepository->create($data, [
-            'client_id',
+            'profile_id',
             'wallet_id',
             'created_at',
             'admin_id',

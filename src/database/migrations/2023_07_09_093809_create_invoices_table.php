@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamp('due_date')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('processed_at')->nullable();
-            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('profile_id');
             $table->unsignedBigInteger('rahkaran_id')->nullable();
             $table->string('payment_method');
             $table->double('balance')->default(0);
@@ -30,6 +30,8 @@ return new class extends Migration
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->boolean('is_credit')->default(false);
             $table->text('note')->nullable();
+
+            $table->foreign('profile_id')->references('id')->on('profiles');
         });
     }
 

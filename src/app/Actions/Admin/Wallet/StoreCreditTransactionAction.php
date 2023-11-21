@@ -17,9 +17,9 @@ class StoreCreditTransactionAction
     {
     }
 
-    public function __invoke(int $clientId, array $data): CreditTransaction
+    public function __invoke(int $profile_id, array $data): CreditTransaction
     {
-        $wallet = ($this->showWalletAction)($clientId);
+        $wallet = ($this->showWalletAction)($profile_id);
         $creditTransaction = ($this->storeCreditTransactionService)($wallet, $data); // TODO import into Rahkaran 'storeReceipt'
         ($this->calcWalletBalanceService)($wallet);
 

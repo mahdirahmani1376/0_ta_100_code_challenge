@@ -15,7 +15,7 @@ class TransactionResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
-            'client_id' => $this->client_id,
+            'profile_id' => $this->profile_id,
             'invoice_id' => $this->invoice_id,
             'rahkaran_id' => $this->rahkaran_id,
             'amount' => $this->amount,
@@ -27,7 +27,7 @@ class TransactionResource extends JsonResource
             'reference_id' => $this->reference_id,
             'invoice' => [
                 'id' => $this->invoice->id,
-                'client_id' => $this->invoice->client_id,
+                'profile_id' => $this->invoice->profile_id,
             ],
         ];
     }

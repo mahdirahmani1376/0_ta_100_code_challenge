@@ -13,13 +13,13 @@ class DeductBalanceController
     }
 
     /**
-     * @param int $clientId
+     * @param int $profileId
      * @param DeductBalanceRequest $request
      * @return CreditTransactionResource
      */
-    public function __invoke(int $clientId, DeductBalanceRequest $request)
+    public function __invoke(int $profileId, DeductBalanceRequest $request)
     {
-        $creditTransaction = ($this->deductBalanceAction)($clientId, $request->validated());
+        $creditTransaction = ($this->deductBalanceAction)($profileId, $request->validated());
 
         return CreditTransactionResource::make($creditTransaction);
     }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('profile_id');
             $table->unsignedBigInteger('zarinpal_bank_account_id')->nullable();
             $table->string('bank_name')->nullable();
             $table->string('owner_name')->nullable();
@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('account_number')->nullable();
             $table->string('card_number')->nullable();
             $table->string('status')->default(ClientBankAccount::STATUS_PENDING);
+
+            $table->foreign('profile_id')->references('id')->on('profiles');
         });
     }
 

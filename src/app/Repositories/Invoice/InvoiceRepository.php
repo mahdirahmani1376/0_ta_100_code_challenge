@@ -39,8 +39,8 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             $query->whereNull('admin_id')
                 ->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED]);
         }
-        if (!empty($data['client_id'])) {
-            $query->where('client_id', '=', $data['client_id']);
+        if (!empty($data['profile_id'])) {
+            $query->where('profile_id', '=', $data['profile_id']);
         }
         if (!empty($data['invoice_id'])) {
             $query->where('id', '=', $data['invoice_id']);
@@ -81,7 +81,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
     public function profileIndex(array $data): LengthAwarePaginator
     {
         $query = self::newQuery();
-        $query->where('client_id', $data['client_id']);
+        $query->where('profile_id', $data['profile_id']);
         if (!empty($data['search'])) {
             $query->where(function (Builder $query) use ($data) {
                 $query->where('id', "LIKE", '%' . $data['search'] . '%')
@@ -114,10 +114,10 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         return self::paginate($query);
     }
 
-    public function profileListEverything(int $clientId): Collection
+    public function profileListEverything(int $profileId): Collection
     {
         return self::newQuery()
-            ->where('client_id', $clientId)
+            ->where('profile_id', $profileId)
             ->where('status', Invoice::STATUS_PAID)
             ->where('is_credit', false)
             ->where('is_mass_payment', false)
@@ -131,7 +131,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
     public function prepareInvoicesForMassPayment(array $data): Collection
     {
         return self::newQuery()
-            ->where('client_id', $data['client_id'])
+            ->where('profile_id', $data['profile_id'])
             ->where('status', Invoice::STATUS_UNPAID)
             ->where('is_credit', false)
             ->where('is_mass_payment', false)
@@ -142,8 +142,8 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
     public function internalIndex(array $data): Collection
     {
         return self::newQuery()
-            ->when(!empty($data['client_id']), function (Builder $builder) use ($data) {
-                $builder->where('client_id', $data['client_id']);
+            ->when(!empty($data['profile_id']), function (Builder $builder) use ($data) {
+                $builder->where('profile_id', $data['profile_id']);
             })
             ->when(!empty($data['status']), function (Builder $builder) use ($data) {
                 $builder->where('status', $data['status']);
@@ -172,7 +172,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             })
             ->orWhere(function (Builder $builder) use ($data) {
                 $builder->where('is_credit', true);
-                $builder->where('client_id', $data['client_id']);
+                $builder->where('profile_id', $data['profile_id']);
             });
         if (!empty($data['search'])) {
             $query->where('id', $data['search']);

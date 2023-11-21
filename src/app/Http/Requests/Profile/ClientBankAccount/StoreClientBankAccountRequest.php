@@ -14,7 +14,7 @@ class StoreClientBankAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'bank_name' => ['nullable', 'string',],
             'card_number' => ['required',],
             'sheba_number' => ['required', 'regex:/^(?:IR)?(?=.{24}$)[0-9]*$/',],

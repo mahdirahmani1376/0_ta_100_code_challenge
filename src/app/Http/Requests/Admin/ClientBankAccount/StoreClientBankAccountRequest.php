@@ -21,7 +21,7 @@ class StoreClientBankAccountRequest extends FormRequest
             'card_number' => ['required',],
             'sheba_number' => ['required', 'regex:/^(?:IR)?(?=.{24}$)[0-9]*$/',],
             'account_number' => ['nullable', 'max:255'],
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'owner_name' => ['required', 'max:255',],
         ];
     }

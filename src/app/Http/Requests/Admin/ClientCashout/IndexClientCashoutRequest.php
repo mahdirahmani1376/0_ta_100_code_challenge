@@ -16,7 +16,7 @@ class IndexClientCashoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['nullable', 'numeric',],
+            'profile_id' => ['nullable', 'numeric',],
             'status' => ['nullable', Rule::in(ClientCashout::STATUSES),],
             'client_bank_account_id' => ['nullable', 'exists:client_bank_accounts,id'],
         ];

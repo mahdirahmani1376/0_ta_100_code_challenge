@@ -11,6 +11,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Models\Item;
 use App\Models\OfflineTransaction;
+use App\Models\Profile;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use Carbon\Carbon;
@@ -161,7 +162,7 @@ class DataMigration extends Command
                 $newRow['created_at'] = $row['created_at'];
                 $newRow['updated_at'] = $row['updated_at'];
                 $newRow['deleted_at'] = $row['deleted_at'];
-                $newRow['client_id'] = $row['client_id'];
+                $newRow['profile_id'] = self::createProfile($row['client_id']);
                 $newRow['zarinpal_bank_account_id'] = $row['zarinpal_bank_account_id'];
                 $newRow['bank_name'] = $row['bank_name'];
                 $newRow['owner_name'] = $row['deposit_owner'];
@@ -199,7 +200,7 @@ class DataMigration extends Command
                 $newRow['created_at'] = $row['created_at'];
                 $newRow['updated_at'] = $row['updated_at'];
                 $newRow['deleted_at'] = $row['deleted_at'];
-                $newRow['client_id'] = $row['client_id'];
+                $newRow['profile_id'] = self::createProfile($row['client_id']);
                 $newRow['client_bank_account_id'] = $row['bank_account_id'];
                 $newRow['zarinpal_payout_id'] = $row['payout_id'];
                 $newRow['admin_id'] = $row['admin_id'];
@@ -246,7 +247,7 @@ class DataMigration extends Command
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['client_id'] = $row['client_id'];
+                    $newRow['profile_id'] = self::createProfile($row['client_id']);
                     $newRow['name'] = $row['wallet'];
                     $newRow['balance'] = $row['credit'];
                     $newRow['is_active'] = true;
@@ -281,9 +282,10 @@ class DataMigration extends Command
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['client_id'] = $row['client_id'];
-                    $newRow['wallet_id'] = Wallet::query()->where('client_id', $row['client_id'])->firstOrCreate([
-                        'client_id' => $row['client_id'],
+                    $profileId = self::createProfile($row['client_id']);
+                    $newRow['profile_id'] = $profileId;
+                    $newRow['wallet_id'] = Wallet::query()->where('profile_id', $profileId)->firstOrCreate([
+                        'profile_id' => $profileId,
                         'name' => Wallet::WALLET_DEFAULT_NAME,
                         'balance' => 0,
                         'is_active' => true,
@@ -326,7 +328,7 @@ class DataMigration extends Command
                     $newRow['id'] = $row['invoice_id'];
                     $newRow['created_at'] = $row['invoice_date'];
                     $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['client_id'] = $row['client_id'];
+                    $newRow['profile_id'] = self::createProfile($row['client_id']);
                     $newRow['due_date'] = $row['due_date'];
                     $newRow['paid_at'] = $row['paid_date'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
@@ -474,7 +476,7 @@ class DataMigration extends Command
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
                     $newRow['paid_at'] = $row['paid_date'];
-                    $newRow['client_id'] = $row['i_client_id'];
+                    $newRow['profile_id'] = self::createProfile($row['i_client_id']);
                     $newRow['invoice_id'] = $row['i_invoice_id'];
                     if (Transaction::where('id', $row['transaction_id'])->doesntExist()) {
                         return false;
@@ -552,7 +554,7 @@ class DataMigration extends Command
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['client_id'] = $row['i_client_id'];
+                    $newRow['profile_id'] = self::createProfile($row['i_client_id']);
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['amount'] = $row['amount'];
@@ -641,4 +643,16 @@ class DataMigration extends Command
         }
     }
 
+    private static function createProfile(int $clientId)
+    {
+        if ($profile = Profile::query()->find($clientId)) {
+            return $profile->id;
+        } else {
+            Profile::unguard();
+            return Profile::query()->create([
+                'id' => $clientId,
+                'client_id' => $clientId
+            ])->id;
+        }
+    }
 }

@@ -10,8 +10,8 @@ class IndexClientBankAccountAction
     {
     }
 
-    public function __invoke(int $clientId, array $data)
+    public function __invoke(array $data)
     {
-        return ($this->indexClientBankAccountService)($clientId, $data);
+        return ($this->indexClientBankAccountService)($data);
     }
 }

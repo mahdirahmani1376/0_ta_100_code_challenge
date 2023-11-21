@@ -16,7 +16,7 @@ class StoreTransactionService
     public function __invoke(Invoice $invoice, array $data): Transaction
     {
         $data['invoice_id'] = $invoice->getKey();
-        $data['client_id'] = $invoice->client_id;
+        $data['profile_id'] = $invoice->profile_id;
         $data['status'] = $data['status'] ?? Transaction::STATUS_SUCCESS;
         if (empty($data['created_at'])) {
             $data['created_at'] = now();
@@ -35,7 +35,7 @@ class StoreTransactionService
 
         return $this->transactionRepository->create($data, [
             'invoice_id',
-            'client_id',
+            'profile_id',
             'status',
             'created_at',
             'amount',

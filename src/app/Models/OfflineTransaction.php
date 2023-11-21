@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon created_at
  * @property Carbon updated_at
  * @property Carbon paid_at
- * @property int client_id
+ * @property int profile_id
  * @property int invoice_id
  * @property int transaction_id
  * @property int bank_account_id
@@ -60,7 +60,7 @@ class OfflineTransaction extends Model
 
     protected $fillable = [
         'paid_at',
-        'client_id',
+        'profile_id',
         'invoice_id',
         'bank_account_id',
         'admin_id',

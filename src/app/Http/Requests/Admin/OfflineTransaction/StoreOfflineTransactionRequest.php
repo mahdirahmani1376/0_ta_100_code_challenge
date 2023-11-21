@@ -25,7 +25,7 @@ class StoreOfflineTransactionRequest extends FormRequest
             'description' => ['nullable', 'string',],
             'tracking_code' => ['required', 'unique:offline_transactions',],
             'bank_account_id' => ['required', 'exists:bank_accounts,id',],
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'admin_id' => ['required', 'numeric',],
         ];
     }

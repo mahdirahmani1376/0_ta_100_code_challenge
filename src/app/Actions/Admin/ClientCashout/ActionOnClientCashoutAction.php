@@ -66,7 +66,7 @@ class ActionOnClientCashoutAction
             throw new BadRequestException(trans('validation.bank_account_not_active'));
         }
 
-        $wallet = ($this->showWalletAction)($clientCashout->client_id);
+        $wallet = ($this->showWalletAction)($clientCashout->profile_id);
         if ($clientCashout->amount > $wallet->balance) {
             throw new BadRequestException(trans('validation.not_enough_credit'));
         }
@@ -102,7 +102,7 @@ class ActionOnClientCashoutAction
             ]);
         }
 
-        $creditTransaction = ($this->deductBalanceAction)($clientCashout->client_id, [
+        $creditTransaction = ($this->deductBalanceAction)($clientCashout->profile_id, [
             'amount' => $clientCashout->amount * -1,
             'description' => 'بازگشت وجه به حساب بانکی کاربر - شماره درخواست : ' . $clientCashout->id,
         ]);

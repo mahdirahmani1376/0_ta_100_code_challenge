@@ -18,7 +18,7 @@ class ShowWalletController
      */
     public function __invoke(ShowWalletRequest $request)
     {
-        $wallet = ($this->showWalletAction)($request->validated('client_id'));
+        $wallet = ($this->showWalletAction)($request->validated('profile_id'));
 
         return WalletResource::make($wallet);
     }

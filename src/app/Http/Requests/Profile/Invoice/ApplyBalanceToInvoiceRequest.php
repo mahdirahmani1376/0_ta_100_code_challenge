@@ -15,7 +15,7 @@ class ApplyBalanceToInvoiceRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:1'],
-            'client_id' => ['required', 'numeric'],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
         ];
     }
 }

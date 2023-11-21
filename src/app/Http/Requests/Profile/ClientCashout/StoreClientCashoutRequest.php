@@ -15,12 +15,12 @@ class StoreClientCashoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'client_bank_account_id' => [
                 'required',
                 'numeric',
                 Rule::exists('client_bank_accounts', 'id')
-                    ->where('client_id', request('client_id')),
+                    ->where('profile_id', request('profile_id')),
             ],
             'amount' => [
                 'nullable',

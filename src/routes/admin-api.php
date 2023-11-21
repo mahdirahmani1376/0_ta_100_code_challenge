@@ -107,9 +107,9 @@ Route::namespace('Wallet')
     ->prefix('wallet')
     ->group(function () {
         Route::get('credit-transaction', IndexCreditTransactionController::class);
-        Route::get('{clientId}', ShowWalletController::class);
-        Route::get('{clientId}/list', ShowWalletAndTransactionController::class);
-        Route::prefix('{clientId}/credit-transaction')
+        Route::get('{profileId}', ShowWalletController::class);
+        Route::get('{profileId}/list', ShowWalletAndTransactionController::class);
+        Route::prefix('{profileId}/credit-transaction')
             ->group(function () {
                 Route::post('/', StoreCreditTransactionController::class);
                 Route::post('deduct-balance', DeductBalanceController::class);

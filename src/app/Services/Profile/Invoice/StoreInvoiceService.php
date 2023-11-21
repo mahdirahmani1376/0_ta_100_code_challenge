@@ -20,7 +20,7 @@ class StoreInvoiceService
             'tax_rate',
             'payment_method',
             'status',
-            'client_id',
+            'profile_id',
             'is_credit',
         ]);
     }

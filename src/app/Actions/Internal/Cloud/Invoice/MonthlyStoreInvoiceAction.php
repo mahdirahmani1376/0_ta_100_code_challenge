@@ -23,7 +23,7 @@ class MonthlyStoreInvoiceAction
         $sum = abs(($this->sumAmountOfCreditTransactionService)($data['credit_transaction_ids']));
         ($this->deleteBulkCreditTransactionService)($data['credit_transaction_ids']);
         if ($sum > 0) {
-            $creditTransaction = ($this->storeCreditTransactionAction)($data['client_id'], [
+            $creditTransaction = ($this->storeCreditTransactionAction)($data['profile_id'], [
                 'amount' => abs($sum),
                 'description' => $data['credit_transaction_description'],
             ]);

@@ -14,7 +14,7 @@ class StoreCreditTransactionController
 
     public function __invoke(StoreCreditTransactionRequest $request)
     {
-        $creditTransaction = ($this->storeCreditTransactionAction)($request->validated('client_id'), $request->validated());
+        $creditTransaction = ($this->storeCreditTransactionAction)($request->validated('profile_id'), $request->validated());
 
         return ShowCreditTransactionResource::make($creditTransaction);
     }

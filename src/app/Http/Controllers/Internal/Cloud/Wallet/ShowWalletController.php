@@ -11,9 +11,9 @@ class ShowWalletController
     {
     }
 
-    public function __invoke(int $clientId)
+    public function __invoke(int $profileId)
     {
-        $wallet = ($this->showWalletAction)($clientId);
+        $wallet = ($this->showWalletAction)($profileId);
 
         return WalletResource::make($wallet);
     }

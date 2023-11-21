@@ -8,7 +8,7 @@ Route::namespace('Cloud')
         Route::namespace('Wallet')
             ->prefix('wallet')
             ->group(function () {
-                Route::get('{client}', 'ShowWalletController');
+                Route::get('{profile}', 'ShowWalletController');
                 Route::post('credit-transaction', 'StoreCreditTransactionController');
                 Route::get('credit-transaction/{creditTransaction}', 'ShowCreditTransactionController');
                 Route::delete('bulk-delete', 'DeleteBulkCreditTransactionController');

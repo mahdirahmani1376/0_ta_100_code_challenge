@@ -12,12 +12,12 @@ class ShowWalletAndTransactionController
     }
 
     /**
-     * @param int $clientId
+     * @param int $profileId
      * @return ShowWalletAndTransactionResource
      */
-    public function __invoke(int $clientId)
+    public function __invoke(int $profileId)
     {
-        $wallet = ($this->showWalletAndTransactionAction)($clientId);
+        $wallet = ($this->showWalletAndTransactionAction)($profileId);
 
         return ShowWalletAndTransactionResource::make($wallet);
     }

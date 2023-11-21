@@ -20,6 +20,8 @@ use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Invoice\ItemRepository;
 use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryInterface;
 use App\Repositories\OfflineTransaction\OfflineTransactionRepository;
+use App\Repositories\Profile\Interface\ProfileRepositoryInterface;
+use App\Repositories\Profile\ProfileRepository;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use App\Repositories\Transaction\TransactionRepository;
 use App\Repositories\Wallet\CreditTransactionRepository;
@@ -44,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
         $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
         $this->app->bind(CreditTransactionRepositoryInterface::class, CreditTransactionRepository::class);
+        $this->app->bind(ProfileRepositoryInterface::class, ProfileRepository::class);
     }
 
     public function boot(): void

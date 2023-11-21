@@ -16,7 +16,7 @@ class ChargeWalletInvoiceAction
     {
         $invoiceData = [
             'status' => Invoice::STATUS_UNPAID,
-            'client_id' => $data['client_id'],
+            'profile_id' => $data['profile_id'],
             'tax_rate' => 0,
             'is_credit' => true,
             'admin_id' => $data['admin_id'],

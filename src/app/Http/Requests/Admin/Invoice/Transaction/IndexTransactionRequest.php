@@ -18,7 +18,7 @@ class IndexTransactionRequest extends FormRequest
         return [
             'sort' => ['string', 'nullable', Rule::in(get_sortable_items((new Transaction())->getFillable()))],
             'sortDirection' => ['string', 'nullable', Rule::in('desc', 'asc')],
-            'client_id' => ['integer', 'nullable'],
+            'profile_id' => ['integer', 'nullable'],
             'invoice_id' => ['integer', 'nullable'],
             'search' => ['nullable', 'string', 'max:80'],
             'tracking_code' => ['integer', 'nullable'],

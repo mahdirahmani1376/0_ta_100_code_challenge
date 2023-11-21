@@ -5,14 +5,14 @@ namespace App\Services\Wallet;
 use App\Models\Wallet;
 use App\Repositories\Wallet\Interface\WalletRepositoryInterface;
 
-class FindWalletByClientIdService
+class FindWalletByProfileIdService
 {
     public function __construct(private readonly WalletRepositoryInterface $walletRepository)
     {
     }
 
-    public function __invoke(int $clientId): ?Wallet
+    public function __invoke(int $profileId): ?Wallet
     {
-        return $this->walletRepository->findByClientId($clientId);
+        return $this->walletRepository->findByProfileId($profileId);
     }
 }

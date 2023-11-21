@@ -23,7 +23,7 @@ class AddBalanceAction
         // Create an Invoice with one Item which User can pay that invoice later on and "CreditTransaction" and "Transaction" records will be added on to it
         $invoice = ($this->storeInvoiceService)([
             'status' => Invoice::STATUS_UNPAID,
-            'client_id' => $data['client_id'],
+            'profile_id' => $data['profile_id'],
             'is_credit' => true,
             'description' => __('finance.invoice.ClientCreditInvoiceItem'),
             'tax_rate' => 0,

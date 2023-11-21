@@ -19,7 +19,7 @@ class IndexClientCashoutController
      */
     public function __invoke(IndexClientCashoutRequest $request)
     {
-        $clientCashouts = ($this->indexClientCashoutAction)(request('client_id'), $request->validated());
+        $clientCashouts = ($this->indexClientCashoutAction)(request('profile_id'), $request->validated());
 
         return ClientCashoutResource::collection($clientCashouts);
     }

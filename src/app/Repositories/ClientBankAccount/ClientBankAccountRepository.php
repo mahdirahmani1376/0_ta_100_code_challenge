@@ -27,8 +27,8 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
         if (!empty($data['status'])) {
             $query->where('status', '=', $data['status']);
         }
-        if (!empty($data['client_id'])) {
-            $query->where('client_id', $data['client_id']);
+        if (!empty($data['profile_id'])) {
+            $query->where('profile_id', $data['profile_id']);
         }
         $query->orderBy(
             $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
@@ -38,17 +38,15 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
         return self::paginate($query);
     }
 
-    public function profileIndex(int $clientId, array $data): LengthAwarePaginator
+    public function profileIndex(array $data): LengthAwarePaginator
     {
-        $data['client_id'] = $clientId;
-
         return self::adminIndex($data);
     }
 
     public function findSimilarWithZarinpalId(ClientBankAccount $clientBankAccount)
     {
         return self::newQuery()
-            ->where('client_id', $clientBankAccount->client_id)
+            ->where('profile_id', $clientBankAccount->profile_id)
             ->where(function (Builder $query) use ($clientBankAccount) {
                 $query->where('sheba_number', $clientBankAccount->sheba_number);
                 $query->orWhere('card_number', $clientBankAccount->card_number);

@@ -36,14 +36,14 @@ class StoreMassPaymentInvoiceService
             'is_mass_payment' => true,
             'tax_rate' => Invoice::DEFAULT_TAX_RATE,
             'status' => Invoice::STATUS_UNPAID,
-            'client_id' => $data['client_id'],
+            'profile_id' => $data['profile_id'],
         ], [
             'payment_method',
             'due_date',
             'is_mass_payment',
             'tax_rate',
             'status',
-            'client_id',
+            'profile_id',
         ]);
 
         // Create an Item for each valid invoices ( $invoicesForMassPayment ) with the amount of those invoice's "balance"

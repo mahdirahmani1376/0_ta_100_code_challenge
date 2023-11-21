@@ -14,7 +14,7 @@ class DownloadInvoiceBillRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
         ];
     }
 }

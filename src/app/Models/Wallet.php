@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon created_at
  * @property Carbon updated_at
  * @property Carbon deleted_at
- * @property int client_id
+ * @property int profile_id
  * @property string name
  * @property float balance
  * @property boolean is_active
@@ -32,7 +32,7 @@ class Wallet extends Model
     const WALLET_DEFAULT_NAME = 'client';
 
     protected $fillable = [
-        'client_id',
+        'profile_id',
         'name',
         'balance',
         'is_active',

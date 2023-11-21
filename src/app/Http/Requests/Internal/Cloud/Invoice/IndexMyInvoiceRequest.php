@@ -16,7 +16,7 @@ class IndexMyInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'integer'],
+            'profile_id' => ['required', 'integer', 'exists:profiles,id',],
             'invoiceable_ids' => ['required', 'array',],
             'status' => ['nullable', Rule::in([Invoice::STATUS_PAID, Invoice::STATUS_UNPAID, Invoice::STATUS_CANCELED,])],
             'search' => ['nullable',],

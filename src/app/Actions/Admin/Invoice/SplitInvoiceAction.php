@@ -45,7 +45,7 @@ class SplitInvoiceAction
             'status' => Invoice::STATUS_UNPAID,
             'tax_rate' => $invoice->tax_rate,
             'due_date' => $invoice->due_date,
-            'client_id' => $invoice->client_id,
+            'profile_id' => $invoice->profile_id,
             'admin_id' => $data['admin_id'],
         ];
         $newInvoice = ($this->storeInvoiceAction)($invoiceData);
