@@ -579,6 +579,8 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_PENDING_BANK_VERIFY;
                     } elseif ($row['status'] == 5) {
                         $newRow['status'] = Transaction::STATUS_PENDING;
+                    } elseif ($row['status'] == 29) {
+                        $newRow['status'] = Transaction::STATUS_CANCELED;
                     } else {
                         throw new \Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']);
                     }
