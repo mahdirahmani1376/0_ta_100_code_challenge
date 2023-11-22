@@ -6,6 +6,7 @@ use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Integrations\Rahkaran\ValueObjects\Product;
 use App\Models\Invoice;
+use App\Models\Profile;
 use Illuminate\Http\Response;
 
 class MainAppAPIService extends BaseMainAppAPIService
@@ -133,7 +134,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         $url = '/api/internal/finance/invoice/post-process';
         $data = [
             'id' => $invoice->id,
-            'client_id' => $invoice->client_id,
+            'client_id' => $invoice->profile->client_id,
             'total' => $invoice->total,
             'items' => $invoice->items,
         ];
@@ -152,6 +153,9 @@ class MainAppAPIService extends BaseMainAppAPIService
     public static function sendInvoiceReminder(array $payload, $channel = 'email')
     {
         $url = '/api/internal/finance/invoice/reminder';
+        foreach ($payload['reminders'] as $index => $reminder) {
+            $payload['reminders'][$index]['client_id'] = Profile::find($reminder['profile_id'])->client_id;
+        }
         $data = [
             'channel' => $channel,
             'subject' => $payload['subject'] ?? null,
@@ -165,7 +169,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function sendInvoiceCreateEmail(int $clientId,string $subject, string $message)
+    public static function sendInvoiceCreateEmail(int $clientId, string $subject, string $message)
     {
         $url = '/api/internal/finance/invoice/create-email';
         $data = [

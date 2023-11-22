@@ -59,25 +59,25 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::bind('profileInvoice', function ($profileInvoiceId) {
             return Invoice::query()
-                ->where('client_id', request('client_id'))
+                ->where('profile_id', request('profile_id'))
                 ->where('id', $profileInvoiceId)
                 ->firstOrFail();
         });
         Route::bind('profileOfflineTransaction', function ($profileOfflineTransaction) {
             return OfflineTransaction::query()
-                ->where('client_id', request('client_id'))
+                ->where('profile_id', request('profile_id'))
                 ->where('id', $profileOfflineTransaction)
                 ->firstOrFail();
         });
         Route::bind('profileClientBankAccount', function ($clientBankAccount) {
             return ClientBankAccount::query()
-                ->where('client_id', request('client_id'))
+                ->where('profile_id', request('profile_id'))
                 ->where('id', $clientBankAccount)
                 ->firstOrFail();
         });
         Route::bind('profileClientCashOut', function ($profileClientCashOut) {
             return ClientCashout::query()
-                ->where('client_id', request('client_id'))
+                ->where('profile_id', request('profile_id'))
                 ->where('id', $profileClientCashOut)
                 ->firstOrFail();
         });

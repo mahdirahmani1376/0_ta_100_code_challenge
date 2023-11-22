@@ -17,7 +17,7 @@ class IndexClientBankAccountRequest extends FormRequest
     {
         return [
             'search' => ['nullable', 'max:255',],
-            'client_id' => ['nullable', 'numeric',],
+            'profile_id' => ['nullable', 'numeric',],
             'status' => ['nullable', Rule::in(ClientBankAccount::STATUSES),],
         ];
     }

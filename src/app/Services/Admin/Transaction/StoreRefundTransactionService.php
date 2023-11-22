@@ -19,13 +19,13 @@ class StoreRefundTransactionService
             'invoice_id' => $invoice->getKey(),
             'status' => Transaction::STATUS_SUCCESS,
             'amount' => $invoice->total,
-            'client_id' => $invoice->client_id,
+            'profile_id' => $invoice->profile_id,
         ], [
             'payment_method',
             'invoice_id',
             'status',
             'amount',
-            'client_id',
+            'profile_id',
         ]);
     }
 }

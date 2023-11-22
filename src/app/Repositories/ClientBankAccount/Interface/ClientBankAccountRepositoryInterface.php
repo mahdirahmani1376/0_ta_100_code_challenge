@@ -10,7 +10,7 @@ interface ClientBankAccountRepositoryInterface extends EloquentRepositoryInterfa
 {
     public function adminIndex(array $data): LengthAwarePaginator;
 
-    public function profileIndex(int $clientId, array $data): LengthAwarePaginator;
+    public function profileIndex(array $data): LengthAwarePaginator;
 
     public function findSimilarWithZarinpalId(ClientBankAccount $clientBankAccount);
 }

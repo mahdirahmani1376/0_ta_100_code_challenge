@@ -11,8 +11,8 @@ class IndexClientBankAccountService
     {
     }
 
-    public function __invoke(int $clientId, array $data): LengthAwarePaginator
+    public function __invoke(array $data): LengthAwarePaginator
     {
-        return $this->clientBankAccountRepository->profileIndex($clientId, $data);
+        return $this->clientBankAccountRepository->profileIndex($data);
     }
 }

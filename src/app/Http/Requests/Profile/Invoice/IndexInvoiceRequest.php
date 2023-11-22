@@ -16,7 +16,7 @@ class IndexInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'numeric'],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'status' => ['nullable', 'string', Rule::in(Invoice::STATUSES)],
             'search' => "string|nullable",
             'sort' => ['string', 'nullable', Rule::in(get_sortable_items((new Invoice())->getFillable()))],

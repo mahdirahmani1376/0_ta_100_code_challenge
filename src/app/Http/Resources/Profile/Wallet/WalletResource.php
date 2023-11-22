@@ -15,7 +15,7 @@ class WalletResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
-            'client_id' => $this->client_id,
+            'profile_id' => $this->profile_id,
             'name' => $this->name,
             'balance' => $this->balance,
             'is_active' => $this->is_active,

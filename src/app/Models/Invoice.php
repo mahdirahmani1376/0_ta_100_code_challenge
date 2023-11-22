@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Carbon due_date
  * @property Carbon paid_at
  * @property Carbon processed_at
- * @property int client_id
+ * @property int profile_id
  * @property int rahkaran_id
  * @property string payment_method
  * @property double balance
@@ -38,7 +39,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property InvoiceNumber invoiceNumber
  * @property Collection transactions
  * @property Collection offlineTransactions
- * @property Client $client
+ * @property Profile profile
+ * @property Client client
  */
 class Invoice extends Model
 {
@@ -72,7 +74,7 @@ class Invoice extends Model
         'created_at',
         'due_date',
         'paid_at',
-        'client_id',
+        'profile_id',
         'payment_method',
         'total',
         'sub_total',
@@ -113,5 +115,9 @@ class Invoice extends Model
     public function offlineTransactions(): HasMany
     {
         return $this->hasMany(OfflineTransaction::class);
+    }
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(Profile::class);
     }
 }

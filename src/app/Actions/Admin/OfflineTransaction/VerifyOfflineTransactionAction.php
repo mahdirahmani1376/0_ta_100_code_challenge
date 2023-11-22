@@ -66,7 +66,7 @@ class VerifyOfflineTransactionAction
             // pay the new charge-wallet-invoice -> because is_credit -> charge the wallet
             // use the wallet balance to pay the first invoice
             $chargeWalletInvoice = ($this->chargeWalletInvoiceAction)([
-                'client_id' => $invoice->client_id,
+                'profile_id' => $invoice->profile_id,
                 'admin_id' => request('admin_id'),
                 'amount' => $offlineTransaction->amount,
             ]);

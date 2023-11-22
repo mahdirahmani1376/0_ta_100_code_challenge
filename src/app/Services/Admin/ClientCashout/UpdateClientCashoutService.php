@@ -14,7 +14,7 @@ class UpdateClientCashoutService
     public function __invoke(ClientCashout $clientCashout, array $data): ClientCashout
     {
         return $this->clientCashoutRepository->update($clientCashout, $data, [
-            'client_id',
+            'profile_id',
             'client_bank_account_id',
             'zarinpal_payout_id',
             'admin_id',

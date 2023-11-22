@@ -16,12 +16,12 @@ class StoreTransactionService
     public function __invoke(Invoice $invoice, array $data): Transaction
     {
         $data['invoice_id'] = $invoice->getKey();
-        $data['client_id'] = $invoice->client_id;
+        $data['profile_id'] = $invoice->profile_id;
         $data['ip'] = Request::createFromGlobals()->header('x-forwarded-for');
 
         return $this->transactionRepository->create($data, [
             'invoice_id',
-            'client_id',
+            'profile_id',
             'status',
             'created_at',
             'amount',

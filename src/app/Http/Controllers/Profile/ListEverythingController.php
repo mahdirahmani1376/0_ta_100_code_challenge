@@ -15,7 +15,7 @@ class ListEverythingController
     {
         return [
             'data' => ($this->listEverythingAction)(
-                $request->get('client_id'),
+                $request->get('profile_id'),
                 $request->get('offset', 0),
                 $request->get('perPage', 100),
             ),

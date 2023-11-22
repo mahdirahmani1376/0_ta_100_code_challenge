@@ -14,7 +14,7 @@ class ChargeWalletInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'numeric'],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'item' => [
                 'amount' => ['required', 'numeric',],
                 'invoiceable_type' => ['required',],

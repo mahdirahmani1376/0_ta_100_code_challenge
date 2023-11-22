@@ -16,11 +16,11 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'integer'],
+            'profile_id' => ['required', 'integer', 'exists:profiles,id',],
             'invoice_date' => ['required', 'date', 'date_format:Y-m-d'],
             'due_date' => ['required', 'date', 'date_format:Y-m-d'],
             'paid_at' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'tax_rate'=> ['nullable', 'numeric',],
+            'tax_rate' => ['nullable', 'numeric',],
             'status' => [Rule::in([
                 Invoice::STATUS_UNPAID,
                 Invoice::STATUS_PAID,

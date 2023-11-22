@@ -9,10 +9,10 @@ class WalletRepository extends BaseRepository implements Interface\WalletReposit
 {
     public string $model = Wallet::class;
 
-    public function findByClientId(int $clientId): Wallet|null
+    public function findByProfileId(int $profileId): Wallet|null
     {
         return self::newQuery()
-            ->where('client_id', $clientId)
+            ->where('profile_id', $profileId)
             ->first();
     }
 

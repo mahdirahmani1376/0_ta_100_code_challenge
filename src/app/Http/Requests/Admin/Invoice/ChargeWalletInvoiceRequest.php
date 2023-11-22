@@ -15,7 +15,7 @@ class ChargeWalletInvoiceRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric',],
-            'client_id' => ['required', 'numeric'],
+            'profile_id' => ['required', 'numeric','exists:profiles,id',],
             'admin_id' => ['required', 'numeric',],
         ];
     }

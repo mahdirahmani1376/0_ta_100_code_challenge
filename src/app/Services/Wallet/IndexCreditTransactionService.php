@@ -11,8 +11,8 @@ class IndexCreditTransactionService
     {
     }
 
-    public function __invoke(int $clientId): LengthAwarePaginator
+    public function __invoke(int $profileId): LengthAwarePaginator
     {
-        return $this->creditTransactionRepository->indexByClientId($clientId);
+        return $this->creditTransactionRepository->indexByProfileId($profileId);
     }
 }

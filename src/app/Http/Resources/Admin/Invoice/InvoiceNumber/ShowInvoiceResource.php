@@ -13,7 +13,7 @@ class ShowInvoiceResource extends JsonResource
         /** @var Invoice $this */
         return [
             'status' => $this->status,
-            'client_id' => $this->client_id,
+            'profile_id' => $this->profile_id,
         ];
     }
 }

@@ -8,13 +8,13 @@ use Illuminate\Support\Collection;
 
 interface CreditTransactionRepositoryInterface extends EloquentRepositoryInterface
 {
-    public function indexByClientId(int $clientId): LengthAwarePaginator;
+    public function indexByProfileId(int $profileId): LengthAwarePaginator;
 
-    public function sum(int $clientId): int;
+    public function sum(int $profileId): int;
 
     public function adminIndex(array $data): LengthAwarePaginator;
 
-    public function profileListEverything(int $clientId): Collection;
+    public function profileListEverything(int $profileId): Collection;
 
     public function internalCloudBulkDelete(array $ids): int;
 

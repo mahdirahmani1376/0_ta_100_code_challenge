@@ -19,7 +19,7 @@ class StoreClientBankAccountService
             'card_number',
             'sheba_number',
             'account_number',
-            'client_id',
+            'profile_id',
             'zarinpal_bank_account_id',
             'owner_name',
         ]);

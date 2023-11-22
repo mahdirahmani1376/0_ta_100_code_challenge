@@ -11,8 +11,8 @@ class IndexClientCashoutService
     {
     }
 
-    public function __invoke(int $clientId, array $data): LengthAwarePaginator
+    public function __invoke(int $profileId, array $data): LengthAwarePaginator
     {
-        return $this->clientCashoutRepository->profileIndex($clientId, $data);
+        return $this->clientCashoutRepository->profileIndex($profileId, $data);
     }
 }

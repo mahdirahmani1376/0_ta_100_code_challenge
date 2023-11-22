@@ -11,10 +11,10 @@ class StoreWalletService
     {
     }
 
-    public function __invoke(int $clientId): Wallet
+    public function __invoke(int $profileId): Wallet
     {
         return $this->walletRepository->create([
-            'client_id' => $clientId,
+            'profile_id' => $profileId,
             'name' => Wallet::WALLET_DEFAULT_NAME,
             'balance' => 0,
             'is_active' => true,

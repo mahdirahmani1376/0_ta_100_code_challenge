@@ -20,7 +20,7 @@ class AddBalanceRequest extends FormRequest
                 'min:' . config('payment.transactions.limit.min'),
                 'max:' . config('payment.transactions.limit.max'),
             ],
-            'client_id' => ['required', 'numeric',]
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
         ];
     }
 }

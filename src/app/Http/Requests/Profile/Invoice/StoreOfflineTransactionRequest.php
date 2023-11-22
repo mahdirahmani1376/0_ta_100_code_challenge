@@ -24,7 +24,7 @@ class StoreOfflineTransactionRequest extends FormRequest
             'bank_account_id' => ['required', 'exists:bank_accounts,id',],
             'mobile' => ['nullable', new ValidIRMobile,],
             'paid_at' => ['required', 'bail', 'date_format:Y-m-d', 'before:tomorrow',],
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
         ];
     }
 }

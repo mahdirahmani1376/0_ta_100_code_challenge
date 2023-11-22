@@ -19,7 +19,7 @@ class IndexClientBankAccountController
      */
     public function __invoke(IndexClientBankAccountRequest $request)
     {
-        $clientBankAccounts = ($this->indexClientBankAccountAction)(request('client_id'), $request->validated());
+        $clientBankAccounts = ($this->indexClientBankAccountAction)($request->validated());
 
         return ClientBankAccountResource::collection($clientBankAccounts);
     }

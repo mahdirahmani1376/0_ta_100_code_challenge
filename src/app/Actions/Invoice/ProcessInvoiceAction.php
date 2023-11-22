@@ -47,7 +47,7 @@ class ProcessInvoiceAction
         }
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
         if ($invoice->status === Invoice::STATUS_REFUNDED) {
-            ($this->storeCreditTransactionAction)($invoice->client_id, [
+            ($this->storeCreditTransactionAction)($invoice->profile_id, [
                 'amount' => $invoice->total,
                 'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
             ]);
@@ -74,7 +74,7 @@ class ProcessInvoiceAction
         // If invoice is charge-wallet (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
         if ($invoice->is_credit) {
-            ($this->storeCreditTransactionAction)($invoice->client_id, [
+            ($this->storeCreditTransactionAction)($invoice->profile_id, [
                 'amount' => $invoice->total,
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
             ]);

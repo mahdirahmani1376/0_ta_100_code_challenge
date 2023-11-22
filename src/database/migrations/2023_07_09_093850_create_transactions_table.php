@@ -14,7 +14,7 @@ return new class extends Migration {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('profile_id');
             $table->unsignedBigInteger('invoice_id');
             $table->unsignedBigInteger('rahkaran_id')->nullable();
             $table->double('amount');
@@ -26,6 +26,7 @@ return new class extends Migration {
             $table->string('reference_id')->nullable();
 
             $table->foreign('invoice_id')->references('id')->on('invoices');
+            $table->foreign('profile_id')->references('id')->on('profiles');
         });
     }
 

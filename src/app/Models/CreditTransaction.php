@@ -14,20 +14,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int id
  * @property Carbon created_at
  * @property Carbon updated_at
- * @property int client_id
+ * @property int profile_id
  * @property int wallet_id
  * @property int invoice_id
  * @property int admin_id
  * @property float amount
  * @property string description
+
  * @property Invoice invoice
+ * @property Profile profile
  */
 class CreditTransaction extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'client_id',
+        'profile_id',
         'wallet_id',
         'invoice_id',
         'admin_id',
@@ -43,5 +45,10 @@ class CreditTransaction extends Model
     public function wallet(): BelongsTo
     {
         return $this->belongsTo(Wallet::class);
+    }
+
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(Profile::class);
     }
 }

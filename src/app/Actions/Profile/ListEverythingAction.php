@@ -10,8 +10,8 @@ class ListEverythingAction
     {
     }
 
-    public function __invoke(int $clientId, int $offset = null, $perPage = 100)
+    public function __invoke(int $profileId, int $offset = null, $perPage = 100)
     {
-        return ($this->listEverythingService)($clientId, $offset, $perPage);
+        return ($this->listEverythingService)($profileId, $offset, $perPage);
     }
 }

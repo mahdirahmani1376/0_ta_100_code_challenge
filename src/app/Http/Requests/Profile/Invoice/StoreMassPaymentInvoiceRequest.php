@@ -14,7 +14,7 @@ class StoreMassPaymentInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => ['required', 'numeric',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'invoice_ids' => ['required', 'array',],
             'invoice_ids.*' => ['numeric',],
         ];

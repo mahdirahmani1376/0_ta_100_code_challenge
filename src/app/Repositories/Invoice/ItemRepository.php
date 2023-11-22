@@ -22,10 +22,10 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
         $query = self::newQuery();
         $query->where('description', 'LIKE', "%" . $criteria['search'] . "%");
 
-        // if client_id is provided, search only in items of a specific client's invoices
-        if (!empty($criteria['client_id'])) {
+        // if profile_id is provided, search only in items of a specific client's invoices
+        if (!empty($criteria['profile_id'])) {
             $query->whereHas('invoice', function (Builder $builder) use ($criteria) {
-                $builder->where('client_id', $criteria['client_id']);
+                $builder->where('profile_id', $criteria['profile_id']);
             });
         }
 

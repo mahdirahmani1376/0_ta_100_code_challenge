@@ -27,7 +27,7 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
             $query->where(function (Builder $query) use ($data) {
                 $query->where('tracking_code', "LIKE", '%' . $data['search'] . '%')
                     ->orWhere('invoice_id', "LIKE", '%' . $data['search'] . '%')
-                    ->orWhere('client_id', "LIKE", '%' . $data['search'] . '%');
+                    ->orWhere('profile_id', "LIKE", '%' . $data['search'] . '%');
             });
         }
         if (!empty($data['from_date'])) {

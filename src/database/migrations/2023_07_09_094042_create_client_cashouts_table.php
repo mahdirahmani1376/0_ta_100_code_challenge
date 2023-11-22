@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('profile_id');
             $table->unsignedBigInteger('client_bank_account_id');
             $table->unsignedBigInteger('zarinpal_payout_id')->nullable();
             $table->unsignedInteger('admin_id')->nullable();
@@ -25,6 +25,7 @@ return new class extends Migration {
             $table->boolean('rejected_by_bank')->default(false);
 
             $table->foreign('client_bank_account_id')->references('id')->on('client_bank_accounts');
+            $table->foreign('profile_id')->references('id')->on('profiles');
         });
     }
 

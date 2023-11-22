@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon created_at
  * @property Carbon updated_at
  * @property Carbon deleted_at
- * @property int client_id
+ * @property int profile_id
  * @property int client_bank_account_id
  * @property int zarinpal_payout_id
  * @property int admin_id
@@ -49,7 +49,7 @@ class ClientCashout extends Model
     const ACTION_REJECT_BANK = 'reject_bank';
 
     protected $fillable = [
-        'client_id',
+        'profile_id',
         'client_bank_account_id',
         'zarinpal_payout_id',
         'admin_id',

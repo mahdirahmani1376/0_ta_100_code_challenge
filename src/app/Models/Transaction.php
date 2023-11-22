@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int id
  * @property Carbon created_at
  * @property Carbon updated_at
- * @property int client_id
+ * @property int profile_id
  * @property int invoice_id
  * @property int rahkaran_id
  * @property float amount
@@ -54,7 +54,7 @@ class Transaction extends Model
     ];
 
     protected $fillable = [
-        'client_id',
+        'profile_id',
         'invoice_id',
         'rahkaran_id',
         'amount',

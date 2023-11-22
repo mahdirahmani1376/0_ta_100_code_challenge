@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('profile_id');
             $table->unsignedBigInteger('wallet_id');
             $table->unsignedBigInteger('invoice_id')->nullable();
             $table->unsignedBigInteger('admin_id')->nullable();
@@ -23,6 +23,7 @@ return new class extends Migration
 
             $table->foreign('invoice_id')->references('id')->on('invoices');
             $table->foreign('wallet_id')->references('id')->on('wallets');
+            $table->foreign('profile_id')->references('id')->on('profiles');
         });
     }
 
