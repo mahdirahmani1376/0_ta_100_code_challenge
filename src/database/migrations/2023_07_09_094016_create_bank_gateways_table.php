@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('name_fa')->nullable();
             $table->string('status')->default(BankGateway::STATUS_ACTIVE);
             $table->json('config')->nullable();
+            $table->unsignedBigInteger('rahkaran_id')->nullable();
         });
     }
 

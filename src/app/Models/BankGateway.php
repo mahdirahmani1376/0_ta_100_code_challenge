@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string name_fa
  * @property string status
  * @property array config
+ * @property int rahkaran_id
  */
 class BankGateway extends Model
 {

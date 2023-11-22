@@ -14,6 +14,7 @@ return [
     'productGroupDlCode' => env('RAHKARAN_PRODUCT_GROUP_DL_CODE', 90000100),
     'level4DlType' => env('RAHKARAN_LEVEL4DL_TYPE', 12),
     'level5DlType' => env('RAHKARAN_LEVEL5DL_TYPE', 15),
+    'level6DlType' => env('RAHKARAN_LEVEL5DL_TYPE', 15), // mahsool
     'paymentSl' => env('RAHKARAN_PAYMENT_SL', 1212705),
     'collectionSl' => env('RAHKARAN_COLLECTION_SL', 1212705),
     'taxSl' => env('RAHKARAN_TAX_SL', 1212221),
@@ -28,6 +29,7 @@ return [
     'refundSl' => env('RAHKARAN_REFUND_SL', 2111312),
     'generalDl4Code' => env('RAHKARAN_GENERAL_DL4_CODE', 90000001),
     'generalDl5Code' => env('RAHKARAN_GENERAL_DL5_CODE', 50001000),
+    'generalDl6Code' => env('RAHKARAN_GENERAL_DL5_CODE', 60001000),
     'refundDl4Code' => env('RAHKARAN_REFUND_DL4_CODE', 50000999),
     'domainDl4Code' => env('RAHKARAN_DOMAIN_DL4_CODE', 90000003),
     'domainIrDl5Code' => env('RAHKARAN_DOMAIN_IR_DL5_CODE', 50002002),

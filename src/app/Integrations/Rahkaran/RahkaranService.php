@@ -25,6 +25,7 @@ use App\Models\Item;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
+use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\OfflineTransaction\FindOfflineTransactionByTransactionService;
 use GuzzleHttp\Client as HttpClient;
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use phpseclib3\Crypt\RSA;
 use phpseclib3\Crypt\RSA\PublicKey;
 use phpseclib3\Math\BigInteger;
@@ -54,6 +56,7 @@ class RahkaranService
         private readonly InvoiceRepositoryInterface                 $invoiceRepository,
         private readonly AssignInvoiceNumberService                 $assignInvoiceNumberService,
         private readonly FindOfflineTransactionByTransactionService $findOfflineTransactionByTransactionService,
+        private readonly FindBankGatewayByNameService               $findBankGatewayByNameService,
     )
     {
         $this->config = new RahkaranConfig();
@@ -734,17 +737,26 @@ class RahkaranService
             return $this->config->roundingBankId;
         }
         switch ($transaction->payment_method) {
-            case 'client_credit':
-                return $this->config->creditBankId;
             case 'sermelli':
             case 'sadad_meli':
-                return $this->config->sadadBankId;
             case 'irankish':
-                return $this->config->iranKishBankId;
             case 'mellatbank':
-                return $this->config->mellatBankId;
             case 'parsianbank':
-                return $this->config->parsianBankId;
+            case 'zarinpal':
+            case 'zarinpal_sms':
+            case 'zibal':
+            case 'asanpardakht':
+            case 'saman':
+                $bankGateway = ($this->findBankGatewayByNameService)($transaction->payment_method);
+                if (is_null($bankGateway) || is_null($bankGateway->rahkaran_id)) {
+                    throw new BadRequestException(trans('rahkaran.error.NOT_FOUND_TRANSACTION_BANK_ACCOUNT_ID', [
+                        'transaction_id' => $transaction->id
+                    ]));
+                }
+
+                return $bankGateway->rahkaran_id;
+            case 'client_credit':
+                return $this->config->creditBankId;
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':
@@ -755,14 +767,6 @@ class RahkaranService
                     ]));
                 }
                 return $offlineTransaction->bankAccount->rahkaran_id;
-            case 'zarinpal':
-                return $this->config->zarinpalBankId;
-            case 'zarinpal_sms':
-                return $this->config->zarinpalSmsBankId;
-            case 'zibal':
-                return $this->config->zibalBankId;
-            case 'asanpardakht':
-                return $this->config->asanpardakhtBankId;
             default:
                 return $this->config->defaultBankId;
         }
@@ -1319,40 +1323,49 @@ class RahkaranService
 
         $level_4 = null;
         $level_5 = null;
+        $level_6 = null;
 
         switch ($item->invoiceable_type) {
             case Item::TYPE_HOSTING:
-                $product = MainAppAPIService::getProduct($item->invoiceable_id);
-                if ($product) {
-                    $level_5 = $this->getProductLevel5Dl($product);
-                    $level_4 = $this->getProductLevel4Dl($product);
-                }
+            case Item::TYPE_PRODUCT_SERVICE:
+            case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
+                $service = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id);
+                $level_6 = $this->getTotalDL6Code('product', $service['product']);
+                $level_5 = $this->getTotalDL5Code('product', $service['product']);
+                $level_4 = $this->getTotalDL4Code('product', $service['product']['product_group']);
                 break;
             case Item::TYPE_DOMAIN_SERVICE:
                 // Todo: Load domain tld to find region
-                $level_5 = $this->getDomainLevel5Dl('com');
-                $level_4 = $this->getDomainLevel4Dl();
+                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
+                $level_6 = $this->getTotalDL6Code('domain', null, $domain);
+                $level_5 = $this->getTotalDL5Code('domain', null, $domain);
+                $level_4 = $this->getTotalDL4Code('domain');
                 break;
             case Item::TYPE_ADMIN_TIME:
-                $level_5 = $this->getAdminTimeLevel5Dl();
-                $level_4 = $this->getAdminTimeLevel4Dl();
+                $level_6 = $this->getTotalDL6Code('adminTime');
+                $level_5 = $this->getTotalDL5Code('adminTime');
+                $level_4 = $this->getTotalDL4Code('adminTime');
                 break;
             case Item::TYPE_CLOUD :
-                $level_5 = $this->getCloudLevel5Dl();
-                $level_4 = $this->getCloudLevel4Dl();
+                $level_6 = $this->getTotalDL6Code('cloud');
+                $level_5 = $this->getTotalDL5Code('cloud');
+                $level_4 = $this->getTotalDL4Code('cloud');
                 break;
             default:
                 break;
         }
 
-        if ($level_4 && $level_5) {
+        if ($level_4 && $level_5 && $level_6) {
             $voucher_item->DL4 = $level_4->Code;
             $voucher_item->DL5 = $level_5->Code;
+            $voucher_item->DL6 = $level_6->Code;
             $voucher_item->DLLevel4Title = $level_4->Title;
             $voucher_item->DLLevel5Title = $level_5->Title;
+            $voucher_item->DLLevel6Title = $level_6->Title;
         } else {
             $voucher_item->DL4 = $is_refund ? $this->config->refundDl4Code : $this->config->generalDl4Code;
             $voucher_item->DL5 = $this->config->generalDl5Code;
+            $voucher_item->DL6 = $this->config->generalDl6Code;
         }
 
         $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
@@ -1956,5 +1969,261 @@ class RahkaranService
     private function isBarterTransaction(Transaction $transaction): bool
     {
         return $transaction->payment_method == Transaction::PAYMENT_METHOD_BARTER;
+    }
+
+    /**
+     * @param $type
+     * @param $productGroup
+     * @return DlObject
+     */
+    private function getTotalDL4Code($type = 'domain', $productGroup = null)
+    {
+        $code = 90000000; // omomie sathe 4
+        $description = 'تفضیلی عمومی سطح چهار';
+        switch ($type) {
+            case 'domain':
+                $code = 90000201;
+                $description = 'دامنه';
+                break;
+            case 'cloud':
+                $code = 90000202;
+                $description = 'ابر';
+                break;
+            case 'adminTime':
+                $code = 90000205;
+                $description = 'خدمات';
+                break;
+            case 'other':
+                $code = 90000000;
+                $description = 'عمومی سطح چهار';
+                break;
+            case 'product':
+                if (!isset($productGroup) || !isset($productGroup['name'])) {
+                    break;
+                }
+                if (Str::contains($productGroup['name'], ['Reseller', 'نمایندگی'])) {
+                    $code = 90000206;
+                    $description = 'سرویس نمایندگی';
+                    break;
+                }
+                if (Str::contains($productGroup['name'], ['host', 'Host', 'هاست'])) {
+                    $code = 90000203;
+                    $description = 'خدمات میزبانی';
+                    break;
+                }
+                if (Str::contains($productGroup['name'], ['Network', 'IXP', 'ixp'])) {
+                    $code = 90000204;
+                    $description = 'ارتباطات';
+                    break;
+                }
+                // Other
+                $code = 90000205;
+                $description = 'خدمات';
+                break;
+        }
+
+        $dl_object = $this->getDl($code);
+
+        if (!$dl_object) {
+            $this->createDl((string)$code, $this->config->level4DlType, $description, $description);
+            return $this->getTotalDL4Code($type, $productGroup);
+        } else {
+            return $dl_object;
+        }
+    }
+
+    /**
+     * @param $type
+     * @param $product
+     * @param $domain
+     * @return DlObject
+     */
+    private function getTotalDL5Code($type = 'domain', $product = null, $domain = null)
+    {
+
+        $code = 50001000; // omomie sathe 5
+        $description = 'تفضیلی عمومی سطح پنج';
+
+        switch ($type) {
+            case 'domain':
+                if (!isset($domain) || !isset($domain['registrar'])) {
+                    break;
+                }
+                if (Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
+                    $code = 50002003;
+                    $description = 'دامنه ir';
+                } else {
+                    $code = 50002002;
+                    $description = 'دامنه بین المللی';
+                }
+                break;
+
+            case 'cloud':
+                $code = 50001063;
+                $description = 'سرور مجازی';
+                break;
+            case 'adminTime':
+                $code = 50002004;
+                $description = 'هزینه خدمات کارشناس';
+                break;
+            case 'product':
+                if (!isset($product) || !isset($product['name'])) {
+                    break;
+                }
+                if (Str::contains($product['name'], ['خدمات مدیریت'])) {
+                    $code = 50002004;
+                    $description = 'هزینه خدمات کارشناس';
+                    break;
+                }
+                if (Str::contains($product['name'], ['نمایندگی'])) {
+                    $code = 50001124;
+                    $description = 'نمایندگی هاست لینوکس';
+                    break;
+                }
+                if ($product['product_group']['name'] == 'transactional-email') {
+                    $code = 50002001;
+                    $description = 'سرویس های ایمیل';
+                    break;
+                }
+                if ($product['name'] == 'Backup Storage') {
+                    $code = 50001156;
+                    $description = 'Backup Storage';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['ssl-certificate', 'License']) || Str::contains($product['name'], ['ssl-certificate', 'License'])) {
+                    $code = 50002014;
+                    $description = 'لایسنس و گواهی ها';
+                    break;
+                }
+                if (Str::contains($product['name'], ['Co-Location', 'Co Location'])) {
+                    $code = 50002015;
+                    $description = 'فضای اشتراکی';
+                    break;
+                }
+                if (Str::contains($product['name'], ['سرویس مانیتورینگ'])) {
+                    $code = 50002004;
+                    $description = 'سرویس مانیتورینگ';
+                    break;
+                }
+                if (Str::contains($product['name'], ['فروش ترافیک'])) {
+                    $code = 50002005;
+                    $description = 'ترافیک IXP';
+                    break;
+                }
+                if (Str::contains($product['name'], ['Transmission', 'Radio'])) {
+                    $code = 50002006;
+                    $description = 'سرویس های انتقال';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['Windows-host'])) {
+                    $code = 50002007;
+                    $description = 'هاست ویندوز';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['Host-backup-ir'])) {
+                    $code = 50001129;
+                    $description = 'هاست بک آپ';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['Host-Download'])) {
+                    $code = 50001108;
+                    $description = 'هاست دانلود';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['Host-linux', 'Host-Linux'])) {
+                    $code = 50002008;
+                    $description = 'هاست لینوکس';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['wordpress', 'WordPress'])) {
+                    $code = 50002009;
+                    $description = 'هاست وردپرس';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['anycast', 'Anycast'])) {
+                    $code = 50002010;
+                    $description = 'هاست Anycast';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['dedicate', 'Dedicate'])) {
+                    $code = 50002011;
+                    $description = 'سرور اختصاصی';
+                    break;
+                }
+                if (Str::contains($product['product_group']['name'], ['Host-Framework-IR'])) {
+                    $code = 50002012;
+                    $description = 'هاست فریم ورک';
+                    break;
+                }
+                break;
+        }
+
+
+        $dl_object = $this->getDl(
+            $code
+        );
+        if (!$dl_object) {
+            $this->createDl((string)$code, $this->config->level5DlType, $description, $description);
+            return $this->getTotalDL5Code($type, $product, $domain);
+        } else {
+            return $dl_object;
+        }
+
+    }
+
+    /**
+     * @param $type
+     * @param $product
+     * @param $domain
+     * @return DlObject
+     */
+    private function getTotalDL6Code($type = 'domain', $product = null, $domain = null)
+    {
+
+        $code = 60001000;
+        $description = 'تفصیلی عمومی سطح شش';
+
+        switch ($type) {
+            case 'domain':
+
+                if (!isset($domain) || !isset($domain['registrar'])) {
+                    break;
+                }
+
+                $code = $this->config->generalDl6Code + $domain['registrar']['id'];
+                $description = 'شرکت ' . ($domain['registrar']['name'] != "none" ? $domain['registrar']['name'] : 'متفرقه');
+                break;
+
+            case 'cloud':
+                $code = 60002000;
+                $description = 'سرورهای ابری';
+
+                // @todo: Base on type of cloud must change later
+                break;
+
+            case 'adminTime':
+                $code = 60004000;
+                $description = 'خدمات کارشناس هاست ایران';
+                break;
+
+            case 'product':
+                if (!isset($product) || !isset($product['name'])) {
+                    break;
+                }
+                $code = 60003000 + $product['id'];
+                $description = 'محصول ' . $product['name'];
+                break;
+        }
+
+        $dl_object = $this->getDl(
+            $code
+        );
+
+        if (!$dl_object) {
+            $this->createDl((string)$code, $this->config->level6DlType, $description, $description);
+            return $this->getTotalDL6Code($type, $product, $domain);
+        } else {
+            return $dl_object;
+        }
     }
 }
