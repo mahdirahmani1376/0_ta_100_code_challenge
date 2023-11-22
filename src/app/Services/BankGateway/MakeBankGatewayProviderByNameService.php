@@ -6,7 +6,7 @@ use App\Integrations\BankGateway\Interface\BankGatewayInterface;
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
 use Illuminate\Support\Str;
 
-class FindBankGatewayByNameService
+class MakeBankGatewayProviderByNameService
 {
     public function __construct(private readonly BankGatewayRepositoryInterface $bankGatewayRepository)
     {

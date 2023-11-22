@@ -3,14 +3,14 @@
 namespace App\Actions\Public\BankGateway;
 
 use App\Models\Transaction;
-use App\Services\BankGateway\FindBankGatewayByNameService;
+use App\Services\BankGateway\MakeBankGatewayProviderByNameService;
 use App\Services\Profile\Invoice\UpdateTransactionService;
 
 class CallbackFromGatewayAction
 {
     public function __construct(
-        private readonly FindBankGatewayByNameService $findBankGatewayByNameService,
-        private readonly UpdateTransactionService     $updateTransactionService,
+        private readonly MakeBankGatewayProviderByNameService $makeBankGatewayProviderByNameService,
+        private readonly UpdateTransactionService             $updateTransactionService,
     )
     {
     }
@@ -31,8 +31,8 @@ class CallbackFromGatewayAction
         // Immediately change Transaction's status into STATUS_PENDING_BANK_VERIFY
         ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_PENDING_BANK_VERIFY,]);
         // Try to verify if this transaction is successful or failed
-        $gateway = ($this->findBankGatewayByNameService)($gatewayName);
-        $gateway->callbackFromGateway($transaction, $data);
+        $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
+        $bankGatewayProvider->callbackFromGateway($transaction, $data);
 
         return $redirectTo;
     }
