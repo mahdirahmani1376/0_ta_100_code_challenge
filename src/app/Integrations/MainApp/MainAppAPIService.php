@@ -1,4 +1,7 @@
 <?php
+// TODO fix the following issues in this file
+// 1- error handling strategy
+// 2- refactor the redundant codes and encapsulate re-usable methods
 
 namespace App\Integrations\MainApp;
 
@@ -105,25 +108,22 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getProduct(int $invoiceableId): ?Product
+    public static function getProductOrDomain(string $type, int $invoiceableId): array
     {
-        $url = '/api/internal/finance/product';
-        $data = ['rel_id' => $invoiceableId,];
+        $url = '/api/internal/finance/product-domain';
+        $data = [
+            'type' => $type,
+            'rel_id' => $invoiceableId,
+        ];
 
         try {
             $response = self::makeRequest('get', $url, $data);
 
-            if ($response->status() == Response::HTTP_OK) {
-                $product = new Product();
-                foreach ($response->json('data') as $key => $value) {
-                    $product->$key = $value;
-                }
+            if ($response->successful()) {
+                return $response->json('data');
+            }
 
-                return $product;
-            }
-            if ($response->status() == Response::HTTP_NOT_FOUND) {
-                return null;
-            }
+            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }

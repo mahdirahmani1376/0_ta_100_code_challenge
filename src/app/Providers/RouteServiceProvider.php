@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\BankGateway;
 use App\Models\ClientBankAccount;
 use App\Models\ClientCashout;
 use App\Models\Invoice;
@@ -11,6 +12,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -79,6 +81,12 @@ class RouteServiceProvider extends ServiceProvider
             return ClientCashout::query()
                 ->where('profile_id', request('profile_id'))
                 ->where('id', $profileClientCashOut)
+                ->firstOrFail();
+        });
+        Route::bind('publicGatewayName', function ($gatewayName) {
+            return BankGateway::query()
+                ->where('name', Str::lower($gatewayName))
+                ->where('status', BankGateway::STATUS_ACTIVE)
                 ->firstOrFail();
         });
     }

@@ -17,6 +17,7 @@ class RahkaranConfig
     public int $productGroupDlCode;
     public int $level4DlType;
     public int $level5DlType;
+    public int $level6DlType;
     public int $paymentSl;
     public int $collectionSl;
     public int $taxSl;
@@ -31,6 +32,7 @@ class RahkaranConfig
     public int $refundSl;
     public int $generalDl4Code;
     public int $generalDl5Code;
+    public int $generalDl6Code;
     public int $refundDl4Code;
     public int $domainDl4Code;
     public int $domainIrDl5Code;
@@ -85,6 +87,7 @@ class RahkaranConfig
         $this->productGroupDlCode = config('rahkaran.productGroupDlCode');
         $this->level4DlType = config('rahkaran.level4DlType');
         $this->level5DlType = config('rahkaran.level5DlType');
+        $this->level6DlType = config('rahkaran.level6DlType');
         $this->paymentSl = config('rahkaran.paymentSl');
         $this->collectionSl = config('rahkaran.collectionSl');
         $this->taxSl = config('rahkaran.taxSl');
@@ -99,6 +102,7 @@ class RahkaranConfig
         $this->refundSl = config('rahkaran.refundSl');
         $this->generalDl4Code = config('rahkaran.generalDl4Code');
         $this->generalDl5Code = config('rahkaran.generalDl5Code');
+        $this->generalDl6Code = config('rahkaran.generalDl6Code');
         $this->refundDl4Code = config('rahkaran.refundDl4Code');
         $this->domainDl4Code = config('rahkaran.domainDl4Code');
         $this->domainIrDl5Code = config('rahkaran.domainIrDl5Code');

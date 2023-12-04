@@ -5,16 +5,16 @@ namespace App\Actions\Public\BankGateway;
 use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Models\Invoice;
 use App\Models\Transaction;
-use App\Services\BankGateway\FindBankGatewayByNameService;
+use App\Services\BankGateway\MakeBankGatewayProviderByNameService;
 use App\Services\Profile\Invoice\StoreTransactionService;
 use Illuminate\Support\Str;
 
 class PayInvoiceAction
 {
     public function __construct(
-        private readonly ProcessInvoiceAction         $processInvoiceAction,
-        private readonly FindBankGatewayByNameService $findBankGatewayByNameService,
-        private readonly StoreTransactionService      $storeTransactionService,
+        private readonly ProcessInvoiceAction                 $processInvoiceAction,
+        private readonly MakeBankGatewayProviderByNameService $makeBankGatewayProviderByNameService,
+        private readonly StoreTransactionService              $storeTransactionService,
     )
     {
     }
@@ -45,7 +45,7 @@ class PayInvoiceAction
         // Prepare a "pending" transaction for this Invoice
         // Prepare callbackUrl e.g. /callback/{transaction}/{gateway}/{source} => callback/1/zibal/cloud
         // Redirect to Gateway via the Transaction
-        $bankGateway = ($this->findBankGatewayByNameService)($gatewayName);
+        $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
         $transaction = ($this->storeTransactionService)($invoice, [
             'status' => Transaction::STATUS_PENDING,
             'amount' => $invoice->balance,
@@ -59,6 +59,6 @@ class PayInvoiceAction
             config('payment.bank_gateway.cloud_callback_url') :
             config('payment.bank_gateway.callback_url'));
 
-        return $bankGateway->getRedirectUrlToGateway($transaction, $callbackUrl);
+        return $bankGatewayProvider->getRedirectUrlToGateway($transaction, $callbackUrl);
     }
 }

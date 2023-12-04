@@ -18,8 +18,8 @@ Route::namespace('BankGateway')
     ->prefix('bank-gateway')
     ->group(function () {
         Route::get('/', IndexBankGatewayController::class);
-        Route::get('{gateway}/pay/{invoice}/{source?}', PayInvoiceController::class);
-        Route::any('{gateway}/callback/{transaction}/{source?}', CallbackFromGatewayController::class);
+        Route::get('{publicGatewayName}/pay/{invoice}/{source?}', PayInvoiceController::class);
+        Route::any('{publicGatewayName}/callback/{transaction}/{source?}', CallbackFromGatewayController::class);
     });
 
 Route::namespace('BankAccount')

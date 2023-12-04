@@ -2,22 +2,16 @@
 
 namespace App\Services\BankGateway;
 
-use App\Integrations\BankGateway\Interface\BankGatewayInterface;
+use App\Models\BankGateway;
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
-use Illuminate\Support\Str;
 
 class FindBankGatewayByNameService
 {
     public function __construct(private readonly BankGatewayRepositoryInterface $bankGatewayRepository)
     {
     }
-
-    public function __invoke(string $name): BankGatewayInterface
+    public function __invoke(string $bankGatewayName): ?BankGateway
     {
-        $bankGatewayModel = $this->bankGatewayRepository->findByName($name);
-
-        $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($name);
-
-        return $provider::make($bankGatewayModel);
+        return $this->bankGatewayRepository->findByName($bankGatewayName);
     }
 }
