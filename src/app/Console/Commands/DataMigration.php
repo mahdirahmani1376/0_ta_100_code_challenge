@@ -17,6 +17,7 @@ use App\Models\Wallet;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -645,14 +646,22 @@ class DataMigration extends Command
 
     private static function createProfile(int $clientId)
     {
-        if ($profile = Profile::query()->find($clientId)) {
-            return $profile->id;
-        } else {
+        try {
             Profile::unguard();
-            return Profile::query()->create([
+            Profile::query()->create([
                 'id' => $clientId,
                 'client_id' => $clientId
-            ])->id;
+            ]);
+            DB::connection('mainapp')
+                ->table('clients')
+                ->where('id', $clientId)
+                ->update(['finance_profile_id' => $clientId,]);
+            return $clientId;
+        } catch (UniqueConstraintViolationException $exception) {
+            return $clientId;
+        } catch (Exception $exception) {
+            dump($exception);
+            exit('error while making profile id');
         }
     }
 }
