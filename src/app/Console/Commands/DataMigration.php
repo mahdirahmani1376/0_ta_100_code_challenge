@@ -566,24 +566,30 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_SUCCESS;
                     } elseif ($row['status'] == 2) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 8) {
-                        $newRow['status'] = Transaction::STATUS_SUCCESS;
-                    } elseif ($row['status'] == 10) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 26) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 30) {
-                        $newRow['status'] = Transaction::STATUS_REFUND;
-                    } elseif ($row['status'] == 20) { // 20 = STATUS_IPG_FAILED_TO_START
-                        $newRow['status'] = Transaction::STATUS_FAIL; // TODO CHECK
-                    } elseif ($row['status'] == 6) {
-                        $newRow['status'] = Transaction::STATUS_PENDING_BANK_VERIFY;
+                    } elseif ($row['status'] == 4) { // BANK_REFERRAL
+                        $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 5) {
                         $newRow['status'] = Transaction::STATUS_PENDING;
-                    } elseif ($row['status'] == 29) {
-                        $newRow['status'] = Transaction::STATUS_CANCELED;
+                    } elseif ($row['status'] == 6) {
+                        $newRow['status'] = Transaction::STATUS_PENDING_BANK_VERIFY;
+                    } elseif ($row['status'] == 7) {
+                        $newRow['status'] = Transaction::STATUS_FAIL;
+                    } elseif ($row['status'] == 8) {
+                        $newRow['status'] = Transaction::STATUS_SUCCESS;
+                    } elseif ($row['status'] == 9) {
+                        $newRow['status'] = Transaction::STATUS_PENDING_BANK_VERIFY;
+                    } elseif ($row['status'] == 10) {
+                        $newRow['status'] = Transaction::STATUS_FAIL;
+                    } elseif ($row['status'] == 20) { // 20 = STATUS_IPG_FAILED_TO_START
+                        $newRow['status'] = Transaction::STATUS_FAIL; // TODO CHECK
+                    } elseif ($row['status'] == 26) {
+                        $newRow['status'] = Transaction::STATUS_FAIL;
                     } elseif ($row['status'] == 28) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
+                    } elseif ($row['status'] == 29) {
+                        $newRow['status'] = Transaction::STATUS_CANCELED;
+                    } elseif ($row['status'] == 30) {
+                        $newRow['status'] = Transaction::STATUS_REFUND;
                     } else {
                         throw new \Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']);
                     }
