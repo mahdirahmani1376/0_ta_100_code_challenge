@@ -564,10 +564,10 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 1) {
                         $newRow['status'] = Transaction::STATUS_SUCCESS;
-                    } elseif ($row['status'] == 8) {
-                        $newRow['status'] = Transaction::STATUS_SUCCESS;
                     } elseif ($row['status'] == 2) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
+                    } elseif ($row['status'] == 8) {
+                        $newRow['status'] = Transaction::STATUS_SUCCESS;
                     } elseif ($row['status'] == 10) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
                     } elseif ($row['status'] == 26) {
@@ -582,6 +582,8 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 29) {
                         $newRow['status'] = Transaction::STATUS_CANCELED;
+                    } elseif ($row['status'] == 28) {
+                        $newRow['status'] = Transaction::STATUS_FAIL;
                     } else {
                         throw new \Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']);
                     }
