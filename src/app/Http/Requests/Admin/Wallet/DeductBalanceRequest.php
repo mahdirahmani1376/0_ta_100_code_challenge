@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Wallet;
 
+use App\Actions\Admin\Wallet\ShowWalletAction;
 use App\Services\Wallet\FindWalletByProfileIdService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -9,11 +10,11 @@ class DeductBalanceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        /** @var FindWalletByProfileIdService $findWalletByProfileIdService */
-        $findWalletByProfileIdService = app(FindWalletByProfileIdService::class);
-        $wallet = $findWalletByProfileIdService(request('profileId'));
+        /** @var FindWalletByProfileIdService $showWalletAction */
+        $showWalletAction = app(ShowWalletAction::class);
+        $wallet = $showWalletAction(request('profileId'));
 
-        return $wallet->balance > request('amount');
+        return $wallet->balance >= request('amount');
     }
 
     public function rules(): array
