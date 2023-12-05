@@ -11,7 +11,7 @@ class RefundTransactionService
     {
     }
 
-    public function __invoke(Invoice $invoice): int
+    public function __invoke(Invoice $invoice): float
     {
         $paidAmount = $this->transactionRepository->sumOfPaidTransactions($invoice);
         $this->transactionRepository->refundSuccessfulTransactions($invoice);
