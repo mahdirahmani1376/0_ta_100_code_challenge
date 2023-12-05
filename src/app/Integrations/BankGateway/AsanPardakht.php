@@ -61,8 +61,7 @@ class AsanPardakht implements Interface\BankGatewayInterface
             ]);
 
         if ($transactionResultResponse->status() != Response::HTTP_OK) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('AsanPardakht transaction_result_url was not successful');
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         $verifyResponse = Http::withHeader('Content-Type', 'application/json')

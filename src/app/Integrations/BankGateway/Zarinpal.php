@@ -47,8 +47,7 @@ class Zarinpal implements BankGatewayInterface
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
         if ($data['status'] == 'NOK') {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zarinpal was not successful');
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
         if ($data['Authority'] != $transaction->tracking_code) {
             throw new BadRequestException("Zarinpal miss match tracking_code, transactionId: $transaction->id , Authority: " . $data['Authority']);
