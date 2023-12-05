@@ -1,5 +1,8 @@
 <?php
 // TODO maybe use Dedicated Exception class for each payment provider ?
+// TODO refactor duplicate logics into an AbstractBase class
+// TODO e.g. on callback when the payment has been unsuccessful we always set the status of transaction to fail and return,
+// TODO this should not be repeated in each implementation of IPG providers
 namespace App\Integrations\BankGateway;
 
 use App\Exceptions\Http\BadRequestException;
@@ -73,8 +76,7 @@ class Zibal implements Interface\BankGatewayInterface
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
         if (!$data['success']) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zibal was not successful, status: ' . $data['success']);
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
         if ($data['trackId'] != $transaction->tracking_code) {
             throw new BadRequestException("Zibal miss match tracking_code, transactionId: $transaction->id , trackId: " . $data['trackId']);

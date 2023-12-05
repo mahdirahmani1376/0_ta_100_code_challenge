@@ -48,8 +48,7 @@ class Saman implements BankGatewayInterface
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
         if ($data['state'] != 'OK') {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Saman was not successful');
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
         if ($data['ResNum'] != $transaction->getKey()) {
             throw new BadRequestException("Saman miss match transactionId, transactionId: $transaction->id , ResNum: " . $data['ResNum']);

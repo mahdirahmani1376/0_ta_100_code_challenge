@@ -48,8 +48,7 @@ class Sadad implements Interface\BankGatewayInterface
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
         if ($data['ResCode'] != 0) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Sadad was not successful');
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         $response = Http::withHeader('Content-Type', 'application/json')

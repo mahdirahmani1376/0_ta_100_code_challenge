@@ -4,6 +4,7 @@ use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranExce
 use App\Helpers\JalaliCalender;
 use App\Models\AdminLog;
 use App\Models\Invoice;
+use App\Models\Transaction;
 
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
@@ -144,10 +145,20 @@ if (!function_exists('parse_string')) {
 }
 
 if (!function_exists('callback_result_redirect_url')) {
-    function callback_result_redirect_url($url, int $invoiceId): string
+    function callback_result_redirect_url($url, int $invoiceId, string $transactionStatus = null, string $invoiceStatus = null): string
     {
+        if (is_null($transactionStatus)) {
+            $status = match ($invoiceStatus) {
+                Invoice::STATUS_CANCELED, Invoice::STATUS_DRAFT, Invoice::STATUS_DELETED => Transaction::STATUS_FAIL,
+                Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED => Transaction::STATUS_SUCCESS,
+            };
+        } else {
+            $status = $transactionStatus;
+        }
+
         return Str::swap([
-            '{invoice}' => $invoiceId
+            '{invoice}' => $invoiceId,
+            '{status}' => $status,
         ], $url);
     }
 }

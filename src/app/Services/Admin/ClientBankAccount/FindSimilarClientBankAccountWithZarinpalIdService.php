@@ -13,6 +13,6 @@ class FindSimilarClientBankAccountWithZarinpalIdService
 
     public function __invoke(ClientBankAccount $clientBankAccount): ?ClientBankAccount
     {
-        return ($this->clientBankAccountRepository)($clientBankAccount);
+        return $this->clientBankAccountRepository->findSimilarWithZarinpalId($clientBankAccount);
     }
 }
