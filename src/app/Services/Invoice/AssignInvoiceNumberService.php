@@ -57,22 +57,7 @@ class AssignInvoiceNumberService
         // Normally this if-clause MUST NOT be executed otherwise something is wrong(race condition) and needs investigation
         if ($affectedRecordCount == 0) {
             info('Could not assign InvoiceNumber to invoice: ' . $invoice->id);
-            info('Generating 100 InvoiceNumbers'); // TODO alert/warn devTeam
-            $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
-            $hundredAvailableInvoiceNumbers = [];
-            $now = now();
-            for ($i = 1; $i <= 100; $i++) {
-                $hundredAvailableInvoiceNumbers[] = [
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                    'invoice_number' => $latestInvoiceNumber + $i,
-                    'type' => $type,
-                    'fiscal_year' => $fiscalYear,
-                    'status' => InvoiceNumber::STATUS_UNUSED,
-                ];
-            }
-            // Insert new available InvoiceNumbers
-            $this->invoiceNumberRepository->insert($hundredAvailableInvoiceNumbers);
+            $this->emergencyInvoiceNumberGenerator($type, $fiscalYear);
 
             // Try again to get an available InvoiceNumber
             $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear);
@@ -84,5 +69,31 @@ class AssignInvoiceNumberService
         GenerateInvoiceNumberJob::dispatch($type, $fiscalYear);
 
         return $invoice->invoiceNumber;
+    }
+
+    public function emergencyInvoiceNumberGenerator(string $type, string $fiscalYear, int $count = 100): bool
+    {
+        $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
+        if (is_null($latestInvoiceNumber)) {
+            $offset = match ($type) {
+                InvoiceNumber::TYPE_PAID => config('payment.invoice_number.invoice_number_paid_offset', 1),
+                InvoiceNumber::TYPE_REFUND => config('payment.invoice_number.invoice_number_refund_offset', 1),
+            };
+            $latestInvoiceNumber = $offset > 0 ? $offset - 1 : $offset;
+        }
+        $hundredAvailableInvoiceNumbers = [];
+        $now = now();
+        for ($i = 1; $i <= $count; $i++) {
+            $hundredAvailableInvoiceNumbers[] = [
+                'created_at' => $now,
+                'updated_at' => $now,
+                'invoice_number' => $latestInvoiceNumber + $i,
+                'type' => $type,
+                'fiscal_year' => $fiscalYear,
+                'status' => InvoiceNumber::STATUS_UNUSED,
+            ];
+        }
+        // Insert new available InvoiceNumbers
+        return $this->invoiceNumberRepository->insert($hundredAvailableInvoiceNumbers);
     }
 }

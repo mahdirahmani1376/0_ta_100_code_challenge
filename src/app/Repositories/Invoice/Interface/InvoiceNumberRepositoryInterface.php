@@ -15,7 +15,7 @@ interface InvoiceNumberRepositoryInterface extends EloquentRepositoryInterface
 
     public function use(Invoice $invoice, string $type, string $fiscalYear, $invoiceNumber = null): int;
 
-    public function getLatestInvoiceNumber(string $type, string $fiscalYear): int;
+    public function getLatestInvoiceNumber(string $type, string $fiscalYear): ?int;
 
     public function countUnused(string $type, string $fiscalYear): int;
 }

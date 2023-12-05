@@ -65,7 +65,7 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
             ]);
     }
 
-    public function getLatestInvoiceNumber(string $type, string $fiscalYear): int
+    public function getLatestInvoiceNumber(string $type, string $fiscalYear): ?int
     {
         return self::newQuery()
             ->where('type', $type)

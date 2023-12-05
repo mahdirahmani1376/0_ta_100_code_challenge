@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\InvoiceNumber;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
+use App\Services\Invoice\AssignInvoiceNumberService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -17,7 +18,7 @@ class GenerateInvoiceNumberCommand extends Command
 
     protected $description = 'Generate Invoice Number records';
 
-    public function handle(InvoiceNumberRepositoryInterface $invoiceNumberRepository)
+    public function handle(AssignInvoiceNumberService $assignInvoiceNumberService)
     {
         $type = $this->option('type') ?? InvoiceNumber::TYPE_PAID;
         $fiscalYear = $this->option('fiscal-year') ?? config('payment.invoice_number.current_fiscal_year');
@@ -25,21 +26,7 @@ class GenerateInvoiceNumberCommand extends Command
 
         $this->alert("Generating $count InvoiceNumber with type of $type and fiscalYear of $fiscalYear");
 
-        $latestInvoiceNumber = $invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
-        $hundredAvailableInvoiceNumbers = [];
-        $now = now();
-        for ($i = 1; $i <= $count; $i++) {
-            $hundredAvailableInvoiceNumbers[] = [
-                'created_at' => $now,
-                'updated_at' => $now,
-                'invoice_number' => $latestInvoiceNumber + $i,
-                'type' => $type,
-                'fiscal_year' => $fiscalYear,
-                'status' => InvoiceNumber::STATUS_UNUSED,
-            ];
-        }
-        // Insert new available InvoiceNumbers
-        $success = $invoiceNumberRepository->insert($hundredAvailableInvoiceNumbers);
+        $success = $assignInvoiceNumberService->emergencyInvoiceNumberGenerator($type,$fiscalYear, $count);
 
         if ($this->option('lock-owner')) {
             Cache::restoreLock('generateInvoiceNumberLock', $this->option('lock-owner'))->release();
