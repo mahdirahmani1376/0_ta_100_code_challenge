@@ -23,7 +23,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->update(['status' => Transaction::STATUS_REFUND]);
     }
 
-    public function sumOfPaidTransactions(Invoice $invoice): int
+    public function sumOfPaidTransactions(Invoice $invoice): float
     {
         return $this->newQuery()
             ->where('invoice_id', $invoice->getKey())
