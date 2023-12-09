@@ -121,6 +121,7 @@ class InvoiceReminderCommand extends Command
                                 [
                                     'profile_id' => $clientId,
                                     'message' => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->emailMessageTemplate, $this->emailLinkTemplate),
+                                    'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ]
                             ],
                             'subject' => $this->emailSubject,
@@ -143,7 +144,7 @@ class InvoiceReminderCommand extends Command
             if (empty($smsThreshold)) {
                 continue;
             }
-            $this->info('----- SMS threshold: ' . $smsThreshold. ' days before due_date');
+            $this->info('----- SMS threshold: ' . $smsThreshold . ' days before due_date');
             $invoices = $this->prepareInvoices($smsThreshold);
 
             $this->info('Invoice count: ' . $invoices->count());

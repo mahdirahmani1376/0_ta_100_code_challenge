@@ -153,9 +153,7 @@ class MainAppAPIService extends BaseMainAppAPIService
     public static function sendInvoiceReminder(array $payload, $channel = 'email')
     {
         $url = '/api/internal/finance/invoice/reminder';
-        foreach ($payload['reminders'] as $index => $reminder) {
-            $payload['reminders'][$index]['client_id'] = Profile::find($reminder['profile_id'])->client_id;
-        }
+
         $data = [
             'channel' => $channel,
             'subject' => $payload['subject'] ?? null,
