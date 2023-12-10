@@ -41,7 +41,8 @@ class AsanPardakht implements Interface\BankGatewayInterface
             ]);
 
         if ($response->status() != Response::HTTP_OK) {
-            throw new BadRequestException('AsanPardakht request status: ' . $response->status());
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('AsanPardakht failed at start: ' . $response->status());
         }
 
         $trackingCode = Str::replace('"', '', $response->body());

@@ -37,7 +37,8 @@ class Sadad implements Interface\BankGatewayInterface
             ]);
 
         if ($response->json('ResCode') != 0) {
-            throw new BadRequestException('Sadad request ResCode: ' . $response->json('ResCode'));
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('Sadad failed at start, ResCode: ' . $response->json('ResCode'));
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('Token'),]);

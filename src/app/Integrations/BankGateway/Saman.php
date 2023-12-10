@@ -37,7 +37,8 @@ class Saman implements BankGatewayInterface
             ]);
 
         if ($response->json('status') != 1) {
-            throw new BadRequestException('Saman request status: ' . $response->json('status'));
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('Saman  failed at start, status: ' . $response->json('status'));
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('token'),]);

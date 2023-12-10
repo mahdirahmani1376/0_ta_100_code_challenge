@@ -65,7 +65,8 @@ class Zibal implements Interface\BankGatewayInterface
             ]);
 
         if ($response->json('result') != 100) {
-            throw new BadRequestException('Zibal result: ' . $response->json('result')); // TODO maybe use a custom exception class
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('Zibal failed at start, result: ' . $response->json('result')); // TODO maybe use a custom exception class
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('trackId'),]);
