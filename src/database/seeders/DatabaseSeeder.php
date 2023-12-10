@@ -19,20 +19,7 @@ class DatabaseSeeder extends Seeder
 //            'card_number' => '6219-8610-3582-1643',
 //            'rahkaran_id' => '213441412414414',
 //        ]);
-//        BankGateway::create([
-//            'name' => 'zibal',
-//            'name_fa' => 'زیبال',
-//            'status' => BankGateway::STATUS_ACTIVE,
-//            'config' => [
-//                'status' => 'active',
-//                'api_key' => 'ZMVaPzvUZj6Ux3MwT8z98YbSB5kZIzkV',
-//                'start_url' => 'https://gateway.zibal.ir/start/',
-//                'verify_url' => 'https://gateway.zibal.ir/v1/verify',
-//                'merchant_id' => 'zibal',
-//                'request_url' => 'https://gateway.zibal.ir/v1/request',
-//                'terminal_id' => '2408938',
-//            ],
-//        ]);
+
 //        InvoiceNumber::create([
 //            'invoice_number' => 1,
 //            'fiscal_year' => 1402,

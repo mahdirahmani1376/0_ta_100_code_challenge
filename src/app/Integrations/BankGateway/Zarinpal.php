@@ -36,7 +36,8 @@ class Zarinpal implements BankGatewayInterface
             ]);
 
         if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
-            throw new BadRequestException('Zarinpal request code: ' . $response->json('data.code')); // TODO maybe use a custom exception class
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('Zarinpal  failed at start, code: ' . $response->json('data.code')); // TODO maybe use a custom exception class
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('data.authority'),]);

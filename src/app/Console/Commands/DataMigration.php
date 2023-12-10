@@ -104,10 +104,13 @@ class DataMigration extends Command
                 $newRow['deleted_at'] = $row['deleted_at'];
                 $newRow['name'] = $row['name'];
                 $newRow['name_fa'] = $row['label'];
-                if ($row['status'] != 'active') {
+                if ($row['status'] == 'active') {
+                    $newRow['status'] = BankGateway::STATUS_ACTIVE;
+                } else {
                     $newRow['deleted_at'] = Carbon::now();
+                    $newRow['status'] = BankGateway::STATUS_INACTIVE;
                 }
-                $newRow['status'] = $row['status'] == 'active' ? BankGateway::STATUS_ACTIVE : BankGateway::STATUS_INACTIVE;
+
                 $config = [];
                 if (!empty($row['merchant_id'])) {
                     $config['merchant_id'] = $row['merchant_id'];
@@ -287,9 +290,9 @@ class DataMigration extends Command
                     $newRow['profile_id'] = $profileId;
                     $newRow['wallet_id'] = Wallet::query()->where('profile_id', $profileId)->firstOrCreate([
                         'profile_id' => $profileId,
-                        'name' => Wallet::WALLET_DEFAULT_NAME,
-                        'balance' => 0,
-                        'is_active' => true,
+                        'name'       => Wallet::WALLET_DEFAULT_NAME,
+                        'balance'    => 0,
+                        'is_active'  => true,
                     ])->getKey();
                     if (Invoice::where('id', $row['invoice_id'])->doesntExist()) {
                         return false;
@@ -659,7 +662,7 @@ class DataMigration extends Command
         try {
             Profile::unguard();
             Profile::query()->create([
-                'id' => $clientId,
+                'id'        => $clientId,
                 'client_id' => $clientId
             ]);
             DB::connection('mainapp')
