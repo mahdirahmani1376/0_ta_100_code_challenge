@@ -56,7 +56,7 @@ class PayInvoiceAction
             'payment_method' => $gatewayName,
         ]);
         $callbackUrl = Str::swap([
-            '{transaction}' => $transaction->getKey(),
+            '{transaction}' => $transaction->id,
             '{gateway}' => $gatewayName,
             '{source}' => $source,
         ], $source == 'cloud' ?
