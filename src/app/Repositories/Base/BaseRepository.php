@@ -103,37 +103,6 @@ class BaseRepository implements EloquentRepositoryInterface
         );
     }
 
-    /**
-     * @throws BindingResolutionException
-     */
-    public function findManyByCriteria(
-        $criteria,
-        $limit,
-        $paginate = [],
-        $relations = [],
-        $scopes = [],
-        $columns = ['*'],
-        $sortColumn = self::DEFAULT_SORT_COLUMN,
-        $sortDirection = self::DEFAULT_SORT_COLUMN_DIRECTION,
-    )
-    {
-        $query = $this->newQuery()
-            ->scopes($scopes)
-            ->select($columns)
-            ->with($relations)
-            ->where($criteria)
-            ->orderBy(
-                $sortColumn ?? self::DEFAULT_SORT_COLUMN,
-                $sortDirection ?? self::DEFAULT_SORT_COLUMN_DIRECTION
-            );
-
-        if (isset($limit)) {
-            $query = $query->limit($limit);
-        }
-
-        return !empty($paginate) ? $query->paginate($paginate['perPage'], $columns, 'page', $paginate['page']) : $query->get();
-    }
-
     public function indexByIds(array $ids): Collection
     {
         return self::newQuery()

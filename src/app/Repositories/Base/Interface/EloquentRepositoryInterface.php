@@ -27,17 +27,6 @@ interface EloquentRepositoryInterface
 
     public function paginate(Builder $query): LengthAwarePaginator;
 
-    public function findManyByCriteria(
-        $criteria,
-        $limit,
-        $paginate = [],
-        $relations = [],
-        $scopes = [],
-        $columns = ['*'],
-        $sortColumn = 'id',
-        $sortDirection = 'desc'
-    );
-
     public function indexByIds(array $ids): Collection;
 
     public function insert(array $data): bool;
