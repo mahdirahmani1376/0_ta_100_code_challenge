@@ -25,7 +25,7 @@ class StoreInvoiceRequest extends FormRequest
             'items' => ['required', 'array',],
             'items.*.description' => ['required', 'string',],
             'items.*.amount' => ['required', 'numeric',],
-            'items.*.invoiceable_type' => ['required', 'string', Rule::in([Item::TYPE_DOMAIN_SERVICE, Item::TYPE_REFUND_DOMAIN,])],
+            'items.*.invoiceable_type' => ['required', 'string',],
             'items.*.invoiceable_id' => ['required', 'numeric',],
         ];
     }
