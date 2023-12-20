@@ -16,6 +16,8 @@ class StoreItemRequest extends FormRequest
         return [
             'description' => ['required', 'string',],
             'amount' => ['required', 'numeric',],
+            'invoiceable_type' => ['nullable', 'string',],
+            'invoiceable_id' => ['nullable', 'numeric',],
         ];
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Internal\Domain\Invoice;
 
 use App\Actions\Internal\Domain\Invoice\StoreInvoiceAction;
+use App\Exceptions\Http\BadRequestException;
 use App\Http\Requests\Internal\Domain\Invoice\StoreInvoiceRequest;
 use App\Http\Resources\Internal\Domain\Invoice\InvoiceResource;
-use Illuminate\Http\Response;
 
 class StoreInvoiceController
 {
@@ -18,7 +18,7 @@ class StoreInvoiceController
         $invoice = ($this->storeInvoiceAction)($request->validated());
 
         if (is_null($invoice)) {
-            return response()->json([], Response::HTTP_BAD_REQUEST);
+            throw new BadRequestException(__('finance.invoice.UnpaidInvoiceAlreadyExists'));
         }
 
         return InvoiceResource::make($invoice);

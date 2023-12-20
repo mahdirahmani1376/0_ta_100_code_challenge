@@ -17,7 +17,7 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'profile_id' => ['required', 'nullable', 'exists:profiles,id',],
+            'profile_id' => ['required', 'numeric', 'exists:profiles,id',],
             'due_date' => ['nullable',],
             'paid_at' => ['nullable',],
             'invoice_date' => ['nullable',],

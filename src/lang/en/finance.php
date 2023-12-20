@@ -33,6 +33,7 @@ return [
         "MassPaymentInvoiceItemFailed" => "خطای پرداخت گروهی فاکتور :mass_invoice_id",
         "MassPaymentInvoiceItemFailedDescription" => "پرداخت صورت حساب شماره :invoice_id ناموفق بود. صورت حساب :",
         "ChangeServiceInvoiceItemDescription" => "هزینه تبدیل سرویس :domain به محصول :product تا تاریخ :expire_date",
+        "UnpaidInvoiceAlreadyExists" => "فاکتور پرداخت نشده برای ایتم های ارسال شده وجود دارد",
 
     ],
     'credit' => [
