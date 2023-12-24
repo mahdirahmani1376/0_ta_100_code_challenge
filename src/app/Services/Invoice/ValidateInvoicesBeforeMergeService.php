@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Invoice;
+namespace App\Services\Invoice;
 
 use App\Exceptions\SystemException\MergeInvoiceException;
 use App\Models\Invoice;
@@ -48,8 +48,7 @@ class ValidateInvoicesBeforeMergeService
             }
             if (!in_array($invoice->status, [
                 Invoice::STATUS_UNPAID,
-                Invoice::STATUS_CANCELED,
-                Invoice::STATUS_DRAFT
+                Invoice::STATUS_DRAFT,
             ]))
                 throw MergeInvoiceException::make(trans('finance.mergeInvoice.notAllowedStatus', [
                     'invoice_id' => $invoice->getKey(),
