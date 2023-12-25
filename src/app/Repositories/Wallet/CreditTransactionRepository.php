@@ -5,7 +5,6 @@ namespace App\Repositories\Wallet;
 use App\Models\CreditTransaction;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -14,14 +13,6 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
 {
     public string $model = CreditTransaction::class;
 
-    public function indexByProfileId(int $profileId): LengthAwarePaginator
-    {
-        return $this->paginate(
-            $this->newQuery()
-                ->where('profile_id', $profileId)
-        );
-    }
-
     public function sum(int $profileId): int
     {
         return $this->newQuery()
@@ -29,10 +20,7 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             ->sum('amount');
     }
 
-    /**
-     * @throws BindingResolutionException
-     */
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
 
@@ -55,15 +43,14 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             $query->where('profile_id', '=', $data['profile_id']);
         }
 
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
+        if (isset($data['export']) && $data['export']) {
+            return self::sortQuery($query)->get();
+        }
 
         return self::paginate($query);
     }
 
-    public function profileListEverything(int $profileId): Collection
+    public function indexEverything(int $profileId): Collection
     {
         return self::newQuery()
             ->where('profile_id', $profileId)
@@ -74,14 +61,14 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             ->get(['id', 'created_at', 'updated_at', 'invoice_id', 'amount', 'description',]);
     }
 
-    public function internalCloudBulkDelete(array $ids): int
+    public function bulkDelete(array $ids): int
     {
         return self::newQuery()
             ->whereIn('id', $ids)
             ->delete();
     }
 
-    public function internalCloudSum(array $ids): int
+    public function internalCloudSum(array $ids): float
     {
         return self::newQuery()
             ->whereIn('id', $ids)

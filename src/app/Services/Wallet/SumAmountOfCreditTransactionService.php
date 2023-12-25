@@ -10,7 +10,7 @@ class SumAmountOfCreditTransactionService
     {
     }
 
-    public function __invoke(array $ids)
+    public function __invoke(array $ids): float
     {
         return $this->creditTransactionRepository->internalCloudSum($ids);
     }

@@ -19,7 +19,7 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
     /**
      * @throws BindingResolutionException
      */
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
         $query = self::newQuery();
 
@@ -39,11 +39,9 @@ class OfflineTransactionRepository extends BaseRepository implements OfflineTran
         if (!empty($data['status'])) {
             $query->where('status', $data['status']);
         }
-
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
+        if (!empty($data['profile_id'])) {
+            $query->where('profile_id', $data['profile_id']);
+        }
 
         return self::paginate($query);
     }

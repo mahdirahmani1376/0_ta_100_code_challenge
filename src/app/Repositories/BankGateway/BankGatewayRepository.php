@@ -17,7 +17,7 @@ class BankGatewayRepository extends BaseRepository implements BankGatewayReposit
     /**
      * @throws BindingResolutionException
      */
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
         if (!empty($data['search'])) {
@@ -29,21 +29,12 @@ class BankGatewayRepository extends BaseRepository implements BankGatewayReposit
         if (!empty($data['status'])) {
             $query->where('status', $data['status']);
         }
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
+
+        if (isset($data['export']) && $data['export']) {
+            return self::sortQuery($query)->get();
+        }
 
         return self::paginate($query);
-    }
-
-    public function all(bool $isAdmin = false): Collection
-    {
-        return $this->newQuery()
-            ->when(!$isAdmin, function (Builder $builder) {
-                $builder->where('status', BankGateway::STATUS_ACTIVE);
-            })
-            ->get();
     }
 
     public function findByName(string $name): ?BankGateway

@@ -3,6 +3,7 @@
 namespace App\Services\BankGateway;
 
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class IndexBankGatewayService
@@ -11,8 +12,8 @@ class IndexBankGatewayService
     {
     }
 
-    public function __invoke(bool $isAdmin = false): Collection
+    public function __invoke(array $data): Collection|LengthAwarePaginator
     {
-        return $this->bankGatewayRepository->all($isAdmin);
+        return $this->bankGatewayRepository->index($data);
     }
 }

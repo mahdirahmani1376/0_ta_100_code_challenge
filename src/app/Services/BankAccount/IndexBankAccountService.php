@@ -13,6 +13,6 @@ class IndexBankAccountService
 
     public function __invoke(array $data): LengthAwarePaginator
     {
-        return $this->bankAccountRepository->publicIndex($data);
+        return $this->bankAccountRepository->index($data);
     }
 }

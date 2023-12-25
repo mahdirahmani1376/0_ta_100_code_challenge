@@ -11,6 +11,7 @@ return [
         'OnlyUnpaidInvoiceAllowed' => 'این امکان فقط برای فاکتورهای پرداخت نشده وجود دارد.',
         'OnlyPendingOfflinePaymentAllowed' => 'این امکان فقط برای پرداخت آفلاین درحال انتظار وجود دارد.',
         'CannotMakeMassPaymentInvoice' => 'هیچ یک از فاکتور های ارسال شده امکان پرداخت گروهی ندارد.',
+        "AccessDeniedToCashout" => "شما دسترسی به این رکورد درخواست بازگشت وجه را ندارید",
     ],
     'invoice' => [
         'AmountExceedsInvoiceBalance' => 'مقدار انتخاب شده از مبلغ فاکتور بیشتر می باشد.',
@@ -33,7 +34,7 @@ return [
         "MassPaymentInvoiceItemFailed" => "خطای پرداخت گروهی فاکتور :mass_invoice_id",
         "MassPaymentInvoiceItemFailedDescription" => "پرداخت صورت حساب شماره :invoice_id ناموفق بود. صورت حساب :",
         "ChangeServiceInvoiceItemDescription" => "هزینه تبدیل سرویس :domain به محصول :product تا تاریخ :expire_date",
-
+        "AccessDeniedToInvoice" => "شما دسترسی به این فاکتور ندارید",
     ],
     'credit' => [
         'WalletAdjustment' => 'اصلاحیه اعتبار کیف پول',

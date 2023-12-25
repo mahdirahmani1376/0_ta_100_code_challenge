@@ -3,7 +3,6 @@
 namespace App\Services\Invoice;
 
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
-use Illuminate\Support\Collection;
 
 class IndexInvoiceService
 {
@@ -11,8 +10,8 @@ class IndexInvoiceService
     {
     }
 
-    public function __invoke(array $data): Collection
+    public function __invoke(array $data)
     {
-        return $this->invoiceRepository->internalIndex($data);
+        return $this->invoiceRepository->index($data);
     }
 }

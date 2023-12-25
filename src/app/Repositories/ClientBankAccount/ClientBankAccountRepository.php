@@ -12,7 +12,7 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
 {
     public string $model = ClientBankAccount::class;
 
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
         $query = self::newQuery();
         if (!empty($data['search'])) {
@@ -36,11 +36,6 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
         );
 
         return self::paginate($query);
-    }
-
-    public function profileIndex(array $data): LengthAwarePaginator
-    {
-        return self::adminIndex($data);
     }
 
     public function findSimilarWithZarinpalId(ClientBankAccount $clientBankAccount)
