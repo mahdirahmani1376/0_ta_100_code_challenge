@@ -89,6 +89,9 @@ if (!function_exists('clean_ir_mobile')) {
 if (!function_exists('admin_log')) {
     function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null): void
     {
+        if (is_null($adminId) && is_null(request('admin_id'))) {
+            return;
+        }
         try {
             if (!is_array($oldState)) {
                 $oldState = $oldState?->toArray();

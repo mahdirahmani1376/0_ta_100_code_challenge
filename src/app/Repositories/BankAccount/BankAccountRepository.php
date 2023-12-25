@@ -5,18 +5,15 @@ namespace App\Repositories\BankAccount;
 use App\Models\BankAccount;
 use App\Repositories\BankAccount\Interface\BankAccountRepositoryInterface;
 use App\Repositories\Base\BaseRepository;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class BankAccountRepository extends BaseRepository implements BankAccountRepositoryInterface
 {
     public string $model = BankAccount::class;
 
-    /**
-     * @throws BindingResolutionException
-     */
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
         if (!empty($data['search'])) {
@@ -31,18 +28,6 @@ class BankAccountRepository extends BaseRepository implements BankAccountReposit
             $query->where('status', $data['status']);
         }
 
-        $query->orderBy(
-            $data['sort'] ?? 'display_order',
-            $data['sortDirection'] ?? 'asc',
-        );
-
         return self::paginate($query);
-    }
-
-    public function publicIndex(array $data): LengthAwarePaginator
-    {
-        $data['status'] = BankAccount::STATUS_ACTIVE;
-
-        return self::adminIndex($data);
     }
 }

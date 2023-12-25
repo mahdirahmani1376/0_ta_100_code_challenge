@@ -27,7 +27,6 @@ use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
-use App\Services\OfflineTransaction\FindOfflineTransactionByTransactionService;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
@@ -52,11 +51,10 @@ class RahkaranService
     private array $regions = [];
 
     public function __construct(
-        private readonly TransactionRepositoryInterface             $transactionRepository,
-        private readonly InvoiceRepositoryInterface                 $invoiceRepository,
-        private readonly AssignInvoiceNumberService                 $assignInvoiceNumberService,
-        private readonly FindOfflineTransactionByTransactionService $findOfflineTransactionByTransactionService,
-        private readonly FindBankGatewayByNameService               $findBankGatewayByNameService,
+        private readonly TransactionRepositoryInterface $transactionRepository,
+        private readonly InvoiceRepositoryInterface     $invoiceRepository,
+        private readonly AssignInvoiceNumberService     $assignInvoiceNumberService,
+        private readonly FindBankGatewayByNameService   $findBankGatewayByNameService,
     )
     {
         $this->config = new RahkaranConfig();
@@ -760,7 +758,7 @@ class RahkaranService
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':
-                $offlineTransaction = ($this->findOfflineTransactionByTransactionService)($transaction);
+                $offlineTransaction = $transaction->offlineTransaction;
                 if (!$offlineTransaction || !$offlineTransaction->bankAccount || !$offlineTransaction->bankAccount->rahkaran_id) {
                     throw new BadRequestException(trans('rahkaran.error.NOT_FOUND_TRANSACTION_BANK_ACCOUNT_ID', [
                         'transaction_id' => $transaction->id

@@ -47,7 +47,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->first();
     }
 
-    public function adminIndex(array $data): Collection|LengthAwarePaginator
+    public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
 
@@ -87,47 +87,15 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         if (!empty($data['from_date'])) {
             $query->whereDate('created_at', '>=', $data['from_date']);
         }
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
 
         if (isset($data['export']) && $data['export']) {
-            return $query->get();
+            return $this->sortQuery($query)->get();
         }
 
         return $this->paginate($query);
     }
 
-    public function profileIndex(array $data): Collection|LengthAwarePaginator
-    {
-        $query = self::newQuery();
-
-        $query->where('profile_id', $data['profile_id']);
-        if (!empty($data['search'])) {
-            $query->where(function (Builder $query) use ($data) {
-                return $query->where('reference_id', 'LIKE', '%' . $data['search'] . '%')
-                    ->orWhere('id', '%' . $data['search'] . '%')
-                    ->orWhere('invoice_id', 'LIKE', '%' . $data['search'] . '%')
-                    ->orWhere('tracking_code', 'LIKE', '%' . $data['search'] . '%')
-                    ->orWhere("description", "LIKE", '%' . $data['search'] . '%');
-            });
-        }
-        if (!empty($data['status'])) {
-            $query->where('status', '=', $data['status']);
-        }
-        if (!empty($data['payment_method'])) {
-            $query->where('payment_method', '=', $data['payment_method']);
-        }
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
-
-        return $this->paginate($query);
-    }
-
-    public function profileListEverything(int $profileId): Collection
+    public function indexEverything(int $profileId): Collection
     {
         return self::newQuery()
             ->where('profile_id', $profileId)

@@ -9,15 +9,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
 {
-    public function adminIndex(array $data): LengthAwarePaginator|Collection;
-
-    public function profileIndex(array $data): LengthAwarePaginator;
-
-    public function profileListEverything(int $profileId): Collection;
+    public function indexEverything(int $profileId): Collection;
 
     public function prepareInvoicesForMassPayment(array $data): Collection;
-
-    public function internalIndex(array $data): Collection;
 
     public function internalIndexMyInvoice(array $data): LengthAwarePaginator;
 
@@ -32,10 +26,12 @@ interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
     public function reportLatest(): Collection;
 
     public function reportRevenue($from, $to): array;
+
     public function reportRevenueBasedOnGateway($from, $to): array;
 
     public function reportCollection($from, $to): array;
 
     public function rahkaranQuery($from, $to): Builder;
+
     public function hourlyReport($from, $to): float;
 }

@@ -17,7 +17,7 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
     /**
      * @throws BindingResolutionException
      */
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
         $query = self::newQuery();
         if (!empty($data['search'])) {

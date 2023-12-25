@@ -21,7 +21,7 @@ class ListEverythingService
 
     public function __invoke(int $profileId, int $offset = null, $perPage = 100)
     {
-        $invoices = $this->invoiceRepository->profileListEverything($profileId)
+        $invoices = $this->invoiceRepository->indexEverything($profileId)
             ->map(function (Invoice $invoice) {
                 return [
                     'id' => $invoice->getKey(),
@@ -32,7 +32,7 @@ class ListEverythingService
                     'description' => null,
                 ];
             });
-        $transactions = $this->transactionRepository->profileListEverything($profileId)
+        $transactions = $this->transactionRepository->indexEverything($profileId)
             ->map(function (Transaction $transaction) {
                 return [
                     'id' => $transaction->getKey(),
@@ -43,7 +43,7 @@ class ListEverythingService
                     'description' => $transaction->description,
                 ];
             });
-        $creditTransaction = $this->creditTransactionRepository->profileListEverything($profileId)
+        $creditTransaction = $this->creditTransactionRepository->indexEverything($profileId)
             ->map(function (CreditTransaction $creditTransaction) {
                 return [
                     'id' => $creditTransaction->getKey(),

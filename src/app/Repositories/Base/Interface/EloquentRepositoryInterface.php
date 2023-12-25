@@ -25,6 +25,8 @@ interface EloquentRepositoryInterface
 
     public function all(): Collection;
 
+    public function index(array $data): Collection|LengthAwarePaginator;
+
     public function paginate(Builder $query): LengthAwarePaginator;
 
     public function indexByIds(array $ids): Collection;

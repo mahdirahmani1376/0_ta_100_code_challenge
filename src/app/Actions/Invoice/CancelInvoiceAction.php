@@ -2,7 +2,7 @@
 
 namespace App\Actions\Invoice;
 
-use App\Actions\Wallet\StoreCreditTransactionAction;
+use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
 use App\Models\Invoice;
 use App\Services\Invoice\CancelInvoiceService;
 use App\Services\Transaction\RefundTransactionService;

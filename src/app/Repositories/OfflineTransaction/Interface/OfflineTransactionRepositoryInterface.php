@@ -11,8 +11,6 @@ use Illuminate\Support\Collection;
 
 interface OfflineTransactionRepositoryInterface extends EloquentRepositoryInterface
 {
-    public function adminIndex(array $data): LengthAwarePaginator;
-
     public function adminIndexSimilar(OfflineTransaction $offlineTransaction): LengthAwarePaginator;
 
     public function sumOfVerifiedOfflineTransactions(Invoice $invoice): Collection;

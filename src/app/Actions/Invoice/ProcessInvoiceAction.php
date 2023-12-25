@@ -2,17 +2,17 @@
 
 namespace App\Actions\Invoice;
 
-use App\Actions\Admin\Wallet\StoreCreditTransactionAction;
+use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
 use App\Events\InvoiceProcessed;
 use App\Jobs\AssignInvoiceNumberJob;
 use App\Models\Invoice;
 use App\Models\Item;
-use App\Services\Admin\Invoice\ChangeInvoiceStatusService;
-use App\Services\Admin\Transaction\StoreRefundTransactionService;
 use App\Services\Invoice\CalcInvoicePaidAtService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\CalcInvoiceProcessedAtService;
+use App\Services\Invoice\ChangeInvoiceStatusService;
 use App\Services\Invoice\FindInvoiceByIdService;
+use App\Services\Invoice\Transaction\StoreRefundTransactionService;
 
 class ProcessInvoiceAction
 {
@@ -27,6 +27,7 @@ class ProcessInvoiceAction
     )
     {
     }
+
     // TODO check usage of this action
     public function __invoke(Invoice $invoice): Invoice
     {

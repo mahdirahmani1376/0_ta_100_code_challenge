@@ -11,7 +11,7 @@ class ClientCashoutRepository extends BaseRepository implements ClientCashoutRep
 {
     public string $model = ClientCashout::class;
 
-    public function adminIndex(array $data): LengthAwarePaginator
+    public function index(array $data): LengthAwarePaginator
     {
         $query = self::newQuery();
         if (!empty($data['profile_id'])) {
@@ -23,18 +23,7 @@ class ClientCashoutRepository extends BaseRepository implements ClientCashoutRep
         if (!empty($data['status'])) {
             $query->where('status', $data['status']);
         }
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
 
         return self::paginate($query);
-    }
-
-    public function profileIndex(int $profileId, array $data): LengthAwarePaginator
-    {
-        $data['profile_id'] = $profileId;
-
-        return self::adminIndex($data);
     }
 }

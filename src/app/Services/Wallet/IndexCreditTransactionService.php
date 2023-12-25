@@ -4,6 +4,7 @@ namespace App\Services\Wallet;
 
 use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class IndexCreditTransactionService
 {
@@ -11,8 +12,8 @@ class IndexCreditTransactionService
     {
     }
 
-    public function __invoke(int $profileId): LengthAwarePaginator
+    public function __invoke(array $data): Collection|LengthAwarePaginator
     {
-        return $this->creditTransactionRepository->indexByProfileId($profileId);
+        return $this->creditTransactionRepository->index($data);
     }
 }

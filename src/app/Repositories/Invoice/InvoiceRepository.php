@@ -15,7 +15,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
 {
     public string $model = Invoice::class;
 
-    public function adminIndex(array $data): Collection|LengthAwarePaginator
+    public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
 
@@ -29,11 +29,15 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
                 }
             });
         }
+        $dateField = 'created_at';
+        if (!empty($data['date_field'])) {
+            $dateField = $data['date_field'];
+        }
         if (!empty($data['from_date'])) {
-            $query->whereDate('created_at', '>=', $data['from_date']);
+            $query->whereDate($dateField, '>=', $data['from_date']);
         }
         if (!empty($data['to_date'])) {
-            $query->whereDate('created_at', '<=', $data['to_date']);
+            $query->whereDate($dateField, '<=', $data['to_date']);
         }
         if (!empty($data['non_checked'])) {
             $query->whereNull('admin_id')
@@ -60,61 +64,61 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         if (!empty($data['due_date'])) {
             $query->whereDate('due_date', '=', $data['due_date']);
         }
+        if (isset($data['is_credit'])) {
+            $query->where('is_credit', $data['is_credit']);
+        }
+        if (isset($data['is_mass_payment'])) {
+            $query->where('is_mass_payment', $data['is_mass_payment']);
+        }
         if (!empty($data['invoice_number'])) {
             $query->whereHas('invoiceNumber', function (Builder $query) use ($data) {
                 $query->where('invoice_number', $data['invoice_number']);
             });
         }
-
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
+        if (!empty($data['invoiceable_id']) || !empty($data['invoiceable_type'])) {
+            $query->whereHas('items', function (Builder $query) use ($data) {
+                $query->when(
+                    !empty($data['invoiceable_id']),
+                    fn(Builder $query) => $query->where('invoiceable_id', $data['invoiceable_id'])
+                );
+                $query->when(
+                    !empty($data['invoiceable_type']),
+                    fn(Builder $query) => $query->where('invoiceable_type', $data['invoiceable_type'])
+                );
+            });
+        }
+        /**
+         * items => [
+         *      ['invoiceable_ids' => array, 'invoiceable_type' => string],
+         *      ['invoiceable_ids' => array, 'invoiceable_type' => string],
+         *      ...
+         *   ]
+         */
+        if (!empty($data['items'])) {
+            $query->where(function (Builder $query) use ($data) {
+                foreach ($data['items'] as $item) {
+                    $query->orWhereHas('items', function (Builder $query) use ($item) {
+                        $query->when(
+                            !empty($item['invoiceable_ids']),
+                            fn(Builder $query) => $query->whereIn('invoiceable_id', $item['invoiceable_ids'])
+                        );
+                        $query->when(
+                            !empty($item['invoiceable_type']),
+                            fn(Builder $query) => $query->where('invoiceable_type', $item['invoiceable_type'])
+                        );
+                    });
+                }
+            });
+        }
 
         if (isset($data['export']) && $data['export']) {
-            return $query->get();
+            return self::sortQuery($query)->get();
         }
 
         return $this->paginate($query);
     }
 
-    public function profileIndex(array $data): LengthAwarePaginator
-    {
-        $query = self::newQuery();
-        $query->where('profile_id', $data['profile_id']);
-        if (!empty($data['search'])) {
-            $query->where(function (Builder $query) use ($data) {
-                $query->where('id', "LIKE", '%' . $data['search'] . '%')
-                    ->orWhere("total", $data['search'] . '.00');
-
-                if (!empty($data['item_invoice_ids'])) {
-                    $query->orWhereIn('id', $data['item_invoice_ids']);
-                }
-            });
-        }
-        if (!empty($data['status'])) {
-            if ($data['status'] == Invoice::STATUS_UNPAID) {
-                $query->whereIn('status', [
-                    Invoice::STATUS_UNPAID,
-                    Invoice::STATUS_COLLECTIONS,
-                    Invoice::STATUS_PAYMENT_PENDING,
-                ]);
-            } else {
-                $query->where('status', '=', $data['status']);
-            }
-        }
-        $query->where('status', '<>', Invoice::STATUS_DRAFT);
-        $query->where('is_mass_payment', false);
-
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
-
-        return self::paginate($query);
-    }
-
-    public function profileListEverything(int $profileId): Collection
+    public function indexEverything(int $profileId): Collection
     {
         return self::newQuery()
             ->where('profile_id', $profileId)
@@ -136,22 +140,6 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->where('is_credit', false)
             ->where('is_mass_payment', false)
             ->whereIn('id', $data['invoice_ids'])
-            ->get();
-    }
-
-    public function internalIndex(array $data): Collection
-    {
-        return self::newQuery()
-            ->when(!empty($data['profile_id']), function (Builder $builder) use ($data) {
-                $builder->where('profile_id', $data['profile_id']);
-            })
-            ->when(!empty($data['status']), function (Builder $builder) use ($data) {
-                $builder->where('status', $data['status']);
-            })
-            ->whereHas('items', function (Builder $builder) use ($data) {
-                $builder->where('invoiceable_id', $data['invoiceable_id']);
-                $builder->where('invoiceable_type', $data['invoiceable_type']);
-            })
             ->get();
     }
 

@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Actions\Invoice\Transaction;
+
+use App\Exceptions\Http\BadRequestException;
+use App\Models\AdminLog;
+use App\Models\Transaction;
+use App\Services\Invoice\CalcInvoicePriceFieldsService;
+use App\Services\Invoice\FindInvoiceByIdService;
+use App\Services\Invoice\Transaction\StoreTransactionService;
+
+class StoreTransactionAction
+{
+    public function __construct(
+        private readonly FindInvoiceByIdService        $findInvoiceByIdService,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
+        private readonly StoreTransactionService       $storeTransactionService)
+    {
+    }
+
+    public function __invoke(array $data)
+    {
+        $invoice = ($this->findInvoiceByIdService)($data['invoice_id']);
+        check_rahkaran($invoice);
+
+        if ($invoice->balance < 0) {
+            throw new BadRequestException(__('finance.invoice.NegativeBalance'));
+        }
+        if ($invoice->balance == 0 || $data['amount'] > $invoice->balance) {
+            throw new BadRequestException(__('finance.invoice.AmountExceedsInvoiceBalance'));
+        }
+
+        $data['status'] = Transaction::STATUS_SUCCESS;
+        $transaction = ($this->storeTransactionService)($invoice, $data);
+
+        ($this->calcInvoicePriceFieldsService)($invoice);
+
+        admin_log(AdminLog::ADD_INVOICE_TRANSACTION, $transaction, validatedData: $data);
+
+        return $transaction;
+    }
+}

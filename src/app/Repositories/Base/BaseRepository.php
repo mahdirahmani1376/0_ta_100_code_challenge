@@ -96,11 +96,32 @@ class BaseRepository implements EloquentRepositoryInterface
         return $this->newQuery()->get();
     }
 
+
+    public function index(array $data): Collection|LengthAwarePaginator
+    {
+        $query = self::newQuery();
+        if (isset($data['export']) && $data['export']) {
+            return self::sortQuery($query)->get();
+        }
+
+        return self::paginate($query);
+    }
+
     public function paginate(Builder $query): LengthAwarePaginator
     {
-        return $query->paginate(
+        return self::sortQuery($query)->paginate(
             get_paginate_params()['perPage']
         );
+    }
+
+    public function sortQuery(Builder $query): Builder
+    {
+        $query->orderBy(
+            request('sort', self::DEFAULT_SORT_COLUMN),
+            request('sort_direction', self::DEFAULT_SORT_COLUMN_DIRECTION),
+        );
+
+        return $query;
     }
 
     public function indexByIds(array $ids): Collection
