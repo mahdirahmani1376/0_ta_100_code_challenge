@@ -18,6 +18,7 @@ class IndexInvoiceRequest extends FormRequest
         return [
             'sort' => ['nullable', 'max:255', Rule::in(get_sortable_items((new Invoice())->getFillable())),],
             'sort_direction' => ['nullable', 'max:255', Rule::in('desc', 'asc'),],
+            'per_page' => ['nullable', 'integer',],
             'profile_id' => ['nullable', 'integer',],
             'invoice_id' => ['nullable', 'integer',],
             'invoice_ids' => ['nullable', 'array',],
@@ -34,6 +35,7 @@ class IndexInvoiceRequest extends FormRequest
             'from_date' => ['nullable', 'date', 'date_format:Y-m-d', 'before_or_equal:to_date',],
             'to_date' => ['nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:from_date',],
             'export' => ['nullable', 'boolean',],
+            'with_detail' => ['nullable', 'boolean',],
             'non_checked' => ['nullable', 'boolean',],
             'is_credit' => ['nullable', 'boolean',],
             'is_mass_payment' => ['nullable', 'boolean',],
