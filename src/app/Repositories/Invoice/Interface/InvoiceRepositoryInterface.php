@@ -3,7 +3,6 @@
 namespace App\Repositories\Invoice\Interface;
 
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -12,8 +11,6 @@ interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
     public function indexEverything(int $profileId): Collection;
 
     public function prepareInvoicesForMassPayment(array $data): Collection;
-
-    public function internalIndexMyInvoice(array $data): LengthAwarePaginator;
 
     public function count(): int;
 

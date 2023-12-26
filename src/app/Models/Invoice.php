@@ -102,6 +102,7 @@ class Invoice extends Model
         return $this->hasMany(Item::class);
     }
 
+
     public function invoiceNumber(): HasOne
     {
         return $this->hasOne(InvoiceNumber::class);
