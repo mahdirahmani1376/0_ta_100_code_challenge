@@ -20,6 +20,8 @@ class IndexInvoiceRequest extends FormRequest
             'sort_direction' => ['nullable', 'max:255', Rule::in('desc', 'asc'),],
             'profile_id' => ['nullable', 'integer',],
             'invoice_id' => ['nullable', 'integer',],
+            'invoice_ids' => ['nullable', 'array',],
+            'invoice_ids.*' => ['integer',],
             'payment_method' => ['nullable', 'max:255',],
             'status' => ['nullable', 'max:255', Rule::in(Invoice::STATUSES),],
             'date' => ['nullable', 'date_format:Y-m-d',],

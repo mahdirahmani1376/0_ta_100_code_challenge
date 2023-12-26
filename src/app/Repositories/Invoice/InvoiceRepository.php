@@ -49,6 +49,9 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         if (!empty($data['invoice_id'])) {
             $query->where('id', '=', $data['invoice_id']);
         }
+        if (!empty($data['invoice_ids'])) {
+            $query->whereIn('id', $data['invoice_ids']);
+        }
         if (!empty($data['payment_method'])) {
             $query->where('payment_method', '=', $data['payment_method']);
         }

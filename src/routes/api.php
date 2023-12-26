@@ -109,7 +109,6 @@ Route::namespace('Invoice')
         Route::post('{invoice}/split', SplitInvoiceController::class);
         Route::get('{invoice}/download', DownloadInvoiceBillController::class);
         Route::post('{invoice}/apply-balance', ApplyBalanceToInvoiceController::class);
-//        Route::get()
     });
 
 Route::namespace('Wallet')
@@ -175,7 +174,6 @@ Route::namespace('Profile')
     ->group(function () {
         Route::get('{clientId}', ShowProfileIdController::class);
     });
-
 
 Route::get('report', FinanceServiceReportController::class);
 Route::get('hourly-report', FinanceServiceHourlyReportController::class);
