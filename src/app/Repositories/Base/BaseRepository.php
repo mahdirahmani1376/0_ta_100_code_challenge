@@ -110,7 +110,7 @@ class BaseRepository implements EloquentRepositoryInterface
     public function paginate(Builder $query): LengthAwarePaginator
     {
         return self::sortQuery($query)->paginate(
-            get_paginate_params()['perPage']
+            get_paginate_params()['per_page']
         );
     }
 

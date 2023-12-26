@@ -9,7 +9,7 @@ use App\Models\Transaction;
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
     {
-        $perPage = request()->get('perPage');
+        $perPage = request()->get('per_page');
         $page = request()->get('page');
 
         if (empty($perPage) || is_array($perPage) || is_object($perPage) || (int)$perPage < 0 || (int)$perPage > 200) {
@@ -19,7 +19,7 @@ if (!function_exists('get_paginate_params')) {
             $page = 1;
         }
 
-        return ['perPage' => (int)$perPage, 'page' => (int)$page];
+        return ['per_page' => (int)$perPage, 'page' => (int)$page];
     }
 }
 

@@ -4,7 +4,6 @@ namespace App\Repositories\Invoice;
 
 use App\Models\BankGateway;
 use App\Models\Invoice;
-use App\Models\Item;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -115,6 +114,8 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         }
 
         if (isset($data['export']) && $data['export']) {
+            $query->when(!empty($data['per_page']), fn(Builder $query) => $query->limit($data['per_page']));
+
             return self::sortQuery($query)->get();
         }
 
@@ -144,40 +145,6 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->where('is_mass_payment', false)
             ->whereIn('id', $data['invoice_ids'])
             ->get();
-    }
-
-    public function internalIndexMyInvoice(array $data): LengthAwarePaginator
-    {
-        $query = self::newQuery()
-            ->where(function (Builder $builder) use ($data) {
-                $builder->whereHas('items', function (Builder $builder) use ($data) {
-                    $builder->whereIn('invoiceable_id', $data['invoiceable_ids']);
-                    $builder->where('invoiceable_type', Item::TYPE_CLOUD);
-                });
-            })
-            ->orWhere(function (Builder $builder) use ($data) {
-                $builder->whereHas('items', function (Builder $builder) use ($data) {
-                    $builder->whereIn('invoiceable_id', $data['invoiceable_ids']);
-                    $builder->where('invoiceable_type', Item::TYPE_ADD_CLOUD_CREDIT);
-                });
-            })
-            ->orWhere(function (Builder $builder) use ($data) {
-                $builder->where('is_credit', true);
-                $builder->where('profile_id', $data['profile_id']);
-            });
-        if (!empty($data['search'])) {
-            $query->where('id', $data['search']);
-        }
-        if (!empty($data['status'])) {
-            $query->where('status', $data['status']);
-        }
-
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
-
-        return self::paginate($query);
     }
 
     public function count(): int

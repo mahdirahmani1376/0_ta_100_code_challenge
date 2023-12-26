@@ -17,9 +17,9 @@ class ListEverythingController
             'data' => ($this->listEverythingAction)(
                 $request->get('profile_id'),
                 $request->get('offset', 0),
-                $request->get('perPage', 100),
+                $request->get('per_page', 100),
             ),
-            'perPage' => $request->get('perPage', 100)
+            'per_page' => $request->get('per_page', 100)
         ];
     }
 }

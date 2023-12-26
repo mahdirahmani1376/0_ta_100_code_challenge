@@ -16,7 +16,7 @@ class ListEverythingRequest extends FormRequest
         return [
             'profile_id' => ['required', 'integer', 'exists:profiles,id',],
             'offset' => ['nullable', 'integer',],
-            'perPage' => ['nullable', 'integer',],
+            'per_page' => ['nullable', 'integer',],
         ];
     }
 }
