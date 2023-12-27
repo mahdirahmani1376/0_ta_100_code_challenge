@@ -23,8 +23,9 @@ class ChargeWalletInvoiceAction
             'items' => [
                 [
                     'amount' => $data['amount'],
-                    'description' => __('finance.invoice.ClientCreditInvoiceItem'),
-                    'invoiceable_type' => Item::TYPE_ADD_CLIENT_CREDIT
+                    'description' => data_get($data, 'description', __('finance.invoice.ClientCreditInvoiceItem')),
+                    'invoiceable_id' => data_get($data, 'invoiceable_id'),
+                    'invoiceable_type' => data_get($data, 'invoiceable_type', Item::TYPE_ADD_CLIENT_CREDIT),
                 ],
             ]
         ];

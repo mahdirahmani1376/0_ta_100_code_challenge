@@ -20,6 +20,9 @@ class ChargeWalletInvoiceRequest extends FormRequest
                 'min:' . config('payment.transactions.limit.min'),
                 'max:' . config('payment.transactions.limit.max'),
             ],
+            'invoiceable_id' => ['nullable', 'integer',],
+            'invoiceable_type' => ['nullable', 'max:255',],
+            'description' => ['nullable', 'max:255',],
             'profile_id' => ['required', 'integer', 'exists:profiles,id',],
             'admin_id' => ['nullable', 'integer',],
         ];
