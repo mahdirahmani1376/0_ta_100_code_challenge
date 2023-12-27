@@ -17,6 +17,7 @@ class ShowInvoiceResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'invoice_id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'due_date' => $this->due_date?->toDateTimeString(),

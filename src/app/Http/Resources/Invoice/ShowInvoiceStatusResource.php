@@ -13,6 +13,7 @@ class ShowInvoiceStatusResource extends JsonResource
         /** @var Invoice $this */
         return [
             'id' => $this->id,
+            'invoice_id' => $this->id,
             'created_at' => $this->created_at?->toDateTimeString(),
             'due_date' => $this->due_date?->toDateTimeString(),
             'balance' => $this->balance,
