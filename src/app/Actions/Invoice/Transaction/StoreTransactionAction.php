@@ -2,6 +2,7 @@
 
 namespace App\Actions\Invoice\Transaction;
 
+use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Models\AdminLog;
 use App\Models\Transaction;
@@ -14,7 +15,9 @@ class StoreTransactionAction
     public function __construct(
         private readonly FindInvoiceByIdService        $findInvoiceByIdService,
         private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
-        private readonly StoreTransactionService       $storeTransactionService)
+        private readonly StoreTransactionService       $storeTransactionService,
+        private readonly ProcessInvoiceAction          $processInvoiceAction,
+    )
     {
     }
 
@@ -33,7 +36,8 @@ class StoreTransactionAction
         $data['status'] = Transaction::STATUS_SUCCESS;
         $transaction = ($this->storeTransactionService)($invoice, $data);
 
-        ($this->calcInvoicePriceFieldsService)($invoice);
+        $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
+        ($this->processInvoiceAction)($invoice);
 
         admin_log(AdminLog::ADD_INVOICE_TRANSACTION, $transaction, validatedData: $data);
 

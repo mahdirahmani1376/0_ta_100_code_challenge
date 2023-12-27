@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Invoice\Transaction;
 
 use App\Actions\Invoice\Transaction\StoreTransactionAction;
-use App\Http\Requests\Transaction\StoreTransactionRequest;
+use App\Http\Requests\Invoice\Transaction\StoreTransactionRequest;
 use App\Http\Resources\Invoice\Transaction\TransactionResource;
-use App\Models\Invoice;
 
 class StoreTransactionController
 {

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Transaction;
+namespace App\Http\Requests\Invoice\Transaction;
 
 use App\Models\BankGateway;
+use App\Models\Transaction;
 use App\Services\BankGateway\IndexBankGatewayService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,13 @@ class StoreTransactionRequest extends FormRequest
     {
         /** @var IndexBankGatewayService $indexBankGatewayService */
         $indexBankGatewayService = app(IndexBankGatewayService::class);
+        $allowedPaymentMethods = $indexBankGatewayService([
+            'export' => 1,
+            'status' => BankGateway::STATUS_ACTIVE,
+        ])
+            ->pluck('name')
+            ->toArray();
+        $allowedPaymentMethods = array_merge($allowedPaymentMethods, Transaction::PAYMENT_METHODS);
 
         return [
             'invoice_id' => ['required', Rule::exists('invoices', 'id'),],
@@ -30,7 +38,7 @@ class StoreTransactionRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'payment_method' => [
                 'required',
-                Rule::in(($indexBankGatewayService(['status' => BankGateway::STATUS_ACTIVE,]))->pluck('name')->toArray())
+                Rule::in($allowedPaymentMethods)
             ],
             'tracking_code' => ['required', 'string'],
             'created_at' => [
