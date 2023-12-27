@@ -23,6 +23,7 @@ use App\Http\Controllers\ClientCashout\UpdateClientCashoutController;
 use App\Http\Controllers\FinanceServiceHourlyReportController;
 use App\Http\Controllers\FinanceServiceReportController;
 use App\Http\Controllers\Invoice\ApplyBalanceToInvoiceController;
+use App\Http\Controllers\Invoice\BulkIndexInvoiceController;
 use App\Http\Controllers\Invoice\ChangeInvoiceStatusController;
 use App\Http\Controllers\Invoice\ChargeWalletInvoiceController;
 use App\Http\Controllers\Invoice\DownloadInvoiceBillController;
@@ -58,6 +59,7 @@ use App\Http\Controllers\Wallet\CreditTransaction\DeductBalanceController;
 use App\Http\Controllers\Wallet\CreditTransaction\IndexCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\ShowCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\StoreCreditTransactionController;
+use App\Http\Controllers\Wallet\CreditTransaction\UpdateCreditTransactionController;
 use App\Http\Controllers\Wallet\ShowWalletAndTransactionController;
 use App\Http\Controllers\Wallet\ShowWalletController;
 
@@ -97,6 +99,7 @@ Route::namespace('Invoice')
             });
         Route::get('/', IndexInvoiceController::class);
         Route::post('/', StoreInvoiceController::class);
+        Route::get('bulk-index', BulkIndexInvoiceController::class);
         Route::post('charge-wallet-invoice', ChargeWalletInvoiceController::class);
         Route::post('merge', MergeInvoiceController::class);
         Route::post('mass-payment', StoreMassPaymentInvoiceController::class);
@@ -119,6 +122,7 @@ Route::namespace('Wallet')
                 Route::get('/', IndexCreditTransactionController::class);
                 Route::delete('bulk-delete', BulkDeleteCreditTransactionController::class);
                 Route::get('{creditTransaction}', ShowCreditTransactionController::class);
+                Route::put('{creditTransaction}', UpdateCreditTransactionController::class);
             });
         Route::get('{profileId}', ShowWalletController::class);
         Route::get('{profileId}/list', ShowWalletAndTransactionController::class);
