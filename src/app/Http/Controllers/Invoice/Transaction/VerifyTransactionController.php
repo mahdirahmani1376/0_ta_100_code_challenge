@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Invoice\Transaction;
 
 use App\Actions\Invoice\Transaction\VerifyTransactionAction;
-use App\Http\Requests\Transaction\VerifyTransactionRequest;
+use App\Http\Requests\Invoice\Transaction\VerifyTransactionRequest;
 use App\Http\Resources\Invoice\Transaction\TransactionResource;
 use App\Models\Transaction;
 
