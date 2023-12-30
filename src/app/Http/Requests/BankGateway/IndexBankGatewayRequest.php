@@ -25,3 +25,4 @@ class IndexBankGatewayRequest extends FormRequest
         ];
     }
 }
+
