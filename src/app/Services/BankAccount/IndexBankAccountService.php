@@ -4,6 +4,7 @@ namespace App\Services\BankAccount;
 
 use App\Repositories\BankAccount\Interface\BankAccountRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class IndexBankAccountService
 {
@@ -11,7 +12,7 @@ class IndexBankAccountService
     {
     }
 
-    public function __invoke(array $data): LengthAwarePaginator
+    public function __invoke(array $data): Collection|LengthAwarePaginator
     {
         return $this->bankAccountRepository->index($data);
     }

@@ -20,7 +20,8 @@ class IndexBankAccountRequest extends FormRequest
             'sort_direction' => ['string', 'nullable', Rule::in('desc', 'asc'),],
             'search' => ['nullable', 'max:255',],
             'status' => ['nullable', Rule::in(BankAccount::STATUSES)],
-            'admin_id' => ['filled', 'integer',]
+            'admin_id' => ['filled', 'integer',],
+            'export' => ['nullable', 'bool',],
         ];
     }
 

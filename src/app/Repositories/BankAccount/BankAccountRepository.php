@@ -28,6 +28,10 @@ class BankAccountRepository extends BaseRepository implements BankAccountReposit
             $query->where('status', $data['status']);
         }
 
+        if (isset($data['export']) && $data['export']) {
+            return self::sortQuery($query)->get();
+        }
+
         return self::paginate($query);
     }
 }
