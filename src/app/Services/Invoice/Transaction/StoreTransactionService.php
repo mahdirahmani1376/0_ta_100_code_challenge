@@ -23,7 +23,10 @@ class StoreTransactionService
         if (empty($data['description'])) {
             $data['description'] = ' ';
         }
-        $data['description'] .= '---Record created by Admin #' . request('admin_id', -1);
+        if (!is_null(request('admin_id'))) {
+            $data['description'] .= '---Record created by Admin #' . request('admin_id', -1);
+        }
+
         if (empty($data['tracking_code'])) {
             $data['tracking_code'] = 'NO_TRACKING_CODE';
         }
