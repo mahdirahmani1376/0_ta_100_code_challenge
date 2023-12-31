@@ -14,7 +14,7 @@ class DownloadInvoiceBillRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_id' => ['required', 'integer',],
+            'admin_id' => ['nullable', 'integer',],
         ];
     }
 }
