@@ -15,7 +15,7 @@ class UpdateClientBankAccountService
     public function __invoke(ClientBankAccount $clientBankAccount, array $data): ClientBankAccount
     {
         if (isset($data['sheba_number'])) {
-            $data['sheba_number'] = Str::start($data['sheba_number'], 'IR');
+            $data['sheba_number'] = normalise_sheba_number($data['sheba_number']);
         }
 
         return $this->clientBankAccountRepository->update($clientBankAccount, $data, [

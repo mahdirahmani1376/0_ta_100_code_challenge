@@ -3,6 +3,7 @@
 namespace App\Http\Requests\BankAccount;
 
 use App\Models\BankAccount;
+use App\Rules\ShebaNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,7 @@ class UpdateBankAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sheba_number' => ['required', 'string'],
+            'sheba_number' => ['required', new ShebaNumber],
             'account_number' => ['required', 'string'],
             'card_number' => ['required', 'string'],
             'title' => ['required', 'string'],

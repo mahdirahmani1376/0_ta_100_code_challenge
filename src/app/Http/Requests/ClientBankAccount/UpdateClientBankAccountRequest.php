@@ -3,6 +3,7 @@
 namespace App\Http\Requests\ClientBankAccount;
 
 use App\Models\ClientBankAccount;
+use App\Rules\ShebaNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class UpdateClientBankAccountRequest extends FormRequest
             'status' => ['nullable', 'string', Rule::in(ClientBankAccount::STATUSES),],
             'bank_name' => ['nullable', 'string',],
             'card_number' => ['required',],
-            'sheba_number' => ['required', 'regex:/^(?:IR)?\d{24}$/',],
+            'sheba_number' => ['required', new ShebaNumber,],
             'account_number' => ['nullable', 'max:255'],
             'zarinpal_bank_account_id' => ['nullable', 'integer',],
             'owner_name' => ['required', 'max:255',],
