@@ -30,10 +30,6 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
         if (!empty($data['profile_id'])) {
             $query->where('profile_id', $data['profile_id']);
         }
-        $query->orderBy(
-            $data['sort'] ?? BaseRepository::DEFAULT_SORT_COLUMN,
-            $data['sortDirection'] ?? BaseRepository::DEFAULT_SORT_COLUMN_DIRECTION,
-        );
 
         return self::paginate($query);
     }
