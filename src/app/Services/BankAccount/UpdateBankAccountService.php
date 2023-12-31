@@ -13,6 +13,8 @@ class UpdateBankAccountService
 
     public function __invoke(BankAccount $bankAccount, array $data): BankAccount
     {
+        $data['sheba_number'] = normalise_sheba_number($data['sheba_number']);
+
         return $this->bankAccountRepository->update($bankAccount, $data, [
             'sheba_number',
             'account_number',

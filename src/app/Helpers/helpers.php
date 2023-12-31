@@ -5,6 +5,7 @@ use App\Helpers\JalaliCalender;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
+use Illuminate\Support\Str;
 
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
@@ -163,5 +164,15 @@ if (!function_exists('callback_result_redirect_url')) {
             '{invoice}' => $invoiceId,
             '{status}' => $status,
         ], $url);
+    }
+}
+
+if (!function_exists('normalise_sheba_number')) {
+    function normalise_sheba_number(string $shebaNumber): string
+    {
+        return Str::of($shebaNumber)
+            ->replace('I', '', caseSensitive: false)
+            ->replace('R', '', caseSensitive: false)
+            ->start('IR');
     }
 }

@@ -14,7 +14,7 @@ class StoreClientBankAccountService
 
     public function __invoke(array $data): ClientBankAccount
     {
-        $data['sheba_number'] = Str::start($data['sheba_number'], 'IR');
+        $data['sheba_number'] = normalise_sheba_number($data['sheba_number']);
 
         return $this->clientBankAccountRepository->create($data, [
             'status',

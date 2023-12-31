@@ -13,6 +13,8 @@ class StoreBankAccountService
 
     public function __invoke(array $data): BankAccount
     {
+        $data['sheba_number'] = normalise_sheba_number($data['sheba_number']);
+
         return $this->bankAccountRepository->create($data, [
             'sheba_number',
             'account_number',
