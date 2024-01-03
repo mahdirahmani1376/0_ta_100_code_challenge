@@ -1,0 +1,97 @@
+String repoUrl = "https://source.hostiran.com/dev-team/finance-service.git"
+String helmRepo = "https://source.hostiran.com/dev-team/devops-and-infra/helm-and-yaml-group/services/php/finance-service.git"
+String registryUrl = "keeper.hostiran.com"
+String team="php"
+String app="finance-service"
+String deployment="finance-service"
+String fullRegistryUrl="${registryUrl}/${team}/${app}"
+String dockerfile = ".docker-compose/Dockerfile"
+String pipresult = "ok"
+String keypath = "./src/storage/"
+String branch = env.BRANCH_NAME
+
+@Library(['config', 'docker', 'deploy'])_
+
+// DevSecOps stages
+//String DDId = "7"
+//devsecops(DDID: "$DDId", Dockerfile: "$Dockerfile")
+
+            // mattermostNotifier 
+            mattermostSend channel: 'finance-service', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
+
+timestamps {
+node ('public') {
+    try{
+
+    environment="release"
+    if(branch.matches("release")){
+        environment="release"
+        replicas="1"
+	dockerfile="./deploy/Dockerfile"
+        jobs_path="../deploy/jobs.yml"
+        AppDomain="api-kstg.hostiran.com"
+        type="ImplementationSpecific"
+        prefix="/finance-service"
+    }else if( branch.matches("master")) {
+        environment="production"
+    }
+
+
+    
+    stage('GIT'){
+        git branch: "${branch}", credentialsId: 'Gitlab', url: "$repoUrl"
+    }
+
+//    stage('Init') {
+//        // getAppconfig(String app, String env="staging", String envFileName=".env")
+ //       getAppconfig("$deployment", "$environment", ".env")
+//    }
+    stage('Build Image') {
+            // dockerBuild(registryUrl: String, Tag: String, String ENV="", , extraArgs: String, dockerfilePath: String )
+            dockerBuild( "$fullRegistryUrl","$BUILD_NUMBER", "-$environment", "--add-host=keeper.hostiran.com:172.29.43.203 --add-host=github.com:172.29.0.14 --add-host=api.github.com:172.29.0.14  --add-host=codeload.github.com:172.29.0.14", "$dockerfile")
+    }
+
+    stage('deploy') {
+
+            // run Container
+            runInHostGroup("kubectl"){
+                git branch: "master", credentialsId: 'Gitlab', url: "$helmRepo"
+
+                //namespaceInit(String namespace, String env)
+                namespaceInit("$app", "$environment")
+                // getAppconfig(String app, String env="staging", String envFileName=".env")
+                getAppconfig("$deployment", "$environment", ".env")
+                // createConfig(String namespace, String env="staging", String app="")
+                createConfig("$app", "$environment", "$deployment")
+                // helmDeploywithDomain(String registryUrl, String tag,String namespace, String helmChart="./charts", String env, String domain, String prefix)
+		            
+          //helmDeploywithExtraArgs("$fullRegistryUrl", "$BUILD_NUMBER", "$app", "./", "$environment", "$replicas", "-f $jobs_path")                
+
+             // helmDeploywithKong("$fullRegistryUrl", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas", "-f ../deploy/jobs.yml -f ../deploy/consumers.yml")
+                helmDeploywithDomain("$fullRegistryUrl-$environment", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas")
+                
+                }
+        
+                    
+    }
+           
+    }
+    catch(e) {
+            pipresult = "FAILURE"
+            throw e
+    } finally {
+      if(pipresult == "FAILURE") {
+        mattermostSend channel: 'finance-service', color: 'danger', message: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            
+       } 
+       else {
+       mattermostSend channel: 'finance-service', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+
+      }
+    }
+  }
+}       
+
+
+
