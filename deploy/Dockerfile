@@ -65,7 +65,7 @@ COPY ./deploy/horizon.conf /etc/supervisor/conf.d/horizon.conf
 COPY ./deploy/entrypoint.sh /
 
 # Config apache
-ADD default.conf /etc/apache2/sites-enabled/000-default.conf
+ADD ./deploy/default.conf /etc/apache2/sites-enabled/000-default.conf
 RUN \
     printf "\nServerName localhost" >> /etc/apache2/apache2.conf  && \
     a2enmod rewrite && a2enmod headers
