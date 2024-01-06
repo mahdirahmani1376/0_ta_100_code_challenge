@@ -12,6 +12,7 @@ return [
         'OnlyPendingOfflinePaymentAllowed' => 'این امکان فقط برای پرداخت آفلاین درحال انتظار وجود دارد.',
         'CannotMakeMassPaymentInvoice' => 'هیچ یک از فاکتور های ارسال شده امکان پرداخت گروهی ندارد.',
         "AccessDeniedToCashout" => "شما دسترسی به این رکورد درخواست بازگشت وجه را ندارید",
+        "AccessDeniedToOfflineTransaction" => "شما دسترسی به این رکورد پرداخت آفلاین را ندارید",
     ],
     'invoice' => [
         'AmountExceedsInvoiceBalance' => 'مقدار انتخاب شده از مبلغ فاکتور بیشتر می باشد.',
