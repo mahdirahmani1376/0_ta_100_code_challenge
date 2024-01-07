@@ -57,8 +57,8 @@ RUN pecl install mongodb-1.16.2.tgz \
 COPY --from=keeper.hostiran.com/composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user to run Composer and Artisan Commands
-RUN usermod -u ${WWW_DATA_USER_ID} www-data && \
-    groupmod -g ${WWW_DATA_USER_ID} www-data
+RUN usermod -u 1000 www-data && \
+    groupmod -g 1000 www-data
 
 COPY ./deploy/php.ini /usr/local/etc/php/php.ini
 COPY ./deploy/horizon.conf /etc/supervisor/conf.d/horizon.conf
