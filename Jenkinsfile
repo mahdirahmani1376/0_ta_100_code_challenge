@@ -48,7 +48,7 @@ node ('public') {
 //    }
     stage('Build Image') {
             // dockerBuild(registryUrl: String, Tag: String, String ENV="", , extraArgs: String, dockerfilePath: String )
-            dockerBuild( "$fullRegistryUrl","$BUILD_NUMBER", "-$environment", "--add-host=keeper.hostiran.com:172.29.43.203 --add-host=github.com:172.29.0.14 --add-host=api.github.com:172.29.0.14  --add-host=codeload.github.com:172.29.0.14", "$dockerfile")
+            dockerBuild( "$fullRegistryUrl","$BUILD_NUMBER", "-$environment", "--add-host=keeper.hostiran.com:172.29.43.203 --add-host=github.com:172.29.0.14 --add-host=api.github.com:172.29.0.14  --add-host=codeload.github.com:172.29.0.14 --add-host=deb.debian.org:172.29.0.14", "$dockerfile")
     }
 
     stage('deploy') {
