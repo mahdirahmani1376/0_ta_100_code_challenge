@@ -35,6 +35,8 @@ use App\Http\Controllers\Invoice\Item\StoreItemController;
 use App\Http\Controllers\Invoice\Item\UpdateItemController;
 use App\Http\Controllers\Invoice\ManualCheckController;
 use App\Http\Controllers\Invoice\MergeInvoiceController;
+use App\Http\Controllers\Invoice\MoadianLog\IndexMoadianLogController;
+use App\Http\Controllers\Invoice\MoadianLog\InquiryMoadianController;
 use App\Http\Controllers\Invoice\OfflineTransaction\DeleteOfflineTransactionController;
 use App\Http\Controllers\Invoice\OfflineTransaction\IndexOfflineTransactionController;
 use App\Http\Controllers\Invoice\OfflineTransaction\IndexSimilarOfflineTransactionController;
@@ -96,6 +98,12 @@ Route::namespace('Invoice')
                 Route::get('{offlineTransaction}/similar', IndexSimilarOfflineTransactionController::class);
                 Route::post('{offlineTransaction}/verify', VerifyOfflineTransactionController::class);
                 Route::post('{offlineTransaction}/reject', RejectOfflineTransactionController::class);
+            });
+        Route::namespace('MoadianLog')
+            ->prefix('moadian-log')
+            ->group(function () {
+                Route::get('/', IndexMoadianLogController::class);
+                Route::get('{moadianLog}/inquiry', InquiryMoadianController::class);
             });
         Route::get('/', IndexInvoiceController::class);
         Route::post('/', StoreInvoiceController::class);

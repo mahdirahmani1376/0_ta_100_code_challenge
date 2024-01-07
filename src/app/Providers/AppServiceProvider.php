@@ -15,9 +15,11 @@ use App\Repositories\ClientCashout\Interface\ClientCashoutRepositoryInterface;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
 use App\Repositories\Invoice\Interface\ItemRepositoryInterface;
+use App\Repositories\Invoice\Interface\MoadianLogRepositoryInterface;
 use App\Repositories\Invoice\InvoiceNumberRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Invoice\ItemRepository;
+use App\Repositories\Invoice\MoadianLogRepository;
 use App\Repositories\OfflineTransaction\Interface\OfflineTransactionRepositoryInterface;
 use App\Repositories\OfflineTransaction\OfflineTransactionRepository;
 use App\Repositories\Profile\Interface\ProfileRepositoryInterface;
@@ -47,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
         $this->app->bind(CreditTransactionRepositoryInterface::class, CreditTransactionRepository::class);
         $this->app->bind(ProfileRepositoryInterface::class, ProfileRepository::class);
+        $this->app->bind(MoadianLogRepositoryInterface::class, MoadianLogRepository::class);
     }
 
     public function boot(): void

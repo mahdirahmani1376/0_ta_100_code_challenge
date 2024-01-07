@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Collection offlineTransactions
  * @property Profile profile
  * @property Client client
+ * @property MoadianLog moadianLog
  */
 class Invoice extends Model
 {
@@ -117,8 +118,14 @@ class Invoice extends Model
     {
         return $this->hasMany(OfflineTransaction::class);
     }
+
     public function profile(): BelongsTo
     {
         return $this->belongsTo(Profile::class);
+    }
+
+    public function moadianLog(): HasOne
+    {
+        return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
     }
 }

@@ -13,6 +13,8 @@ return [
         'CannotMakeMassPaymentInvoice' => 'هیچ یک از فاکتور های ارسال شده امکان پرداخت گروهی ندارد.',
         "AccessDeniedToCashout" => "شما دسترسی به این رکورد درخواست بازگشت وجه را ندارید",
         "AccessDeniedToOfflineTransaction" => "شما دسترسی به این رکورد پرداخت آفلاین را ندارید",
+        'MoadianAlreadySuccessful' => 'رکورد مودیان قبلا تایید شده',
+        'MoadianInquiryFataError' => 'خطای در سیستم مودیان رخ داده است',
     ],
     'invoice' => [
         'AmountExceedsInvoiceBalance' => 'مقدار انتخاب شده از مبلغ فاکتور بیشتر می باشد.',
