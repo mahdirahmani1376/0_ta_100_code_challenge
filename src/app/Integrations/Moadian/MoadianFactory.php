@@ -28,18 +28,20 @@ class MoadianFactory
 
     private function createInvoiceHeader(Invoice $invoice): self
     {
-        $date = str_pad(Carbon::parse($invoice->paid_date)->timestamp, 13, 0, STR_PAD_RIGHT);
+        $date = str_pad(Carbon::parse($invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
         $header = new InvoiceHeader(config('moadian.username'));
-        $header->setTaxID(Carbon::parse($invoice->paid_date), $invoice->invoice_id);
+        $header->setTaxID(Carbon::parse($invoice->paid_at), $invoice->id);
         $header->indatim = $date;
         $header->indati2m = $date;
         $header->inty = 1; //invoice type
-        $header->inno = str_pad($invoice->invoice_id, 10, 0, STR_PAD_LEFT);
+        $header->inno = str_pad($invoice->id, 10, 0, STR_PAD_LEFT);
         $header->irtaxid = null; // invoice reference tax ID
         $header->inp = 1; //invoice pattern
         $header->ins = 1;
         $header->tins = '10103421620';
-        $header->tob = $invoice->client->is_legal == 1 ? 2 : 1;
+        $client = MainAppAPIService::getClients($invoice->profile->client_id)[0];
+        $invoice->client = $client;
+        $header->tob = $invoice->client->is_legal == 1 ? 2 : 1; // fetch client from mainapp
         $header->bid = ($invoice->client->is_legal == 1 && $invoice->client->company_national_code) ? $invoice->client->company_national_code : $invoice->client->national_code;
         $header->tinb = ($invoice->client->is_legal == 1 && $invoice->client->company_national_code) ? $invoice->client->company_national_code : $invoice->client->national_code;
         if ($invoice->client->is_legal == 0)
@@ -52,11 +54,11 @@ class MoadianFactory
         $header->tprdis = floor($invoice->sub_total);
         $header->tdis = 0;
         $header->tadis = floor($invoice->sub_total);
-        $header->tvam = floor($invoice->tax1);
+        $header->tvam = floor($invoice->tax);
         $header->todam = 0;
-        $header->tbill = floor($invoice->tax1) + floor($invoice->sub_total);
+        $header->tbill = floor($invoice->tax) + floor($invoice->sub_total);
         $header->setm = 1;
-        $header->cap = floor($invoice->tax1) + floor($invoice->sub_total);
+        $header->cap = floor($invoice->tax) + floor($invoice->sub_total);
         $this->moadianInvoice = new MoadianInvoice($header);
 
 
