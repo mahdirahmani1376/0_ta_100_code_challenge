@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string name
  * @property string name_fa
  * @property string status
+ * @property int display_order
  * @property array config
  * @property int rahkaran_id
  */

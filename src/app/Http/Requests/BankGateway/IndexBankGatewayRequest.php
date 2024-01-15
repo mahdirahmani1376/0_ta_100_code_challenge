@@ -22,6 +22,7 @@ class IndexBankGatewayRequest extends FormRequest
             'status' => ['string', 'nullable', Rule::in(BankGateway::STATUSES)],
             'export' => ['nullable', 'boolean',],
             'admin_id' => ['nullable', 'integer',],
+            'profile_id' => ['nullable', 'integer',],
         ];
     }
 }

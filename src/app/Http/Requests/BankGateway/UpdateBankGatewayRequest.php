@@ -20,6 +20,7 @@ class UpdateBankGatewayRequest extends FormRequest
             'name_fa' => ['required', 'max:255'], // old 'label' field
             'provider' => ['required', 'max:255',],
             'status' => ['required', 'string', Rule::in(BankGateway::STATUSES)],
+            'display_order' => ['required', 'integer',],
             'merchant_id' => ['required', 'max:255',],
             'request_url' => ['nullable', 'max:255',],
             'verify_url' => ['nullable', 'max:255',],

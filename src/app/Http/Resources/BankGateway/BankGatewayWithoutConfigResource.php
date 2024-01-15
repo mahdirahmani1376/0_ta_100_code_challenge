@@ -18,6 +18,7 @@ class BankGatewayWithoutConfigResource extends JsonResource
             'name' => $this->name,
             'name_fa' => $this->name_fa,
             'status' => $this->status,
+            'display_order' => $this->display_order,
         ];
     }
 }
