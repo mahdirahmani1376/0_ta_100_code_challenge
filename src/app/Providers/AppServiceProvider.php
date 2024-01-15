@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Repositories\BankAccount\BankAccountRepository;
 use App\Repositories\BankAccount\Interface\BankAccountRepositoryInterface;
 use App\Repositories\BankGateway\BankGatewayRepository;
+use App\Repositories\BankGateway\DirectPaymentRepository;
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
+use App\Repositories\BankGateway\Interface\DirectPaymentRepositoryInterface;
 use App\Repositories\Base\BaseRepository;
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use App\Repositories\ClientBankAccount\ClientBankAccountRepository;
@@ -50,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CreditTransactionRepositoryInterface::class, CreditTransactionRepository::class);
         $this->app->bind(ProfileRepositoryInterface::class, ProfileRepository::class);
         $this->app->bind(MoadianLogRepositoryInterface::class, MoadianLogRepository::class);
+        $this->app->bind(DirectPaymentRepositoryInterface::class, DirectPaymentRepository::class);
     }
 
     public function boot(): void

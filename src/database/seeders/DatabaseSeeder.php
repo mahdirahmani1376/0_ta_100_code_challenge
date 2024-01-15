@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(BankGatewaySeeder::class);
 //        BankAccount::create([
 //            'title' => 'بانک ملت',
 //            'status' => BankAccount::STATUS_ACTIVE,

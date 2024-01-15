@@ -7,6 +7,7 @@ use App\Http\Controllers\BankAccount\StoreBankAccountController;
 use App\Http\Controllers\BankAccount\UpdateBankAccountController;
 use App\Http\Controllers\BankGateway\CallbackFromGatewayController;
 use App\Http\Controllers\BankGateway\DeleteBankGatewayController;
+use App\Http\Controllers\BankGateway\DirectPayment\RequestBazaarPayContractController;
 use App\Http\Controllers\BankGateway\IndexBankGatewayController;
 use App\Http\Controllers\BankGateway\PayInvoiceController;
 use App\Http\Controllers\BankGateway\ShowBankGatewayController;
@@ -144,6 +145,11 @@ Route::namespace('Wallet')
 Route::namespace('BankGateway')
     ->prefix('bank-gateway')
     ->group(function () {
+        Route::namespace('DirectPayment')
+            ->prefix('direct-payment')
+            ->group(function () {
+                Route::get('bazaar-pay-contract', RequestBazaarPayContractController::class);
+            });
         Route::get('/', IndexBankGatewayController::class);
         Route::post('/', StoreBankGatewayController::class);
         Route::get('{bankGateway}', ShowBankGatewayController::class);
