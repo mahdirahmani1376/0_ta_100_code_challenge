@@ -21,27 +21,15 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         $this->bindRoutes();
-
-        $this->bindRouteParameter();
     }
 
     public function bindRoutes(): void
     {
-        $this->routes(function () {
-            Route::middleware('api')
-                ->prefix('api')
-                ->namespace('App\Http\Controllers')
-                ->group(base_path('routes/api.php'));
-        });
+	Route::prefix('api')
+            ->middleware('api')
+	    ->namespace('App\Http\Controllers')
+	    ->group(base_path('routes/api.php'));
+
     }
 
-    public function bindRouteParameter(): void
-    {
-        Route::bind('publicGatewayName', function ($gatewayName) {
-            return BankGateway::query()
-                ->where('name', Str::lower($gatewayName))
-                ->where('status', BankGateway::STATUS_ACTIVE)
-                ->firstOrFail();
-        });
-    }
 }
