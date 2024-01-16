@@ -46,6 +46,7 @@ use App\Http\Controllers\Invoice\OfflineTransaction\ShowOfflineTransactionContro
 use App\Http\Controllers\Invoice\OfflineTransaction\StoreOfflineTransactionController;
 use App\Http\Controllers\Invoice\OfflineTransaction\UpdateOfflineTransactionController;
 use App\Http\Controllers\Invoice\OfflineTransaction\VerifyOfflineTransactionController;
+use App\Http\Controllers\Invoice\SendInvoiceReminderController;
 use App\Http\Controllers\Invoice\ShowInvoiceController;
 use App\Http\Controllers\Invoice\ShowInvoiceStatusController;
 use App\Http\Controllers\Invoice\SplitInvoiceController;
@@ -121,6 +122,7 @@ Route::namespace('Invoice')
         Route::post('{invoice}/split', SplitInvoiceController::class);
         Route::get('{invoice}/download', DownloadInvoiceBillController::class);
         Route::post('{invoice}/apply-balance', ApplyBalanceToInvoiceController::class);
+        Route::get('{invoice}/send-reminder', SendInvoiceReminderController::class);
     });
 
 Route::namespace('Wallet')

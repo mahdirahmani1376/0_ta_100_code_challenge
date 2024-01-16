@@ -17,7 +17,8 @@ class InvoiceReminderCommand extends Command
     protected $signature = 'cron:invoice-reminder
                             {--test : Run in test mode}
                             {--email-thresholds= : Email reminder thresholds in days e.g. 1,5,10}
-                            {--sms-thresholds= : SMS reminder thresholds in days e.g. 5,15}';
+                            {--sms-thresholds= : SMS reminder thresholds in days e.g. 5,15}
+                            {--override-invoice-id= : Set this to an Invoice Id if you want to send an Email reminder}';
 
     protected $description = 'Send notification to clients to remind them to pay their Invoices before due date';
     private bool $test;
@@ -30,6 +31,7 @@ class InvoiceReminderCommand extends Command
     private string $smsMessageTemplate;
     private string $smsLinkTemplate;
     private array $reminders;
+    private ?int $overrideInvoiceId;
 
     public function handle(InvoiceRepositoryInterface $invoiceRepository)
     {
@@ -43,9 +45,13 @@ class InvoiceReminderCommand extends Command
         App::setLocale('fa');
         $this->alert('Invoice reminder , now: ' . JalaliCalender::getJalaliString(now()) . '  ' . now()->toDateTimeString());
 
+        $this->overrideInvoiceId = $this->option('override-invoice-id');
+
         $this->prepareConfigVariablesAndData();
         $this->sendEmailReminder();
-        $this->sendSMSReminder();
+        if (empty($this->overrideInvoiceId)) {
+            $this->sendSMSReminder();
+        }
 
         if (!empty($this->reminders)) {
             Bus::batch($this->reminders)->dispatch();
@@ -58,7 +64,7 @@ class InvoiceReminderCommand extends Command
     private function prepareConfigVariablesAndData(): void
     {
         $hour = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_HOUR, noCache: true);
-        if (now()->hour != $hour) {
+        if (now()->hour != $hour && empty($this->overrideInvoiceId)) {
             $this->info('Hour miss match now: ' . now()->hour . ' config: ' . $hour);
             exit();
         }
@@ -98,6 +104,9 @@ class InvoiceReminderCommand extends Command
 
     private function sendEmailReminder()
     {
+        if (!empty($this->overrideInvoiceId)) {
+            $this->emailThresholds = '1'; // to make sure the foreach below only iterates one time
+        }
         foreach (explode(',', $this->emailThresholds) as $emailThreshold) {
             if (empty($emailThreshold)) {
                 continue;
@@ -194,6 +203,12 @@ class InvoiceReminderCommand extends Command
 
     public function prepareInvoices(string $emailThreshold): array|\Illuminate\Database\Eloquent\Collection
     {
+        if (!empty($this->overrideInvoiceId)) {
+            return $this->invoiceRepository->newQuery()
+                ->where('id', $this->overrideInvoiceId)
+                ->get(['id', 'profile_id']);
+        }
+
         return $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
             ->whereDate('due_date', '=', now()->addDays($emailThreshold)->toDateString())
