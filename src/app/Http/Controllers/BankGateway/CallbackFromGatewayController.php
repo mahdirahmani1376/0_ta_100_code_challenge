@@ -12,9 +12,9 @@ class CallbackFromGatewayController
     {
     }
 
-    public function __invoke(BankGateway $bankGateway, Transaction $transaction, string $source = null)
+    public function __invoke(string $bankGateway, Transaction $transaction, string $source = null)
     {
-        $redirectUrl = ($this->callbackFromGatewayAction)($transaction, $bankGateway->name, $source, request()->all());
+        $redirectUrl = ($this->callbackFromGatewayAction)($transaction, $bankGateway, $source, request()->all());
 
         return response()->json(['redirect_url' => $redirectUrl,]);
     }

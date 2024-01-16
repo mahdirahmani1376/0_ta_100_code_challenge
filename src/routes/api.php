@@ -155,8 +155,8 @@ Route::namespace('BankGateway')
         Route::get('{bankGateway}', ShowBankGatewayController::class);
         Route::put('{bankGateway}', UpdateBankGatewayController::class);
         Route::delete('{bankGateway}', DeleteBankGatewayController::class);
-        Route::get('{publicGatewayName}/pay/{invoice}/{source?}', PayInvoiceController::class); // TODO rethink this route's namespace
-        Route::any('{publicGatewayName}/callback/{transaction}/{source?}', CallbackFromGatewayController::class);// TODO rethink this route's namespace
+        Route::get('{bankGateway}/pay/{invoice}/{source?}', PayInvoiceController::class); // TODO rethink this route's namespace
+        Route::any('{bankGateway}/callback/{transaction}/{source?}', CallbackFromGatewayController::class);// TODO rethink this route's namespace
     });
 
 Route::namespace('BankAccount')
