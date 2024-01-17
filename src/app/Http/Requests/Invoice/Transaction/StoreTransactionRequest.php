@@ -41,10 +41,7 @@ class StoreTransactionRequest extends FormRequest
                 Rule::in($allowedPaymentMethods)
             ],
             'tracking_code' => ['required', 'string'],
-            'created_at' => [
-                'filled',
-                'date_format:Y-m-d H:i:s',
-            ],
+            'created_at' => ['filled', 'date',],
         ];
     }
 }

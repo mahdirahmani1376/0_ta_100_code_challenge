@@ -23,7 +23,7 @@ class DeductBalanceRequest extends FormRequest
         return [
             'amount' => ['required', 'gte:1',],
             'description' => ['nullable', 'string',],
-            'date' => ['nullable', 'date_format:Y-m-d',],
+            'date' => ['nullable', 'date',],
             'invoice_id' => ['nullable', 'integer', Rule::exists('invoices', 'id'),]
         ];
     }

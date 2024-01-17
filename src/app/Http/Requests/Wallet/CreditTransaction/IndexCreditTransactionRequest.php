@@ -20,9 +20,9 @@ class IndexCreditTransactionRequest extends FormRequest
             'sort_direction' => ['string', 'nullable', Rule::in('desc', 'asc'),],
             'profile_id' => ['nullable', 'string',],
             'search' => ['nullable', 'string', 'max:255',],
-            'date' => ['date_format:Y-m-d', 'nullable',],
-            'from_date' => ['nullable', 'date', 'date_format:Y-m-d', 'before_or_equal:to_date',],
-            'to_date' => ['nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:from_date',],
+            'date' => ['date', 'nullable',],
+            'from_date' => ['nullable', 'date', 'before_or_equal:to_date',],
+            'to_date' => ['nullable', 'date', 'after_or_equal:from_date',],
         ];
     }
 }

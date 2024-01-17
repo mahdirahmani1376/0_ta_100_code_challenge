@@ -21,7 +21,7 @@ class StoreOfflineTransactionRequest extends FormRequest
             'amount' => ['required', 'integer',],
             'payment_method' => ['required', 'string', Rule::in(OfflineTransaction::PAYMENT_METHODS),],
             'mobile' => ['nullable', new ValidIRMobile,],
-            'paid_at' => ['required', 'date_format:Y-m-d', 'before:tomorrow',],
+            'paid_at' => ['required', 'date', 'before:tomorrow',],
             'description' => ['nullable', 'string',],
             'tracking_code' => ['required', 'unique:offline_transactions',],
             'bank_account_id' => ['required', 'exists:bank_accounts,id',],

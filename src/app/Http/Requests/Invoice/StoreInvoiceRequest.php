@@ -18,9 +18,9 @@ class StoreInvoiceRequest extends FormRequest
         return [
             'admin_id' => ['nullable', 'integer',],
             'profile_id' => ['required', 'integer', 'exists:profiles,id',],
-            'invoice_date' => ['required', 'date', 'date_format:Y-m-d'],
-            'due_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'paid_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'invoice_date' => ['required', 'date',],
+            'due_date' => ['nullable', 'date',],
+            'paid_at' => ['nullable', 'date',],
             'status' => [Rule::in([
                 Invoice::STATUS_UNPAID,
                 Invoice::STATUS_DRAFT,
@@ -31,8 +31,8 @@ class StoreInvoiceRequest extends FormRequest
             'items.*.amount' => ['required', 'numeric'],
             'items.*.invoiceable_type' => ['nullable', 'string'],
             'items.*.invoiceable_id' => ['nullable', 'integer'],
-            'items.*.from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'items.*.to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'items.*.from_date' => ['nullable', 'date',],
+            'items.*.to_date' => ['nullable', 'date',],
             'note' => ['nullable',],
         ];
     }

@@ -18,8 +18,8 @@ class StoreItemRequest extends FormRequest
             'amount' => ['required', 'numeric',],
             'invoiceable_type' => ['nullable', 'string',],
             'invoiceable_id' => ['nullable', 'integer',],
-            'from_date' => ['nullable', 'date', 'date_format:Y-m-d',],
-            'to_date' => ['nullable', 'date', 'date_format:Y-m-d',],
+            'from_date' => ['nullable', 'date',],
+            'to_date' => ['nullable', 'date',],
         ];
     }
 }

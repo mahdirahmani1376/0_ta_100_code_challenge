@@ -19,8 +19,8 @@ class IndexOfflineTransactionRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'sort' => ['string', 'nullable', Rule::in(get_sortable_items((new OfflineTransaction())->getFillable()))],
             'sort_direction' => ['string', 'nullable', Rule::in('desc', 'asc')],
-            'from_date' => ['nullable', 'date', 'date_format:Y-m-d', 'before_or_equal:to_date'],
-            'to_date' => ['nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:from_date'],
+            'from_date' => ['nullable', 'date', 'before_or_equal:to_date'],
+            'to_date' => ['nullable', 'date', 'after_or_equal:from_date'],
             'status' => ['nullable', Rule::in(OfflineTransaction::STATUSES)],
             'profile_id' => ['integer', 'nullable',],
         ];
