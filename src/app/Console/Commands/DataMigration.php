@@ -562,7 +562,7 @@ class DataMigration extends Command
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['amount'] = $row['amount'];
-
+// todo maybe clean this up by using "match" statement
                     if ($row['status'] == 0) {
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 1) {
@@ -585,7 +585,13 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_FAIL;
                     } elseif ($row['status'] == 20) { // 20 = STATUS_IPG_FAILED_TO_START
                         $newRow['status'] = Transaction::STATUS_FAIL; // TODO CHECK
+                    } elseif ($row['status'] == 24) {
+                        $newRow['status'] = Transaction::STATUS_FAIL;
+                    }elseif ($row['status'] == 25) {
+                        $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 26) {
+                        $newRow['status'] = Transaction::STATUS_FAIL;
+                    } elseif ($row['status'] == 27) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
                     } elseif ($row['status'] == 28) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
