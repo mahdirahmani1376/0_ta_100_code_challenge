@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->softDeletes();
             $table->string('title');
             $table->string('status')->default(BankAccount::STATUS_ACTIVE);
-            $table->integer('display_order')->default(0);
+            $table->integer('order')->default(0);
             $table->string('sheba_number')->nullable();
             $table->string('account_number')->nullable();
             $table->string('card_number')->nullable();

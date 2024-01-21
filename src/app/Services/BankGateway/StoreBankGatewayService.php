@@ -23,10 +23,10 @@ class StoreBankGatewayService
         unset($data['config']['name']);
         unset($data['config']['name_fa']);
         unset($data['config']['status']);
-        unset($data['config']['display_order']);
+        unset($data['config']['order']);
 
         return $this->bankGatewayRepository->create($data, [
-            'name', 'name_fa', 'config', 'status', 'display_order',
+            'name', 'name_fa', 'config', 'status', 'order',
         ]);
     }
 }

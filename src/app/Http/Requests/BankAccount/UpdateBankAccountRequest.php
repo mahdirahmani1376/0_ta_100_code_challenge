@@ -21,7 +21,7 @@ class UpdateBankAccountRequest extends FormRequest
             'account_number' => ['required', 'string'],
             'card_number' => ['required', 'string'],
             'title' => ['required', 'string'],
-            'display_order' => ['required', 'integer'],
+            'order' => ['required', 'integer'],
             'rahkaran_id' => ['nullable'],
             'status' => ['nullable', Rule::in(BankAccount::STATUSES)],
         ];

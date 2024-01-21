@@ -61,7 +61,7 @@ class DataMigration extends Command
                 $newRow['updated_at'] = $row['updated_at'];
                 $newRow['deleted_at'] = $row['deleted_at'];
                 $newRow['title'] = $row['title'];
-                $newRow['display_order'] = $row['order'];
+                $newRow['order'] = $row['order'];
                 if ($row['active'] == 0) {
                     $newRow['deleted_at'] = Carbon::now();
                     $newRow['status'] = BankAccount::STATUS_INACTIVE;

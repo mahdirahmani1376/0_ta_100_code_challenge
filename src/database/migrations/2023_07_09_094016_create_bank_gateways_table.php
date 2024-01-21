@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('name_fa')->nullable();
             $table->string('status')->default(BankGateway::STATUS_ACTIVE);
             $table->boolean('is_direct_payment_provider')->default(false);
-            $table->integer('display_order')->default(0);
+            $table->integer('order')->default(0);
             $table->json('config')->nullable();
             $table->unsignedBigInteger('rahkaran_id')->nullable();
         });

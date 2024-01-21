@@ -20,7 +20,7 @@ class StoreBankAccountService
             'account_number',
             'card_number',
             'title',
-            'display_order',
+            'order',
             'rahkaran_id',
             'status',
         ]);

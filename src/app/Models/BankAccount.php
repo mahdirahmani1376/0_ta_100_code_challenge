@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon deleted_at
  * @property string title
  * @property string status
- * @property int display_order
+ * @property int order
  * @property string sheba_number
  * @property string account_number
  * @property string card_number
@@ -37,7 +37,7 @@ class BankAccount extends Model
 
     protected $fillable = [
         'title',
-        'display_order',
+        'order',
         'sheba_number',
         'account_number',
         'card_number',
