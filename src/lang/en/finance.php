@@ -11,6 +11,10 @@ return [
         'OnlyUnpaidInvoiceAllowed' => 'این امکان فقط برای فاکتورهای پرداخت نشده وجود دارد.',
         'OnlyPendingOfflinePaymentAllowed' => 'این امکان فقط برای پرداخت آفلاین درحال انتظار وجود دارد.',
         'CannotMakeMassPaymentInvoice' => 'هیچ یک از فاکتور های ارسال شده امکان پرداخت گروهی ندارد.',
+        "AccessDeniedToCashout" => "شما دسترسی به این رکورد درخواست بازگشت وجه را ندارید",
+        "AccessDeniedToOfflineTransaction" => "شما دسترسی به این رکورد پرداخت آفلاین را ندارید",
+        'MoadianAlreadySuccessful' => 'رکورد مودیان قبلا تایید شده',
+        'MoadianInquiryFataError' => 'خطای در سیستم مودیان رخ داده است',
     ],
     'invoice' => [
         'AmountExceedsInvoiceBalance' => 'مقدار انتخاب شده از مبلغ فاکتور بیشتر می باشد.',
@@ -33,8 +37,7 @@ return [
         "MassPaymentInvoiceItemFailed" => "خطای پرداخت گروهی فاکتور :mass_invoice_id",
         "MassPaymentInvoiceItemFailedDescription" => "پرداخت صورت حساب شماره :invoice_id ناموفق بود. صورت حساب :",
         "ChangeServiceInvoiceItemDescription" => "هزینه تبدیل سرویس :domain به محصول :product تا تاریخ :expire_date",
-        "UnpaidInvoiceAlreadyExists" => "فاکتور پرداخت نشده برای ایتم های ارسال شده وجود دارد",
-
+        "AccessDeniedToInvoice" => "شما دسترسی به این فاکتور ندارید",
     ],
     'credit' => [
         'WalletAdjustment' => 'اصلاحیه اعتبار کیف پول',
@@ -101,5 +104,21 @@ return [
     ],
     'affiliation' => [
         'item_desc' => 'بابت تخفیف استفاده از کد :code'
-    ]
+    ],
+    'mergeInvoice' => [
+        'needMoreInvoice' => "برای اینکار به حداقل دو فاکتور نیاز است",
+        'notCredit' => "فاکتور شماره :invoice_id پرداختی است",
+        'notMassPayment' => "فاکتور شماره :invoice_id تجمیعی است",
+        'notRahkaranId' => "فاکتور شماره :invoice_id دارای شناسه راهکاران است",
+        'notAllowedStatus' => "فاکتور شماره :invoice_id نباید در وضعیت :status قرار داشته باشد",
+        'withDifferentClient' => "فاکتور به کاربران متفاوت متصل هستند",
+        'withDifferentTaxRate' => "ضریب مالیات فاکتور های انتخابی متفاوت است و امکان ادغام آنها وجود ندارد.",
+        'mergeFailed' => "ادغام فاکتور ها با خطا مواجه شد",
+    ],
+    'direct_payment' => [
+        'bazaar_pay' => [
+            'contract_token_not_active'=> 'وضعیت قرارداد فعال نمیباشد, اقدام به ساخت و قبول قرارداد جدید کنید',
+            'service_name'=> 'بابت پرداخت فاکتور شماره :invoice_id',
+        ],
+    ],
 ];

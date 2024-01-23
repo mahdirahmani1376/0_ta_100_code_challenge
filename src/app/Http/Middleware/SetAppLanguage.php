@@ -24,7 +24,7 @@ class SetAppLanguage
         if (in_array($acceptLanguageHeader, self::LANGUAGES)) {
             App::setLocale($acceptLanguageHeader);
         } else if (in_array($langQueryString, self::LANGUAGES)) {
-            App::setLocale($acceptLanguageHeader);
+            App::setLocale($langQueryString);
         } else {
             App::setLocale(self::DEFAULT_LANG);
         }
