@@ -25,9 +25,10 @@ class UpdateBankGatewayService
         unset($data['config']['name_fa']);
         unset($data['config']['status']);
         unset($data['config']['order']);
+        unset($data['config']['is_direct_payment_provider']);
 
         return $this->bankGatewayRepository->update($bankGateway, $data, [
-            'name', 'name_fa', 'config', 'status', 'order',
+            'name', 'name_fa', 'config', 'status', 'order', 'is_direct_payment_provider',
         ]);
     }
 }

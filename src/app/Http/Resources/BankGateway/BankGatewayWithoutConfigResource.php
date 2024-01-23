@@ -19,6 +19,7 @@ class BankGatewayWithoutConfigResource extends JsonResource
             'name_fa' => $this->name_fa,
             'status' => $this->status,
             'order' => $this->order,
+            'is_direct_payment_provider' => $this->is_direct_payment_provider,
         ];
     }
 }

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string name
  * @property string name_fa
  * @property string status
+ * @property boolean is_direct_payment_provider
  * @property int order
  * @property array config
  * @property int rahkaran_id
@@ -43,6 +44,7 @@ class BankGateway extends Model
         'name',
         'name_fa',
         'config',
+        'is_direct_payment_provider',
         'order',
     ];
 }

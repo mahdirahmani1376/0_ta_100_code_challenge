@@ -21,6 +21,7 @@ class UpdateBankGatewayRequest extends FormRequest
             'provider' => ['required', 'max:255',],
             'status' => ['required', 'string', Rule::in(BankGateway::STATUSES)],
             'order' => ['required', 'integer',],
+            'is_direct_payment_provider'=> ['required', 'boolean',],
             'merchant_id' => ['required', 'max:255',],
             'request_url' => ['nullable', 'max:255',],
             'verify_url' => ['nullable', 'max:255',],
