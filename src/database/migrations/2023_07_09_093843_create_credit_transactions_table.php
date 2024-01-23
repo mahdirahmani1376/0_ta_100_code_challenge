@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->softDeletes();
             $table->unsignedBigInteger('profile_id');
             $table->unsignedBigInteger('wallet_id');
             $table->unsignedBigInteger('invoice_id')->nullable();
