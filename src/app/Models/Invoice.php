@@ -69,7 +69,7 @@ class Invoice extends Model
 
     const PAYMENT_METHOD_CREDIT = 'client_credit';
 
-    const DEFAULT_TAX_RATE = 11;
+    const DEFAULT_TAX_RATE = 9;
 
     protected $fillable = [
         'created_at',
