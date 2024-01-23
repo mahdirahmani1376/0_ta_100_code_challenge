@@ -92,7 +92,6 @@ class ProcessInvoiceAction
 
         ($this->calcInvoiceProcessedAtService)($invoice);
         InvoiceProcessed::dispatch($invoice);
-        // TODO Invoice Affiliation ?
 
         return $invoice;
     }
