@@ -25,7 +25,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
     public function sumOfPaidTransactions(Invoice $invoice): float
     {
-        return $this->newQuery()
+        return self::newQuery()
             ->where('invoice_id', $invoice->getKey())
             ->where('status', Transaction::STATUS_SUCCESS)
             ->sum('amount');
@@ -33,7 +33,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
     public function getLastSuccessfulTransaction(Invoice $invoice)
     {
-        return $this->newQuery()
+        return self::newQuery()
             ->where('invoice_id', $invoice->getKey())
             ->where('amount', '>', 10)
             ->orderBy('created_at', 'desc')
@@ -89,10 +89,10 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         }
 
         if (isset($data['export']) && $data['export']) {
-            return $this->sortQuery($query)->get();
+            return self::sortQuery($query)->get();
         }
 
-        return $this->paginate($query);
+        return self::paginate($query);
     }
 
     public function indexEverything(int $profileId): Collection

@@ -15,7 +15,7 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
 
     public function sum(int $profileId): int
     {
-        return $this->newQuery()
+        return self::newQuery()
             ->where('profile_id', $profileId)
             ->sum('amount');
     }

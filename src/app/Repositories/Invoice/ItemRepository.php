@@ -36,7 +36,7 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
 
     public function sumAmountByInvoice(Invoice $invoice): float
     {
-        return $this->newQuery()
+        return self::newQuery()
             ->where('invoice_id', $invoice->getKey())
             ->sum('amount');
     }

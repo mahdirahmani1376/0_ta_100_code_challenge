@@ -36,6 +36,6 @@ class MoadianLogRepository extends BaseRepository implements Interface\MoadianLo
             $query->where('tax_id', $data['tax_id']);
         }
 
-        return $this->paginate($query);
+        return self::paginate($query);
     }
 }

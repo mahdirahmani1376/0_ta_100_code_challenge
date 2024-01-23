@@ -119,7 +119,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             return self::sortQuery($query)->get();
         }
 
-        return $this->paginate($query);
+        return self::paginate($query);
     }
 
     public function indexEverything(int $profileId): Collection
