@@ -11,7 +11,7 @@ use App\Services\Invoice\Item\StoreItemService;
 class StoreItemAction
 {
     public function __construct(
-        private readonly StoreItemService              $addItemService,
+        private readonly StoreItemService              $storeItemService,
         private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService
     )
     {
@@ -23,7 +23,7 @@ class StoreItemAction
             check_rahkaran($invoice);
         }
 
-        $item = ($this->addItemService)($invoice, $data);
+        $item = ($this->storeItemService)($invoice, $data);
         if ($data['amount'] != 0) {
             ($this->calcInvoicePriceFieldsService)($invoice);
         }
