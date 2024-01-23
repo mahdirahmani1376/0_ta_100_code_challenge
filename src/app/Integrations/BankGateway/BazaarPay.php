@@ -40,6 +40,7 @@ class BazaarPay implements Interface\BankGatewayInterface
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
+        //TODO add 'provider' parameter to distinguish between different providers
         $directPayment = ($this->findDirectPaymentByProfileIdService)($transaction->profile_id);
 
         // check contract_token validity ( trace endpoint )
@@ -129,8 +130,8 @@ class BazaarPay implements Interface\BankGatewayInterface
             ->withToken($this->bankGateway->config['authorization_token'])
             ->post($this->bankGateway->config['init_contract_url'], [
                 'type' => 'direct_debit',
-                'period' => 'yearly',
-                'amount_limit' => 1000000000,
+                'period' => 'yearly', //todo check where to get these values, maybe read it from mainapp's config, maybe .env ?
+                'amount_limit' => 1000000000, //todo check where to get these values, maybe read it from mainapp's config, maybe .env ?
             ]);
 
         if (!$response->successful()) {
