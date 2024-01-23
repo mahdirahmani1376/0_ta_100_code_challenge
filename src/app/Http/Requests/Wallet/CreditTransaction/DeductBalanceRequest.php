@@ -21,7 +21,7 @@ class DeductBalanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'gte:1',],
+            'amount' => ['required',],
             'description' => ['nullable', 'string',],
             'date' => ['nullable', 'date',],
             'invoice_id' => ['nullable', 'integer', Rule::exists('invoices', 'id'),]
