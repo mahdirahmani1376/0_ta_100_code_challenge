@@ -29,9 +29,9 @@ node ('public') {
         replicas="1"
 	dockerfile="./deploy/Dockerfile"
         jobs_path="../deploy/jobs.yml"
-        AppDomain="api-kstg.hostiran.com"
+        AppDomain="finance-service.cluster.hostiran.com"
         type="ImplementationSpecific"
-        prefix="/finance-service"
+        prefix="/"
     }else if( branch.matches("master")) {
         environment="production"
     }
