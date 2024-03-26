@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int admin_id
  * @property boolean is_credit
  * @property string note
+ * @property int $source_invoice
  *
  * @property Collection items
  * @property InvoiceNumber invoiceNumber
@@ -45,8 +46,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Invoice extends Model
 {
-    use HasFactory;
-
     const STATUS_CANCELED = 'canceled'; // old status 3
     const STATUS_UNPAID = 'unpaid'; // old status = 0
     const STATUS_PAID = 'paid'; // old status = 1
@@ -86,6 +85,7 @@ class Invoice extends Model
         'admin_id',
         'is_credit',
         'note',
+        'source_invoice'
     ];
 
     protected $hidden = [
