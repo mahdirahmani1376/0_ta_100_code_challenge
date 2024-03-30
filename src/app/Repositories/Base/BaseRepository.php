@@ -136,4 +136,18 @@ class BaseRepository implements EloquentRepositoryInterface
         return self::newQuery()
             ->insert($data);
     }
+
+    /**
+     * @param string $column
+     * @param array $criteria
+     * @param array $scopes
+     * @return int|float
+     */
+    public function sum(string $column, array $criteria = [], array $scopes = []): float|int
+    {
+        return self::newQuery()
+            ->where($criteria)
+            ->scopes($scopes)
+            ->sum($column);
+    }
 }

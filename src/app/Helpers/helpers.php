@@ -112,6 +112,25 @@ if (!function_exists('admin_log')) {
     }
 }
 
+if (!function_exists('math_subtract')) {
+    /**
+     * @param float|int|string $minuend
+     * @param float|int|string $subtrahend
+     * @param int $decimal_places
+     * @return float|int
+     */
+    function math_subtract($minuend, $subtrahend, int $decimal_places)
+    {
+        $decimal = pow(10, $decimal_places);
+
+        $minuend = round($minuend * $decimal);
+
+        $subtrahend = round($subtrahend * $decimal);
+
+        return ($minuend - $subtrahend) / $decimal;
+    }
+}
+
 if (!function_exists('finance_report_dates')) {
     function finance_report_dates($from = null, $to = null): array
     {
