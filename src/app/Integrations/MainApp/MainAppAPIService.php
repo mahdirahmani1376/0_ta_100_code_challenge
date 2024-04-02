@@ -7,9 +7,7 @@ namespace App\Integrations\MainApp;
 
 use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\Rahkaran\ValueObjects\Client;
-use App\Integrations\Rahkaran\ValueObjects\Product;
 use App\Models\Invoice;
-use App\Models\Profile;
 use Illuminate\Http\Response;
 
 class MainAppAPIService extends BaseMainAppAPIService
@@ -180,6 +178,17 @@ class MainAppAPIService extends BaseMainAppAPIService
             self::makeRequest('post', $url, $data);
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
+    }
+
+    public function adminListProducts(array $array)
+    {
+        $url = '/api/internal/finance/get-products';
+
+        try {
+            return self::makeRequest('get', $url, $array);
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($array));
         }
     }
 }

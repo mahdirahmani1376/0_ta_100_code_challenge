@@ -1042,7 +1042,7 @@ class RahkaranService
      * @param string $code
      * @return DlObject|null
      */
-    private function getDl(string $code): ?DlObject
+    public function getDl(string $code): ?DlObject
     {
         $result = $this->getDlList([
             $code
@@ -1254,7 +1254,7 @@ class RahkaranService
      * @param string $description
      * @return mixed
      */
-    private function createDl(string $code, $dl_type_ref, string $title = '', string $description = ''): ?DlObject
+    public function createDl(string $code, $dl_type_ref, string $title = '', string $description = ''): ?DlObject
     {
         if ($this->isTestMode()) {
             return $this->getDl($code);
