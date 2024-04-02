@@ -88,16 +88,19 @@ if (!function_exists('clean_ir_mobile')) {
 }
 
 if (!function_exists('admin_log')) {
-    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null): void
+    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
     {
         if (is_null($adminId) && is_null(request('admin_id'))) {
             return;
         }
+
+        $adminLog ='';
+
         try {
             if (!is_array($oldState)) {
                 $oldState = $oldState?->toArray();
             }
-            AdminLog::query()->create([
+            $adminLog = AdminLog::query()->create([
                 'admin_id' => $adminId ?? request('admin_id'),
                 'action' => $action,
                 'model_id' => $model?->id,
@@ -109,6 +112,8 @@ if (!function_exists('admin_log')) {
         } catch (Exception $exception) {
             // TODO
         }
+
+        return $adminLog;
     }
 }
 

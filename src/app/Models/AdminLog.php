@@ -2,12 +2,8 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
-
-class AdminLog extends Model
+class AdminLog extends AbstractBaseLog
 {
-    protected $connection = "mongodb";
-
     const        CREATE_ADMIN_USER_ACTION = "create_admin_user";
     const        UPDATE_ADMIN_USER_ACTION = "update_admin_user";
     const        DELETE_ADMIN_USER_ACTION = "delete_admin_user";
@@ -301,6 +297,7 @@ class AdminLog extends Model
     const CREATE_SURVEY_QUESTION = "create_survey_question";
     const UPDATE_SURVEY_QUESTION = "update_survey_question";
     const DELETE_SURVEY_QUESTION = "delete_survey_question";
+
     protected $fillable = [
         'admin_id',
         'action',
