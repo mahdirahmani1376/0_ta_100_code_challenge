@@ -87,6 +87,14 @@ if (!function_exists('clean_ir_mobile')) {
     }
 }
 
+if (!function_exists('is_json')) {
+    function is_json($string)
+    {
+        json_decode($string, true);
+        return (json_last_error() === JSON_ERROR_NONE);
+    }
+}
+
 if (!function_exists('admin_log')) {
     function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
     {

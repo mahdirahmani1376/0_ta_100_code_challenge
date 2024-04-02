@@ -6,7 +6,6 @@ use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\Http\FatalErrorException;
 use App\Exceptions\Repository\ModelNotFoundException;
 use App\Exceptions\SystemException\MainAppInternalAPIException;
-use App\Exceptions\SystemException\RepositoryModelNotFoundException;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Integrations\Rahkaran\ValueObjects\DlObject;
@@ -19,15 +18,20 @@ use App\Integrations\Rahkaran\ValueObjects\Receipt;
 use App\Integrations\Rahkaran\ValueObjects\ReceiptDeposit;
 use App\Integrations\Rahkaran\ValueObjects\Voucher;
 use App\Integrations\Rahkaran\ValueObjects\VoucherItem;
+use App\Jobs\UpdateSystemLog;
+use App\Models\AbstractBaseLog;
 use App\Models\ClientCashout;
 use App\Models\CreditTransaction;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\SystemLog;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
+use App\Services\LogService;
+use App\ValueObjects\Queue;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
@@ -1906,7 +1910,6 @@ class RahkaranService
      */
     private function createRequestLog($method, $url, $requestBody, $headers): ?AbstractBaseLog
     {
-        return null; // TODO revert once logging is implemented
         $requestBody = $requestBody && is_string($requestBody) && is_json($requestBody) ? json_decode($requestBody, true) : $requestBody;
 
         return LogService::store((new SystemLog()), [
@@ -1929,7 +1932,6 @@ class RahkaranService
      */
     private function updateRequestLog($systemLog, $responseBody, array $getHeaders, int $getStatusCode): void
     {
-        return; // TODO revert once logging is implemented
         if ($systemLog instanceof AbstractBaseLog) {
             $responseBody = $responseBody && is_string($responseBody) && is_json($responseBody) ? json_decode($responseBody, true) : $responseBody;
 

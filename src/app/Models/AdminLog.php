@@ -2,8 +2,16 @@
 
 namespace App\Models;
 
-class AdminLog extends AbstractBaseLog
+use App\Traits\MongoDate;
+use DateTimeInterface;
+use MongoDB\Laravel\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\SoftDeletes;
+
+
+class AdminLog extends Model
 {
+    use SoftDeletes, MongoDate;
+
     const        CREATE_ADMIN_USER_ACTION = "create_admin_user";
     const        UPDATE_ADMIN_USER_ACTION = "update_admin_user";
     const        DELETE_ADMIN_USER_ACTION = "delete_admin_user";
@@ -13,9 +21,6 @@ class AdminLog extends AbstractBaseLog
     const        CREATE_BANK_ACCOUNT = "create_bank_account";
     const        UPDATE_BANK_ACCOUNT = "update_bank_account";
     const        DELETE_BANK_ACCOUNT = "delete_bank_account";
-    const        CREATE_CLIENT_BANK_ACCOUNT = "create_client_bank_account";
-    const        UPDATE_CLIENT_BANK_ACCOUNT = "update_client_bank_account";
-    const        DELETE_CLIENT_BANK_ACCOUNT = "delete_client_bank_account";
     const        BLOG_REPLY_COMMENT = "blog_reply_comment";
     const        BLOG_APPROVE_COMMENT = "blog_approve_comment";
     const        CREATE_BLOG = "create_blog";
@@ -58,23 +63,18 @@ class AdminLog extends AbstractBaseLog
     const        EDIT_INVOICE_ITEM = "edit_invoice_item";
     const        PAY_INVOICE = "pay_invoice";
     const        REFUNDED_INVOICE = "refunded_invoice";
-    const        INVOICE_PROCESSED = "invoice_processed";
-    const        SET_INVOICE_PAID_AT = "set_invoice_paid_at";
-    const        SET_INVOICE_NUMBER = "set_invoice_number";
     const        SEND_INVOICE_TO_RAHKARAN = "send_invoice_to_rahkaran";
     const        UNPAID_INVOICE = "unpaid_invoice";
     const        UPDATE_INVOICE = "update_invoice";
     public const SPLIT_INVOICE = 'split_invoice';
     const        DELETE_INVOICE_OFFICIAL_BILL = "delete_invoice_official_bill";
     const        DOWNLOAD_INVOICE_OFFICIAL_BILL = "download_invoice_official_bill";
-    const        CREATE_OFFLINE_TRANSACTION = "create_offline_transaction";
-    const        DELETE_OFFLINE_TRANSACTION = "delete_offline_transaction";
-    const        REJECT_OFFLINE_TRANSACTION = "reject_offline_transaction";
-    const        ROLLBACK_OFFLINE_TRANSACTION = "rollback_offline_transaction";
-    const        UPDATE_OFFLINE_TRANSACTION = "update_offline_transaction";
-    const        VERIFY_OFFLINE_TRANSACTION = "verify_offline_transaction";
-    const        VERIFY_TRANSACTION = "verify_transaction";
-    const        STORE_CREDIT_TRANSACTION = "store_credit_transaction";
+    const        CREATE_OFFLINE_PAYMENT = "create_offline_payment";
+    const        DELETE_OFFLINE_PAYMENT = "delete_offline_payment";
+    const        REJECT_OFFLINE_PAYMENT = "reject_offline_payment";
+    const        ROLLBACK_OFFLINE_PAYMENT = "rollback_offline_payment";
+    const        UPDATE_OFFLINE_PAYMENT = "update_offline_payment";
+    const        VERIFY_OFFLINE_PAYMENT = "verify_offline_payment";
     const        DELETE_HOSTIRAN_PROXY = "delete_hostiran_proxy";
     const        UPDATE_HOSTIRAN_PROXY = "update_hostiran_proxy";
     const        CREATE_INFORMATION_SYSTEM_CATEGORY = "create_information_system_category";
@@ -186,6 +186,8 @@ class AdminLog extends AbstractBaseLog
     const        PROVISIONING_MODULE_UPDATE = "update_provisioning_module";
     const        MANUAL_CHECK_INVOICE = "manual_check_invoice";
     const        MIGRATE_HOSTIRAN_POOL = "migrate_hostiran_pool";
+
+    const        STORE_IP_POOL = "store_ip_pool";
     const        UPDATE_IP_POOL = "update_ip_pool";
     const        STORE_RATING = "STORE_RATING";
     const        DELETE_RATE_LOG = "DELETE_RATE_LOG";
@@ -276,9 +278,9 @@ class AdminLog extends AbstractBaseLog
     const        DELETE_BULK_MESSAGE = 'delete_bulk_message';
     const        TRY_BULK_MESSAGE = 'try_bulk_message';
 
-    const CREATE_BANK_GATEWAY = 'create_bank_gateway';
-    const UPDATE_BANK_GATEWAY = 'update_bank_gateway';
-    const DELETE_BANK_GATEWAY = 'delete_bank_gateway';
+    const CREATE_PAYMENT_GATEWAY = 'create_payment_gateway';
+    const UPDATE_PAYMENT_GATEWAY = 'update_payment_gateway';
+    const DELETE_PAYMENT_GATEWAY = 'delete_payment_gateway';
     const STORE_VM_DISK = 'store_vm_disk';
     const EXPORT_VM_DISK = 'export_vm_disk';
     const EXTEND_VM_DISK = 'extend_VM_DISK';
@@ -290,6 +292,8 @@ class AdminLog extends AbstractBaseLog
     const CREATE_AFFILIATION_PLAN = "create_affiliation_plan";
     const UPDATE_AFFILIATION_PLAN = "update_affiliation_plan";
     const DELETE_AFFILIATION_PLAN = "delete_affiliation_plan";
+    const UPDATE_AFFILIATION = 'update_affiliation';
+    const DELETE_AFFILIATION = 'delete_affiliation';
     const CREATE_SURVEY = "create_survey";
     const UPDATE_SURVEY = "update_survey";
     const DELETE_SURVEY = "delete_survey";
@@ -297,14 +301,67 @@ class AdminLog extends AbstractBaseLog
     const CREATE_SURVEY_QUESTION = "create_survey_question";
     const UPDATE_SURVEY_QUESTION = "update_survey_question";
     const DELETE_SURVEY_QUESTION = "delete_survey_question";
+    const UPDATE_OBJECT_STORAGE_INFRA = 'update_object_storage_infra';
+    const STORE_OBJECT_STORAGE_INFRA = 'store_object_storage_infra';
+    const DELETE_OBJECT_STORAGE_INFRA = 'delete_object_storage_infra';
+    const UPDATE_OBJECT_STORAGE_NODE = 'update_object_storage_node';
+    const STORE_OBJECT_STORAGE_NODE = 'store_object_storage_node';
+    const DELETE_OBJECT_STORAGE_NODE = 'delete_object_storage_node';
+    const STORE_OBJECT_STORAGE = "store_object_storage";
+    const UPDATE_OBJECT_STORAGE = "update_object_storage";
+    const TERMINATE_OBJECT_STORAGE = "terminate_object_storage";
+    const ACTION_OBJECT_STORAGE = 'action_object_storage';
+    const RESERVE_IP_POOL = 'reserve_ip_pool';
+    const CLOUD_CHANGE_DATACENTER = 'change_datacenter';
+    const CLOUD_CHANGE_NETWORK = 'cloud_change_network';
+    const STORE_CLOUD_NETWORK = 'store_cloud_network';
+    const UPDATE_CLOUD_NETWORK = 'update_cloud_network';
+    const DELETE_CLOUD_NETWORK = 'delete_cloud_network';
+    const STORE_CLOUD_PROXY = 'store_cloud_proxy';
+    const UPDATE_CLOUD_PROXY = 'update_cloud_proxy';
+    const DELETE_CLOUD_PROXY = 'delete_cloud_proxy';
+    const TERMINATE_IP = "terminate_ip";
+    const STORE_ADMIN_ANYCAST = 'store_admin_anycast';
+    const UPDATE_ADMIN_ANYCAST = 'update_admin_anycast';
+    const DELETE_ADMIN_ANYCAST = 'delete_admin_anycast';
+    const STORE_TEMPLATE_SCRIPT = 'store_template_script';
+    const UPDATE_TEMPLATE_SCRIPT = 'update_template_script';
+    const DELETE_TEMPLATE_SCRIPT = 'delete_template_script';
+    const STORE_DATACENTER_TEMPLATE = 'store_datacenter_template';
+    const UPDATE_DATACENTER_TEMPLATE = 'update_datacenter_template';
+    const DELETE_DATACENTER_TEMPLATE = 'delete_datacenter_template';
+
+
+    protected $connection = "mongodb";
+
+    protected $collection = 'admin_changes';
 
     protected $fillable = [
-        'admin_id',
-        'action',
-        'model_id',
-        'model_class',
-        'changes',
-        'old_state',
-        'validated_data',
+        "logable_type",
+        "logable_id",
+        "request",
+        "before",
+        "after",
+        "admin_user_id",
+        "action",
+        "created_at"
     ];
+
+    protected $casts = [
+        "created_at" => 'datetime',
+        "updated_at" => 'datetime'
+    ];
+
+    public function logable()
+    {
+        return $this->morphTo();
+    }
+    /**
+     * @param DateTimeInterface $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 }
