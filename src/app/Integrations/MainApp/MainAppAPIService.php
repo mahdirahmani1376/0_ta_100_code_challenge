@@ -181,7 +181,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public function adminListProducts(array $array)
+    public function adminListProducts($array)
     {
         $url = '/api/internal/finance/get-products';
 
@@ -192,32 +192,49 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getBulkServiceProductGroup()
+    public static function getProductsById($productIds)
     {
-        //todo todo implement this method
-        return;
+        $url = 'api/product-service/admin/product';
+
+        $data = [
+            'profile_ids' => [
+                $productIds
+            ]
+        ];
+
+        try {
+            $response = self::makeRequest('get', $url, $data);
+
+            if ($response->successful()) {
+                return $response->json('data');
+            }
+
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
     }
 
-    public static function getBulkDomainById()
+    public static function getDomainsById(array $profileIds)
     {
-        //todo implement this method
-        return;
-//        $url = '/api/internal/finance/bulk-service-product-group';
-////        $data = [
-////            'type' => $type,
-////            'rel_id' => $invoiceableId,
-////        ];
-//
-//        try {
-//            $response = self::makeRequest('get', $url, $data);
-//
-//            if ($response->successful()) {
-//                return $response->json('data');
-//            }
-//
-//            throw MainAppInternalAPIException::make($url, json_encode($data));
-//        } catch (\Exception $exception) {
-//            throw MainAppInternalAPIException::make($url, json_encode($data));
-//        }
+        $url = '/api/product-service/admin/service';
+
+        $data = [
+            'profile_ids' => [
+                $profileIds
+            ]
+        ];
+
+        try {
+            $response = self::makeRequest('get', $url, $data);
+
+            if ($response->successful()) {
+                return $response->json('data');
+            }
+
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
     }
 }

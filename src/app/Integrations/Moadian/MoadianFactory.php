@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\MoadianLog;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Jooyeshgar\Moadian\Invoice as MoadianInvoice;
 use Jooyeshgar\Moadian\InvoiceHeader;
@@ -17,6 +18,8 @@ use Jooyeshgar\Moadian\Payment as MoadianPayment;
 class MoadianFactory
 {
     private MoadianInvoice $moadianInvoice;
+    private Collection $responseProducts;
+    private Collection $responseDomains;
 
     public function createMoadianInvoiceDTO(Invoice $invoice): MoadianInvoice
     {
@@ -86,12 +89,18 @@ class MoadianFactory
         return $this;
     }
 
-    private function createInvoiceBody(Invoice $invoice): self
+    public function createInvoiceBody(Invoice $invoice): self
     {
-        $negativeItems = abs($invoice->items->where('amount', '<', 0)->sum('amount'));
+        $items = $invoice->items;
+
+        $negativeItems = abs($items->where('amount', '<', 0)->sum('amount'));
+
+        $positiveItems = $items->where('amount', '>', 0);
+
+        $this->getProductsAndDomainsList($positiveItems);
 
         /** @var Item $item */
-        foreach ($invoice->items->where('amount', '>', 0)->all() as $item) {
+        foreach ($positiveItems->all() as $item) {
 
             $amount = $item->amount;
 
@@ -158,8 +167,7 @@ class MoadianFactory
             case Item::TYPE_HOSTING:
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-//                $product = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id)['product'];
-                $product = MainAppAPIService::getBulkServiceProductGroup('products',$item->invoiceable_id)['product'];
+                $product = $this->responseProducts->where('id', $item->invoiceable_id)->first();
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
                     $description = 'پنل نمايندگي هاست وب سايت';
@@ -247,8 +255,7 @@ class MoadianFactory
                 }
                 break;
             case Item::TYPE_DOMAIN_SERVICE:
-//                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
-                $domain = MainAppAPIService::getBulkDomainById('domain', $item->invoiceable_id);
+                $domain = $this->responseDomains->where('id', $item->invoiceable_id)->first();
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
                     $code = 2330001496112; // TODO dobuble check دامنه داخلی
                     $description = 'تخصيص و مديريت دامنه هاي داخلي';
@@ -274,5 +281,32 @@ class MoadianFactory
         }
 
         return [$code, $description];
+    }
+
+
+    public function getProductsAndDomainsList($positiveItems)
+    {
+        $productListById = collect();
+        $domainListById = collect();
+
+        $positiveItems
+            ->whereIn('invoiceable_type', [
+                Item::TYPE_HOSTING,
+                Item::TYPE_PRODUCT_SERVICE,
+                Item::TYPE_PRODUCT_SERVICE_UPGRADE
+            ])
+            ->each(function (Item $item) use (&$productListById) {
+                $productListById->push($item->invoiceable_id);
+            })
+            ->whereIn('invoiceable_type', [
+                Item::TYPE_DOMAIN_SERVICE
+            ])
+            ->each(function (Item $item) use (&$domainListById) {
+                $domainListById->push($item->invoiceable_id);
+            });
+
+        $this->responseProducts = collect(MainAppAPIService::getProductsById($productListById->toArray()));
+        $this->responseDomains = collect(MainAppAPIService::getDomainsById($domainListById->toArray()));
+
     }
 }
