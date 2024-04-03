@@ -191,4 +191,33 @@ class MainAppAPIService extends BaseMainAppAPIService
             throw MainAppInternalAPIException::make($url, json_encode($array));
         }
     }
+
+    public static function getBulkServiceProductGroup()
+    {
+        //todo todo implement this method
+        return;
+    }
+
+    public static function getBulkDomainById()
+    {
+        //todo implement this method
+        return;
+//        $url = '/api/internal/finance/bulk-service-product-group';
+////        $data = [
+////            'type' => $type,
+////            'rel_id' => $invoiceableId,
+////        ];
+//
+//        try {
+//            $response = self::makeRequest('get', $url, $data);
+//
+//            if ($response->successful()) {
+//                return $response->json('data');
+//            }
+//
+//            throw MainAppInternalAPIException::make($url, json_encode($data));
+//        } catch (\Exception $exception) {
+//            throw MainAppInternalAPIException::make($url, json_encode($data));
+//        }
+    }
 }

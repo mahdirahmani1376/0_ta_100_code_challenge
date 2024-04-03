@@ -158,7 +158,8 @@ class MoadianFactory
             case Item::TYPE_HOSTING:
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $product = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id)['product'];
+//                $product = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id)['product'];
+                $product = MainAppAPIService::getBulkServiceProductGroup('products',$item->invoiceable_id)['product'];
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
                     $description = 'پنل نمايندگي هاست وب سايت';
@@ -246,7 +247,8 @@ class MoadianFactory
                 }
                 break;
             case Item::TYPE_DOMAIN_SERVICE:
-                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
+//                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
+                $domain = MainAppAPIService::getBulkDomainById('domain', $item->invoiceable_id);
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
                     $code = 2330001496112; // TODO dobuble check دامنه داخلی
                     $description = 'تخصيص و مديريت دامنه هاي داخلي';
