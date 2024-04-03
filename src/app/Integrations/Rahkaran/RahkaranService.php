@@ -626,7 +626,7 @@ class RahkaranService
                 // Collection Negative voucher item to balance Voucher
                 if ($invoice->status == Invoice::STATUS_COLLECTIONS) {
                     $collection_voucher_item = $this->getCollectionVoucherItem($client_dl_code, $invoice);
-                    if ($collection_voucher_item){
+                    if ($collection_voucher_item) {
                         $voucher->addVoucherItem($collection_voucher_item);
                     }
                 }
@@ -747,7 +747,7 @@ class RahkaranService
         switch ($transaction->payment_method) {
             case 'sermelli':
             case 'sadad_meli':
-            return $this->config->sadadBankId;
+                return $this->config->sadadBankId;
             case 'irankish':
                 return $this->config->iranKishBankId;
 
@@ -1264,13 +1264,16 @@ class RahkaranService
             return $this->getDl($code);
         }
 
-        $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/RegisterDL', 'post', [[
-                                                                                                                                  'Code'        => $code,
-                                                                                                                                  'DLTypeRef'   => $dl_type_ref,
-                                                                                                                                  'Description' => $description,
-                                                                                                                                  'Title'       => $title,
-                                                                                                                                  'Title_En'    => ''
-                                                                                                                              ]], $this->getHeaders());
+        $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/RegisterDL',
+            'post',
+            [[
+                 'Code'        => $code,
+                 'DLTypeRef'   => $dl_type_ref,
+                 'Description' => $description,
+                 'Title'       => $title,
+                 'Title_En'    => ''
+             ]],
+            $this->getHeaders());
 
         $result = $this->validatePartyResult($result);
 
@@ -1912,12 +1915,12 @@ class RahkaranService
     {
         $requestBody = $requestBody && is_string($requestBody) && is_json($requestBody) ? json_decode($requestBody, true) : $requestBody;
 
-        return LogService::store((new SystemLog()), [
-                'method'         => $method,
+        return LogService::store(SystemLog::make(), [
+            'method'         => $method,
             'endpoint'       => AbstractBaseLog::ENDPOINT_RAHKARAN,
-                'request_url'    => $url,
-                'request_body'   => $requestBody,
-                'request_header' => json_encode($headers),
+            'request_url'    => $url,
+            'request_body'   => $requestBody,
+            'request_header' => json_encode($headers),
             'provider'       => AbstractBaseLog::PROVIDER_OUTGOING,
         ]);
 

@@ -209,7 +209,6 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return $response->json('data');
             }
 
-            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
@@ -232,7 +231,6 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return $response->json('data');
             }
 
-            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }

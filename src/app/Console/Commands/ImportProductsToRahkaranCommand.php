@@ -2,12 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Entities\Product;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\RahkaranService;
-use App\Traits\InteractsWithFinance;
-use App\Traits\InteractsWithProduct;
-use App\Traits\InteractsWithWhmcs;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 

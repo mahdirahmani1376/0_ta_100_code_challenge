@@ -77,6 +77,11 @@ class AbstractBaseLog extends Model
     protected $connection = "mongodb";
     protected $table = '';
 
+    public function make(): static
+    {
+        return new static();
+    }
+
     protected $fillable = [
         'method',
         'endpoint',
