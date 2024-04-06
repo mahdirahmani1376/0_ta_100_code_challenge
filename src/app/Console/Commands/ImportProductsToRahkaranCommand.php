@@ -42,8 +42,8 @@ class ImportProductsToRahkaranCommand extends Command
     {
         $this->info('Create new DLs');
 
-        $products = $this->mainAppAPIService->adminListProducts(['perPage' => 200]);
-        foreach ( $products['data'] as $product )
+        $products = $this->mainAppAPIService->adminListProducts(['all' => 1]);
+        foreach ( $products as $product )
         {
             try {
                 $code = 60003000 + $product['id'];
