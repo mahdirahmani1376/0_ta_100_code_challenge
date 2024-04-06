@@ -305,6 +305,11 @@ class AdminLog extends Model
     const CREATE_SURVEY_QUESTION = "create_survey_question";
     const UPDATE_SURVEY_QUESTION = "update_survey_question";
     const DELETE_SURVEY_QUESTION = "delete_survey_question";
+    const UPDATE_OFFLINE_PAYMENT = 'update_offline_payment';
+    const VERIFY_OFFLINE_PAYMENT = 'verify_offline_payment';
+    const REJECT_OFFLINE_PAYMENT = 'reject_offline_payment';
+    const ROLLBACK_OFFLINE_PAYMENT = 'rollback_offline_payment';
+    const CREATE_OFFLINE_PAYMENT = 'create_offline_payment';
 
     protected $connection = "mongodb";
 
@@ -318,7 +323,6 @@ class AdminLog extends Model
         "after",
         "admin_user_id",
         "action",
-        "created_at"
     ];
 
     protected $casts = [
