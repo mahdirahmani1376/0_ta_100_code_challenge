@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -127,5 +126,10 @@ class Invoice extends Model
     public function moadianLog(): HasOne
     {
         return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
+    }
+
+    public function hasStatus($status): bool
+    {
+        return $this->attributes['status'] == (int)self::getStatusValue($status);
     }
 }
