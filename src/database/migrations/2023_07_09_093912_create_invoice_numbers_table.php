@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('invoice_id')->nullable();
             $table->unsignedBigInteger('invoice_number');
             $table->string('fiscal_year');
-            $table->string('status')->default(InvoiceNumber::STATUS_UNUSED);
+            $table->string('status')->default(InvoiceNumber::STATUS_PENDING);
             $table->string('type')->default(InvoiceNumber::TYPE_PAID);
 
             $table->foreign('invoice_id')->references('id')->on('invoices');
