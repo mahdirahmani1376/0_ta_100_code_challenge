@@ -86,6 +86,8 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_NOT_FOUND) {
                 return [];
             }
+
+            throw MainAppInternalAPIException::make($url, json_encode($param));
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
@@ -194,7 +196,8 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public static function getProductsById($productIds)
     {
-        $url = 'api/product-service/admin/product';
+        $url = '/api/product-service/admin/product';
+
 
         $data = [
             'profile_ids' => [
@@ -209,6 +212,7 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return $response->json('data');
             }
 
+            throw MainAppInternalAPIException::make($url, json_encode($data));
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
@@ -234,5 +238,30 @@ class MainAppAPIService extends BaseMainAppAPIService
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
+    }
+
+    public static function getBasePaidInvoiceNumber()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_PAID_INVOICE_NUMBER');
+    }
+
+    public static function getBaseRefundedInvoiceNumber()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_REFUNDED_INVOICE_NUMBER');
+    }
+
+    public static function getBaseInvoiceId()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_INVOICE_ID');
+    }
+
+    public static function getCurrentFiscalYear()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_FISCAL_YEAR');
+    }
+
+    public static function getDefaultTaxRate()
+    {
+        return static::getConfig('FINANCE_SERVICE_DEFAULT_TAX');
     }
 }

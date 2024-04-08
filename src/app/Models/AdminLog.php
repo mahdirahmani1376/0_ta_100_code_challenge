@@ -310,6 +310,7 @@ class AdminLog extends Model
     const REJECT_OFFLINE_PAYMENT = 'reject_offline_payment';
     const ROLLBACK_OFFLINE_PAYMENT = 'rollback_offline_payment';
     const CREATE_OFFLINE_PAYMENT = 'create_offline_payment';
+    const PROVIDER_OUTGOING = 'provider_outgoing';
 
     protected $connection = "mongodb";
 

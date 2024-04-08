@@ -29,20 +29,26 @@ class InvoiceNumber extends Model
     use HasFactory;
     use SoftDeletes;
 
-    const STATUS_UNUSED = 'unused';
-    const STATUS_USED = 'used';
+    /**
+     * Pending   :  ready for assignment
+     * Allocated :  allocated for future assignment
+     * Active    :  assigned to an invoice
+     */
+    const STATUS_PENDING = '0';
+    const STATUS_ALLOCATED = '2';
+    const STATUS_ACTIVE = '1';
 
     const STATUSES = [
-        self::STATUS_UNUSED,
-        self::STATUS_USED,
+        self::STATUS_PENDING,
+        self::STATUS_ACTIVE,
     ];
 
     const TYPE_PAID = 'paid';
-    const TYPE_REFUND = 'refund';
+    const TYPE_REFUNDED = 'refunded';
 
     const TYPES = [
         self::TYPE_PAID,
-        self::TYPE_REFUND,
+        self::TYPE_REFUNDED,
     ];
 
     protected $fillable = [

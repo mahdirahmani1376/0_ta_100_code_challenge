@@ -34,7 +34,7 @@ class StoreMassPaymentInvoiceService
             'payment_method' => Invoice::PAYMENT_METHOD_CREDIT,
             'due_date' => null,
             'is_mass_payment' => true,
-            'tax_rate' => Invoice::DEFAULT_TAX_RATE,
+            'tax_rate' => Invoice::defaultTaxRate(),
             'status' => Invoice::STATUS_UNPAID,
             'profile_id' => $data['profile_id'],
         ], [

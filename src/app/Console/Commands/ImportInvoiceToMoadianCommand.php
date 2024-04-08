@@ -55,13 +55,13 @@ class ImportInvoiceToMoadianCommand extends Command
             // TODO maybe sleep or something to prevent sending too many requests to the moadian server
             // TODO or maybe queue all of these sendInvoices and chain em synchronously using
             // TODO https://laravel.com/docs/10.x/queues#dispatching-batches
-            try {
+//            try {
                 $this->sendInvoice($invoice);
                 $this->info('Sent invoice: ' . $invoice->invoice_id);
-            } catch (\Exception $exception) {
-                $this->error($exception->getMessage());
-                $this->info('skipping Invoice#' . $invoice->invoice_id);
-            }
+//            } catch (\Exception $exception) {
+//                $this->error($exception->getMessage());
+//                $this->info('skipping Invoice#' . $invoice->invoice_id);
+//            }
         }
 
         $this->info('Command Finished');
@@ -82,8 +82,8 @@ class ImportInvoiceToMoadianCommand extends Command
                 $status_query->where('status', Invoice::STATUS_COLLECTIONS);
             });
             $query->orWhere(function (Builder $status_query) use ($fromDate, $toDate) {
-                $status_query->whereDate('paid_date', '>=', $fromDate);
-                $status_query->whereDate('paid_date', '<=', $toDate);
+                $status_query->whereDate('paid_at', '>=', $fromDate);
+                $status_query->whereDate('paid_at', '<=', $toDate);
             });
         });
 

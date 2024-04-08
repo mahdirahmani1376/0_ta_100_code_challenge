@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -67,8 +68,6 @@ class Invoice extends Model
 
     const PAYMENT_METHOD_CREDIT = 'client_credit';
 
-    const DEFAULT_TAX_RATE = 9;
-
     protected $fillable = [
         'created_at',
         'due_date',
@@ -128,8 +127,8 @@ class Invoice extends Model
         return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
     }
 
-    public function hasStatus($status): bool
+    public static function defaultTaxRate()
     {
-        return $this->attributes['status'] == (int)self::getStatusValue($status);
+        return MainAppAPIService::getDefaultTaxRate();
     }
 }

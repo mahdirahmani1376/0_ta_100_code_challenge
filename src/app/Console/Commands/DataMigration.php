@@ -31,6 +31,7 @@ class DataMigration extends Command
 
     public function handle()
     {
+
         ini_set('memory_limit', '4096M');
         self::migrateBankAccount();
         self::migrateBankGateway();
@@ -321,12 +322,13 @@ class DataMigration extends Command
     {
         $tableName = (new Invoice())->getTable();
         $this->alert("Beginning to migrate $tableName");
+        $taxRate = Invoice::defaultTaxRate();
         try {
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoices`')[0]->count;
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `invoices`  LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
+                $mappedData = Arr::map($oldData, function ($row) use ($taxRate) {
                     $row = (array)$row;
                     $newRow = [];
                     $newRow['id'] = $row['invoice_id'];
@@ -340,7 +342,7 @@ class DataMigration extends Command
                     $newRow['balance'] = $row['balance'];
                     $newRow['total'] = $row['total'];
                     $newRow['sub_total'] = $row['sub_total'];
-                    $newRow['tax_rate'] = 9;
+                    $newRow['tax_rate'] = $taxRate;
                     $newRow['tax'] = $row['tax1'] + $row['tax2'];
                     $newStatus = null;
                     if ($row['status'] == 0) {
@@ -646,8 +648,8 @@ class DataMigration extends Command
                     $newRow['deleted_at'] = $row['deleted_at'];
                     $newRow['invoice_number'] = $row['invoice_number'];
                     $newRow['fiscal_year'] = $row['fiscal_year'];
-                    $newRow['type'] = $row['type'] == 'paid' ? InvoiceNumber::TYPE_PAID : InvoiceNumber::TYPE_REFUND;
-                    $newRow['status'] = $row['status'] ? InvoiceNumber::STATUS_USED : InvoiceNumber::STATUS_UNUSED;
+                    $newRow['type'] = $row['type'] == 'paid' ? InvoiceNumber::TYPE_PAID : InvoiceNumber::TYPE_REFUNDED;
+                    $newRow['status'] = $row['status'] ? InvoiceNumber::STATUS_ACTIVE : InvoiceNumber::STATUS_PENDING;
                     $newRow['invoice_id'] = $row['invoice_id'];
 
                     return $newRow;

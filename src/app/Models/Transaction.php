@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -83,14 +82,5 @@ class Transaction extends Model
     public function offlineTransaction(): HasOne
     {
         return $this->hasOne(OfflineTransaction::class);
-    }
-
-    /**
-     * @param Builder $builder
-     * @return Builder
-     */
-    public function scopeWithoutRounding(Builder $builder): Builder
-    {
-        return $builder->where('reference_id', 'not like', 'ROUND-%');
     }
 }
