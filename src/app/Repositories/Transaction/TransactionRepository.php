@@ -214,4 +214,11 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             'online' => $onlineTransactionsBasedOnGateway,
         ];
     }
+    public function sum(string $column, array $criteria = [], array $scopes = []): float|int
+    {
+        return self::newQuery()
+            ->where($criteria)
+            ->scopes($scopes)
+            ->sum($column);
+    }
 }

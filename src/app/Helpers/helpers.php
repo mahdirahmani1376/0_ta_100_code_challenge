@@ -87,17 +87,28 @@ if (!function_exists('clean_ir_mobile')) {
     }
 }
 
+if (!function_exists('is_json')) {
+    function is_json($string)
+    {
+        json_decode($string, true);
+        return (json_last_error() === JSON_ERROR_NONE);
+    }
+}
+
 if (!function_exists('admin_log')) {
-    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null): void
+    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
     {
         if (is_null($adminId) && is_null(request('admin_id'))) {
             return;
         }
+
+        $adminLog ='';
+
         try {
             if (!is_array($oldState)) {
                 $oldState = $oldState?->toArray();
             }
-            AdminLog::query()->create([
+            $adminLog = AdminLog::query()->create([
                 'admin_id' => $adminId ?? request('admin_id'),
                 'action' => $action,
                 'model_id' => $model?->id,
@@ -109,6 +120,27 @@ if (!function_exists('admin_log')) {
         } catch (Exception $exception) {
             // TODO
         }
+
+        return $adminLog;
+    }
+}
+
+if (!function_exists('math_subtract')) {
+    /**
+     * @param float|int|string $minuend
+     * @param float|int|string $subtrahend
+     * @param int $decimal_places
+     * @return float|int
+     */
+    function math_subtract($minuend, $subtrahend, int $decimal_places)
+    {
+        $decimal = pow(10, $decimal_places);
+
+        $minuend = round($minuend * $decimal);
+
+        $subtrahend = round($subtrahend * $decimal);
+
+        return ($minuend - $subtrahend) / $decimal;
     }
 }
 

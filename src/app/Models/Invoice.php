@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int admin_id
  * @property boolean is_credit
  * @property string note
+ * @property int $source_invoice
  *
  * @property Collection items
  * @property InvoiceNumber invoiceNumber
@@ -45,8 +46,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Invoice extends Model
 {
-    use HasFactory;
-
     const STATUS_CANCELED = 'canceled'; // old status 3
     const STATUS_UNPAID = 'unpaid'; // old status = 0
     const STATUS_PAID = 'paid'; // old status = 1
@@ -69,8 +68,6 @@ class Invoice extends Model
 
     const PAYMENT_METHOD_CREDIT = 'client_credit';
 
-    const DEFAULT_TAX_RATE = 9;
-
     protected $fillable = [
         'created_at',
         'due_date',
@@ -86,6 +83,7 @@ class Invoice extends Model
         'admin_id',
         'is_credit',
         'note',
+        'source_invoice'
     ];
 
     protected $hidden = [
@@ -127,5 +125,10 @@ class Invoice extends Model
     public function moadianLog(): HasOne
     {
         return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
+    }
+
+    public static function defaultTaxRate()
+    {
+        return MainAppAPIService::getDefaultTaxRate();
     }
 }

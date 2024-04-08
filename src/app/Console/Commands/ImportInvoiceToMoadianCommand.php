@@ -82,8 +82,8 @@ class ImportInvoiceToMoadianCommand extends Command
                 $status_query->where('status', Invoice::STATUS_COLLECTIONS);
             });
             $query->orWhere(function (Builder $status_query) use ($fromDate, $toDate) {
-                $status_query->whereDate('paid_date', '>=', $fromDate);
-                $status_query->whereDate('paid_date', '<=', $toDate);
+                $status_query->whereDate('paid_at', '>=', $fromDate);
+                $status_query->whereDate('paid_at', '<=', $toDate);
             });
         });
 

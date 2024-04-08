@@ -7,9 +7,7 @@ namespace App\Integrations\MainApp;
 
 use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\Rahkaran\ValueObjects\Client;
-use App\Integrations\Rahkaran\ValueObjects\Product;
 use App\Models\Invoice;
-use App\Models\Profile;
 use Illuminate\Http\Response;
 
 class MainAppAPIService extends BaseMainAppAPIService
@@ -88,6 +86,8 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_NOT_FOUND) {
                 return [];
             }
+
+            throw MainAppInternalAPIException::make($url, json_encode($param));
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
@@ -181,5 +181,87 @@ class MainAppAPIService extends BaseMainAppAPIService
         } catch (\Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
+    }
+
+    public function adminListProducts($array)
+    {
+        $url = '/api/internal/finance/get-products';
+
+        try {
+            return self::makeRequest('get', $url, $array);
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($array));
+        }
+    }
+
+    public static function getProductsById($productIds)
+    {
+        $url = '/api/product-service/admin/product';
+
+
+        $data = [
+            'profile_ids' => [
+                $productIds
+            ]
+        ];
+
+        try {
+            $response = self::makeRequest('get', $url, $data);
+
+            if ($response->successful()) {
+                return $response->json('data');
+            }
+
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
+    }
+
+    public static function getDomainsById(array $profileIds)
+    {
+        $url = '/api/product-service/admin/service';
+
+        $data = [
+            'profile_ids' => [
+                $profileIds
+            ]
+        ];
+
+        try {
+            $response = self::makeRequest('get', $url, $data);
+
+            if ($response->successful()) {
+                return $response->json('data');
+            }
+
+        } catch (\Exception $exception) {
+            throw MainAppInternalAPIException::make($url, json_encode($data));
+        }
+    }
+
+    public static function getBasePaidInvoiceNumber()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_PAID_INVOICE_NUMBER');
+    }
+
+    public static function getBaseRefundedInvoiceNumber()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_REFUNDED_INVOICE_NUMBER');
+    }
+
+    public static function getBaseInvoiceId()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_INVOICE_ID');
+    }
+
+    public static function getCurrentFiscalYear()
+    {
+        return static::getConfig('INVOICE_NUMBER_CURRENT_FISCAL_YEAR');
+    }
+
+    public static function getDefaultTaxRate()
+    {
+        return static::getConfig('FINANCE_SERVICE_DEFAULT_TAX');
     }
 }

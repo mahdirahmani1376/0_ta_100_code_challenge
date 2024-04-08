@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float amount
  * @property string admin_note
  * @property string status
+ * @property string $source
  * @property array actions
  * @property boolean rejected_by_bank
  */
@@ -57,6 +58,7 @@ class ClientCashout extends Model
         'admin_note',
         'status',
         'rejected_by_bank',
+        'source'
     ];
 
     public function getActionsAttribute(): array

@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\MongoDate;
+use DateTimeInterface;
 use MongoDB\Laravel\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\SoftDeletes;
+
 
 class AdminLog extends Model
 {
-    protected $connection = "mongodb";
+    use SoftDeletes, MongoDate;
 
     const        CREATE_ADMIN_USER_ACTION = "create_admin_user";
     const        UPDATE_ADMIN_USER_ACTION = "update_admin_user";
@@ -301,13 +305,42 @@ class AdminLog extends Model
     const CREATE_SURVEY_QUESTION = "create_survey_question";
     const UPDATE_SURVEY_QUESTION = "update_survey_question";
     const DELETE_SURVEY_QUESTION = "delete_survey_question";
+    const UPDATE_OFFLINE_PAYMENT = 'update_offline_payment';
+    const VERIFY_OFFLINE_PAYMENT = 'verify_offline_payment';
+    const REJECT_OFFLINE_PAYMENT = 'reject_offline_payment';
+    const ROLLBACK_OFFLINE_PAYMENT = 'rollback_offline_payment';
+    const CREATE_OFFLINE_PAYMENT = 'create_offline_payment';
+    const PROVIDER_OUTGOING = 'provider_outgoing';
+
+    protected $connection = "mongodb";
+
+    protected $collection = 'admin_changes';
+
     protected $fillable = [
-        'admin_id',
-        'action',
-        'model_id',
-        'model_class',
-        'changes',
-        'old_state',
-        'validated_data',
+        "logable_type",
+        "logable_id",
+        "request",
+        "before",
+        "after",
+        "admin_user_id",
+        "action",
     ];
+
+    protected $casts = [
+        "created_at" => 'datetime',
+        "updated_at" => 'datetime'
+    ];
+
+    public function logable()
+    {
+        return $this->morphTo();
+    }
+    /**
+     * @param DateTimeInterface $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 }

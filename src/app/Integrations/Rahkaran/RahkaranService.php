@@ -18,15 +18,20 @@ use App\Integrations\Rahkaran\ValueObjects\Receipt;
 use App\Integrations\Rahkaran\ValueObjects\ReceiptDeposit;
 use App\Integrations\Rahkaran\ValueObjects\Voucher;
 use App\Integrations\Rahkaran\ValueObjects\VoucherItem;
+use App\Jobs\UpdateSystemLog;
+use App\Models\AbstractBaseLog;
 use App\Models\ClientCashout;
 use App\Models\CreditTransaction;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\SystemLog;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
+use App\Services\LogService;
+use App\ValueObjects\Queue;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
@@ -43,7 +48,6 @@ use Throwable;
 
 class RahkaranService
 {
-    public RahkaranConfig $config;
     private HttpClient $client;
     private string $baseUrl;
     private string $sessionId = '';
@@ -55,9 +59,9 @@ class RahkaranService
         private readonly InvoiceRepositoryInterface     $invoiceRepository,
         private readonly AssignInvoiceNumberService     $assignInvoiceNumberService,
         private readonly FindBankGatewayByNameService   $findBankGatewayByNameService,
+        public RahkaranConfig                           $config
     )
     {
-        $this->config = new RahkaranConfig();
 
         if ($this->isTestMode()) {
             return;
@@ -522,7 +526,7 @@ class RahkaranService
         $voucher->AuxiliaryNumber = $invoices[0]->invoiceNumber->invoice_number ?? $invoices[1]->invoiceNumber->invoice_number ?? $invoices[2]->invoiceNumber->invoice_number;
         $voucher->BranchRef = $this->config->voucherBranchRef;
         $voucher->Creator = $this->config->voucherCreatorId;
-        $voucher->Date = $invoices[0]->paid_at ?? $invoices[0]->created_at3;
+        $voucher->Date = $invoices[0]->paid_at ?? $invoices[0]->created_at;
         $voucher->Description = $description;
         $voucher->Description_En = $description;
         $voucher->FiscalYearRef = $this->config->fiscalYearRef;
@@ -588,7 +592,11 @@ class RahkaranService
 
                 // Credit Transaction
                 $transactions = $invoice->transactions()
-                    ->where('status', Transaction::STATUS_SUCCESS)
+                    ->whereIn('status', [
+                        Transaction::STATUS_SUCCESS,
+                        Transaction::STATUS_OPG_PAID,
+                        Transaction::STATUS_IPG_PAID,
+                    ])
                     ->where('payment_method', Transaction::PAYMENT_METHOD_CREDIT)
                     ->where('amount', '>=', 0)
                     ->get();
@@ -618,7 +626,9 @@ class RahkaranService
                 // Collection Negative voucher item to balance Voucher
                 if ($invoice->status == Invoice::STATUS_COLLECTIONS) {
                     $collection_voucher_item = $this->getCollectionVoucherItem($client_dl_code, $invoice);
-                    $voucher->addVoucherItem($collection_voucher_item);
+                    if ($collection_voucher_item) {
+                        $voucher->addVoucherItem($collection_voucher_item);
+                    }
                 }
 
             } elseif ($invoice->status == Invoice::STATUS_REFUNDED) {
@@ -707,8 +717,8 @@ class RahkaranService
         $encrypted = $rsa->encrypt($this->sessionId . '**' . config('rahkaran.rahkaran_password'));
 
         $body = [
-            'username' => config('rahkaran.rahkaran_username'),
-            'password' => strtoupper(bin2hex($encrypted)),
+            'username'  => config('rahkaran.rahkaran_username'),
+            'password'  => strtoupper(bin2hex($encrypted)),
             'sessionId' => $this->sessionId
         ];
 
@@ -737,13 +747,28 @@ class RahkaranService
         switch ($transaction->payment_method) {
             case 'sermelli':
             case 'sadad_meli':
+                return $this->config->sadadBankId;
             case 'irankish':
+                return $this->config->iranKishBankId;
+
             case 'mellatbank':
+                return $this->config->mellatBankId;
+
             case 'parsianbank':
+                return $this->config->parsianBankId;
+
             case 'zarinpal':
+                return $this->config->zarinpalBankId;
+
             case 'zarinpal_sms':
+                return $this->config->zarinpalSmsBankId;
+
             case 'zibal':
+                return $this->config->zibalBankId;
+
             case 'asanpardakht':
+                return $this->config->asanpardakhtBankId;
+
             case 'saman':
                 $bankGateway = ($this->findBankGatewayByNameService)($transaction->payment_method);
                 if (is_null($bankGateway) || is_null($bankGateway->rahkaran_id)) {
@@ -978,12 +1003,12 @@ class RahkaranService
 
         $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/GeneratePartyDL', 'post', [
             [
-                'Code' => $party_dl_code,
-                'DLTypeRef' => $party_dl_type,
+                'Code'        => $party_dl_code,
+                'DLTypeRef'   => $party_dl_type,
                 'Description' => $party_title,
-                'Title' => $party_title,
+                'Title'       => $party_title,
                 'ReferenceID' => $party->ID,
-                'Title_En' => $party_title
+                'Title_En'    => $party_title
             ]
         ], $this->getHeaders());
 
@@ -1021,7 +1046,7 @@ class RahkaranService
      * @param string $code
      * @return DlObject|null
      */
-    private function getDl(string $code): ?DlObject
+    public function getDl(string $code): ?DlObject
     {
         $result = $this->getDlList([
             $code
@@ -1041,7 +1066,7 @@ class RahkaranService
         if ($this->isTestMode()) {
             return collect($codes)->map(function ($dl_object) {
                 return new DlObject([
-                    'Code' => $dl_object,
+                    'Code'  => $dl_object,
                     'Title' => $dl_object,
                 ]);
             })->all();
@@ -1064,7 +1089,7 @@ class RahkaranService
     {
         if ($this->isTestMode()) {
             return [
-                'ID' => 1,
+                'ID'   => 1,
                 'Code' => 1
             ];
         }
@@ -1089,7 +1114,7 @@ class RahkaranService
      * Validates receipt or payment result by given voucher object
      *
      * @param array $result
-     * @return mixed|void
+     * @return array
      * @todo
      */
     private function validateReceiptAndPayment(array $result): array
@@ -1233,19 +1258,22 @@ class RahkaranService
      * @param string $description
      * @return mixed
      */
-    private function createDl(string $code, $dl_type_ref, string $title = '', string $description = ''): ?DlObject
+    public function createDl(string $code, $dl_type_ref, string $title = '', string $description = ''): ?DlObject
     {
         if ($this->isTestMode()) {
             return $this->getDl($code);
         }
 
-        $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/RegisterDL', 'post', [[
-            'Code' => $code,
-            'DLTypeRef' => $dl_type_ref,
-            'Description' => $description,
-            'Title' => $title,
-            'Title_En' => ''
-        ]], $this->getHeaders());
+        $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/RegisterDL',
+            'post',
+            [[
+                 'Code'        => $code,
+                 'DLTypeRef'   => $dl_type_ref,
+                 'Description' => $description,
+                 'Title'       => $title,
+                 'Title_En'    => ''
+             ]],
+            $this->getHeaders());
 
         $result = $this->validatePartyResult($result);
 
@@ -1299,8 +1327,8 @@ class RahkaranService
         if ($this->isTestMode()) {
             return [
                 [
-                    'Name' => 'Test City',
-                    'Type' => 3,
+                    'Name'               => 'Test City',
+                    'Type'               => 3,
                     'RegionalDivisionID' => $this->config->defaultRegionalDivisionID
                 ]
             ];
@@ -1350,6 +1378,9 @@ class RahkaranService
                 $level_4 = $this->getTotalDL4Code('cloud');
                 break;
             default:
+                $level_6 = $this->getTotalDL6Code('global');
+                $level_5 = $this->getTotalDL5Code('global');
+                $level_4 = $this->getTotalDL4Code('global');
                 break;
         }
 
@@ -1401,6 +1432,53 @@ class RahkaranService
     }
 
     /**
+     * Returns raw invoice toll-excluded tax (ex. 6%)
+     *
+     * @param Invoice $invoice
+     * @return int|float
+     */
+    public function getRawInvoiceTax(Invoice $invoice)
+    {
+
+        $total_tax = round(abs($invoice->tax), 0, PHP_ROUND_HALF_DOWN);
+
+        $tax_percent = config('tax.tax');
+
+        $total_tax_percent = config('tax.total');
+
+        return round(($total_tax * $tax_percent) / $total_tax_percent, 0, PHP_ROUND_HALF_DOWN);
+    }
+
+    /**
+     * Returns raw invoice toll
+     *
+     * @param $invoice
+     * @return int|float
+     */
+    public function getRawInvoiceToll($invoice)
+    {
+        $total_tax = $this->getRawInvoiceTotalTax($invoice);
+
+        $toll_percent = config('tax.toll');
+
+        $total_tax_percent = config('tax.total');
+
+        return round(($total_tax * $toll_percent) / $total_tax_percent, 0, PHP_ROUND_HALF_DOWN);
+    }
+
+    /**
+     * Returns invoice total tax
+     *
+     * @param $invoice
+     * @return int|float
+     */
+    public function getRawInvoiceTotalTax(Invoice $invoice)
+    {
+        // @todo calculate by invoice items
+        return round($invoice->tax > 0 ? $invoice->tax : 0);
+    }
+
+    /**
      * @param Item $item
      * @return int|null
      */
@@ -1446,7 +1524,11 @@ class RahkaranService
      */
     private function getNewTaxVoucherItem(Invoice $invoice, $client_rahkaran_id = null): ?VoucherItem
     {
-        if ($invoice->total <= 0) {
+        $totalTax = $this->getRawInvoiceTotalTax($invoice);
+        $tax = $this->getRawInvoiceTax($invoice);
+        $troll = $this->getRawInvoiceToll($invoice);
+
+        if ($totalTax <= 0) {
             var_dump('No Troll found for invoice: ' . $invoice->id);
         }
 
@@ -1456,8 +1538,8 @@ class RahkaranService
 
         if ($client_rahkaran_id) {
             $voucher_item->PartyRef = $client_rahkaran_id;
-            $voucher_item->TaxAmount = $invoice->tax; // TODO check this
-            $voucher_item->TollAmount = $invoice->tax;
+            $voucher_item->TaxAmount = $tax; // TODO check this
+            $voucher_item->TollAmount = $troll;
             $voucher_item->TaxStateType = 1;
             $voucher_item->PurchaseOrSale = 1;
             $voucher_item->ItemOrService = 2;
@@ -1465,9 +1547,9 @@ class RahkaranService
         }
 
         if ($invoice->status == Invoice::STATUS_REFUNDED) {
-            $voucher_item->Debit = $invoice->total;
+            $voucher_item->Debit = $totalTax;
         } else {
-            $voucher_item->Credit = $invoice->total;
+            $voucher_item->Credit = $totalTax;
         }
 
         return $voucher_item;
@@ -1496,13 +1578,82 @@ class RahkaranService
     }
 
     /**
+     * Returns and calculates raw invoice balance
+     *
+     * @param Invoice $invoice
+     * @param bool $rounding_included
+     * @return int|float
+     */
+    public function getRawInvoiceBalance(Invoice $invoice, bool $rounding_included): float|int
+    {
+        $total = $invoice->total;
+
+        $payment_sum = $this->getRawInvoicePaymentsAmount($invoice, $rounding_included) ?? 0;
+
+        return math_subtract($total, $payment_sum, $this->getDecimalPlaces());
+    }
+
+    /**
+     * Returns number of decimal places
+     *
+     * @return int
+     */
+    public function getDecimalPlaces(): int
+    {
+        return 2;
+    }
+
+
+    /**
+     * Calculates and returns sum of paid transactions
+     *
+     * @param Invoice $invoice
+     * @param bool $rounding_included
+     * @return float|int|null
+     */
+    public function getRawInvoicePaymentsAmount(Invoice $invoice, bool $rounding_included = true): float|int|null
+    {
+        $transaction_scope = [
+            'status' => [
+                $this->getActiveTransactionStatus()
+            ]
+        ];
+
+        if (!$rounding_included) {
+            $transaction_scope['withoutRounding'] = null;
+        }
+
+        return $this->transactionRepository->sum(
+            'amount',
+            [
+                'invoice_id' => $invoice->id
+            ],
+            $transaction_scope
+        );
+    }
+
+    /**
+     * Returns list of active transaction status
+     *
+     * @return array
+     */
+    public function getActiveTransactionStatus(): array
+    {
+        return [
+            Transaction::STATUS_SUCCESS,
+            Transaction::STATUS_IPG_PAID,
+            Transaction::STATUS_OPG_PAID,
+        ];
+    }
+
+    /**
      * @param int $client_dl_code
      * @param Invoice $invoice
      * @return null|VoucherItem
      */
     private function getCollectionVoucherItem(int $client_dl_code, Invoice $invoice): ?VoucherItem
     {
-        $amount = round($invoice->balance);
+        $amount = round($this->getRawInvoiceBalance($invoice, true));
 
         if ($amount <= 0) {
             return null;
@@ -1627,7 +1778,7 @@ class RahkaranService
         if ($this->isTestMode()) {
             return [
                 [
-                    'ID' => 1,
+                    'ID'   => 1,
                     'Code' => 1
                 ]
             ];
@@ -1643,7 +1794,7 @@ class RahkaranService
     {
         if ($this->isTestMode()) {
             return [
-                'ID' => 1,
+                'ID'   => 1,
                 'Code' => 1
             ];
         }
@@ -1658,7 +1809,7 @@ class RahkaranService
     {
         if ($this->isTestMode()) {
             return [
-                'ID' => 1,
+                'ID'   => 1,
                 'Code' => 1
             ];
         }
@@ -1701,7 +1852,7 @@ class RahkaranService
 
             $params = [
                 'headers' => $headers,
-                'body' => $encoded_body
+                'body'    => $encoded_body
             ];
 
             $params['cookies'] = CookieJar::fromArray([
@@ -1748,7 +1899,7 @@ class RahkaranService
     private function getHeaders(): array
     {
         return [
-            'Accept' => 'Application/json',
+            'Accept'       => 'Application/json',
             'Content-Type' => 'Application/json'
         ];
     }
@@ -1762,16 +1913,15 @@ class RahkaranService
      */
     private function createRequestLog($method, $url, $requestBody, $headers): ?AbstractBaseLog
     {
-        return null; // TODO revert once logging is implemented
         $requestBody = $requestBody && is_string($requestBody) && is_json($requestBody) ? json_decode($requestBody, true) : $requestBody;
 
-        return LogService::store((new SystemLog()), [
-            'method' => $method,
-            'endpoint' => AbstractBaseLog::ENDPOINT_RAHKARAN,
-            'request_url' => $url,
-            'request_body' => $requestBody,
+        return LogService::store(SystemLog::make(), [
+            'method'         => $method,
+            'endpoint'       => AbstractBaseLog::ENDPOINT_RAHKARAN,
+            'request_url'    => $url,
+            'request_body'   => $requestBody,
             'request_header' => json_encode($headers),
-            'provider' => AbstractBaseLog::PROVIDER_OUTGOING,
+            'provider'       => AbstractBaseLog::PROVIDER_OUTGOING,
         ]);
 
     }
@@ -1785,13 +1935,12 @@ class RahkaranService
      */
     private function updateRequestLog($systemLog, $responseBody, array $getHeaders, int $getStatusCode): void
     {
-        return; // TODO revert once logging is implemented
         if ($systemLog instanceof AbstractBaseLog) {
             $responseBody = $responseBody && is_string($responseBody) && is_json($responseBody) ? json_decode($responseBody, true) : $responseBody;
 
             $custom_response = [
                 'header' => $getHeaders,
-                'body' => $responseBody,
+                'body'   => $responseBody,
                 'status' => $getStatusCode
             ];
 
