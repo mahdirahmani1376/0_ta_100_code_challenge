@@ -14,6 +14,7 @@ class ProfileResource extends JsonResource
         return [
             'id' => $this->id,
             'client_id' => $this->client_id,
+            'rahkaran_id' => $this->rahkaran_id,
         ];
     }
 }

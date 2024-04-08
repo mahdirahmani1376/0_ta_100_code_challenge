@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\RahkaranService;
 use Illuminate\Console\Command;
@@ -36,7 +37,7 @@ class ImportProductsToRahkaranCommand extends Command
 
     /**
      * @return int
-     * @throws ValidationException
+     * @throws ValidationException|MainAppInternalAPIException
      */
     public function handle(): int
     {
