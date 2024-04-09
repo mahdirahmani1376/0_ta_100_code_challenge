@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('profiles', function (Blueprint $table) {
-            $table->unsignedBigInteger('rahkaran_id');
+            $table->unsignedBigInteger('rahkaran_id')->nullable();
         });
     }
 

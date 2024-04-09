@@ -13,5 +13,6 @@ class Profile extends Model
 {
     protected $fillable = [
         'client_id',
+        'rahkaran_id',
     ];
 }
