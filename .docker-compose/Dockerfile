@@ -70,7 +70,6 @@ RUN \
     printf "\nServerName localhost" >> /etc/apache2/apache2.conf  && \
     a2enmod rewrite && a2enmod headers
 
-RUN pecl install xdebug-3.3.1 && docker-php-ext-enable xdebug
 
 # Set working directory
 WORKDIR /var/www
