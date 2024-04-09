@@ -62,8 +62,8 @@ use stdClass;
  * @property  string technical_fullname_2
  * @property  int ticket_profile_id
  * @property  int product_profile_id
+ * @property  int finance_profile_id
  **/
 class Client extends stdClass
 {
-
 }

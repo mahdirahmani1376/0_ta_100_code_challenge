@@ -63,13 +63,12 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
         $url = '/api/internal/finance/client';
         $param = [
-            'client_ids' => $clientIds,
+            'profile_ids' => $clientIds,
             'no_rahkaran' => $noRahkaranId,
         ];
 
         try {
             $response = self::makeRequest('get', $url, $param);
-
             if ($response->status() == Response::HTTP_OK) {
                 $clients = [];
                 foreach ($response->json('data') as $items) {
@@ -240,28 +239,4 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getBasePaidInvoiceNumber()
-    {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_PAID_INVOICE_NUMBER');
-    }
-
-    public static function getBaseRefundedInvoiceNumber()
-    {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_REFUNDED_INVOICE_NUMBER');
-    }
-
-    public static function getBaseInvoiceId()
-    {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_INVOICE_ID');
-    }
-
-    public static function getCurrentFiscalYear()
-    {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_FISCAL_YEAR');
-    }
-
-    public static function getDefaultTaxRate()
-    {
-        return static::getConfig('FINANCE_SERVICE_DEFAULT_TAX');
-    }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\InvoiceNumber;
-use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
 use App\Services\Invoice\AssignInvoiceNumberService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -21,7 +21,7 @@ class GenerateInvoiceNumberCommand extends Command
     public function handle(AssignInvoiceNumberService $assignInvoiceNumberService)
     {
         $type = $this->option('type') ?? InvoiceNumber::TYPE_PAID;
-        $fiscalYear = $this->option('fiscal-year') ?? config('payment.invoice_number.current_fiscal_year');
+        $fiscalYear = $this->option('fiscal-year') ?? MainAppConfig::INVOICE_NUMBER_CURRENT_FISCAL_YEAR;
         $count = $this->option('count') ?? 100;
 
         $this->alert("Generating $count InvoiceNumber with type of $type and fiscalYear of $fiscalYear");

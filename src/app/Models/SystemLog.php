@@ -19,12 +19,10 @@ use Illuminate\Contracts\Foundation\Application;
 class SystemLog extends AbstractBaseLog
 {
     protected $table = 'admin_logs';
+    const PROVIDER_OUTGOING = "Outgoing";
+    const PROVIDER_INCOMING = "Incoming";
+    public const ENDPOINT_RAHKARAN = 'rahkaran';
 
-
-    public function make(): static
-    {
-        return new static();
-    }
 
     protected $fillable = [
         'method',

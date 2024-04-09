@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\BankAccount;
 use App\Models\BankGateway;
 use App\Models\ClientBankAccount;
@@ -73,7 +74,6 @@ class DataMigration extends Command
                 $newRow['sheba_number'] = $row['sheba_number'];
                 $newRow['account_number'] = $row['account_number'];
                 $newRow['card_number'] = $row['card_number'];
-                $newRow['rahkaran_id'] = $row['rahkaran_id'];
 
                 return $newRow;
             });
@@ -82,7 +82,7 @@ class DataMigration extends Command
             $this->info("Truncated $bankAccountTableName");
             DB::table($bankAccountTableName)->insert($newBankAccounts);
             $this->info("End of data migrate for $bankAccountTableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $bankAccountTableName");
             dump($e);
         }
@@ -146,7 +146,7 @@ class DataMigration extends Command
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -184,7 +184,7 @@ class DataMigration extends Command
             $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -230,7 +230,7 @@ class DataMigration extends Command
                 $counter += $this->chunkSize;
             });
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -265,7 +265,7 @@ class DataMigration extends Command
                 DB::table($tableName)->insert($mappedData);
             }
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -312,7 +312,7 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -322,7 +322,7 @@ class DataMigration extends Command
     {
         $tableName = (new Invoice())->getTable();
         $this->alert("Beginning to migrate $tableName");
-        $taxRate = Invoice::defaultTaxRate();
+        $taxRate = MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX, null, true);
         try {
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoices`')[0]->count;
             $progress = $this->output->createProgressBar($count);
@@ -385,7 +385,7 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -427,7 +427,7 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -469,6 +469,7 @@ class DataMigration extends Command
                                         transactions.invoice_id as t_invoice_id,
                                         invoices.invoice_id as i_invoice_id,
                                         invoices.client_id as i_client_id
+
                                 FROM offline_payments
                                 LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
                                 LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
@@ -498,7 +499,7 @@ class DataMigration extends Command
                     } elseif ($row['status'] == 2) {
                         $newRow['status'] = OfflineTransaction::STATUS_REJECTED;
                     } else {
-                        throw new \Exception('invalid offline payment status id:' . $row['id'] . ' status:' . $row['status']);
+                        throw new Exception('invalid offline payment status id:' . $row['id'] . ' status:' . $row['status']);
                     }
                     $newRow['payment_method'] = $row['payment_method'];
                     $newRow['tracking_code'] = $row['tracking_code'];
@@ -514,7 +515,7 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -564,46 +565,16 @@ class DataMigration extends Command
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['amount'] = $row['amount'];
-// todo maybe clean this up by using "match" statement
-                    if ($row['status'] == 0) {
-                        $newRow['status'] = Transaction::STATUS_PENDING;
-                    } elseif ($row['status'] == 1) {
-                        $newRow['status'] = Transaction::STATUS_SUCCESS;
-                    } elseif ($row['status'] == 2) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 4) { // BANK_REFERRAL
-                        $newRow['status'] = Transaction::STATUS_PENDING;
-                    } elseif ($row['status'] == 5) {
-                        $newRow['status'] = Transaction::STATUS_PENDING;
-                    } elseif ($row['status'] == 6) {
-                        $newRow['status'] = Transaction::STATUS_PENDING_BANK_VERIFY;
-                    } elseif ($row['status'] == 7) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 8) {
-                        $newRow['status'] = Transaction::STATUS_SUCCESS;
-                    } elseif ($row['status'] == 9) {
-                        $newRow['status'] = Transaction::STATUS_PENDING_BANK_VERIFY;
-                    } elseif ($row['status'] == 10) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 20) { // 20 = STATUS_IPG_FAILED_TO_START
-                        $newRow['status'] = Transaction::STATUS_FAIL; // TODO CHECK
-                    } elseif ($row['status'] == 24) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    }elseif ($row['status'] == 25) {
-                        $newRow['status'] = Transaction::STATUS_PENDING;
-                    } elseif ($row['status'] == 26) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 27) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 28) {
-                        $newRow['status'] = Transaction::STATUS_FAIL;
-                    } elseif ($row['status'] == 29) {
-                        $newRow['status'] = Transaction::STATUS_CANCELED;
-                    } elseif ($row['status'] == 30) {
-                        $newRow['status'] = Transaction::STATUS_REFUND;
-                    } else {
-                        throw new \Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']);
-                    }
+                    $newRow['status'] = match ($row['status']) {
+                        0, 4, 5, 25 => Transaction::STATUS_PENDING,
+                        1, 8 => Transaction::STATUS_SUCCESS,
+                        //todo check number 20
+                        2, 7, 10, 20, 26, 24, 27, 28 => Transaction::STATUS_FAIL,
+                        6, 9 => Transaction::STATUS_PENDING_BANK_VERIFY,
+                        29 => Transaction::STATUS_CANCELED,
+                        30 => Transaction::STATUS_REFUND,
+                        default => throw new Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']),
+                    };
                     $newRow['payment_method'] = $row['payment_method'];
                     $newRow['description'] = $row['description'];
                     $newRow['ip'] = $row['ip'];
@@ -617,7 +588,7 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
@@ -659,24 +630,26 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump($e);
         }
     }
 
-    private static function createProfile(int $clientId)
+    private static function createProfile($clientId): ?int
     {
         try {
+            $client = DB::connection('mainapp')
+                ->table('clients')
+                ->where('id', $clientId);
             Profile::unguard();
             Profile::query()->create([
-                'id'        => $clientId,
-                'client_id' => $clientId
+                'id'          => $clientId,
+                'client_id'   => $clientId,
+                'rahkaran_id' => $client->first()?->rahkaran_id
             ]);
-            DB::connection('mainapp')
-                ->table('clients')
-                ->where('id', $clientId)
-                ->update(['finance_profile_id' => $clientId,]);
+
+            $client->update(['finance_profile_id' => $clientId,]);
             return $clientId;
         } catch (UniqueConstraintViolationException $exception) {
             return $clientId;
