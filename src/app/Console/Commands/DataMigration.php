@@ -35,17 +35,17 @@ class DataMigration extends Command
         $this->info("#### START DATA MIGRATION ####");
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
-//        self::migrateBankAccount();
-//        self::migrateBankGateway();
-//        self::migrateWallet();
+        self::migrateBankAccount();
+        self::migrateBankGateway();
+        self::migrateWallet();
         self::migrateInvoice();
-//        self::migrateClientBankAccount();
-//        self::migrateClientCashout();
-//        self::migrateCreditTransaction();
-//        self::migrateItem();
-//        self::migrateTransaction();
-//        self::migrateOfflineTransaction();
-//        self::migrateInvoiceNumber();
+        self::migrateClientBankAccount();
+        self::migrateClientCashout();
+        self::migrateCreditTransaction();
+        self::migrateItem();
+        self::migrateTransaction();
+        self::migrateOfflineTransaction();
+        self::migrateInvoiceNumber();
         $process_time = Carbon::now()->diffInMinutes($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} minutes");
     }
@@ -303,15 +303,10 @@ class DataMigration extends Command
                     $newRow['updated_at'] = $row['updated_at'];
                     $profileId = self::createProfile($row['client_id']);
                     $newRow['profile_id'] = $profileId;
-                    $newRow['wallet_id'] = Wallet::query()->where('profile_id', $profileId)->firstOrCreate([
-                        'profile_id' => $profileId,
-                        'name'       => Wallet::WALLET_DEFAULT_NAME,
-                        'balance'    => 0,
-                        'is_active'  => true,
-                    ])->getKey();
-                    if (Invoice::where('id', $row['invoice_id'])->doesntExist()) {
-                        return false;
-                    }
+                    $newRow['wallet_id'] = 0;
+//                    if (Invoice::where('id', $row['invoice_id'])->doesntExist()) {
+//                        return false;
+//                    }
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['admin_id'] = $row['admin_user_id'];
                     $newRow['amount'] = $row['amount'];
