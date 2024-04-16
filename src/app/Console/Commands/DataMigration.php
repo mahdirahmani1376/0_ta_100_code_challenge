@@ -301,8 +301,7 @@ class DataMigration extends Command
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
-                    $profileId = self::createProfile($row['client_id']);
-                    $newRow['profile_id'] = $profileId;
+                    $newRow['profile_id'] = $row['client_id'];
                     $newRow['wallet_id'] = 0;
 //                    if (Invoice::where('id', $row['invoice_id'])->doesntExist()) {
 //                        return false;
