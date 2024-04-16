@@ -633,8 +633,9 @@ class DataMigration extends Command
         try {
             $client = DB::connection('mainapp')
                 ->table('clients')
-                ->select(['id', 'finance_profile_id'])
+                ->select(['id', 'finance_profile_id','rahkaran_id'])
                 ->where('id', $clientId);
+            
 
             Profile::unguard();
             Profile::query()->create([
