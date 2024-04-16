@@ -40,7 +40,7 @@ class UpdateInvoiceItemsCommand extends Command
                     if ($item->invoiceable_type == Item::TYPE_DOMAIN) {
                         $data = MainAppAPIService::recalculateDomainServicePrice($item->invoiceable_id);
                         ($this->updateItemAction)($invoice, $item, [
-                            'amount' => $data['cost']
+                            'amount' => $data['price']
                         ]);
                     }
 
