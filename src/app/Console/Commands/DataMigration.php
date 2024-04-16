@@ -33,6 +33,7 @@ class DataMigration extends Command
     public function handle()
     {
         $this->info("#### START DATA MIGRATION ####");
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
         self::migrateBankAccount();
         self::migrateBankGateway();
@@ -85,7 +86,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $bankAccountTableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $bankAccountTableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -147,7 +152,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -183,7 +192,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -227,7 +240,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -260,7 +277,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -307,7 +328,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -380,7 +405,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -422,7 +451,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -510,7 +543,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -582,7 +619,11 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -601,6 +642,7 @@ class DataMigration extends Command
                                 FROM `invoice_numbers`
                                 WHERE EXISTS(SELECT * FROM `invoices` WHERE `invoice_numbers`.`invoice_id` = `invoices`.`invoice_id`)
                                 LIMIT $this->chunkSize OFFSET $i");
+
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -624,7 +666,10 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'file'  => __FUNCTION__
+            ]);
         }
     }
 
@@ -633,23 +678,26 @@ class DataMigration extends Command
         try {
             $client = DB::connection('mainapp')
                 ->table('clients')
-                ->select(['id', 'finance_profile_id','rahkaran_id'])
+                ->select(['id', 'finance_profile_id', 'rahkaran_id'])
                 ->where('id', $clientId);
-            
 
             Profile::unguard();
-            Profile::query()->create([
+            $profile = Profile::query()->create([
                 'id'          => $clientId,
                 'client_id'   => $clientId,
                 'rahkaran_id' => $client->first()?->rahkaran_id
             ]);
 
-            $client->update(['finance_profile_id' => $clientId,]);
+            $client->update(['finance_profile_id' => $profile->id]);
             return $clientId;
         } catch (UniqueConstraintViolationException $exception) {
             return $clientId;
-        } catch (Exception $exception) {
-            dump($exception);
+        } catch (Exception $e) {
+            dump([
+                'error' => substr($e->getMessage(), 0, 500),
+                'line'  => $e->getLine(),
+                'file'  => __FUNCTION__
+            ]);
             exit('error while making profile id');
         }
     }
