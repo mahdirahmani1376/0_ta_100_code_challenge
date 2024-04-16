@@ -558,7 +558,6 @@ class DataMigration extends Command
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['amount'] = $row['amount'];
-                    // 3 11 12 13 14 15 16 17 18 19 21 22 23 25 26
                     $newRow['status'] = match ($row['status']) {
                         0, 3, 4, 5 => Transaction::STATUS_PENDING,
                         1, 8, 25 => Transaction::STATUS_SUCCESS,
