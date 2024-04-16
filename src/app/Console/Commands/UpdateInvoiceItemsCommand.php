@@ -10,9 +10,9 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class CheckInvoicePriceCommand extends Command
+class UpdateInvoiceItemsCommand extends Command
 {
-    protected $signature = 'invoice:check';
+    protected $signature = 'invoice:update';
     protected $description = 'Update Unpaid Invoice Prices after 72 hours';
 
     public function __construct(
