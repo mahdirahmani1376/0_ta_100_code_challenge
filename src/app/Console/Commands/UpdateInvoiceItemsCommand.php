@@ -39,16 +39,22 @@ class UpdateInvoiceItemsCommand extends Command
 
                     if ($item->invoiceable_type == Item::TYPE_DOMAIN) {
                         $data = MainAppAPIService::recalculateDomainServicePrice($item->invoiceable_id);
-                        ($this->updateItemAction)($invoice, $item, [
-                            'amount' => $data['price']
-                        ]);
+
+                        if (!empty(data_get($data,'price'))){
+                            ($this->updateItemAction)($invoice, $item, [
+                                'amount' => $data['price']
+                            ]);
+                        }
                     }
 
                     if ($item->invoiceable_type == Item::TYPE_PRODUCT_SERVICE) {
                         $data = MainAppAPIService::recalculateProductServicePrice($item->invoiceable_id);
-                        ($this->updateItemAction)($invoice, $item, [
-                            'amount' => $data['cost']
-                        ]);
+
+                        if (!empty(data_get($data,'cost'))){
+                            ($this->updateItemAction)($invoice, $item, [
+                                'amount' => $data['cost']
+                            ]);
+                        }
                     }
 
 
