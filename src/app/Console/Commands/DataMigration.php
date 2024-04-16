@@ -85,7 +85,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $bankAccountTableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $bankAccountTableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -147,7 +147,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -183,7 +183,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -227,7 +227,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -260,7 +260,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -307,7 +307,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -380,7 +380,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -422,7 +422,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -510,7 +510,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -582,7 +582,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -624,7 +624,7 @@ class DataMigration extends Command
             $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
-            dump($e);
+            dump($e->getMessage());
         }
     }
 
@@ -648,7 +648,7 @@ class DataMigration extends Command
         } catch (UniqueConstraintViolationException $exception) {
             return $clientId;
         } catch (Exception $exception) {
-            dump($exception);
+            dump($exception->getMessage());
             exit('error while making profile id');
         }
     }
