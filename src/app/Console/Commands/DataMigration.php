@@ -76,6 +76,7 @@ class DataMigration extends Command
                 $newRow['sheba_number'] = $row['sheba_number'];
                 $newRow['account_number'] = $row['account_number'];
                 $newRow['card_number'] = $row['card_number'];
+                $newRow['rahkaran_id'] = $row['rahkaran_id'];
 
                 return $newRow;
             });
@@ -557,11 +558,11 @@ class DataMigration extends Command
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['amount'] = $row['amount'];
+                    // 3 11 12 13 14 15 16 17 18 19 21 22 23 25 26
                     $newRow['status'] = match ($row['status']) {
-                        0, 4, 5, 25 => Transaction::STATUS_PENDING,
-                        1, 8 => Transaction::STATUS_SUCCESS,
-                        //todo check number 20
-                        2, 7, 10, 20, 26, 24, 27, 28 => Transaction::STATUS_FAIL,
+                        0, 3, 4, 5 => Transaction::STATUS_PENDING,
+                        1, 8, 25 => Transaction::STATUS_SUCCESS,
+                        2, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 20, 26, 24, 27, 28 => Transaction::STATUS_FAIL,
                         6, 9 => Transaction::STATUS_PENDING_BANK_VERIFY,
                         29 => Transaction::STATUS_CANCELED,
                         30 => Transaction::STATUS_REFUND,
@@ -633,7 +634,9 @@ class DataMigration extends Command
         try {
             $client = DB::connection('mainapp')
                 ->table('clients')
+                ->select(['id', 'finance_profile_id'])
                 ->where('id', $clientId);
+
             Profile::unguard();
             Profile::query()->create([
                 'id'          => $clientId,
