@@ -35,17 +35,17 @@ class DataMigration extends Command
         $this->info("#### START DATA MIGRATION ####");
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
-        self::migrateBankAccount();
-        self::migrateBankGateway();
-        self::migrateWallet();
+//        self::migrateBankAccount();
+//        self::migrateBankGateway();
+//        self::migrateWallet();
         self::migrateInvoice();
-        self::migrateClientBankAccount();
-        self::migrateClientCashout();
-        self::migrateCreditTransaction();
-        self::migrateItem();
-        self::migrateTransaction();
-        self::migrateOfflineTransaction();
-        self::migrateInvoiceNumber();
+//        self::migrateClientBankAccount();
+//        self::migrateClientCashout();
+//        self::migrateCreditTransaction();
+//        self::migrateItem();
+//        self::migrateTransaction();
+//        self::migrateOfflineTransaction();
+//        self::migrateInvoiceNumber();
         $process_time = Carbon::now()->diffInMinutes($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} minutes");
     }
@@ -340,13 +340,15 @@ class DataMigration extends Command
     {
         $tableName = (new Invoice())->getTable();
         $this->alert("Beginning to migrate $tableName");
-        $taxRate = MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX, null, true);
         try {
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoices`')[0]->count;
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')->select("SELECT * FROM `invoices`  LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) use ($taxRate) {
+                $whmcs_invoices = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
+                $oldData = DB::connection('mainapp')->select(
+                    "SELECT inv.*,winv.taxrate FROM `invoices` as inv JOIN $whmcs_invoices as winv on winv.id=inv.invoice_id LIMIT $this->chunkSize OFFSET $i"
+                );
+                $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
                     $newRow['id'] = $row['invoice_id'];
@@ -360,7 +362,7 @@ class DataMigration extends Command
                     $newRow['balance'] = $row['balance'];
                     $newRow['total'] = $row['total'];
                     $newRow['sub_total'] = $row['sub_total'];
-                    $newRow['tax_rate'] = $taxRate;
+                    $newRow['tax_rate'] = $row['taxrate'] ?? 0;
                     $newRow['tax'] = $row['tax1'] + $row['tax2'];
                     $newStatus = null;
                     if ($row['status'] == 0) {
