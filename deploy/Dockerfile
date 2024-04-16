@@ -52,8 +52,7 @@ RUN rm -f /var/www/composer.lock
 RUN composer install --ignore-platform-req=ext-pcntl
 
 USER root
-RUN rm /var/www/storage/oauth*
-RUN rm /var/www/.env
+#RUN rm /var/www/.env
 # Override workdir to an existing directory
 
 CMD ["/entrypoint.sh"]
