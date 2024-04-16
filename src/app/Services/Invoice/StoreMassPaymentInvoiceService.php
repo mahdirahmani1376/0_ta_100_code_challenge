@@ -3,6 +3,7 @@
 namespace App\Services\Invoice;
 
 use App\Exceptions\Http\BadRequestException;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
@@ -34,7 +35,7 @@ class StoreMassPaymentInvoiceService
             'payment_method' => Invoice::PAYMENT_METHOD_CREDIT,
             'due_date' => null,
             'is_mass_payment' => true,
-            'tax_rate' => Invoice::defaultTaxRate(),
+            'tax_rate' => MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX),
             'status' => Invoice::STATUS_UNPAID,
             'profile_id' => $data['profile_id'],
         ], [

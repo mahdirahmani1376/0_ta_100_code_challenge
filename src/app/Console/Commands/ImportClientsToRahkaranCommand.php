@@ -6,7 +6,6 @@ use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\RahkaranService;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -46,14 +45,15 @@ class ImportClientsToRahkaranCommand extends Command
 
     protected function getClients()
     {
-        $clientIds = [
-            127625,
+        $financeProfileIds = [
+            4,
         ];
         if (!empty($this->argument('clients'))) {
-            $clientIds = array_merge($clientIds, $this->argument('clients'));
+            $financeProfileIds = array_merge($financeProfileIds, $this->argument('clients'));
         }
-        $this->info('Fetching client data from MainApp for: ' . implode(',', $clientIds));
-        $clients = MainAppAPIService::getClients($clientIds, true);
+        $this->info('Fetching client data from MainApp for: ' . implode(',', $financeProfileIds));
+        $clients = MainAppAPIService::getClients($financeProfileIds, true);
+
         $this->info('Clients received, count:' . count($clients));
 
         return collect($clients);

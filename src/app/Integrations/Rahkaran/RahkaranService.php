@@ -24,6 +24,7 @@ use App\Models\ClientCashout;
 use App\Models\CreditTransaction;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\Profile;
 use App\Models\SystemLog;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
@@ -121,8 +122,8 @@ class RahkaranService
 
         $client_party = $this->createParty($client_party);
 
-        $client->rahkaran_id = $client_party->ID;
-        MainAppAPIService::updateClient($client->id, ['rahkaran_id' => $client_party->ID]);
+        $profile = Profile::where('id',$client->finance_profile_id)->first();
+        $profile->update(['rahkaran_id' => $client_party->ID]);
 
         $this->getClientDl($client);
 
@@ -1909,19 +1910,19 @@ class RahkaranService
      * @param $url
      * @param $requestBody
      * @param $headers
-     * @return AbstractBaseLog|null
+     * @return AbstractBaseLog
      */
-    private function createRequestLog($method, $url, $requestBody, $headers): ?AbstractBaseLog
+    private function createRequestLog($method, $url, $requestBody, $headers): AbstractBaseLog
     {
         $requestBody = $requestBody && is_string($requestBody) && is_json($requestBody) ? json_decode($requestBody, true) : $requestBody;
 
         return LogService::store(SystemLog::make(), [
             'method'         => $method,
-            'endpoint'       => AbstractBaseLog::ENDPOINT_RAHKARAN,
+            'endpoint'       => SystemLog::ENDPOINT_RAHKARAN,
             'request_url'    => $url,
             'request_body'   => $requestBody,
             'request_header' => json_encode($headers),
-            'provider'       => AbstractBaseLog::PROVIDER_OUTGOING,
+            'provider'       => SystemLog::PROVIDER_OUTGOING,
         ]);
 
     }

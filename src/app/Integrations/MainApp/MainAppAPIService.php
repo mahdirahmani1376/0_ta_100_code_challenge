@@ -8,6 +8,7 @@ namespace App\Integrations\MainApp;
 use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Models\Invoice;
+use Exception;
 use Illuminate\Http\Response;
 
 class MainAppAPIService extends BaseMainAppAPIService
@@ -26,7 +27,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_OK) {
                 return $response->json('data');
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
@@ -38,7 +39,7 @@ class MainAppAPIService extends BaseMainAppAPIService
     {
         $url = '/api/internal/finance/config';
         $param = [
-            'key' => $key,
+            'key'   => $key,
             'value' => $value,
         ];
 
@@ -48,7 +49,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->successful()) {
                 return $response->json('data');
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
@@ -63,13 +64,12 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
         $url = '/api/internal/finance/client';
         $param = [
-            'client_ids' => $clientIds,
+            'profile_ids' => $clientIds,
             'no_rahkaran' => $noRahkaranId,
         ];
 
         try {
             $response = self::makeRequest('get', $url, $param);
-
             if ($response->status() == Response::HTTP_OK) {
                 $clients = [];
                 foreach ($response->json('data') as $items) {
@@ -88,7 +88,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             }
 
             throw MainAppInternalAPIException::make($url, json_encode($param));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
@@ -103,7 +103,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_OK) {
                 return $response->json('data');
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -112,7 +112,7 @@ class MainAppAPIService extends BaseMainAppAPIService
     {
         $url = '/api/internal/finance/product-domain';
         $data = [
-            'type' => $type,
+            'type'   => $type,
             'rel_id' => $invoiceableId,
         ];
 
@@ -124,7 +124,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             }
 
             throw MainAppInternalAPIException::make($url, json_encode($data));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -133,10 +133,10 @@ class MainAppAPIService extends BaseMainAppAPIService
     {
         $url = '/api/internal/finance/invoice/post-process';
         $data = [
-            'id' => $invoice->id,
+            'id'        => $invoice->id,
             'client_id' => $invoice->profile->client_id,
-            'total' => $invoice->total,
-            'items' => $invoice->items,
+            'total'     => $invoice->total,
+            'items'     => $invoice->items,
         ];
 
         try {
@@ -145,7 +145,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             if ($response->status() == Response::HTTP_OK) {
                 return;
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -155,14 +155,14 @@ class MainAppAPIService extends BaseMainAppAPIService
         $url = '/api/internal/finance/invoice/reminder';
 
         $data = [
-            'channel' => $channel,
-            'subject' => $payload['subject'] ?? null,
+            'channel'   => $channel,
+            'subject'   => $payload['subject'] ?? null,
             'reminders' => $payload['reminders'],
         ];
 
         try {
             self::makeRequest('post', $url, $data);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -172,13 +172,13 @@ class MainAppAPIService extends BaseMainAppAPIService
         $url = '/api/internal/finance/invoice/create-email';
         $data = [
             'client_id' => $clientId,
-            'subject' => $subject,
-            'message' => $message,
+            'subject'   => $subject,
+            'message'   => $message,
         ];
 
         try {
             self::makeRequest('post', $url, $data);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
@@ -189,15 +189,14 @@ class MainAppAPIService extends BaseMainAppAPIService
 
         try {
             return self::makeRequest('get', $url, $array);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($array));
         }
     }
 
     public static function getProductsById($productIds)
     {
-        $url = '/api/product-service/admin/product';
-
+        $url = '/api/internal/finance/products';
 
         $data = [
             'profile_ids' => [
@@ -207,20 +206,19 @@ class MainAppAPIService extends BaseMainAppAPIService
 
         try {
             $response = self::makeRequest('get', $url, $data);
-
             if ($response->successful()) {
                 return $response->json('data');
             }
 
             throw MainAppInternalAPIException::make($url, json_encode($data));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
 
     public static function getDomainsById(array $profileIds)
     {
-        $url = '/api/product-service/admin/service';
+        $url = '/api/internal/finance/domains';
 
         $data = [
             'profile_ids' => [
@@ -235,33 +233,27 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return $response->json('data');
             }
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
 
-    public static function getBasePaidInvoiceNumber()
+    public static function recalculateDomainServicePrice($domainId)
     {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_PAID_INVOICE_NUMBER');
+        $url = "/api/internal/domain/$domainId/recalculate-domain-service";
+
+        $response = self::makeRequest('get', $url);
+        return $response->json();
+
     }
 
-    public static function getBaseRefundedInvoiceNumber()
+    public static function recalculateProductServicePrice($serviceId)
     {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_REFUNDED_INVOICE_NUMBER');
+        $url = "/api/internal/product/$serviceId/recalculate-product-service";
+
+        $response = self::makeRequest('get', $url);
+        return $response->json();
+
     }
 
-    public static function getBaseInvoiceId()
-    {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_INVOICE_ID');
-    }
-
-    public static function getCurrentFiscalYear()
-    {
-        return static::getConfig('INVOICE_NUMBER_CURRENT_FISCAL_YEAR');
-    }
-
-    public static function getDefaultTaxRate()
-    {
-        return static::getConfig('FINANCE_SERVICE_DEFAULT_TAX');
-    }
 }

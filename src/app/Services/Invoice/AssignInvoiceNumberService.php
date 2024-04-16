@@ -2,7 +2,7 @@
 
 namespace App\Services\Invoice;
 
-use App\Integrations\MainApp\MainAppAPIService;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Jobs\GenerateInvoiceNumberJob;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
@@ -40,7 +40,7 @@ class AssignInvoiceNumberService
         }
 
         // Business requirement
-        if ($invoice->getKey() < MainAppAPIService::getBaseInvoiceId()) {
+        if ($invoice->getKey() < MainAppConfig::INVOICE_NUMBER_CURRENT_INVOICE_ID) {
             return null;
         }
 
@@ -52,7 +52,7 @@ class AssignInvoiceNumberService
 
         $type = $invoice->status == Invoice::STATUS_REFUNDED ? InvoiceNumber::TYPE_REFUNDED : InvoiceNumber::TYPE_PAID;
 
-        $fiscalYear = $fiscalYear ?? MainAppAPIService::getCurrentFiscalYear();
+        $fiscalYear = $fiscalYear ?? MainAppConfig::INVOICE_NUMBER_CURRENT_FISCAL_YEAR;
         $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear, $invoiceNumber);
 
         // No available InvoiceNumber, generate 100 available InvoiceNumbers
@@ -78,8 +78,8 @@ class AssignInvoiceNumberService
         $latestInvoiceNumber = $this->invoiceNumberRepository->getLatestInvoiceNumber($type, $fiscalYear);
         if (is_null($latestInvoiceNumber)) {
             $offset = match ($type) {
-                InvoiceNumber::TYPE_PAID => MainAppAPIService::getBasePaidInvoiceNumber(),
-                InvoiceNumber::TYPE_REFUNDED => MainAppAPIService::getBaseRefundedInvoiceNumber(),
+                InvoiceNumber::TYPE_PAID => MainAppConfig::INVOICE_NUMBER_CURRENT_PAID_INVOICE_NUMBER,
+                InvoiceNumber::TYPE_REFUNDED => MainAppConfig::INVOICE_NUMBER_CURRENT_REFUNDED_INVOICE_NUMBER,
             };
             $latestInvoiceNumber = $offset > 0 ? $offset - 1 : $offset;
         }
@@ -87,12 +87,12 @@ class AssignInvoiceNumberService
         $now = now();
         for ($i = 1; $i <= $count; $i++) {
             $hundredAvailableInvoiceNumbers[] = [
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at'     => $now,
+                'updated_at'     => $now,
                 'invoice_number' => $latestInvoiceNumber + $i,
-                'type' => $type,
-                'fiscal_year' => $fiscalYear,
-                'status' => InvoiceNumber::STATUS_PENDING,
+                'type'           => $type,
+                'fiscal_year'    => $fiscalYear,
+                'status'         => InvoiceNumber::STATUS_PENDING,
             ];
         }
         // Insert new available InvoiceNumbers

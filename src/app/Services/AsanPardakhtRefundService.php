@@ -155,7 +155,7 @@ class AsanPardakhtRefundService
             'request_url'    => $url,
             'request_body'   => $request_params,
             'request_header' => $headers,
-            'provider'       => AbstractBaseLog::PROVIDER_OUTGOING,
+            'provider'       => SystemLog::PROVIDER_OUTGOING,
         ]);
     }
 

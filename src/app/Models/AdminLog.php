@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use App\Traits\MongoDate;
-use DateTimeInterface;
-use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 
-class AdminLog extends Model
+class AdminLog extends AbstractBaseLog
 {
     use SoftDeletes, MongoDate;
 
@@ -334,13 +332,5 @@ class AdminLog extends Model
     public function logable()
     {
         return $this->morphTo();
-    }
-    /**
-     * @param DateTimeInterface $date
-     * @return string
-     */
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
     }
 }
