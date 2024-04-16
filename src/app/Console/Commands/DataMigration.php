@@ -31,8 +31,8 @@ class DataMigration extends Command
 
     public function handle()
     {
-
-        ini_set('memory_limit', '4096M');
+        $this->info("#### START DATA MIGRATION ####");
+        $start_time = Carbon::now();
         self::migrateBankAccount();
         self::migrateBankGateway();
         self::migrateWallet();
@@ -44,6 +44,8 @@ class DataMigration extends Command
         self::migrateTransaction();
         self::migrateOfflineTransaction();
         self::migrateInvoiceNumber();
+        $process_time = Carbon::now()->diffInMinutes($start_time);
+        $this->info("#### END DATA MIGRATION in {$process_time} minutes");
     }
 
     private function migrateBankAccount(): void
@@ -78,8 +80,6 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-//            DB::table($bankAccountTableName)->truncate();
-            $this->info("Truncated $bankAccountTableName");
             DB::table($bankAccountTableName)->insert($newBankAccounts);
             $this->info("End of data migrate for $bankAccountTableName");
         } catch (\Exception $e) {
@@ -142,8 +142,6 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-            $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -180,8 +178,6 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-            $this->info("Truncated $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
         } catch (\Exception $e) {
@@ -219,8 +215,6 @@ class DataMigration extends Command
                 return $newRow;
             });
             $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-            $this->info("Truncated $tableName");
             $this->info("Inserting mapped data into $tableName");
             $mappedDataCount = count($mappedData);
             $counter = 0;
@@ -260,8 +254,6 @@ class DataMigration extends Command
                     return $newRow;
                 });
                 $this->info('Mapping done');
-//            DB::table($tableName)->truncate();
-                $this->info("Truncated $tableName");
                 DB::table($tableName)->insert($mappedData);
             }
             $this->info("End of data migrate for $tableName");
@@ -564,7 +556,7 @@ class DataMigration extends Command
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['amount'] = $row['amount'];
-// todo maybe clean this up by using "match" statement
+                    // todo maybe clean this up by using "match" statement
                     if ($row['status'] == 0) {
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 1) {
@@ -589,7 +581,7 @@ class DataMigration extends Command
                         $newRow['status'] = Transaction::STATUS_FAIL; // TODO CHECK
                     } elseif ($row['status'] == 24) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
-                    }elseif ($row['status'] == 25) {
+                    } elseif ($row['status'] == 25) {
                         $newRow['status'] = Transaction::STATUS_PENDING;
                     } elseif ($row['status'] == 26) {
                         $newRow['status'] = Transaction::STATUS_FAIL;
