@@ -42,6 +42,7 @@ class MoadianFactory
         $header->inp = 1; //invoice pattern
         $header->ins = $invoice->status == Invoice::STATUS_REFUNDED ? 4 : 1; // invoice type
         $header->tins = '10103421620';
+//        dd($invoice->profile->toArray());
         $client = MainAppAPIService::getClients($invoice->profile->client_id)[0];
         $invoice->client = $client;
         $header->tob = $invoice->client->is_legal == 1 ? 2 : 1;
