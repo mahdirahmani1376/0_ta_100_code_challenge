@@ -6,6 +6,7 @@ use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -116,6 +117,10 @@ class Invoice extends Model
     public function moadianLog(): HasOne
     {
         return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
+    }
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(Profile::class);
     }
 
 }
