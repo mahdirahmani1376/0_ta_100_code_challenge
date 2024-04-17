@@ -71,6 +71,7 @@ class DataMigration extends Command
                 DB::table($profileTableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
+            $this->newLine();
             $this->info("End of data migrate for $profileTableName");
 
             $this->compareCounts(
