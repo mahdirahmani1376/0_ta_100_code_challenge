@@ -16,24 +16,25 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_id' => ['nullable', 'integer',],
-            'profile_id' => ['required', 'integer', 'exists:profiles,id',],
-            'invoice_date' => ['nullable', 'date',],
-            'due_date' => ['nullable', 'date',],
-            'paid_at' => ['nullable', 'date',],
-            'status' => [Rule::in([
+            'admin_id'                 => ['nullable', 'integer',],
+            'profile_id'               => ['required', 'integer', 'exists:profiles,id',],
+            'invoice_date'             => ['nullable', 'date',],
+            'due_date'                 => ['nullable', 'date',],
+            'paid_at'                  => ['nullable', 'date',],
+            'tax_rate'                 => ['required', 'integer',],
+            'status'                   => [Rule::in([
                 Invoice::STATUS_UNPAID,
                 Invoice::STATUS_DRAFT,
                 Invoice::STATUS_REFUNDED,
             ])],
-            'items' => ['required', 'array'],
-            'items.*.description' => ['required', 'string'],
-            'items.*.amount' => ['required', 'numeric'],
+            'items'                    => ['required', 'array'],
+            'items.*.description'      => ['required', 'string'],
+            'items.*.amount'           => ['required', 'numeric'],
             'items.*.invoiceable_type' => ['nullable', 'string'],
-            'items.*.invoiceable_id' => ['nullable', 'integer'],
-            'items.*.from_date' => ['nullable', 'date',],
-            'items.*.to_date' => ['nullable', 'date',],
-            'note' => ['nullable',],
+            'items.*.invoiceable_id'   => ['nullable', 'integer'],
+            'items.*.from_date'        => ['nullable', 'date',],
+            'items.*.to_date'          => ['nullable', 'date',],
+            'note'                     => ['nullable',],
         ];
     }
 }
