@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Invoice
@@ -45,6 +46,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Invoice extends Model
 {
+    use SoftDeletes;
+
     const STATUS_CANCELED = 'canceled'; // old status 3
     const STATUS_UNPAID = 'unpaid'; // old status = 0
     const STATUS_PAID = 'paid'; // old status = 1
