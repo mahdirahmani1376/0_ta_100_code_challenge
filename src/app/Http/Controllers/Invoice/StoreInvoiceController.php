@@ -16,7 +16,6 @@ class StoreInvoiceController
     /**
      * @param StoreInvoiceRequest $request
      * @return InvoiceResource
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(StoreInvoiceRequest $request)
     {
