@@ -7,13 +7,13 @@ use Carbon\Carbon;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 /**
-* @property $logable_type
-* @property $logable_id
-* @property $request
-* @property $before
-* @property $after
-* @property $admin_user_id
-* @property $action
+* @property string $logable_type
+* @property int $logable_id
+* @property string $request
+* @property string $before
+* @property string $after
+* @property int $admin_user_id
+* @property string $action
 * @property Carbon $created_at
 * @property Carbon $updated_at
 * @property Carbon deleted_at
