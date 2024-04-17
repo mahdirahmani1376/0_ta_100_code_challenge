@@ -66,6 +66,7 @@ class DataMigration extends Command
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['client_id'] = $row['id'];
                     $newRow['id'] = $row['id'];
+                    $newRow['created_at']  = $newRow['updated_at'] = now();
                     return $newRow;
                 });
                 $this->info('Mapping done');
