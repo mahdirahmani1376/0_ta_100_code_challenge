@@ -46,6 +46,7 @@ class DataMigration extends Command
         self::migrateTransaction();
         self::migrateOfflineTransaction();
         self::migrateInvoiceNumber();
+        self::syncWallets();
         $process_time = Carbon::now()->diffInSeconds($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} seconds");
     }
@@ -66,7 +67,7 @@ class DataMigration extends Command
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['client_id'] = $row['id'];
                     $newRow['id'] = $row['id'];
-                    $newRow['created_at']  = $newRow['updated_at'] = now();
+                    $newRow['created_at'] = $newRow['updated_at'] = now();
                     return $newRow;
                 });
                 $this->info('Mapping done');
@@ -770,6 +771,25 @@ class DataMigration extends Command
                 'error'  => substr($e->getMessage(), 0, 500),
                 'method' => __FUNCTION__
             ]);
+        }
+    }
+
+    private function syncWallets()
+    {
+        try {
+            $this->alert('Sync credit transactions with wallet ids');
+            DB::connection('mysql')->select('
+                update credit_transactions as ct join wallets as ww on ww.profile_id = ct.profile_id
+                set wallet_id = ww.id
+                where ct.wallet_id = 0
+            ');
+            $this->info('End sync credit transactions with wallet ids');
+        } catch (\Throwable $exception) {
+            dump([
+                'error'  => substr($exception->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
+            $this->error('Something went wrong when sync credit transactions with wallet ids');
         }
     }
 
