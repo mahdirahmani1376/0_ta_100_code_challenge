@@ -3,9 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * CLass OfflineTransaction
@@ -27,15 +25,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string mobile
  * @property string account_name
  * @property string description
- *
- * @property Invoice invoice
- * @property Transaction transaction
- * @property BankAccount bankAccount
  */
 class OfflineTransaction extends Model
 {
-    use HasFactory;
-
     public const PAYMENT_GATEWAY_NAME = 'offline_bank';
 
     const PAYMENT_METHOD_OFFLINE_BANK = 'offline-bank';
@@ -74,19 +66,4 @@ class OfflineTransaction extends Model
     protected $casts = [
         'paid_at' => 'datetime',
     ];
-
-    public function invoice(): BelongsTo
-    {
-        return $this->belongsTo(Invoice::class);
-    }
-
-    public function transaction(): BelongsTo
-    {
-        return $this->belongsTo(Transaction::class);
-    }
-
-    public function bankAccount(): BelongsTo
-    {
-        return $this->belongsTo(BankAccount::class);
-    }
 }

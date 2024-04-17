@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -31,8 +30,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Transaction extends Model
 {
-    use HasFactory;
-
     public const PREFIX_CREDIT_TRANSACTION = 'CREDIT_TRANSACTION_';
     const PAYMENT_METHOD_OFFLINE = 'offline';
     const PAYMENT_METHOD_WALLET_BALANCE = 'wallet_balance';

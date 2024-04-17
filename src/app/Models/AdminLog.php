@@ -3,9 +3,21 @@
 namespace App\Models;
 
 use App\Traits\MongoDate;
+use Carbon\Carbon;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
-
+/**
+* @property $logable_type
+* @property $logable_id
+* @property $request
+* @property $before
+* @property $after
+* @property $admin_user_id
+* @property $action
+* @property Carbon $created_at
+* @property Carbon $updated_at
+* @property Carbon deleted_at
+ */
 class AdminLog extends AbstractBaseLog
 {
     use SoftDeletes, MongoDate;
