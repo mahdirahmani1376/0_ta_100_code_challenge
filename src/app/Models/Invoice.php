@@ -122,5 +122,9 @@ class Invoice extends Model
     {
         return $this->belongsTo(Profile::class);
     }
+    public function offlineTransactions(): HasMany
+    {
+        return $this->hasMany(OfflineTransaction::class);
+    }
 
 }

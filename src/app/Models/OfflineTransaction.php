@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * CLass OfflineTransaction
@@ -25,6 +26,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string mobile
  * @property string account_name
  * @property string description
+ * @property Invoice invoice
+ * @property Transaction transaction
+ * @property BankAccount bankAccount
  */
 class OfflineTransaction extends Model
 {
@@ -66,4 +70,20 @@ class OfflineTransaction extends Model
     protected $casts = [
         'paid_at' => 'datetime',
     ];
+
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
+    }
+
+    public function transaction(): BelongsTo
+    {
+        return $this->belongsTo(Transaction::class);
+    }
+
+    public function bankAccount(): BelongsTo
+    {
+        return $this->belongsTo(BankAccount::class);
+    }
 }
