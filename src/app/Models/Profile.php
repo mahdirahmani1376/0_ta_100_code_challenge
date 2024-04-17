@@ -15,5 +15,7 @@ class Profile extends Model
         'id',
         'client_id',
         'rahkaran_id',
+        'created_at',
+        'updated_at'
     ];
 }
