@@ -36,7 +36,7 @@ class GenerateInvoiceNumberCommand extends Command
         if ($success) {
             $this->info("Generated $count InvoiceNumber with type of $type and fiscalYear of $fiscalYear");
         } else {
-            $this->warn('Generating Invoice Numbers started');
+            $this->warn('Generating Invoice Numbers failed');
         }
     }
 }
