@@ -89,7 +89,7 @@ class DataMigration extends Command
                 'bank_accounts',
                 DB::connection('mainapp')->table('bank_accounts')->count(),
                 $bankAccountTableName,
-                BankAccount::count()
+                BankAccount::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -160,9 +160,9 @@ class DataMigration extends Command
 
             $this->compareCounts(
                 'payment_gateways',
-                DB::connection('mainapp')->table('payment_gateways')->whereNull('deleted_at')->count(),
+                DB::connection('mainapp')->table('payment_gateways')->count(),
                 $tableName,
-                BankGateway::count()
+                BankGateway::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -207,9 +207,9 @@ class DataMigration extends Command
 
             $this->compareCounts(
                 'client_bank_accounts',
-                DB::connection('mainapp')->table('client_bank_accounts')->whereNull('deleted_at')->count(),
+                DB::connection('mainapp')->table('client_bank_accounts')->count(),
                 $tableName,
-                ClientBankAccount::count()
+                ClientBankAccount::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -264,7 +264,7 @@ class DataMigration extends Command
                 'client_cashouts',
                 DB::connection('mainapp')->table('client_cashouts')->whereNull('deleted_at')->count(),
                 $tableName,
-                ClientCashout::count()
+                ClientCashout::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -306,7 +306,7 @@ class DataMigration extends Command
                 'credits',
                 DB::connection('mainapp')->table('credits')->count(),
                 $tableName,
-                Wallet::count()
+                Wallet::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -350,9 +350,9 @@ class DataMigration extends Command
 
             $this->compareCounts(
                 'credit_transactions',
-                DB::connection('mainapp')->table('credit_transactions')->whereNull('deleted_at')->count(),
+                DB::connection('mainapp')->table('credit_transactions')->count(),
                 $tableName,
-                CreditTransaction::count()
+                CreditTransaction::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -495,7 +495,7 @@ class DataMigration extends Command
                 'tblinvoiceitems',
                 DB::connection('whmcs')->table('tblinvoiceitems')->count(),
                 $tableName,
-                Item::count()
+                Item::withTrashed()->count()
             );
 
         } catch (Exception $e) {
@@ -592,7 +592,7 @@ class DataMigration extends Command
 
             $this->compareCounts(
                 'offline_payments',
-                DB::connection('mainapp')->table('offline_payments')->whereNull('deleted_at')->count(),
+                DB::connection('mainapp')->table('offline_payments')->count(),
                 $tableName,
                 OfflineTransaction::count()
             );
@@ -744,9 +744,9 @@ class DataMigration extends Command
 
             $this->compareCounts(
                 'invoice_numbers',
-                DB::connection('mainapp')->table('invoice_numbers')->whereNull('deleted_at')->count(),
+                DB::connection('mainapp')->table('invoice_numbers')->count(),
                 $tableName,
-                InvoiceNumber::count()
+                InvoiceNumber::withTrashed()->count()
             );
 
         } catch (Exception $e) {
