@@ -406,7 +406,7 @@ class DataMigration extends Command
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $whmcs_invoices = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
                 $oldData = DB::connection('mainapp')->select(
-                    "SELECT inv.*,winv.taxrate,winv.notes FROM `invoices` as inv JOIN $whmcs_invoices as winv on winv.id=inv.invoice_id LIMIT $this->chunkSize OFFSET $i"
+                    "SELECT inv.*,winv.taxrate,winv.notes FROM `invoices` as inv LEFT JOIN $whmcs_invoices as winv on winv.id=inv.invoice_id LIMIT $this->chunkSize OFFSET $i"
                 );
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
@@ -424,6 +424,7 @@ class DataMigration extends Command
                     $newRow['sub_total'] = $row['sub_total'];
                     $newRow['tax_rate'] = $row['taxrate'] ?? 0;
                     $newRow['tax'] = $row['tax1'] + $row['tax2'];
+                    $newRow['deleted_at'] = $row['deleted_at'];
                     $newStatus = null;
                     if ($row['status'] == 0) {
                         $newStatus = Invoice::STATUS_UNPAID;
@@ -466,7 +467,7 @@ class DataMigration extends Command
                 [
                     [
                         DB::connection('mainapp')->table('invoices')->count(),
-                        Invoice::count(),
+                        Invoice::withTrashed()->count(),
                         DB::connection('whmcs')->table('tblinvoices')->count()
                     ]
                 ]

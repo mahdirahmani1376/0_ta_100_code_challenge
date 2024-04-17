@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->softDeletes();
             $table->timestamp('due_date')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('processed_at')->nullable();
