@@ -64,7 +64,7 @@ class DataMigration extends Command
                     $row = (array)$row;
                     $newRow = [];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['client_id'] = $row['client_id'];
+                    $newRow['client_id'] = $row['id'];
                     return $newRow;
                 });
                 $this->info('Mapping done');
@@ -72,8 +72,19 @@ class DataMigration extends Command
                 $progress->advance($this->chunkSize);
             }
             $this->info("End of data migrate for $profileTableName");
-        }catch (\Throwable $exception) {
 
+            $this->compareCounts(
+                'clients',
+                DB::connection('mainapp')->table('clients')->count(),
+                $profileTableName,
+                Profile::count()
+            );
+        } catch (\Throwable $e) {
+            $this->error("Something went wrong when migrating $profileTableName");
+            dump([
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
         }
     }
 
@@ -111,6 +122,14 @@ class DataMigration extends Command
             $this->info('Mapping done');
             DB::table($bankAccountTableName)->insert($newBankAccounts);
             $this->info("End of data migrate for $bankAccountTableName");
+
+            $this->compareCounts(
+                'bank_accounts',
+                DB::connection('mainapp')->table('bank_accounts')->count(),
+                $bankAccountTableName,
+                BankAccount::withTrashed()->count()
+            );
+
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $bankAccountTableName");
             dump([
@@ -176,118 +195,14 @@ class DataMigration extends Command
             $this->info('Mapping done');
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
-        } catch (Exception $e) {
-            $this->error("Something went wrong when migrating $tableName");
-            dump([
-                'error'  => substr($e->getMessage(), 0, 500),
-                'method' => __FUNCTION__
-            ]);
-        }
-    }
 
-    private function migrateWallet(): void
-    {
-        $tableName = (new Wallet())->getTable();
-        $this->alert("Beginning to migrate $tableName");
-        try {
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credits`')[0]->count;
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')->select("SELECT * FROM `credits` LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['client_id'];
-                    $newRow['name'] = $row['wallet'];
-                    $newRow['balance'] = $row['credit'];
-                    $newRow['is_active'] = true;
-                    return $newRow;
-                });
-                $this->info('Mapping done');
-                DB::table($tableName)->insert($mappedData);
-            }
-            $this->info("End of data migrate for $tableName");
-        } catch (Exception $e) {
-            $this->error("Something went wrong when migrating $tableName");
-            dump([
-                'error'  => substr($e->getMessage(), 0, 500),
-                'method' => __FUNCTION__
-            ]);
-        }
-    }
+            $this->compareCounts(
+                'payment_gateways',
+                DB::connection('mainapp')->table('payment_gateways')->count(),
+                $tableName,
+                BankGateway::withTrashed()->count()
+            );
 
-    private function migrateInvoice(): void
-    {
-        $tableName = (new Invoice())->getTable();
-        $this->alert("Beginning to migrate $tableName");
-        try {
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoices`')[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $whmcs_invoices = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
-                $oldData = DB::connection('mainapp')->select(
-                    "SELECT inv.*,winv.taxrate FROM `invoices` as inv JOIN $whmcs_invoices as winv on winv.id=inv.invoice_id LIMIT $this->chunkSize OFFSET $i"
-                );
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['invoice_id'];
-                    $newRow['created_at'] = $row['invoice_date'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['client_id'];
-                    $newRow['due_date'] = $row['due_date'];
-                    $newRow['paid_at'] = $row['paid_date'];
-                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['payment_method'] = $row['payment_method'];
-                    $newRow['balance'] = $row['balance'];
-                    $newRow['total'] = $row['total'];
-                    $newRow['sub_total'] = $row['sub_total'];
-                    $newRow['tax_rate'] = $row['taxrate'] ?? 0;
-                    $newRow['tax'] = $row['tax1'] + $row['tax2'];
-                    $newStatus = null;
-                    if ($row['status'] == 0) {
-                        $newStatus = Invoice::STATUS_UNPAID;
-                    } elseif ($row['status'] == 1) {
-                        $newStatus = Invoice::STATUS_PAID;
-                    } elseif ($row['status'] == 2) {
-                        $newStatus = Invoice::STATUS_DRAFT;
-                    } elseif ($row['status'] == 3) {
-                        $newStatus = Invoice::STATUS_CANCELED;
-                    } elseif ($row['status'] == 4) {
-                        $newStatus = Invoice::STATUS_DELETED;
-                    } elseif ($row['status'] == 5) {
-                        $newStatus = Invoice::STATUS_PAYMENT_PENDING;
-                    } elseif ($row['status'] == 6) {
-                        $newStatus = Invoice::STATUS_REFUNDED;
-                    } elseif ($row['status'] == 7) {
-                        $newStatus = Invoice::STATUS_COLLECTIONS;
-                    }
-                    $newRow['status'] = $newStatus;
-                    $newRow['is_mass_payment'] = $row['is_mass_payment'];
-                    if ($row['manual_check'] == 1) {
-                        $newRow['admin_id'] = 1; // TODO check this
-                    } else {
-                        $newRow['admin_id'] = null;
-                    }
-                    $newRow['is_credit'] = $row['is_credit'];
-                    try {
-                        $id = $row['invoice_id'];
-                        $note = DB::connection('whmcs')->select("SELECT `notes` FROM `tblinvoices` where `id` = $id")[0]->notes;
-                        $newRow['note'] = empty($note) ? null : $note;
-                    } catch (Exception $exception) {
-                        $newRow['note'] = null;
-                    }
-
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
-            $this->newLine();
-            $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -327,6 +242,14 @@ class DataMigration extends Command
             $this->info('Mapping done');
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'client_bank_accounts',
+                DB::connection('mainapp')->table('client_bank_accounts')->count(),
+                $tableName,
+                ClientBankAccount::withTrashed()->count()
+            );
+
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -346,7 +269,6 @@ class DataMigration extends Command
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
-
                 $newRow['id'] = $row['id'];
                 $newRow['created_at'] = $row['created_at'];
                 $newRow['updated_at'] = $row['updated_at'];
@@ -366,14 +288,57 @@ class DataMigration extends Command
             });
             $this->info('Mapping done');
             $this->info("Inserting mapped data into $tableName");
-            $mappedDataCount = count($mappedData);
-            $counter = 0;
-            collect($mappedData)->chunk($this->chunkSize)->each(function ($rows) use (&$counter, $mappedDataCount, $tableName) {
-                DB::table($tableName)->insert($rows->toArray());
-                $this->info("Inserted $counter out of $mappedDataCount items.");
-                $counter += $this->chunkSize;
-            });
+            DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
+            $this->compareCounts(
+                'client_cashouts',
+                DB::connection('mainapp')->table('client_cashouts')->count(),
+                $tableName,
+                ClientCashout::count()
+            );
+
+        } catch (Exception $e) {
+            $this->error("Something went wrong when migrating $tableName");
+            dump([
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
+        }
+    }
+
+    private function migrateWallet(): void
+    {
+        $tableName = (new Wallet())->getTable();
+        $this->alert("Beginning to migrate $tableName");
+        try {
+            $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credits`')[0]->count;
+            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
+                $oldData = DB::connection('mainapp')->select("SELECT * FROM `credits` LIMIT $this->chunkSize OFFSET $i");
+                $this->info('Fetched data');
+                $mappedData = Arr::map($oldData, function ($row) {
+                    $row = (array)$row;
+                    $newRow = [];
+                    $newRow['id'] = $row['id'];
+                    $newRow['created_at'] = $row['created_at'];
+                    $newRow['updated_at'] = $row['updated_at'];
+                    $newRow['profile_id'] = $row['client_id'];
+                    $newRow['name'] = $row['wallet'];
+                    $newRow['balance'] = $row['credit'];
+                    $newRow['is_active'] = true;
+                    return $newRow;
+                });
+                $this->info('Mapping done');
+                DB::table($tableName)->insert($mappedData);
+            }
+            $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'credits',
+                DB::connection('mainapp')->table('credits')->count(),
+                $tableName,
+                Wallet::withTrashed()->count()
+            );
+
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -412,6 +377,100 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'credit_transactions',
+                DB::connection('mainapp')->table('credit_transactions')->count(),
+                $tableName,
+                CreditTransaction::withTrashed()->count()
+            );
+
+        } catch (Exception $e) {
+            $this->error("Something went wrong when migrating $tableName");
+            dump([
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
+        }
+    }
+
+    private function migrateInvoice(): void
+    {
+        $tableName = (new Invoice())->getTable();
+        $this->alert("Beginning to migrate $tableName");
+        try {
+            $count = DB::connection('mainapp')->select("SELECT count(*) as count FROM `invoices`")[0]->count;
+
+            $progress = $this->output->createProgressBar($count);
+            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
+                $whmcs_invoices = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
+                $oldData = DB::connection('mainapp')->select(
+                    "SELECT inv.*,winv.taxrate,winv.notes FROM `invoices` as inv JOIN $whmcs_invoices as winv on winv.id=inv.invoice_id LIMIT $this->chunkSize OFFSET $i"
+                );
+                $mappedData = Arr::map($oldData, function ($row) {
+                    $row = (array)$row;
+                    $newRow = [];
+                    $newRow['id'] = $row['invoice_id'];
+                    $newRow['created_at'] = $row['invoice_date'];
+                    $newRow['updated_at'] = $row['updated_at'];
+                    $newRow['profile_id'] = $row['client_id'];
+                    $newRow['due_date'] = $row['due_date'];
+                    $newRow['paid_at'] = $row['paid_date'];
+                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
+                    $newRow['payment_method'] = $row['payment_method'];
+                    $newRow['balance'] = $row['balance'];
+                    $newRow['total'] = $row['total'];
+                    $newRow['sub_total'] = $row['sub_total'];
+                    $newRow['tax_rate'] = $row['taxrate'] ?? 0;
+                    $newRow['tax'] = $row['tax1'] + $row['tax2'];
+                    $newStatus = null;
+                    if ($row['status'] == 0) {
+                        $newStatus = Invoice::STATUS_UNPAID;
+                    } elseif ($row['status'] == 1) {
+                        $newStatus = Invoice::STATUS_PAID;
+                    } elseif ($row['status'] == 2) {
+                        $newStatus = Invoice::STATUS_DRAFT;
+                    } elseif ($row['status'] == 3) {
+                        $newStatus = Invoice::STATUS_CANCELED;
+                    } elseif ($row['status'] == 4) {
+                        $newStatus = Invoice::STATUS_DELETED;
+                    } elseif ($row['status'] == 5) {
+                        $newStatus = Invoice::STATUS_PAYMENT_PENDING;
+                    } elseif ($row['status'] == 6) {
+                        $newStatus = Invoice::STATUS_REFUNDED;
+                    } elseif ($row['status'] == 7) {
+                        $newStatus = Invoice::STATUS_COLLECTIONS;
+                    }
+                    $newRow['status'] = $newStatus;
+                    $newRow['is_mass_payment'] = $row['is_mass_payment'];
+                    $newRow['admin_id'] = $row['manual_check'] == 1 ? 1 : null; // TODO check this
+                    $newRow['is_credit'] = $row['is_credit'];
+                    $newRow['note'] = $row['notes'];
+
+                    return $newRow;
+                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
+            }
+            $this->newLine();
+            $this->info("End of data migrate for $tableName");
+
+            $this->info('invoice_counts');
+            $this->table(
+                [
+                    'main_app:invoices',
+                    "finance:$tableName",
+                    'whmcs:tblinvoices'
+                ],
+                [
+                    [
+                        DB::connection('mainapp')->table('invoices')->count(),
+                        Invoice::count(),
+                        DB::connection('whmcs')->table('tblinvoices')->count()
+                    ]
+                ]
+            );
+
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -426,17 +485,12 @@ class DataMigration extends Command
         $tableName = (new Item())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
-            $invoiceIds = implode(',', Invoice::query()->select('id')->get()->pluck('id')->toArray());
-            $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems` where `invoiceid` in ($invoiceIds)")[0]->count;
+            $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems`")[0]->count;
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` where `invoiceid` in ($invoiceIds)  LIMIT $this->chunkSize OFFSET $i");
+                $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` LIMIT $this->chunkSize OFFSET $i");
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
-                    if (Invoice::query()->find($row['invoiceid']) == null) {
-                        return null;
-                    }
-
                     $newRow = [];
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = Carbon::now()->toDateTimeString();
@@ -457,81 +511,14 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-        } catch (Exception $e) {
-            $this->error("Something went wrong when migrating $tableName");
-            dump([
-                'error'  => substr($e->getMessage(), 0, 500),
-                'method' => __FUNCTION__
-            ]);
-        }
-    }
 
-    private function migrateTransaction(): void
-    {
-        $tableName = (new Transaction())->getTable();
-        $this->alert("Beginning to migrate $tableName");
-        try {
-            $abnormalData = DB::connection('mainapp')
-                ->select('SELECT transactions.*,
-                                        invoices.invoice_id as i_invoice_id,
-                                        invoices.client_id as i_client_id
-                                FROM `transactions`
-                                LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                WHERE invoices.client_id IS NULL');
-            if (!empty($abnormalData)) {
-                $this->error('SKIPPING ABNORMAL DATA (transactions.id):');
-                collect((array)$abnormalData)->each(function ($row) {
-                    $row = (array)$row;
-                    $this->error($row['id']);
-                });
-            }
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count
-                                                                    FROM `transactions`
-                                                                    LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                                                    WHERE invoices.client_id IS NOT NULL')[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')
-                    ->select("SELECT transactions.*,
-                                        invoices.invoice_id as i_invoice_id,
-                                        invoices.client_id as i_client_id
-                                    FROM `transactions`
-                                    LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                    WHERE invoices.client_id IS NOT NULL
-                                    LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
+            $this->compareCounts(
+                'tblinvoiceitems',
+                DB::connection('whmcs')->table('tblinvoiceitems')->count(),
+                $tableName,
+                Item::withTrashed()->count()
+            );
 
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['i_client_id'];
-                    $newRow['invoice_id'] = $row['invoice_id'];
-                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['amount'] = $row['amount'];
-                    $newRow['status'] = match ($row['status']) {
-                        0, 3, 4, 5 => Transaction::STATUS_PENDING,
-                        1, 8, 25 => Transaction::STATUS_SUCCESS,
-                        2, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 20, 26, 24, 27, 28 => Transaction::STATUS_FAIL,
-                        6, 9 => Transaction::STATUS_PENDING_BANK_VERIFY,
-                        29 => Transaction::STATUS_CANCELED,
-                        30 => Transaction::STATUS_REFUND,
-                        default => throw new Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']),
-                    };
-                    $newRow['payment_method'] = $row['payment_method'];
-                    $newRow['description'] = $row['description'];
-                    $newRow['ip'] = $row['ip'];
-                    $newRow['tracking_code'] = $row['tracking_code'];
-                    $newRow['reference_id'] = $row['reference_id'];
-
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
-            $this->newLine();
-            $this->info("End of data migrate for $tableName");
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -586,16 +573,12 @@ class DataMigration extends Command
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
-
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
                     $newRow['paid_at'] = $row['paid_date'];
                     $newRow['profile_id'] = $row['i_client_id'];
                     $newRow['invoice_id'] = $row['i_invoice_id'];
-                    if (Transaction::where('id', $row['transaction_id'])->doesntExist()) {
-                        return false;
-                    }
                     $newRow['transaction_id'] = $row['transaction_id'];
                     $newRow['bank_account_id'] = $row['bank_account_id'];
                     $newRow['admin_id'] = $row['admin_user_id'];
@@ -616,13 +599,118 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                collect($mappedData)->filter(fn($value) => $value)->chunk($this->chunkSize)->each(function ($rows) use ($count, &$counter, $tableName) {
-                    DB::table($tableName)->insert($rows->toArray());
-                });
+
+                DB::table($tableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'offline_payments',
+                DB::connection('mainapp')->table('offline_payments')->count(),
+                $tableName,
+                OfflineTransaction::count()
+            );
+
+        } catch (Exception $e) {
+            $this->error("Something went wrong when migrating $tableName");
+            dump([
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
+        }
+    }
+
+    private function migrateTransaction(): void
+    {
+        $tableName = (new Transaction())->getTable();
+        $this->alert("Beginning to migrate $tableName");
+        try {
+            /*$abnormalData = DB::connection('mainapp')
+                ->select('SELECT transactions.*,
+                                        invoices.invoice_id as i_invoice_id,
+                                        invoices.client_id as i_client_id
+                                FROM `transactions`
+                                LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
+                                WHERE invoices.client_id IS NULL');
+            if (!empty($abnormalData)) {
+                $this->error('SKIPPING ABNORMAL DATA (transactions.id):');
+                collect((array)$abnormalData)->each(function ($row) {
+                    $row = (array)$row;
+                    $this->error($row['id']);
+                });
+            }*/
+            $count = DB::connection('mainapp')->select('SELECT count(*) as count
+                                                                    FROM `transactions`
+                                                                    LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
+                                                                    WHERE invoices.client_id IS NOT NULL')[0]->count;
+            $progress = $this->output->createProgressBar($count);
+            $mainAppTransactions = [];
+            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
+                $oldData = DB::connection('mainapp')
+                    ->select("SELECT transactions.*,
+                                        invoices.invoice_id as i_invoice_id,
+                                        invoices.client_id as i_client_id
+                                    FROM `transactions`
+                                    LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
+                                    WHERE invoices.client_id IS NOT NULL
+                                    LIMIT $this->chunkSize OFFSET $i");
+                $mappedData = Arr::map($oldData, function ($row) use (&$mainAppTransactions) {
+                    $row = (array)$row;
+                    $newRow = [];
+
+                    $newRow['id'] = $row['id'];
+                    $newRow['created_at'] = $row['created_at'];
+                    $newRow['updated_at'] = $row['updated_at'];
+                    $newRow['profile_id'] = $row['i_client_id'];
+                    $newRow['invoice_id'] = $row['invoice_id'];
+                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
+                    $newRow['amount'] = $row['amount'];
+                    $status = $newRow['status'] = match ($row['status']) {
+                        0, 3, 4, 5 => Transaction::STATUS_PENDING,
+                        1, 8, 25 => Transaction::STATUS_SUCCESS,
+                        2, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 20, 26, 24, 27, 28 => Transaction::STATUS_FAIL,
+                        6, 9 => Transaction::STATUS_PENDING_BANK_VERIFY,
+                        29 => Transaction::STATUS_CANCELED,
+                        30 => Transaction::STATUS_REFUND,
+                        default => throw new Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']),
+                    };
+
+                    $mainAppTransactions[] = $status;
+
+                    $newRow['payment_method'] = $row['payment_method'];
+                    $newRow['description'] = $row['description'];
+                    $newRow['ip'] = $row['ip'];
+                    $newRow['tracking_code'] = $row['tracking_code'];
+                    $newRow['reference_id'] = $row['reference_id'];
+
+                    return $newRow;
+                });
+
+                DB::table($tableName)->insert($mappedData);
+
+                $progress->advance($this->chunkSize);
+            }
+            $this->newLine();
+            $this->info("End of data migrate for $tableName");
+
+            $financeTransactionCounts = collect($mappedData)->groupBy('status')->map->count();
+            $mainAppTransactionCounts = collect(array_count_values($mainAppTransactions));
+
+            $this->info('count of each transaction in finance');
+            $this->table([$financeTransactionCounts->keys()->toArray()], [$financeTransactionCounts->values()->toArray()]);
+
+            $this->info('count of each transaction in main_app');
+            $this->table([$mainAppTransactionCounts->keys()->toArray()], [$mainAppTransactionCounts->values()->toArray()]);
+
+            $this->compareCounts(
+                'transactions',
+                DB::connection('mainapp')->table('transactions')->count(),
+                $tableName,
+                Transaction::count()
+            );
+
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -640,7 +728,8 @@ class DataMigration extends Command
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoice_numbers`')[0]->count;
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')->select("SELECT * FROM `invoice_numbers` LIMIT $this->chunkSize OFFSET $i");
+                $oldData = DB::connection('mainapp')
+                    ->select("SELECT * FROM `invoice_numbers` LIMIT $this->chunkSize OFFSET $i");
 
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
@@ -663,6 +752,14 @@ class DataMigration extends Command
             }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'invoice_numbers',
+                DB::connection('mainapp')->table('invoice_numbers')->count(),
+                $tableName,
+                InvoiceNumber::withTrashed()->count()
+            );
+
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -670,5 +767,13 @@ class DataMigration extends Command
                 'method' => __FUNCTION__
             ]);
         }
+    }
+
+    public function compareCounts($mainAppTableName, $mainAppCount, $financeTableName, $financeCount)
+    {
+        $this->info('count of each record');
+        $this->table(["main_app:$mainAppTableName", "finance:$financeTableName"], [
+            [$mainAppCount, $financeCount]
+        ]);
     }
 }
