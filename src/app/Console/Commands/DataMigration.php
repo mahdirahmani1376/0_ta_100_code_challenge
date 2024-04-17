@@ -31,7 +31,7 @@ class DataMigration extends Command
 
     public function handle()
     {
-        ini_set('memory_limit','4096M');
+        ini_set('memory_limit', '4096M');
         $this->info("#### START DATA MIGRATION ####");
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
@@ -87,9 +87,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $bankAccountTableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -153,9 +152,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -193,9 +191,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -241,9 +238,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -276,9 +272,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -295,15 +290,11 @@ class DataMigration extends Command
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
-
                     $newRow['id'] = $row['id'];
                     $newRow['created_at'] = $row['created_at'];
                     $newRow['updated_at'] = $row['updated_at'];
                     $newRow['profile_id'] = $row['client_id'];
                     $newRow['wallet_id'] = 0;
-//                    if (Invoice::where('id', $row['invoice_id'])->doesntExist()) {
-//                        return false;
-//                    }
                     $newRow['invoice_id'] = $row['invoice_id'];
                     $newRow['admin_id'] = $row['admin_user_id'];
                     $newRow['amount'] = $row['amount'];
@@ -311,9 +302,7 @@ class DataMigration extends Command
 
                     return $newRow;
                 });
-                collect($mappedData)->filter(fn($value) => $value)->each(function ($rows) use ($count, &$counter, $tableName) {
-                    DB::table($tableName)->insert($rows);
-                });
+                DB::table($tableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
             $this->newLine();
@@ -321,9 +310,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -400,9 +388,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -446,9 +433,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -538,9 +524,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -614,9 +599,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -661,8 +645,8 @@ class DataMigration extends Command
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
         }
     }
@@ -688,9 +672,8 @@ class DataMigration extends Command
             return $clientId;
         } catch (Exception $e) {
             dump([
-                'error' => substr($e->getMessage(), 0, 500),
-                'line'  => $e->getLine(),
-                'file'  => __FUNCTION__
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
             ]);
             exit('error while making profile id');
         }
