@@ -20,6 +20,7 @@ class GenerateInvoiceNumberCommand extends Command
 
     public function handle(AssignInvoiceNumberService $assignInvoiceNumberService)
     {
+        $this->info('Generating Invoice Numbers started');
         $type = $this->option('type') ?? InvoiceNumber::TYPE_PAID;
         $fiscalYear = $this->option('fiscal-year') ?? MainAppConfig::get(MainAppConfig::INVOICE_NUMBER_CURRENT_FISCAL_YEAR);
         $count = $this->option('count') ?? 100;
@@ -35,7 +36,7 @@ class GenerateInvoiceNumberCommand extends Command
         if ($success) {
             $this->info("Generated $count InvoiceNumber with type of $type and fiscalYear of $fiscalYear");
         } else {
-            $this->error('Failure');
+            $this->warn('Generating Invoice Numbers started');
         }
     }
 }
