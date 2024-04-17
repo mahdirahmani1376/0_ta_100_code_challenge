@@ -6,7 +6,6 @@ use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int id
  * @property Carbon created_at
  * @property Carbon updated_at
+ * @property Carbon deleted_at
  * @property Carbon due_date
  * @property Carbon paid_at
  * @property Carbon processed_at
@@ -113,17 +113,6 @@ class Invoice extends Model
     {
         return $this->hasMany(Transaction::class);
     }
-
-    public function offlineTransactions(): HasMany
-    {
-        return $this->hasMany(OfflineTransaction::class);
-    }
-
-    public function profile(): BelongsTo
-    {
-        return $this->belongsTo(Profile::class);
-    }
-
     public function moadianLog(): HasOne
     {
         return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
