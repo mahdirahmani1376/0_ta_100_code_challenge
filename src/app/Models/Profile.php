@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class Profile extends Model
 {
     protected $fillable = [
+        'id',
         'client_id',
         'rahkaran_id',
     ];
