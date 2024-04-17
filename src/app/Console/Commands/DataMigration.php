@@ -295,7 +295,7 @@ class DataMigration extends Command
                 'client_cashouts',
                 DB::connection('mainapp')->table('client_cashouts')->count(),
                 $tableName,
-                ClientCashout::count()
+                ClientCashout::withTrashed()->count()
             );
 
         } catch (Exception $e) {
