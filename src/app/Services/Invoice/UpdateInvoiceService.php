@@ -19,6 +19,7 @@ class UpdateInvoiceService
             'paid_at',
             'tax_rate',
             'note',
+            'source_invoice'
         ]);
     }
 }
