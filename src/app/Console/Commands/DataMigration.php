@@ -35,6 +35,7 @@ class DataMigration extends Command
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
         self::migrateProfiles();
+        self::updateMainAppClients();
         self::migrateBankAccount();
         self::migrateBankGateway();
         self::migrateWallet();
@@ -89,6 +90,25 @@ class DataMigration extends Command
                 'error'  => substr($e->getMessage(), 0, 500),
                 'method' => __FUNCTION__
             ]);
+        }
+    }
+
+    private function updateMainAppClients()
+    {
+        try {
+            $this->alert('Set client.id to finance profile id');
+            DB::connection('mainapp')->select('
+                UPDATE clients AS cl 
+                SET cl.finance_profile_id = cl.id
+                WHERE cl.finance_profile_id IS NULL
+            ');
+            $this->info('End Set client.id to finance profile id');
+        } catch (\Throwable $exception) {
+            dump([
+                'error'  => substr($exception->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
+            $this->error('Something went wrong when Set client.id to finance profile id');
         }
     }
 
