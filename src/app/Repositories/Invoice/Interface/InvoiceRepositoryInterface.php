@@ -2,10 +2,15 @@
 
 namespace App\Repositories\Invoice\Interface;
 
+use App\Models\Invoice;
 use App\Repositories\Base\Interface\EloquentRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method Invoice update(Model $object, array $attributes, array $fillable = [])
+ */
 interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
 {
     public function indexEverything(int $profileId): Collection;
