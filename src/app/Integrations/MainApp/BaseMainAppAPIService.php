@@ -2,8 +2,10 @@
 
 namespace App\Integrations\MainApp;
 
+use App\Jobs\UpdateSystemLog;
 use App\Models\SystemLog;
 use App\Services\LogService;
+use App\ValueObjects\Queue;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -19,30 +21,28 @@ abstract class BaseMainAppAPIService
             ...$header
         ];
 
-        $response = Http::withHeaders($headers)->$method($url, $body);
-
         if ($log) {
-            LogService::store(SystemLog::make(), [
-                'method'      => 'get',
-                'endpoint'    => self::setEndpoint(),
+            $systemLog = LogService::store(SystemLog::make(), [
+                'method'      => $method,
+                'endpoint'    => SystemLog::ENDPOINT_MAIN_APP,
                 'request_url' => $url,
                 'request_body' => $body,
                 'request_header' => $headers,
                 'provider'    => SystemLog::PROVIDER_OUTGOING,
-                'response_header' => $response->headers(),
-                'response_body'   => $response->json(),
-                'response_status' => $response->status()
             ]);
         }
 
-        return $response;
-    }
+        $response = Http::withHeaders($headers)->$method($url, $body);
 
-    private static function setEndpoint(): string
-    {
-        return match (self::class) {
-            MainAppAPIService::class => 'main_application',
-            default => 'unknown'
-        };
+        if (isset($systemLog)){
+            $customResponse = [
+                'header' => $response->headers(),
+                'body'   => $response->json(),
+                'status' => $response->status()
+            ];
+            dispatch(new UpdateSystemLog($systemLog, $customResponse))->onQueue(Queue::SYSTEM_LOG_QUEUE);
+        }
+
+        return $response;
     }
 }
