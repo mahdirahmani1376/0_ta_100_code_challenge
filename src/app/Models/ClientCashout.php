@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float amount
  * @property string admin_note
  * @property string status
- * @property string $source
+ * @property string source
  * @property array actions
  * @property boolean rejected_by_bank
  */
