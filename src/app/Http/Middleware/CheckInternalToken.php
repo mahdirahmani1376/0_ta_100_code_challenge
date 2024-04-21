@@ -11,7 +11,9 @@ class CheckInternalToken
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->bearerToken() != config('services.main_app.token')) {
+        $token = config('services.main_app.token');
+
+        if ($request->bearerToken() != $token || empty($token)) {
             throw new AuthenticationException();
         }
 
