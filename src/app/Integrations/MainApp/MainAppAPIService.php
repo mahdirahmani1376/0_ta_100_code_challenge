@@ -216,7 +216,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getDomainsById(array $profileIds)
+    public static function getDomainsById($profileIds)
     {
         $url = '/api/internal/finance/domains';
 
@@ -240,7 +240,7 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public static function recalculateDomainServicePrice($domainId)
     {
-        $url = "/api/internal/finance/$domainId/recalculate-domain-service";
+        $url = "/api/internal/finance/$domainId/recalculate-domain";
 
         $response = self::makeRequest('get', $url);
 
@@ -250,7 +250,7 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public static function recalculateProductServicePrice($serviceId)
     {
-        $url = "/api/internal/finance/$serviceId/recalculate-product-service";
+        $url = "/api/internal/finance/$serviceId/recalculate-service";
 
         $response = self::makeRequest('get', $url);
 
