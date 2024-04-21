@@ -12,7 +12,7 @@ use Throwable;
 
 class UpdateInvoiceItemsCommand extends Command
 {
-    protected $signature = 'invoice:update';
+    protected $signature = 'cron:invoice-update';
     protected $description = 'Update Unpaid Invoice Prices after 72 hours';
 
     public function __construct(
@@ -40,7 +40,7 @@ class UpdateInvoiceItemsCommand extends Command
                     if ($item->invoiceable_type == Item::TYPE_DOMAIN) {
                         $data = MainAppAPIService::recalculateDomainServicePrice($item->invoiceable_id);
 
-                        if (!empty(data_get($data,'price'))){
+                        if (!empty(data_get($data, 'price'))) {
                             ($this->updateItemAction)($invoice, $item, [
                                 'amount' => $data['price']
                             ]);
@@ -50,7 +50,7 @@ class UpdateInvoiceItemsCommand extends Command
                     if ($item->invoiceable_type == Item::TYPE_PRODUCT_SERVICE) {
                         $data = MainAppAPIService::recalculateProductServicePrice($item->invoiceable_id);
 
-                        if (!empty(data_get($data,'cost'))){
+                        if (!empty(data_get($data, 'cost'))) {
                             ($this->updateItemAction)($invoice, $item, [
                                 'amount' => $data['cost']
                             ]);
@@ -60,15 +60,14 @@ class UpdateInvoiceItemsCommand extends Command
 
                     $this->info("Item: $item->id updated successfully for invoice:$invoice->id changes: " . json_encode($item->getChanges()));
                     Log::info("Item: $item->id updated successfully for invoice:$invoice->id", [
-                        'changes'  => $item->getChanges(),
+                        'changes' => $item->getChanges(),
                     ]);
-
 
                 } catch (Throwable $e) {
                     $this->error("item with id:$item->id with invoice $invoice->id threw exception with message {$e->getMessage()}");
                     Log::error("item with id:$item->id with invoice $invoice->id threw exception", [
                         'response' => $data,
-                        'error' => $e->getMessage(),
+                        'error'    => $e->getMessage(),
                         'trace'    => $e->getTrace()
                     ]);
                 }

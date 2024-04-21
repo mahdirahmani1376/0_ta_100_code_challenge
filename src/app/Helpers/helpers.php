@@ -98,23 +98,19 @@ if (!function_exists('is_json')) {
 if (!function_exists('admin_log')) {
     function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
     {
-        if (is_null($adminId) && is_null(request('admin_id'))) {
-            return;
-        }
-
-        $adminLog ='';
+        $adminLog = '';
 
         try {
             if (!is_array($oldState)) {
                 $oldState = $oldState?->toArray();
             }
             $adminLog = AdminLog::query()->create([
-                'admin_id' => $adminId ?? request('admin_id'),
-                'action' => $action,
-                'model_id' => $model?->id,
-                'model_class' => $model ? get_class($model) : null,
-                'changes' => $changes,
-                'old_state' => $oldState,
+                'admin_id'       => $adminId ?? request('admin_id'),
+                'action'         => $action,
+                'model_id'       => $model?->id,
+                'model_class'    => $model ? get_class($model) : null,
+                'changes'        => $changes,
+                'old_state'      => $oldState,
                 'validated_data' => $validatedData,
             ]);
         } catch (Exception $exception) {
@@ -194,7 +190,7 @@ if (!function_exists('callback_result_redirect_url')) {
 
         return Str::swap([
             '{invoice}' => $invoiceId,
-            '{status}' => $status,
+            '{status}'  => $status,
         ], $url);
     }
 }
