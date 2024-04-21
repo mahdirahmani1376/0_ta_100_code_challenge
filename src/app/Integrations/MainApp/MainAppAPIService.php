@@ -185,7 +185,7 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public function adminListProducts($array)
     {
-        $url = '/api/internal/finance/get-products';
+        $url = '/api/internal/finance/products';
 
         try {
             return self::makeRequest('get', $url, $array);
