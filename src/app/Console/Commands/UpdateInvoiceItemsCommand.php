@@ -7,6 +7,7 @@ use App\Integrations\MainApp\MainAppAPIService;
 use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -17,7 +18,8 @@ class UpdateInvoiceItemsCommand extends Command
     protected $description = 'Update Unpaid Invoice Prices after 72 hours';
 
     public function __construct(
-        public UpdateItemAction $updateItemAction
+        public UpdateItemAction           $updateItemAction,
+        public InvoiceRepositoryInterface $invoiceRepository
     )
     {
         parent::__construct();
@@ -27,19 +29,24 @@ class UpdateInvoiceItemsCommand extends Command
     {
         $this->info('getting all unpaid invoices older than 72 hours');
 
-        $unpaidInvoices = Invoice::query()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->whereDate('updated_at', '<', now()->subHours(72))
-            ->get();
+        $unpaidInvoices = $this->invoiceRepository->index([
+            'status'  => Invoice::STATUS_UNPAID,
+            'to_date' => now()->subHours(72),
+            'items'   => [
+                ["invoiceable_type" => Item::TYPE_DOMAIN],
+                ["invoiceable_type" => Item::TYPE_PRODUCT_SERVICE],
+            ],
+            'export'           => 1,
+            'date_field' => 'updated_at'
+        ]);
 
         $this->info("count of unpaid invoices: {$unpaidInvoices->count()}");
 
         $unpaidInvoices->each(function (Invoice $invoice) {
             $invoice->items
-                ->whereIn('invoiceable_type', [Item::TYPE_DOMAIN,Item::TYPE_PRODUCT_SERVICE])
-                    ->each(function (Item $item) use ($invoice) {
-                        $this->updateItem($item, $invoice);
-                    });
+                ->each(function (Item $item) use ($invoice) {
+                    $this->updateItem($item, $invoice);
+                });
         });
 
         $this->info('Completed');
@@ -51,17 +58,15 @@ class UpdateInvoiceItemsCommand extends Command
         try {
             $oldState = $invoice->toArray();
 
-            if ($item->invoiceable_type == Item::TYPE_DOMAIN){
+            if ($item->invoiceable_type == Item::TYPE_DOMAIN) {
                 $response = MainAppAPIService::recalculateDomainServicePrice($item->invoiceable_id);
-                $price = $response;
-            }
-            elseif ($item->invoiceable_type == Item::TYPE_PRODUCT_SERVICE){
-
+                $price = data_get($response, 'price');
+            } elseif ($item->invoiceable_type == Item::TYPE_PRODUCT_SERVICE) {
                 $response = MainAppAPIService::recalculateProductServicePrice($item->invoiceable_id);
                 $price = data_get($response, 'cost');
             }
 
-            if (!empty($price) and !empty($response)){
+            if (!empty($price) and !empty($response)) {
                 ($this->updateItemAction)($invoice, $item, [
                     'amount' => $price
                 ]);
