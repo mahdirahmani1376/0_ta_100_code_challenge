@@ -52,12 +52,10 @@ class UpdateInvoiceItemsCommand extends Command
             $oldState = $invoice->toArray();
 
             if ($item->invoiceable_type == Item::TYPE_DOMAIN){
-                $item->invoiceable_id = 150792;
                 $response = MainAppAPIService::recalculateDomainServicePrice($item->invoiceable_id);
                 $price = $response;
             }
             elseif ($item->invoiceable_type == Item::TYPE_PRODUCT_SERVICE){
-                $item->invoiceable_id = 44;
 
                 $response = MainAppAPIService::recalculateProductServicePrice($item->invoiceable_id);
                 $price = data_get($response, 'cost');
@@ -68,7 +66,7 @@ class UpdateInvoiceItemsCommand extends Command
                     'amount' => $price
                 ]);
 
-                $finance_log = finance_log(FinanceLog::EDIT_INVOICE_ITEM, $item, $item->getChanges(), $oldState, $response);
+                finance_log(FinanceLog::EDIT_INVOICE_ITEM, $item, $item->getChanges(), $oldState, $response);
 
                 $this->info("Item: $item->id updated successfully for invoice:$invoice->id changes: " . json_encode($item->getChanges()));
                 Log::info("Item: $item->id updated successfully for invoice:$invoice->id", [
