@@ -22,6 +22,7 @@ class SystemLog extends AbstractBaseLog
     const PROVIDER_OUTGOING = "Outgoing";
     const PROVIDER_INCOMING = "Incoming";
     public const ENDPOINT_RAHKARAN = 'rahkaran';
+    public const ENDPOINT_MAIN_APP = 'main_app';
 
 
     protected $fillable = [

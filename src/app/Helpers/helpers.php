@@ -3,6 +3,7 @@
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Helpers\JalaliCalender;
 use App\Models\AdminLog;
+use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
@@ -98,30 +99,55 @@ if (!function_exists('is_json')) {
 if (!function_exists('admin_log')) {
     function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
     {
+
         if (is_null($adminId) && is_null(request('admin_id'))) {
             return;
         }
 
-        $adminLog ='';
+        $adminLog = '';
 
         try {
             if (!is_array($oldState)) {
                 $oldState = $oldState?->toArray();
             }
             $adminLog = AdminLog::query()->create([
-                'admin_id' => $adminId ?? request('admin_id'),
-                'action' => $action,
-                'model_id' => $model?->id,
-                'model_class' => $model ? get_class($model) : null,
-                'changes' => $changes,
-                'old_state' => $oldState,
-                'validated_data' => $validatedData,
+                'admin_user_id' => $adminId ?? request('admin_id'),
+                'action'        => $action,
+                'logable_id'    => $model?->id,
+                'logable_type'  => $model ? get_class($model) : null,
+                'after'         => $changes,
+                'before'        => $oldState,
+                'request'       => $validatedData,
             ]);
         } catch (Exception $exception) {
             // TODO
         }
 
         return $adminLog;
+    }
+}
+
+if (!function_exists('finance_log')) {
+    function finance_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null)
+    {
+        $financeLog = '';
+
+        try {
+            if (!is_array($oldState)) {
+                $oldState = $oldState?->toArray();
+            }
+            $financeLog = FinanceLog::query()->create([
+                'action'       => $action,
+                'logable_id'   => $model?->id,
+                'logable_type' => $model ? get_class($model) : null,
+                'after'        => $changes,
+                'before'       => $oldState,
+                'request'      => $validatedData,
+            ]);
+        } catch (Exception $exception) {
+        }
+
+        return $financeLog;
     }
 }
 
@@ -194,7 +220,7 @@ if (!function_exists('callback_result_redirect_url')) {
 
         return Str::swap([
             '{invoice}' => $invoiceId,
-            '{status}' => $status,
+            '{status}'  => $status,
         ], $url);
     }
 }

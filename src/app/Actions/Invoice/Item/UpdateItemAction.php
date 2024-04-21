@@ -29,6 +29,7 @@ class UpdateItemAction
         if ($data['amount'] != 0) {
             ($this->calcInvoicePriceFieldsService)($invoice);
         }
+
         admin_log(AdminLog::EDIT_INVOICE_ITEM, $item, $item->getChanges(), $oldState, $data);
 
         return $item;

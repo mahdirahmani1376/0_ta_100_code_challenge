@@ -185,7 +185,7 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public function adminListProducts($array)
     {
-        $url = '/api/internal/finance/get-products';
+        $url = '/api/internal/finance/products';
 
         try {
             return self::makeRequest('get', $url, $array);
@@ -240,18 +240,20 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public static function recalculateDomainServicePrice($domainId)
     {
-        $url = "/api/internal/domain/$domainId/recalculate-domain-service";
+        $url = "/api/internal/finance/$domainId/recalculate-domain-service";
 
         $response = self::makeRequest('get', $url);
+
         return $response->json();
 
     }
 
     public static function recalculateProductServicePrice($serviceId)
     {
-        $url = "/api/internal/product/$serviceId/recalculate-product-service";
+        $url = "/api/internal/finance/$serviceId/recalculate-product-service";
 
         $response = self::makeRequest('get', $url);
+
         return $response->json();
 
     }
