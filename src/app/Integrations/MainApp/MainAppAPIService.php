@@ -218,7 +218,7 @@ class MainAppAPIService extends BaseMainAppAPIService
 
     public static function getDomainsById($profileIds)
     {
-        $url = '/api/internal/finance/domains';
+        $url = '/api/internal/finance/services';
 
         $data = [
             'profile_ids' => [
