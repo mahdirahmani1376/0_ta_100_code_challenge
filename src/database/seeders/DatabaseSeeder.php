@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
 <br>
 <br>
     ");
-        MainAppAPIService::storeConfig(MainAppConfig::FINANCE_INVOICE_CREATE_SUBJECT, 'پیش فاکتور جدید');
+        MainAppAPIService::storeConfig(MainAppConfig::RAHKARAN_FISCAL_YEAR_REF, config('rahkaran.fiscalYearRef'));
 
     }
 }

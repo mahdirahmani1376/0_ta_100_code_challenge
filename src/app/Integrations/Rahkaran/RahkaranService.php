@@ -7,6 +7,7 @@ use App\Exceptions\Http\FatalErrorException;
 use App\Exceptions\Repository\ModelNotFoundException;
 use App\Exceptions\SystemException\MainAppInternalAPIException;
 use App\Integrations\MainApp\MainAppAPIService;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Integrations\Rahkaran\ValueObjects\DlObject;
 use App\Integrations\Rahkaran\ValueObjects\Party as RahkaranParty;
@@ -467,7 +468,7 @@ class RahkaranService
         $voucher->Date = $cashouts->first()->updated_at;
         $voucher->Description = $description;
         $voucher->Description_En = $description;
-        $voucher->FiscalYearRef = $this->config->fiscalYearRef;
+        $voucher->FiscalYearRef = MainAppConfig::get(MainAppConfig::RAHKARAN_FISCAL_YEAR_REF);
         $voucher->IsCurrencyBased = $this->config->voucherIsCurrencyBased;
         $voucher->IsExternal = true;
         $voucher->LedgerRef = $this->config->voucherLedgerRef;
@@ -1535,7 +1536,9 @@ class RahkaranService
 
         $voucher_item = new VoucherItem();
         $voucher_item->SLCode = $this->config->newTaxSl;
-        $voucher_item->Description = trans('rahkaran.tax.newTax');
+        $voucher_item->Description = trans('rahkaran.tax.newTax',[
+            'tax' => $invoice->tax_rate
+        ]);
 
         if ($client_rahkaran_id) {
             $voucher_item->PartyRef = $client_rahkaran_id;
