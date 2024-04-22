@@ -25,4 +25,5 @@ final class ExceptionCodes
     public const OFFLINE_PAYMENT_APPLY = "410133";
     public const INVOICE_CANCELLATION_FAILED = '410084';
     public const NOT_AUTHORIZED = '410110';
+    public const INVOICE_STATUS_UNACCEPTABLE = '410085';
 }
