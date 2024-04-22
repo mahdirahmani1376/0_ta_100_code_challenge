@@ -25,14 +25,14 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'invoice_date' => ['nullable', 'date',],
-            'due_date' => ['nullable', 'date',],
-            'paid_at' => ['nullable', 'date',],
-            'tax_rate' => ['nullable', 'integer', 'max:99', 'min:0',],
+            'invoice_date'   => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+            'due_date'       => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+            'paid_at'        => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+            'tax_rate'       => ['nullable', 'integer', 'max:99', 'min:0',],
             'invoice_number' => ['nullable', 'int',],
-            'fiscal_year' => ['nullable', 'string',],
-            'note' => ['nullable',],
-            'source_invoice' => ['nullable',Rule::exists('invoices','id')]
+            'fiscal_year'    => ['nullable', 'string',],
+            'note'           => ['nullable',],
+            'source_invoice' => ['nullable', Rule::exists('invoices', 'id')]
         ];
     }
 }
