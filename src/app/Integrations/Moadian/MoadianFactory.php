@@ -304,7 +304,7 @@ class MoadianFactory
             });
 
         $this->responseProducts = collect(MainAppAPIService::getProductsById($productListById->toArray()));
-        $this->responseDomains = collect(MainAppAPIService::getDomainsById($domainListById->toArray()));
+        $this->responseDomains = collect(MainAppAPIService::getServicesById($domainListById->toArray()));
 
     }
 }
