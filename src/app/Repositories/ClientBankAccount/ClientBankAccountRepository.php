@@ -7,12 +7,13 @@ use App\Repositories\Base\BaseRepository;
 use App\Repositories\ClientBankAccount\Interface\ClientBankAccountRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class ClientBankAccountRepository extends BaseRepository implements ClientBankAccountRepositoryInterface
 {
     public string $model = ClientBankAccount::class;
 
-    public function index(array $data): LengthAwarePaginator
+    public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();
         if (!empty($data['search'])) {
@@ -29,6 +30,9 @@ class ClientBankAccountRepository extends BaseRepository implements ClientBankAc
         }
         if (!empty($data['profile_id'])) {
             $query->where('profile_id', $data['profile_id']);
+        }
+        if (isset($data['export']) && $data['export']) {
+            return parent::sortQuery($query)->get();
         }
 
         return self::paginate($query);
