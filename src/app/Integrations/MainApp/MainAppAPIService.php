@@ -216,7 +216,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getDomainsById($profileIds)
+    public static function getServicesById($profileIds)
     {
         $url = '/api/internal/finance/services';
 
