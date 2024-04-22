@@ -44,6 +44,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Profile profile
  * @property Client client
  * @property MoadianLog moadianLog
+ * @property array available_status_list
  */
 class Invoice extends Model
 {
@@ -89,6 +90,10 @@ class Invoice extends Model
         'source_invoice'
     ];
 
+    protected $appends = [
+        'available_status_list'
+    ];
+
     protected $hidden = [
         'rahkaran_id',
     ];
@@ -125,6 +130,50 @@ class Invoice extends Model
     public function offlineTransactions(): HasMany
     {
         return $this->hasMany(OfflineTransaction::class);
+    }
+
+    public function getAvailableStatusListAttribute(): array
+    {
+        $status = [];
+
+        if ($this->rahkaran_id) {
+            return $status;
+        }
+
+        switch ($this->status) {
+            case static::STATUS_DRAFT:
+                $status = [
+                    static::STATUS_UNPAID,
+                    static::STATUS_CANCELED,
+                ];
+                break;
+            case static::STATUS_UNPAID:
+                $status = [
+                    static::STATUS_CANCELED,
+                    static::STATUS_DRAFT,
+                    static::STATUS_PAYMENT_PENDING,
+                    static::STATUS_COLLECTIONS,
+                ];
+
+                if ($this->balance == 0) {
+                    $status[] = static::STATUS_PAID;
+                }
+
+                break;
+            case static::STATUS_CANCELED:
+            case static::STATUS_PAYMENT_PENDING:
+            case static::STATUS_COLLECTIONS:
+                $status = [
+                    static::STATUS_UNPAID
+                ];
+                break;
+            case static::STATUS_REFUNDED:
+            case static::STATUS_PAID:
+                $status = [];
+                break;
+        }
+
+        return $status;
     }
 
 }
