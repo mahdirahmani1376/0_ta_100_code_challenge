@@ -66,9 +66,9 @@ class AsanPardakht implements Interface\BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $amount = data_get($data,'content.amount');
-        $token = data_get($data,'content.payGateTranID');
-        if ($amount != $transaction->amount || $token != $transaction->getKey()) {
+        $amount = data_get($data,'Amount');
+        $transactionId = data_get($data,'PayGateTranID');
+        if ($amount != $transaction->amount || $transactionId != $transaction->getKey()) {
             Log::error('transaction possible fraud',[
                 'transaction' => $transaction,
                 'data' => $transactionResultResponse

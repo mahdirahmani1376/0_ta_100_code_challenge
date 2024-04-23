@@ -8,6 +8,7 @@ use App\Models\BankGateway;
 use App\Models\Transaction;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Saman implements BankGatewayInterface
@@ -54,10 +55,10 @@ class Saman implements BankGatewayInterface
 
         $token = data_get($data,'token');
         if ($data['ResNum'] != $transaction->getKey() || $token != $transaction->tracking_code) {
-            ($this->updateTransactionService)($transaction, [
-                'status' => Transaction::STATUS_FRAUD,
+            Log::error('transaction possible fraud',[
+                'transaction' => $transaction,
+                'data' => $data
             ]);
-            throw new BadRequestException("Saman miss match transactionId, transactionId: $transaction->id , ResNum: " . $data['ResNum']);
         }
 
         $response = Http::withHeader('Accept', 'application/json')
@@ -70,10 +71,10 @@ class Saman implements BankGatewayInterface
         $amount = $response->json('TransactionDetail.OrginalAmount');
 
         if ($amount != $transaction->amount) {
-            ($this->updateTransactionService)($transaction, [
-                'status' => Transaction::STATUS_FRAUD,
+            Log::error('transaction possible fraud',[
+                'transaction' => $transaction,
+                'data' => $amount
             ]);
-            throw new BadRequestException('Saman verify ResultCode: ' . $response->json('ResultCode'));
         }
 
 

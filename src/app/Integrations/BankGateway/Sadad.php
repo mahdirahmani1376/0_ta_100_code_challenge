@@ -7,6 +7,7 @@ use App\Models\BankGateway;
 use App\Models\Transaction;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Sadad implements Interface\BankGatewayInterface
@@ -52,9 +53,11 @@ class Sadad implements Interface\BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        if ($data['token'] != $transaction->tracking_code){
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Sadad token mismatch');
+        if ($data['Token'] != $transaction->tracking_code){
+            Log::error('transaction possible fraud',[
+                'transaction' => $transaction,
+                'data' => $data
+            ]);
         }
 
         $response = Http::withHeader('Content-Type', 'application/json')
@@ -70,8 +73,10 @@ class Sadad implements Interface\BankGatewayInterface
 
         if ($response->json('Amount') != $transaction->amount)
         {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Sadad amount mismatch');
+            Log::error('transaction possible fraud',[
+                'transaction' => $transaction,
+                'data' => $response
+            ]);
         }
 
         return ($this->updateTransactionService)($transaction, [
