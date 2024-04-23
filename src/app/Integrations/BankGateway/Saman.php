@@ -56,6 +56,7 @@ class Saman implements BankGatewayInterface
         $token = data_get($data,'token');
         if ($data['ResNum'] != $transaction->getKey() || $token != $transaction->tracking_code) {
             Log::error('transaction possible fraud',[
+                'gateway' => 'saman',
                 'transaction' => $transaction,
                 'data' => $data
             ]);
@@ -72,6 +73,7 @@ class Saman implements BankGatewayInterface
 
         if ($amount != $transaction->amount) {
             Log::error('transaction possible fraud',[
+                'gateway' => 'sadad',
                 'transaction' => $transaction,
                 'data' => $amount
             ]);

@@ -70,6 +70,7 @@ class AsanPardakht implements Interface\BankGatewayInterface
         $transactionId = data_get($data,'PayGateTranID');
         if ($amount != $transaction->amount || $transactionId != $transaction->getKey()) {
             Log::error('transaction possible fraud',[
+                'gateway' => 'asan_pardakht',
                 'transaction' => $transaction,
                 'data' => $transactionResultResponse
             ]);

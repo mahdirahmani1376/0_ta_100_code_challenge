@@ -55,6 +55,7 @@ class Sadad implements Interface\BankGatewayInterface
 
         if ($data['Token'] != $transaction->tracking_code){
             Log::error('transaction possible fraud',[
+                'gateway' => 'sadad',
                 'transaction' => $transaction,
                 'data' => $data
             ]);
@@ -74,6 +75,7 @@ class Sadad implements Interface\BankGatewayInterface
         if ($response->json('Amount') != $transaction->amount)
         {
             Log::error('transaction possible fraud',[
+                'gateway' => 'sadad',
                 'transaction' => $transaction,
                 'data' => $response
             ]);
