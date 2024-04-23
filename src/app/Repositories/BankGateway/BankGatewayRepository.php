@@ -9,6 +9,9 @@ use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
+/**
+ * @method BankGateway newQuery()
+ */
 class BankGatewayRepository extends BaseRepository implements BankGatewayRepositoryInterface
 {
     public string $model = BankGateway::class;

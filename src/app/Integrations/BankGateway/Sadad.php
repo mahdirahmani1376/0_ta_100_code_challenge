@@ -7,6 +7,7 @@ use App\Models\BankGateway;
 use App\Models\Transaction;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Sadad implements Interface\BankGatewayInterface
@@ -52,6 +53,14 @@ class Sadad implements Interface\BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
+        if ($data['Token'] != $transaction->tracking_code){
+            Log::error('transaction possible fraud',[
+                'gateway' => 'sadad',
+                'transaction' => $transaction,
+                'data' => $data
+            ]);
+        }
+
         $response = Http::withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
                 'Token' => $transaction->tracking_code,
@@ -61,6 +70,15 @@ class Sadad implements Interface\BankGatewayInterface
         if (!$response->json('ResCode') != 0) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw new BadRequestException('Sadad verify ResCode: ' . $response->json('ResCode'));
+        }
+
+        if ($response->json('Amount') != $transaction->amount)
+        {
+            Log::error('transaction possible fraud',[
+                'gateway' => 'sadad',
+                'transaction' => $transaction,
+                'data' => $response
+            ]);
         }
 
         return ($this->updateTransactionService)($transaction, [

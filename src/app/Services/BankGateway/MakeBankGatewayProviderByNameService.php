@@ -16,6 +16,9 @@ class MakeBankGatewayProviderByNameService
     {
         $bankGatewayModel = $this->bankGatewayRepository->findByName($name);
 
+        /**
+         * @var BankGatewayInterface $provider
+         */
         $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($name);
 
         return $provider::make($bankGatewayModel);

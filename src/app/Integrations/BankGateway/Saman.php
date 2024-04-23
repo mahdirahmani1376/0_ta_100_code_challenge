@@ -8,6 +8,7 @@ use App\Models\BankGateway;
 use App\Models\Transaction;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Saman implements BankGatewayInterface
@@ -51,24 +52,43 @@ class Saman implements BankGatewayInterface
         if ($data['state'] != 'OK') {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
-        if ($data['ResNum'] != $transaction->getKey()) {
-            throw new BadRequestException("Saman miss match transactionId, transactionId: $transaction->id , ResNum: " . $data['ResNum']);
+
+        $token = data_get($data,'token');
+        if ($data['ResNum'] != $transaction->getKey() || $token != $transaction->tracking_code) {
+            Log::error('transaction possible fraud',[
+                'gateway' => 'saman',
+                'transaction' => $transaction,
+                'data' => $data
+            ]);
         }
 
         $response = Http::withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
-                'RefNum' => $transaction->tracking_code,
+                'RefNum'         => $transaction->tracking_code,
                 'TerminalNumber' => $this->bankGateway->config['terminal_id'],
             ]);
 
+        $amount = $response->json('TransactionDetail.OrginalAmount');
+
+        if ($amount != $transaction->amount) {
+            Log::error('transaction possible fraud',[
+                'gateway' => 'sadad',
+                'transaction' => $transaction,
+                'data' => $amount
+            ]);
+        }
+
+
         if (!$response->json('Success') || $response->json('ResultCode') != 0) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            ($this->updateTransactionService)($transaction, [
+                'status' => Transaction::STATUS_FAIL,
+            ]);
             throw new BadRequestException('Saman verify ResultCode: ' . $response->json('ResultCode'));
         }
 
         return ($this->updateTransactionService)($transaction, [
-            'status' => Transaction::STATUS_SUCCESS,
+            'status'       => Transaction::STATUS_SUCCESS,
             'reference_id' => $response->json('TransactionDetail.RefNum'),
         ]);
     }
