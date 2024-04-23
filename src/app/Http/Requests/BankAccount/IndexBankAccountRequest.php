@@ -16,19 +16,19 @@ class IndexBankAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort' => ['string', 'nullable', Rule::in(get_sortable_items((new BankAccount())->getFillable())),],
+            'sort'           => ['string', 'nullable', Rule::in(get_sortable_items((new BankAccount())->getFillable())),],
             'sort_direction' => ['string', 'nullable', Rule::in('desc', 'asc'),],
-            'search' => ['nullable', 'max:255',],
-            'status' => ['nullable', Rule::in(BankAccount::STATUSES)],
-            'admin_id' => ['filled', 'integer',],
-            'export' => ['nullable', 'bool',],
+            'search'         => ['nullable', 'max:255',],
+            'status'         => ['nullable', Rule::in(BankAccount::STATUSES)],
+            'admin_id'       => ['filled', 'integer',],
+            'export'         => ['nullable', 'bool',],
         ];
     }
 
     public function prepareForValidation()
     {
         $this->mergeIfMissing([
-            'sort' => 'display_order'
+            'sort' => 'order'
         ]);
     }
 }
