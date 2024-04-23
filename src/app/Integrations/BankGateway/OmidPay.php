@@ -63,6 +63,13 @@ class OmidPay implements Interface\BankGatewayInterface
             throw new BadRequestException("OmidPay callback missing RefNum and/or Token, transactionId: $transaction->id data:" . json_encode($data));
         }
 
+        if ($data['token'] != $transaction->tracking_code){
+            ($this->updateTransactionService)($transaction, [
+                'status' => Transaction::STATUS_FRAUD,
+            ]);
+            throw new BadRequestException("OmidPay token and transaction tracking_code mismatch");
+        }
+
         $response = Http::withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [

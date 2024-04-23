@@ -50,7 +50,10 @@ class Zarinpal implements BankGatewayInterface
         if ($data['status'] == 'NOK') {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
-        if ($data['Authority'] != $transaction->tracking_code) {
+        if ($data['Authority'] != $transaction->tracking_code || $data['amount'] != $transaction->amount) {
+            ($this->updateTransactionService)($transaction, [
+                'status' => Transaction::STATUS_FRAUD,
+            ]);
             throw new BadRequestException("Zarinpal miss match tracking_code, transactionId: $transaction->id , Authority: " . $data['Authority']);
         }
 
@@ -119,14 +122,11 @@ class Zarinpal implements BankGatewayInterface
         $errorMessage = data_get($response, 'errors.0.validation.0.message');
 
         if (!empty($errorMessage)) {
-            switch ($errorMessage) {
-                case 'The provided iban is not valid.':
-                    throw new BadRequestException(trans('validation.invalid_sheba'));
-                case 'The iban has already been taken.':
-                    throw new BadRequestException(trans('validation.sheba_already_taken'));
-                default:
-                    throw new BadRequestException((string)$errorMessage);
-            }
+            throw match ($errorMessage) {
+                'The provided iban is not valid.' => new BadRequestException(trans('validation.invalid_sheba')),
+                'The iban has already been taken.' => new BadRequestException(trans('validation.sheba_already_taken')),
+                default => new BadRequestException((string)$errorMessage),
+            };
         }
 
         $data = data_get($response, 'data.BankAccountAdd');
@@ -179,22 +179,18 @@ class Zarinpal implements BankGatewayInterface
         $errorMessage = data_get($response, 'errors.0.validation.0.message');
 
         if (!empty($errorMessage))
-            switch ($errorMessage) {
-                case 'The amount must be at least 100000.':
-                    throw new BadRequestException(trans('validation.zarinpal_amount_be_least'));
-                default:
-                    throw new BadRequestException((string)$errorMessage);
-            }
+            throw match ($errorMessage) {
+                'The amount must be at least 100000.' => new BadRequestException(trans('validation.zarinpal_amount_be_least')),
+                default => new BadRequestException((string)$errorMessage),
+            };
 
         $errorMessage = data_get($response, 'errors.0.message');
 
         if (!empty($errorMessage)) {
-            switch ($errorMessage) {
-                case 'bank account not active,this bank account status is not active':
-                    throw new BadRequestException(trans('validation.zarinpal_bank_account_not_active'));
-                default:
-                    throw new BadRequestException((string)$errorMessage);
-            }
+            throw match ($errorMessage) {
+                'bank account not active,this bank account status is not active' => new BadRequestException(trans('validation.zarinpal_bank_account_not_active')),
+                default => new BadRequestException((string)$errorMessage),
+            };
         }
 
         $data = data_get($response, 'data.PayoutAdd');

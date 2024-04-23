@@ -51,24 +51,41 @@ class Saman implements BankGatewayInterface
         if ($data['state'] != 'OK') {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
-        if ($data['ResNum'] != $transaction->getKey()) {
+
+        $token = data_get($data,'token');
+        if ($data['ResNum'] != $transaction->getKey() || $token != $transaction->tracking_code) {
+            ($this->updateTransactionService)($transaction, [
+                'status' => Transaction::STATUS_FRAUD,
+            ]);
             throw new BadRequestException("Saman miss match transactionId, transactionId: $transaction->id , ResNum: " . $data['ResNum']);
         }
 
         $response = Http::withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
-                'RefNum' => $transaction->tracking_code,
+                'RefNum'         => $transaction->tracking_code,
                 'TerminalNumber' => $this->bankGateway->config['terminal_id'],
             ]);
 
+        $amount = $response->json('TransactionDetail.OrginalAmount');
+
+        if ($amount != $transaction->amount) {
+            ($this->updateTransactionService)($transaction, [
+                'status' => Transaction::STATUS_FRAUD,
+            ]);
+            throw new BadRequestException('Saman verify ResultCode: ' . $response->json('ResultCode'));
+        }
+
+
         if (!$response->json('Success') || $response->json('ResultCode') != 0) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            ($this->updateTransactionService)($transaction, [
+                'status' => Transaction::STATUS_FAIL,
+            ]);
             throw new BadRequestException('Saman verify ResultCode: ' . $response->json('ResultCode'));
         }
 
         return ($this->updateTransactionService)($transaction, [
-            'status' => Transaction::STATUS_SUCCESS,
+            'status'       => Transaction::STATUS_SUCCESS,
             'reference_id' => $response->json('TransactionDetail.RefNum'),
         ]);
     }

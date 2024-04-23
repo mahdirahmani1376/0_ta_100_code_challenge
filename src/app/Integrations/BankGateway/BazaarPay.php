@@ -113,7 +113,7 @@ class BazaarPay implements Interface\BankGatewayInterface
             ]);
 
         if (!$response->successful()) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
             throw BazaarPayAPIException::make($response->body(), $response->status(), json_encode([
                 'route' => $this->bankGateway->config['init_checkout_url'],
                 'direct_payment_id' => $directPayment->id,

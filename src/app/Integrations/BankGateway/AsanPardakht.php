@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AsanPardakht implements Interface\BankGatewayInterface
@@ -63,6 +64,15 @@ class AsanPardakht implements Interface\BankGatewayInterface
 
         if ($transactionResultResponse->status() != Response::HTTP_OK) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+        }
+
+        $amount = data_get($data,'content.amount');
+        $token = data_get($data,'content.payGateTranID');
+        if ($amount != $transaction->amount || $token != $transaction->getKey()) {
+            Log::error('transaction possible fraud',[
+                'transaction' => $transaction,
+                'data' => $transactionResultResponse
+            ]);
         }
 
         $verifyResponse = Http::withHeader('Content-Type', 'application/json')

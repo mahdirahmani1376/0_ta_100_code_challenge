@@ -52,6 +52,11 @@ class Sadad implements Interface\BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
+        if ($data['token'] != $transaction->tracking_code){
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('Sadad token mismatch');
+        }
+
         $response = Http::withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
                 'Token' => $transaction->tracking_code,
@@ -61,6 +66,12 @@ class Sadad implements Interface\BankGatewayInterface
         if (!$response->json('ResCode') != 0) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw new BadRequestException('Sadad verify ResCode: ' . $response->json('ResCode'));
+        }
+
+        if ($response->json('Amount') != $transaction->amount)
+        {
+            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+            throw new BadRequestException('Sadad amount mismatch');
         }
 
         return ($this->updateTransactionService)($transaction, [
