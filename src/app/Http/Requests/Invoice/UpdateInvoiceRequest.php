@@ -25,8 +25,8 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'invoice_date'   => ['nullable', 'date', 'date_format'],
-            'due_date'       => ['nullable', 'date', 'date_format'],
+            'invoice_date'   => ['nullable', 'date', 'date_format:Y-m-d'],
+            'due_date'       => ['nullable', 'date', 'date_format:Y-m-d'],
             'paid_at'        => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
             'tax_rate'       => ['nullable', 'integer', 'max:99', 'min:0',],
             'invoice_number' => ['nullable', 'int',],
