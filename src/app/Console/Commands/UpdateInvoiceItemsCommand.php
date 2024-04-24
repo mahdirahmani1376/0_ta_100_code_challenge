@@ -81,7 +81,6 @@ class UpdateInvoiceItemsCommand extends Command
         } catch (Throwable $e) {
             $this->error("item with id:$item->id with invoice $invoice->id threw exception with message {$e->getMessage()}");
             Log::error("item with id:$item->id with invoice $invoice->id threw exception", [
-                'response' => $response,
                 'error'    => $e->getMessage(),
                 'trace'    => $e->getTrace()
             ]);
