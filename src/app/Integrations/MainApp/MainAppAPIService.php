@@ -242,33 +242,25 @@ class MainAppAPIService extends BaseMainAppAPIService
     {
         $url = "/api/internal/finance/$domainId/recalculate-domain";
 
-        try {
             $response = self::makeRequest('get', $url);
 
             if ($response->successful()) {
                 return $response->json();
+            } else {
+                throw MainAppInternalAPIException::make($url);
             }
-
-            throw MainAppInternalAPIException::make($url,'');
-        } catch (Exception $exception) {
-            throw MainAppInternalAPIException::make($url,'');
-        }
     }
 
     public static function recalculateProductServicePrice($serviceId)
     {
         $url = "/api/internal/finance/$serviceId/recalculate-service";
 
-        try {
-            $response = self::makeRequest('get', $url);
+        $response = self::makeRequest('get', $url);
 
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            throw MainAppInternalAPIException::make($url,'');
-        } catch (Exception $exception) {
-            throw MainAppInternalAPIException::make($url,'');
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            throw MainAppInternalAPIException::make($url);
         }
     }
 
