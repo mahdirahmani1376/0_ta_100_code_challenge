@@ -242,10 +242,13 @@ class MainAppAPIService extends BaseMainAppAPIService
     {
         $url = "/api/internal/finance/$domainId/recalculate-domain";
 
-        $response = self::makeRequest('get', $url);
+            $response = self::makeRequest('get', $url);
 
-        return $response->json();
-
+            if ($response->successful()) {
+                return $response->json();
+            } else {
+                throw MainAppInternalAPIException::make($url);
+            }
     }
 
     public static function recalculateProductServicePrice($serviceId)
@@ -254,8 +257,11 @@ class MainAppAPIService extends BaseMainAppAPIService
 
         $response = self::makeRequest('get', $url);
 
-        return $response->json();
-
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            throw MainAppInternalAPIException::make($url);
+        }
     }
 
 }

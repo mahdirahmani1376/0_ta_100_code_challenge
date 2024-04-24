@@ -9,8 +9,8 @@ use App\Exceptions\Base\ExceptionTypes;
 /**
  * Class MainAppInternalAPIException
  * @package App\Exceptions\SystemException
- * @method static self make($url,$param)
- * @method self params($url, $param)
+ * @method static self make($url,$param=null)
+ * @method self params($url, $param=null)
  */
 class MainAppInternalAPIException extends BaseSystemException
 {

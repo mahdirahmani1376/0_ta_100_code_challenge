@@ -58,7 +58,6 @@ trait BaseExceptionTrait
         $exception->code = $exception->getErrorCode();
         $exception->setMessageParams($args);
         $exception->message = __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams());
-
         return $exception;
     }
 
