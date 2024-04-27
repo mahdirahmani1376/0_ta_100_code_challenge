@@ -31,7 +31,7 @@ class ApplyBalanceToInvoiceAction
             throw new BadRequestException(__('finance.invoice.AccessDeniedToInvoice'));
         }
 
-        if (is_null($data['amount'])) {
+        if (empty($data['amount'])) {
             $data['amount'] = $invoice->balance;
         }
 
@@ -60,20 +60,20 @@ class ApplyBalanceToInvoiceAction
         }
 
         ($this->deductBalanceAction)($invoice->profile_id, [
-            'amount' => $data['amount'],
+            'amount'      => $data['amount'],
             'description' => __('finance.credit.ApplyCreditToInvoice', ['invoice_id' => $invoice->getKey()]),
         ]);
 
         ($this->storeTransactionAction)([
-            'invoice_id' => $invoice->id,
-            'amount' => $data['amount'],
+            'invoice_id'     => $invoice->id,
+            'amount'         => $data['amount'],
             'payment_method' => Transaction::PAYMENT_METHOD_WALLET_BALANCE,
         ]);
 
         admin_log(AdminLog::ADD_CREDIT_TO_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
 
         $invoice->refresh();
-        if ($invoice->balance == 0) {
+        if ($invoice->balance <= 0) {
             ($this->processInvoiceAction)($invoice);
         }
 
