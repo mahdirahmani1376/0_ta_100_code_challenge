@@ -57,7 +57,8 @@ class ApplyBalanceToInvoiceAction
         $wallet = ($this->showWalletAction)($invoice->profile_id);
 
         if ($data['amount'] > $wallet->balance) {
-            throw new BadRequestException(__('finance.credit.NotEnoughBalance'));
+//            throw new BadRequestException(__('finance.credit.NotEnoughBalance'));
+            $data['amount'] = $wallet->balance;
         }
 
         ($this->deductBalanceAction)($invoice->profile_id, [
@@ -74,6 +75,7 @@ class ApplyBalanceToInvoiceAction
         admin_log(AdminLog::ADD_CREDIT_TO_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
 
         $invoice->refresh();
+
         if ($invoice->balance <= 0) {
             ($this->processInvoiceAction)($invoice);
         }

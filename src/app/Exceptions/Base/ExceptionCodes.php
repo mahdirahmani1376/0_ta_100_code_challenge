@@ -27,4 +27,5 @@ final class ExceptionCodes
     public const NOT_AUTHORIZED = '410110';
     public const INVOICE_STATUS_UNACCEPTABLE = '410085';
     public const INVOICE_STATUS_MUST_BE_UNPAID = '410086';
+    public const MAKE_BANK_GATEWAY_FAILED = '410087';
 }
