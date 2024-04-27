@@ -82,7 +82,7 @@ class ProcessInvoiceAction
         }
 
         if ($invoice->is_mass_payment) {
-            $invoice->items()->each(function (Item $item) {
+            $invoice->items->each(function (Item $item) {
                 $invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
                 if (!is_null($invoice)) {
                     ($this)($invoice);
