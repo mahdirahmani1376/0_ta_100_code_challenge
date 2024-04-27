@@ -8,6 +8,7 @@ use App\Actions\Wallet\ShowWalletAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;
+use App\Exceptions\SystemException\InvoiceStatusMustBeUnpaidException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -42,7 +43,7 @@ class ApplyBalanceToInvoiceAction
             Invoice::STATUS_PAYMENT_PENDING,
             Invoice::STATUS_COLLECTIONS,
         ])) {
-            throw ApplyCreditToCreditInvoiceException::make();
+            throw InvoiceStatusMustBeUnpaidException::make();
         }
 
         if ($data['amount'] > $invoice->balance) {
