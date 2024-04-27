@@ -49,7 +49,7 @@ class ProcessInvoiceAction
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
         if ($invoice->status === Invoice::STATUS_REFUNDED) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount' => $invoice->total,
+                'amount'      => $invoice->total,
                 'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
             ]);
             ($this->storeRefundTransactionService)($invoice);
@@ -64,6 +64,7 @@ class ProcessInvoiceAction
         ])) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
         }
+
         // Calc paid_at
         if (is_null($invoice->paid_at)) {
             ($this->calcInvoicePaidAtService)($invoice);
@@ -74,18 +75,19 @@ class ProcessInvoiceAction
 
         // If invoice is charge-wallet (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
-        if ($invoice->is_credit) {
+        if ($invoice->is_credit || $invoice->is_mass_payment) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount' => $invoice->total,
+                'amount'      => $invoice->total,
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
             ]);
         }
 
         if ($invoice->is_mass_payment) {
-            $invoice->items->each(function (Item $item) {
-                $invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
-                if (!is_null($invoice)) {
-                    ($this)($invoice);
+            $invoice->items->each(function (Item $item) use ($invoice) {
+                $mass_invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
+                if ($mass_invoice instanceof Invoice) {
+                    $applyBalanceToInvoiceAction = app()->make(ApplyBalanceToInvoiceAction::class);
+                    ($applyBalanceToInvoiceAction)($mass_invoice, []);
                 }
             });
         }

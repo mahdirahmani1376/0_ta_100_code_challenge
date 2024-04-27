@@ -19,7 +19,7 @@ class MakeBankGatewayProviderByNameService
         /**
          * @var BankGatewayInterface $provider
          */
-        $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($name);
+        $provider = "App\\Integrations\\BankGateway\\" . Str::ucfirst($bankGatewayModel->name);
 
         return $provider::make($bankGatewayModel);
     }
