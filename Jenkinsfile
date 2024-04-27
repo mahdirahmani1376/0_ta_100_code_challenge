@@ -42,6 +42,12 @@ node ('public') {
         git branch: "${branch}", credentialsId: 'Gitlab', url: "$repoUrl"
     }
 
+    stage('SonarQube Analysis') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            		sonarQube("$app-$team-$environment")
+                	}
+		}
+
 //    stage('Init') {
 //        // getAppconfig(String app, String env="staging", String envFileName=".env")
  //       getAppconfig("$deployment", "$environment", ".env")
