@@ -2,6 +2,7 @@
 
 namespace App\Services\BankGateway;
 
+use App\Exceptions\SystemException\MakeBankGatewayFailedException;
 use App\Integrations\BankGateway\Interface\BankGatewayInterface;
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
 use Illuminate\Support\Str;
