@@ -13,6 +13,7 @@ use App\Services\Invoice\CalcInvoiceProcessedAtService;
 use App\Services\Invoice\ChangeInvoiceStatusService;
 use App\Services\Invoice\FindInvoiceByIdService;
 use App\Services\Invoice\Transaction\StoreRefundTransactionService;
+use App\Services\Invoice\UpdateInvoiceService;
 
 class ProcessInvoiceAction
 {
@@ -24,12 +25,13 @@ class ProcessInvoiceAction
         private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
         private readonly FindInvoiceByIdService        $findInvoiceByIdService,
         private readonly CalcInvoiceProcessedAtService $calcInvoiceProcessedAtService,
+        private readonly UpdateInvoiceService          $updateInvoiceService
     )
     {
     }
 
     // TODO check usage of this action
-    public function __invoke(Invoice $invoice): Invoice
+    public function __invoke(Invoice $invoice, $mass_payment_item = false): Invoice
     {
         $invoice->refresh();
         // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
@@ -38,18 +40,18 @@ class ProcessInvoiceAction
             return $invoice;
         }
         // Normal Invoices must have zero balance to be processed
-        if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
+        if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0 && !$mass_payment_item) {
             return $invoice;
         }
         // Collection Invoices can have positive balance and still be processed,
         // but if an Invoice is not Collection then it MUST have zero balance otherwise cannot be processed until it's paid in full
-        if ($invoice->status != Invoice::STATUS_COLLECTIONS && $invoice->balance > 0) {
+        if ($invoice->status != Invoice::STATUS_COLLECTIONS && $invoice->balance > 0 && !$mass_payment_item) {
             return $invoice;
         }
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
         if ($invoice->status === Invoice::STATUS_REFUNDED) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount' => $invoice->total,
+                'amount'      => $invoice->total,
                 'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
             ]);
             ($this->storeRefundTransactionService)($invoice);
@@ -64,6 +66,11 @@ class ProcessInvoiceAction
         ])) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
         }
+
+        if ($invoice->balance > 0 && $mass_payment_item) {
+            ($this->updateInvoiceService)($invoice, ['balance' => 0]);
+        }
+
         // Calc paid_at
         if (is_null($invoice->paid_at)) {
             ($this->calcInvoicePaidAtService)($invoice);
@@ -76,16 +83,16 @@ class ProcessInvoiceAction
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
         if ($invoice->is_credit) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount' => $invoice->total,
+                'amount'      => $invoice->total,
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
             ]);
         }
 
         if ($invoice->is_mass_payment) {
-            $invoice->items->each(function (Item $item) {
-                $invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
-                if (!is_null($invoice)) {
-                    ($this)($invoice);
+            $invoice->items->each(function (Item $item) use ($invoice) {
+                $mass_invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
+                if (!is_null($mass_invoice)) {
+                    ($this)($mass_invoice, $invoice->is_mass_payment);
                 }
             });
         }
