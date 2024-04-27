@@ -9,6 +9,7 @@ use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;
 use App\Exceptions\SystemException\InvoiceStatusMustBeUnpaidException;
+use App\Exceptions\SystemException\NotEnoughCreditException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -56,8 +57,11 @@ class ApplyBalanceToInvoiceAction
 
         $wallet = ($this->showWalletAction)($invoice->profile_id);
 
+        if ($wallet->balance <= 0) {
+            throw NotEnoughCreditException::make();
+        }
+
         if ($data['amount'] > $wallet->balance) {
-//            throw new BadRequestException(__('finance.credit.NotEnoughBalance'));
             $data['amount'] = $wallet->balance;
         }
 
