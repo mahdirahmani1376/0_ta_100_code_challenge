@@ -26,4 +26,5 @@ final class ExceptionCodes
     public const INVOICE_CANCELLATION_FAILED = '410084';
     public const NOT_AUTHORIZED = '410110';
     public const INVOICE_STATUS_UNACCEPTABLE = '410085';
+    public const INVOICE_STATUS_MUST_BE_UNPAID = '410086';
 }
