@@ -19,7 +19,7 @@ class CalcInvoicePaidAtService
 
     public function __invoke(Invoice $invoice): Invoice
     {
-        if ($invoice->balance != 0) {
+        if ($invoice->balance > 0) {
             return $invoice;
         }
         if (!in_array($invoice->status, [
