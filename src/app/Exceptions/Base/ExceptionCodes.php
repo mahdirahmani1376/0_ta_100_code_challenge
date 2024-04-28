@@ -20,7 +20,6 @@ final class ExceptionCodes
     public const UPDATING_PAID_OR_REFUNDED_INVOICE_NOT_ALLOWED = '420029';
     public const INVOICE_HAS_ACTIVE_TRANSACTIONS = '420032';
     public const AT_LEAST_ONE_INVOICE_ITEM_MUST_REMAIN = '420031';
-    public const APPLY_CREDIT_TO_CREDIT_INVOICE_NOT_ALLOWED = '410088';
     public const AMOUNT_IS_MORE_THAN_INVOICE_BALANCE = '410090';
     public const OFFLINE_PAYMENT_APPLY = "410133";
     public const INVOICE_CANCELLATION_FAILED = '410084';
@@ -28,4 +27,6 @@ final class ExceptionCodes
     public const INVOICE_STATUS_UNACCEPTABLE = '410085';
     public const INVOICE_STATUS_MUST_BE_UNPAID = '410086';
     public const MAKE_BANK_GATEWAY_FAILED = '410087';
+    public const APPLY_CREDIT_TO_CREDIT_INVOICE_NOT_ALLOWED = '410088';
+    public const NOT_ENOUGH_CREDIT = '410089';
 }
