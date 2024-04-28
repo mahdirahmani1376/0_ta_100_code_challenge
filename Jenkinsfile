@@ -42,11 +42,14 @@ node ('public') {
         git branch: "${branch}", credentialsId: 'Gitlab', url: "$repoUrl"
     }
 
-    stage('SonarQube Analysis') {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            		sonarQube("$app-$team-$environment")
-                	}
-		}
+    parallel sonar: {
+
+      stage('SonarQube Analysis') {
+                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              		sonarQube("$app-$team-$environment")
+                  	}
+		  }
+    }, deploy: {
 
 //    stage('Init') {
 //        // getAppconfig(String app, String env="staging", String envFileName=".env")
@@ -80,7 +83,9 @@ node ('public') {
         
                     
     }
-           
+    
+    }
+
     }
     catch(e) {
             pipresult = "FAILURE"
