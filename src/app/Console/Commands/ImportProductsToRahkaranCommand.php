@@ -7,6 +7,7 @@ use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\RahkaranService;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * Class ImportProductsToRahkaranCommand
@@ -43,7 +44,8 @@ class ImportProductsToRahkaranCommand extends Command
     {
         $this->info('Create new DLs');
 
-        $products = $this->mainAppAPIService->adminListProducts(['all' => 1]);
+        $products = $this->mainAppAPIService->adminListProducts();
+
         foreach ( $products as $product )
         {
             try {
@@ -51,9 +53,11 @@ class ImportProductsToRahkaranCommand extends Command
                 $description = 'محصول ' . $product['name'];
 
                 $dl_object = $this->rahkaranService->getDl($code);
-                if (!$dl_object)
+                if (!$dl_object) {
                     $this->rahkaranService->createDl((string)$code, 15, $description, $description);
-            } catch(\Exception $e) {
+                }
+
+            } catch(Throwable $e) {
                 $this->error('Fail on product ' . $product['name']);
             }
         }

@@ -183,14 +183,14 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public function adminListProducts($array)
+    public function adminListProducts()
     {
         $url = '/api/internal/finance/products';
 
         try {
-            return self::makeRequest('get', $url, $array);
+            return self::makeRequest('get', $url);
         } catch (Exception $exception) {
-            throw MainAppInternalAPIException::make($url, json_encode($array));
+            throw MainAppInternalAPIException::make($url);
         }
     }
 
@@ -242,13 +242,13 @@ class MainAppAPIService extends BaseMainAppAPIService
     {
         $url = "/api/internal/finance/$domainId/recalculate-domain";
 
-            $response = self::makeRequest('get', $url);
+        $response = self::makeRequest('get', $url);
 
-            if ($response->successful()) {
-                return $response->json();
-            } else {
-                throw MainAppInternalAPIException::make($url);
-            }
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            throw MainAppInternalAPIException::make($url);
+        }
     }
 
     public static function recalculateProductServicePrice($serviceId)

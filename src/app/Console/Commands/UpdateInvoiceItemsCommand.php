@@ -58,7 +58,7 @@ class UpdateInvoiceItemsCommand extends Command
         try {
             $oldState = $invoice->toArray();
 
-            if ($item->invoiceable_type == Item::TYPE_DOMAIN) {
+            if ($item->invoiceable_type == Item::TYPE_DOMAIN_SERVICE) {
                 $response = MainAppAPIService::recalculateDomainServicePrice($item->invoiceable_id);
                 $price = data_get($response, 'price');
             } elseif ($item->invoiceable_type == Item::TYPE_PRODUCT_SERVICE) {
