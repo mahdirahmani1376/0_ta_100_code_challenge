@@ -11,7 +11,6 @@ use MongoDB\Laravel\Eloquent\Model;
 class AbstractBaseLog extends Model
 {
     use SoftDeletes, MongoDate;
-
     protected $connection = "mongodb";
 
 
