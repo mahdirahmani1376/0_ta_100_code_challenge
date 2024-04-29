@@ -39,6 +39,7 @@ class Item extends Model
     const TYPE_PRODUCT_SERVICE = 'ProductService';
     const TYPE_ADMIN_TIME = 'AdminTime';
     const TYPE_CLOUD = 'Cloud';
+    const TYPE_CLOUD_IP = 'CloudIp';
     const TYPE_REFUND_DOMAIN = 'RefundDomain';
     const TYPE_ADD_FUNDS = 'AddFunds';
     const TYPE_DOMAIN_ADDON_DNS = 'DomainAddonDNS';
