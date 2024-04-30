@@ -16,8 +16,6 @@ class GetTaxExcludeController extends Controller
     public function __invoke($amount)
     {
         $data = ($this->getTaxExcludeAction)($amount);
-        return response()->json([
-            'data' => $data
-        ]);
+        return response()->json($data);
     }
 }
