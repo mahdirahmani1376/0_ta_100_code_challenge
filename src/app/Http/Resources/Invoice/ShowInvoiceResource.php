@@ -38,7 +38,7 @@ class ShowInvoiceResource extends JsonResource
             'source_invoice'        => $this->source_invoice,
             'available_status_list' => $this->available_status_list,
             'invoice_number'        => InvoiceNumberResource::make($this->invoiceNumber),
-            'transactions'          => TransactionWithoutInvoiceResource::collection($this->transactions),
+            'transactions'          => TransactionWithoutInvoiceResource::collection($this->transactions()->orderByDesc('id')->get()),
             'items'                 => ShowItemResource::collection($this->items),
             'offline_transactions'  => OfflineTransactionResource::collection($this->offlineTransactions),
         ];

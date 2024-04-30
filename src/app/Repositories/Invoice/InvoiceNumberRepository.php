@@ -60,7 +60,7 @@ class InvoiceNumberRepository extends BaseRepository implements InvoiceNumberRep
             ->limit(1)
             ->update([
                 'invoice_id' => $invoice->id,
-                'status' => InvoiceNumber::STATUS_ACTIVE,
+                'status'     => InvoiceNumber::STATUS_ACTIVE,
                 'updated_at' => now(),
             ]);
     }

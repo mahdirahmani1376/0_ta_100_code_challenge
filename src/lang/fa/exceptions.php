@@ -19,5 +19,8 @@ return [
     ExceptionCodes::OFFLINE_PAYMENT_APPLY                         => 'پرداخت افلاین شماره :offline_payment_id قبلا تایید شده است.',
     ExceptionCodes::INVOICE_CANCELLATION_FAILED                   => 'فاکتور شماره :invoice_id قابل کنسل کردن نمیباشد.',
     ExceptionCodes::NOT_AUTHORIZED                                => 'درخواست غیر مجاز است.',
-    ExceptionCodes::INVOICE_STATUS_UNACCEPTABLE                   => 'وضعیت صورتحصاب نمیتواند :status باشد.'
+    ExceptionCodes::INVOICE_STATUS_UNACCEPTABLE                   => 'وضعیت صورتحساب نمیتواند :status باشد.',
+    ExceptionCodes::INVOICE_STATUS_MUST_BE_UNPAID                 => 'وضعیت صورتحساب معتبر نمیباشد.',
+    ExceptionCodes::MAKE_BANK_GATEWAY_FAILED                      => 'درگاه :name پیدا نشد.',
+    ExceptionCodes::NOT_ENOUGH_CREDIT                             => 'اعتبار شما کافی نیست.'
 ];

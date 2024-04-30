@@ -8,6 +8,8 @@ use App\Actions\Wallet\ShowWalletAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;
+use App\Exceptions\SystemException\InvoiceStatusMustBeUnpaidException;
+use App\Exceptions\SystemException\NotEnoughCreditException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -31,7 +33,7 @@ class ApplyBalanceToInvoiceAction
             throw new BadRequestException(__('finance.invoice.AccessDeniedToInvoice'));
         }
 
-        if (is_null($data['amount'])) {
+        if (empty($data['amount'])) {
             $data['amount'] = $invoice->balance;
         }
 
@@ -42,7 +44,7 @@ class ApplyBalanceToInvoiceAction
             Invoice::STATUS_PAYMENT_PENDING,
             Invoice::STATUS_COLLECTIONS,
         ])) {
-            throw ApplyCreditToCreditInvoiceException::make();
+            throw InvoiceStatusMustBeUnpaidException::make();
         }
 
         if ($data['amount'] > $invoice->balance) {
@@ -55,25 +57,30 @@ class ApplyBalanceToInvoiceAction
 
         $wallet = ($this->showWalletAction)($invoice->profile_id);
 
+        if ($wallet->balance <= 0) {
+            throw NotEnoughCreditException::make();
+        }
+
         if ($data['amount'] > $wallet->balance) {
-            throw new BadRequestException(__('finance.credit.NotEnoughBalance'));
+            $data['amount'] = $wallet->balance;
         }
 
         ($this->deductBalanceAction)($invoice->profile_id, [
-            'amount' => $data['amount'],
+            'amount'      => $data['amount'],
             'description' => __('finance.credit.ApplyCreditToInvoice', ['invoice_id' => $invoice->getKey()]),
         ]);
 
         ($this->storeTransactionAction)([
-            'invoice_id' => $invoice->id,
-            'amount' => $data['amount'],
+            'invoice_id'     => $invoice->id,
+            'amount'         => $data['amount'],
             'payment_method' => Transaction::PAYMENT_METHOD_WALLET_BALANCE,
         ]);
 
         admin_log(AdminLog::ADD_CREDIT_TO_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
 
         $invoice->refresh();
-        if ($invoice->balance == 0) {
+
+        if ($invoice->balance <= 0) {
             ($this->processInvoiceAction)($invoice);
         }
 

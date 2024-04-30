@@ -32,12 +32,12 @@ class StoreMassPaymentInvoiceService
 
         /** @var Invoice $massPaymentInvoice */
         $massPaymentInvoice = $this->invoiceRepository->create([
-            'payment_method' => Invoice::PAYMENT_METHOD_CREDIT,
-            'due_date' => null,
+            'payment_method'  => Invoice::PAYMENT_METHOD_CREDIT,
+            'due_date'        => null,
             'is_mass_payment' => true,
-            'tax_rate' => MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX),
-            'status' => Invoice::STATUS_UNPAID,
-            'profile_id' => $data['profile_id'],
+            'tax_rate'        => 0,
+            'status'          => Invoice::STATUS_UNPAID,
+            'profile_id'      => $data['profile_id'],
         ], [
             'payment_method',
             'due_date',
@@ -52,11 +52,11 @@ class StoreMassPaymentInvoiceService
         /** @var Invoice $invoiceForMassPayment */
         foreach ($invoicesForMassPayment as $invoiceForMassPayment) {
             $this->itemRepository->create([
-                'invoice_id' => $massPaymentInvoice->getKey(),
-                'description' => __('finance.invoice.MassPaymentInvoice', ['id' => $invoiceForMassPayment->getKey()]),
-                'amount' => $invoiceForMassPayment->balance,
+                'invoice_id'       => $massPaymentInvoice->getKey(),
+                'description'      => __('finance.invoice.MassPaymentInvoice', ['id' => $invoiceForMassPayment->getKey()]),
+                'amount'           => $invoiceForMassPayment->balance,
                 'invoiceable_type' => Item::TYPE_MASS_PAYMENT_INVOICE,
-                'invoiceable_id' => $invoiceForMassPayment->getKey(),
+                'invoiceable_id'   => $invoiceForMassPayment->getKey(),
             ]);
         }
 

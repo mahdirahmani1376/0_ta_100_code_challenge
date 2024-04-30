@@ -93,7 +93,7 @@ class InvoiceReminderCommand extends Command
             }
         } catch (\Exception $exception) {
             \Log::error('Failed to fetch config values from MainApp', [
-                'class' => self::class,
+                'class'   => self::class,
                 'message' => $exception->getMessage(),
             ]);
             $this->error('Failed to fetch config values from MainApp');
@@ -128,12 +128,12 @@ class InvoiceReminderCommand extends Command
                         $payload = [
                             'reminders' => [
                                 [
-                                    'profile_id' => $clientId,
-                                    'message' => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->emailMessageTemplate, $this->emailLinkTemplate),
+                                    'profile_id'  => $clientId,
+                                    'message'     => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->emailMessageTemplate, $this->emailLinkTemplate),
                                     'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ]
                             ],
-                            'subject' => $this->emailSubject,
+                            'subject'   => $this->emailSubject,
                         ];
 
                         if (!$this->test) {
@@ -171,7 +171,7 @@ class InvoiceReminderCommand extends Command
                             'reminders' => [
                                 [
                                     'profile_id' => $clientId,
-                                    'message' => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->smsMessageTemplate, $this->smsLinkTemplate),
+                                    'message'    => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->smsMessageTemplate, $this->smsLinkTemplate),
                                 ],
                             ]
                         ];
@@ -211,7 +211,9 @@ class InvoiceReminderCommand extends Command
 
         return $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
-            ->whereDate('due_date', '=', now()->addDays($emailThreshold)->toDateString())
+            ->where('is_mass_payment', false)
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', now()->addDays($emailThreshold)->toDateString())
             ->get(['id', 'profile_id']);
     }
 }

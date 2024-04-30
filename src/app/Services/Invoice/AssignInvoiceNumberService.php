@@ -7,6 +7,7 @@ use App\Jobs\GenerateInvoiceNumberJob;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class AssignInvoiceNumberService
 {
@@ -64,7 +65,9 @@ class AssignInvoiceNumberService
             // Try again to get an available InvoiceNumber
             $affectedRecordCount = $this->invoiceNumberRepository->use($invoice, $type, $fiscalYear);
             if ($affectedRecordCount == 0) {
-                // TODO send critical error alert to sysAdmin / devTeam
+                Log::emergency('Attach invoice number failed', [
+                    'invoice_id' => $invoice->id
+                ]);
             }
         }
 
