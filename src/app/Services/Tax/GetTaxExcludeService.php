@@ -10,10 +10,14 @@ class GetTaxExcludeService
      * Returns tax-excluded amount from given tax included amount
      *
      * @param $amount
-     * @return float|int
+     * @return array
      */
-    public function __invoke($amount): float|int
+    public function __invoke($amount)
     {
-        return (($amount * 100) / (MainAppConfig::get(MainAppConfig::FINANCE_TAX_TOTAL_PERCENT) + 100));
+        $tax = (MainAppConfig::get(MainAppConfig::FINANCE_TAX_TOTAL_PERCENT) + 100);
+        return [
+            'tax'    => $tax,
+            'amount' => (($amount * 100) / $tax)
+        ];
     }
 }

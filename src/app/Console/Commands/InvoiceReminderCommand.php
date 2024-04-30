@@ -63,7 +63,7 @@ class InvoiceReminderCommand extends Command
 
     private function prepareConfigVariablesAndData(): void
     {
-        $hour = MainAppConfig::get(MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_HOUR, refresh: true);
+        $hour = MainAppConfig::get(key: MainAppConfig::CRON_FINANCE_INVOICE_REMINDER_HOUR, refresh: true);
         if (now()->hour != $hour && empty($this->overrideInvoiceId)) {
             $this->info('Hour miss match now: ' . now()->hour . ' config: ' . $hour);
             exit();

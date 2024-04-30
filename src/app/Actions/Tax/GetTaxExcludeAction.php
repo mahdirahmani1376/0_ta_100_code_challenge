@@ -12,7 +12,7 @@ class GetTaxExcludeAction
     {
     }
 
-    public function __invoke($amount): float|int
+    public function __invoke($amount)
     {
         return ($this->getTaxExcludeService)($amount);
     }
