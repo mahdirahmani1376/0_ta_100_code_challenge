@@ -147,7 +147,7 @@ class AsanPardakhtRefundService
         );
     }
 
-    private function createRequestLog(string $method, string $url, array $request_params = [], array $headers = [], string $request_type = AbstractBaseLog::PROVIDER_OUTGOING)
+    private function createRequestLog(string $method, string $url, array $request_params = [], array $headers = [], string $request_type = SystemLog::PROVIDER_OUTGOING)
     {
         $this->sysLog = LogService::store((new SystemLog()), [
             'method'         => $method,

@@ -58,6 +58,7 @@ use App\Http\Controllers\Invoice\Transaction\VerifyTransactionController;
 use App\Http\Controllers\Invoice\UpdateInvoiceController;
 use App\Http\Controllers\ListEverythingController;
 use App\Http\Controllers\Profile\ShowProfileIdController;
+use App\Http\Controllers\Tax\GetTaxExcludeController;
 use App\Http\Controllers\Wallet\CreditTransaction\BulkDeleteCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\DeductBalanceController;
 use App\Http\Controllers\Wallet\CreditTransaction\IndexCreditTransactionController;
@@ -198,3 +199,5 @@ Route::namespace('Profile')
 Route::get('report', FinanceServiceReportController::class);
 Route::get('hourly-report', FinanceServiceHourlyReportController::class);
 Route::get('everything', ListEverythingController::class);
+
+Route::get('/tax/tax-exclude/{amount}', GetTaxExcludeController::class);
