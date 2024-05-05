@@ -3,6 +3,7 @@
 namespace App\Integrations\MainApp;
 
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class MainAppConfig
 {
@@ -22,19 +23,22 @@ class MainAppConfig
     const INVOICE_NUMBER_CURRENT_FISCAL_YEAR = 'INVOICE_NUMBER_CURRENT_FISCAL_YEAR';
     const FINANCE_SERVICE_DEFAULT_TAX = 'FINANCE_SERVICE_DEFAULT_TAX';
     const RAHKARAN_FISCAL_YEAR_REF = 'RAHKARAN_FISCAL_YEAR_REF';
+    const FINANCE_TAX_TOTAL_PERCENT = 'FINANCE_TAX_TOTAL_PERCENT';
 
-    public static function get($key, $default = null, $noCache = false)
+    public static function get($key, $default = null, $refresh = false)
     {
-        $value = $noCache ? null : Cache::get($key);
-        if (is_null($value)) {
-            try {
-                $value = MainAppAPIService::getConfig($key);
-            } catch (\Exception $e) {
-                $value = $default;
-            }
-            Cache::put($key, $value, config('cache.main_app_config_ttl', 3600));
+        if ($refresh) {
+            Cache::forget($key);
         }
 
-        return $value;
+        $value = Cache::rememberForever($key, function () use ($key) {
+            try {
+                return MainAppAPIService::getConfig($key);
+            } catch (Throwable $exception) {
+                return null;
+            }
+        });
+
+        return $value ?? $default;
     }
 }

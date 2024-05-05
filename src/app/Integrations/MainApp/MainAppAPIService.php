@@ -1,7 +1,4 @@
 <?php
-// TODO fix the following issues in this file
-// 1- error handling strategy
-// 2- refactor the redundant codes and encapsulate re-usable methods
 
 namespace App\Integrations\MainApp;
 
