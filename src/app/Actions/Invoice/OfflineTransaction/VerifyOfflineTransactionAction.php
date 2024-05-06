@@ -10,7 +10,6 @@ use App\Actions\Invoice\Transaction\VerifyTransactionAction;
 use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
 use App\Models\AdminLog;
-use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\Item\FindAddCreditItemService;
 use App\Services\Invoice\OfflineTransaction\AttachOfflineTransactionToNewInvoiceService;
@@ -70,8 +69,6 @@ class VerifyOfflineTransactionAction
                 'profile_id' => $invoice->profile_id,
                 'admin_id' => request('admin_id'),
                 'amount' => $offlineTransaction->amount,
-                'paid_at' => now(),
-                'status' => Invoice::STATUS_PAID
             ]);
             ($this->attachOfflineTransactionToNewInvoiceService)($offlineTransaction, $chargeWalletInvoice);
             ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $chargeWalletInvoice);
