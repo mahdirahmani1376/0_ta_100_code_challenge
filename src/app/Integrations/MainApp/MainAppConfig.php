@@ -3,6 +3,7 @@
 namespace App\Integrations\MainApp;
 
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class MainAppConfig
 {
@@ -27,17 +28,17 @@ class MainAppConfig
     public static function get($key, $default = null, $refresh = false)
     {
         if ($refresh) {
-            try {
-                $value = MainAppAPIService::getConfig($key);
-            } catch (\Exception $e) {
-                $value = $default;
-            }
-            Cache::put($key, $value, config('cache.main_app_config_ttl', 3600));
-        } else {
-            $value = Cache::get($key);
+            Cache::forget($key);
         }
 
-        return $value;
+        $value = Cache::rememberForever($key, function () use ($key) {
+            try {
+                return MainAppAPIService::getConfig($key);
+            } catch (Throwable $exception) {
+                return null;
+            }
+        });
 
+        return $value ?? $default;
     }
 }

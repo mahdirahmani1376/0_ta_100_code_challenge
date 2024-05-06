@@ -19,8 +19,8 @@ class UpdateClientBankAccountRequest extends FormRequest
         return [
             'status' => ['nullable', 'string', Rule::in(ClientBankAccount::STATUSES),],
             'bank_name' => ['nullable', 'string',],
-            'card_number' => ['required',],
-            'sheba_number' => ['required', new ShebaNumber,],
+            'card_number' => ['required_without:sheba_number',],
+            'sheba_number' => ['required_without:card_number', new ShebaNumber,],
             'account_number' => ['nullable', 'max:255'],
             'zarinpal_bank_account_id' => ['nullable', 'integer',],
             'owner_name' => ['required', 'max:255',],
