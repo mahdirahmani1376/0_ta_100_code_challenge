@@ -59,7 +59,7 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
     {
         return self::newQuery()
             ->where('invoice_id', $invoice->getKey())
-            ->whereIn('status', [
+            ->whereIn('invoiceable_type', [
                 Item::TYPE_ADD_CLIENT_CREDIT,
                 Item::TYPE_ADD_CLOUD_CREDIT,
             ])
