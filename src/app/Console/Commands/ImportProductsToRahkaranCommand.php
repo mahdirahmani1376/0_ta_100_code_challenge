@@ -46,7 +46,7 @@ class ImportProductsToRahkaranCommand extends Command
 
         $products = $this->mainAppAPIService->adminListProducts();
 
-        foreach ( $products as $product )
+        foreach ( $products->json() as $product )
         {
             try {
                 $code = 60003000 + $product['id'];
