@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
     {
-        $perPage = request()->get('perpage');
+        $perPage = request()->get('perPage');
         $page = request()->get('page');
 
         if (empty($perPage) || is_array($perPage) || is_object($perPage) || (int)$perPage < 0 || (int)$perPage > 200) {
