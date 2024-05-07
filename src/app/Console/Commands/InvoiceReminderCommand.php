@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Helpers\JalaliCalender;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\MainApp\MainAppConfig;
-use App\Jobs\SendInvoiceReminder;
+use App\Jobs\SendInvoiceReminderJob;
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Console\Command;
@@ -137,7 +137,7 @@ class InvoiceReminderCommand extends Command
                         ];
 
                         if (!$this->test) {
-                            $this->reminders[] = new SendInvoiceReminder($payload, 'email');
+                            $this->reminders[] = new SendInvoiceReminderJob($payload, 'email');
                         }
                         $this->info("Email reminder for client #$clientId sent successfully.");
                     } catch (\Exception $e) {
@@ -176,7 +176,7 @@ class InvoiceReminderCommand extends Command
                             ]
                         ];
                         if (!$this->test) {
-                            $this->reminders[] = new SendInvoiceReminder($payload, 'sms');
+                            $this->reminders[] = new SendInvoiceReminderJob($payload, 'sms');
                         }
                         $this->info("SMS reminder for client #$clientId sent successfully.");
                     } catch (\Exception $e) {
