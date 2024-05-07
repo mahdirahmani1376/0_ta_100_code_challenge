@@ -42,10 +42,11 @@ if (!function_exists("check_rahkaran")) {
      */
     function check_rahkaran(Invoice $invoice): void
     {
-        if ($invoice->rahkaran_id && $invoice->balance == 0 && in_array($invoice->status, [
-                Invoice::STATUS_REFUNDED,
-                Invoice::STATUS_PAID,
-            ])) {
+        if (
+            $invoice->rahkaran_id
+            ||
+            in_array($invoice->status, [Invoice::STATUS_REFUNDED, Invoice::STATUS_PAID,])
+        ) {
             throw InvoiceLockedAndAlreadyImportedToRahkaranException::make($invoice->getKey());
         }
     }
