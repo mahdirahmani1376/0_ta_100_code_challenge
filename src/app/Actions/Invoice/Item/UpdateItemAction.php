@@ -21,7 +21,7 @@ class UpdateItemAction
     public function __invoke(Invoice $invoice, Item $item, array $data)
     {
         $oldState = $item->toArray();
-        if ($data['amount'] != '0') {
+        if ($data['amount'] != 0) {
             check_rahkaran($invoice);
         }
 

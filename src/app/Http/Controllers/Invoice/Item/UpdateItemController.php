@@ -20,7 +20,6 @@ class UpdateItemController
      * @param Item $item
      * @param UpdateItemRequest $request
      * @return ItemResource
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(Invoice $invoice, Item $item, UpdateItemRequest $request)
     {
