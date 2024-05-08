@@ -19,7 +19,7 @@ class StoreInvoiceRequest extends FormRequest
             'admin_id'                 => ['nullable', 'integer',],
             'profile_id'               => ['required', 'integer', 'exists:profiles,id',],
             'invoice_date'             => ['nullable', 'date',],
-            'due_date'                 => ['nullable', 'date',],
+            'due_date'                 => ['nullable', 'date','date_format:Y-m-d'],
             'paid_at'                  => ['nullable', 'date',],
             'tax_rate'                 => ['nullable', 'integer',],
             'status'                   => ['required', Rule::in([
