@@ -39,7 +39,7 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
 
         if ($response->json('status') != 1) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
+            return $this->getFailedRedirectUrl($transaction, $transaction->callback_url);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('token'),]);

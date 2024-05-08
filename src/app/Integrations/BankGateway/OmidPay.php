@@ -42,7 +42,7 @@ class OmidPay extends BaseBankGateway implements Interface\BankGatewayInterface
             ]);
 
         if ($response->failed() || is_null($response->json('Token'))) {
-            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
+            return $this->getFailedRedirectUrl($transaction, $transaction->callback_url);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('Token'),]);

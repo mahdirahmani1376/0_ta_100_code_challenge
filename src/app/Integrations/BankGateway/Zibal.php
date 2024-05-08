@@ -68,7 +68,7 @@ class Zibal extends BaseBankGateway implements Interface\BankGatewayInterface
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             // redirect to failed transaction page
 //            throw new BadRequestException('Zibal failed at start, result: ' . $response->json('result'));
-            return $this->getFailedRedirectUrl($transaction->invoice, $callbackUrl);
+            return $this->getFailedRedirectUrl($transaction, $callbackUrl);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('trackId'),]);
