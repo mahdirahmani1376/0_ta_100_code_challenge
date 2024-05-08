@@ -16,7 +16,7 @@ class UpdateClientCashoutRequest extends FormRequest
         return [
             'amount'                 => ['nullable', 'integer',],
             'profile_id'             => ['nullable', 'integer', 'exists:profiles,id',],
-            'client_bank_account_id' => ['nullable', 'exists:client_bank_account,id']
+            'client_bank_account_id' => ['nullable', 'exists:client_bank_accounts,id']
         ];
     }
 }
