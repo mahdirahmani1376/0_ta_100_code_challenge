@@ -32,44 +32,50 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $e)
+    public function render($request, Throwable $exception)
     {
-        if ($e instanceof BaseSystemException) {
-            return $this->generateJsonResponseForSystemException($e);
-        } elseif ($e instanceof BaseApplicationException) {
-            return $this->generateJsonResponseForApplicationException($e);
-        } elseif ($e instanceof HttpException) {
-            return $this->generateJsonResponseForHttpException($e);
+        if (app()->bound('sentry') && $this->shouldReport($exception)) {
+            app('sentry')->captureException($exception);
         }
 
-        return parent::render($request, $e);
+        if ($exception instanceof BaseSystemException) {
+            return $this->generateJsonResponseForSystemException($exception);
+        } elseif ($exception instanceof BaseApplicationException) {
+            return $this->generateJsonResponseForApplicationException($exception);
+        } elseif ($exception instanceof HttpException) {
+            return $this->generateJsonResponseForHttpException($exception);
+        }
+
+        return parent::render($request, $exception);
     }
 
     protected function generateJsonResponseForSystemException(BaseSystemException $exception): JsonResponse
     {
         return response()->json([
-            'code' => $exception->getCode(),
-            'logRef' => $exception->getLogRef(),
+            'code'      => $exception->getCode(),
+            'logRef'    => $exception->getLogRef(),
             'errorCode' => $exception->getErrorCode(),
-            'message' => __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams())
+            'message'   => __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams())
         ], $exception->getCode());
     }
+
     protected function generateJsonResponseForApplicationException(BaseApplicationException $exception): JsonResponse
     {
         return response()->json([
-            'code' => $exception->getCode(),
-            'logRef' => $exception->getLogRef(),
+            'code'      => $exception->getCode(),
+            'logRef'    => $exception->getLogRef(),
             'errorCode' => $exception->getErrorCode(),
-            'message' => __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams())
+            'message'   => __('exceptions.' . $exception->getLogRef(), $exception->getMessageParams())
         ], $exception->getCode());
     }
+
     protected function generateJsonResponseForHttpException(HttpException $exception): JsonResponse
     {
         return response()->json([
-            'code' => $exception->getCode(),
-            'logRef' => $exception->getLogRef(),
+            'code'      => $exception->getCode(),
+            'logRef'    => $exception->getLogRef(),
             'errorCode' => $exception->getErrorCode(),
-            'message' => __($exception->getMessage())
+            'message'   => __($exception->getMessage())
         ], $exception->getCode());
     }
 }
