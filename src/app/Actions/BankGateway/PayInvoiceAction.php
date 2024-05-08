@@ -55,7 +55,7 @@ class PayInvoiceAction
         $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
 
         $amount = $invoice->balance;
-        $max_transaction_amount = MainAppConfig::get(MainAppConfig::MAX_TRANSACTION_AMOUNT,1_000_000_000);
+        $max_transaction_amount = MainAppConfig::get(MainAppConfig::MAX_TRANSACTION_AMOUNT, 1_000_000_000);
         if ($amount > $max_transaction_amount) {
             $amount = $max_transaction_amount;
         }
@@ -78,6 +78,12 @@ class PayInvoiceAction
             'callback_url' => $callbackUrl
         ]);
 
-        return $bankGatewayProvider->getRedirectUrlToGateway($transaction, $callbackUrl);
+        try {
+            $redirectUrl = $bankGatewayProvider->getRedirectUrlToGateway($transaction, $callbackUrl);
+        } catch (\Throwable $exception) {
+            return callback_result_redirect_url($rawRedirectUrl, $transaction->invoice_id, transactionStatus: Transaction::STATUS_FAIL);
+        }
+
+        return $redirectUrl;
     }
 }
