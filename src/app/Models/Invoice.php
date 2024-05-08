@@ -74,6 +74,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'created_at',
+        'processed_at',
         'due_date',
         'paid_at',
         'profile_id',

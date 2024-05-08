@@ -20,7 +20,8 @@ class UpdateInvoiceService
             'tax_rate',
             'note',
             'source_invoice',
-            'balance'
+            'balance',
+            'processed_at'
         ]);
     }
 }
