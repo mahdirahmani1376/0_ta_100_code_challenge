@@ -32,8 +32,9 @@ class CancelInvoiceAction
         $refundAmount = ($this->refundTransactionService)($invoice);
         if ($refundAmount > 0) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount' => $refundAmount,
+                'amount'      => $refundAmount,
                 'description' => __('finance.credit.RefundCancelledInvoice', ['invoice_id' => $invoice->getKey()]),
+                'invoice_id'  => $invoice->getKey()
             ]);
         }
 
