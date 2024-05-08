@@ -4,7 +4,9 @@ namespace App\Actions\Invoice;
 
 use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
 use App\Models\Invoice;
+use App\Models\Transaction;
 use App\Services\Invoice\CancelInvoiceService;
+use App\Services\Invoice\Transaction\AttachTransactionToNewInvoiceService;
 use App\Services\Transaction\RefundTransactionService;
 
 class CancelInvoiceAction
