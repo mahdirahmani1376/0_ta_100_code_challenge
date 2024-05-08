@@ -12,6 +12,7 @@ use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\CalcInvoiceProcessedAtService;
 use App\Services\Invoice\ChangeInvoiceStatusService;
 use App\Services\Invoice\FindInvoiceByIdService;
+use App\Services\Invoice\ManualCheckService;
 use App\Services\Invoice\Transaction\StoreRefundTransactionService;
 
 class ProcessInvoiceAction
@@ -24,6 +25,7 @@ class ProcessInvoiceAction
         private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
         private readonly FindInvoiceByIdService        $findInvoiceByIdService,
         private readonly CalcInvoiceProcessedAtService $calcInvoiceProcessedAtService,
+        private readonly ManualCheckService            $manualCheckService
     )
     {
     }
@@ -84,6 +86,10 @@ class ProcessInvoiceAction
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
                 'invoice_id'  => $invoice->getKey()
             ]);
+        }
+
+        if ($invoice->is_credit && !$invoice->admin_id) {
+            ($this->manualCheckService)($invoice, 1);
         }
 
         if ($invoice->is_mass_payment) {
