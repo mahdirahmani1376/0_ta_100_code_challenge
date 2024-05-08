@@ -2,42 +2,44 @@ version: '3.5'
 
 services:
 
-    finance_service:
-        build:
-            context: ./.docker-compose
-            dockerfile: Dockerfile
-            args:
-                - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
-        volumes:
-            - ./src:/var/www/
-            - ./.docker-compose/php.ini:/usr/local/etc/php/php.ini
-        environment:
-            - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
-            - EXCLUDE_PORTS=443
-        ports:
-          - 6090:80
-        dns:
-            - 172.29.0.100
-            - 172.29.2.100
-        restart: always
-        env_file:
-            - .env
-        networks:
-            - database_mysql_network
-            - hostiran_system_network
+  finance_service:
+    build:
+      context: ./.docker-compose
+      dockerfile: Dockerfile
+      args:
+        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    volumes:
+      - ./src:/var/www/
+      - ./.docker-compose/php.ini:/usr/local/etc/php/php.ini
+    environment:
+      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+      - EXCLUDE_PORTS=443
+    ports:
+      - 6090:80
+    dns:
+      - 172.29.0.100
+      - 172.29.2.100
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - database_mysql_network
+      - hostiran_system_network
+    extra_hosts:
+      - slog.hostiran.com:172.29.43.201
 
-    finance_redis:
-        image: redis:alpine
-        expose:
-            - "6379"
-        restart: always
-        networks:
-            - database_mysql_network
-            - hostiran_system_network
+  finance_redis:
+    image: redis:alpine
+    expose:
+      - "6379"
+    restart: always
+    networks:
+      - database_mysql_network
+      - hostiran_system_network
 
 
 networks:
-    database_mysql_network:
-        external: true
-    hostiran_system_network:
-      external: true
+  database_mysql_network:
+    external: true
+  hostiran_system_network:
+    external: true
