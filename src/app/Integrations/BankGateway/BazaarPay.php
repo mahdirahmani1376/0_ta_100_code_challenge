@@ -13,7 +13,7 @@ use App\Services\BankGateway\DirectPayment\UpdateDirectPaymentService;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
 
-class BazaarPay implements Interface\BankGatewayInterface
+class BazaarPay extends BaseBankGateway implements Interface\BankGatewayInterface
 {
     const TRACE_CONTRACT_STATUS_ACTIVE = 'active';
 
@@ -63,9 +63,9 @@ class BazaarPay implements Interface\BankGatewayInterface
         if (!$response->successful()) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw BazaarPayAPIException::make($response->body(), $response->status(), json_encode([
-                'route' => $this->bankGateway->config['direct_pay_url'],
+                'route'             => $this->bankGateway->config['direct_pay_url'],
                 'direct_payment_id' => $directPayment->id,
-                'transaction_id' => $transaction->id,
+                'transaction_id'    => $transaction->id,
             ]));
         }
 
@@ -85,7 +85,7 @@ class BazaarPay implements Interface\BankGatewayInterface
         if (!$response->successful()) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw BazaarPayAPIException::make($response->body(), $response->status(), json_encode([
-                'route' => $this->bankGateway->config['trace_url'],
+                'route'             => $this->bankGateway->config['trace_url'],
                 'direct_payment_id' => $directPayment->id,
             ]));
         }
@@ -107,17 +107,17 @@ class BazaarPay implements Interface\BankGatewayInterface
         $response = Http::withHeader('Content-Type', 'application/json')
             ->withToken($this->bankGateway->config['authorization_token'])
             ->post($this->bankGateway->config['init_checkout_url'], [
-                'amount' => $transaction->amount,
-                'destination' => 'HostIran',
+                'amount'       => $transaction->amount,
+                'destination'  => 'HostIran',
                 'service_name' => __('finance.direct_payment.bazaar_pay.service_name', ['invoice_id' => $transaction->invoice_id]),
             ]);
 
         if (!$response->successful()) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             throw BazaarPayAPIException::make($response->body(), $response->status(), json_encode([
-                'route' => $this->bankGateway->config['init_checkout_url'],
+                'route'             => $this->bankGateway->config['init_checkout_url'],
                 'direct_payment_id' => $directPayment->id,
-                'transaction_id' => $transaction->id,
+                'transaction_id'    => $transaction->id,
             ]));
         }
 
@@ -129,8 +129,8 @@ class BazaarPay implements Interface\BankGatewayInterface
         $response = Http::withHeader('Content-Type', 'application/json')
             ->withToken($this->bankGateway->config['authorization_token'])
             ->post($this->bankGateway->config['init_contract_url'], [
-                'type' => 'direct_debit',
-                'period' => 'yearly', //todo check where to get these values, maybe read it from mainapp's config, maybe .env ?
+                'type'         => 'direct_debit',
+                'period'       => 'yearly', //todo check where to get these values, maybe read it from mainapp's config, maybe .env ?
                 'amount_limit' => 1000000000, //todo check where to get these values, maybe read it from mainapp's config, maybe .env ?
             ]);
 

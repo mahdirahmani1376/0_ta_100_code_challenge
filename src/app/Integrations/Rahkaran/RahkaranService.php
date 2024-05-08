@@ -123,7 +123,7 @@ class RahkaranService
 
         $client_party = $this->createParty($client_party);
 
-        $profile = Profile::where('id',$client->finance_profile_id)->first();
+        $profile = Profile::where('id', $client->finance_profile_id)->first();
         $profile->update(['rahkaran_id' => $client_party->ID]);
 
         $this->getClientDl($client);
@@ -1269,12 +1269,12 @@ class RahkaranService
         $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/RegisterDL',
             'post',
             [[
-                 'Code'        => $code,
-                 'DLTypeRef'   => $dl_type_ref,
-                 'Description' => $description,
-                 'Title'       => $title,
-                 'Title_En'    => ''
-             ]],
+                'Code'        => $code,
+                'DLTypeRef'   => $dl_type_ref,
+                'Description' => $description,
+                'Title'       => $title,
+                'Title_En'    => ''
+            ]],
             $this->getHeaders());
 
         $result = $this->validatePartyResult($result);
@@ -1536,7 +1536,7 @@ class RahkaranService
 
         $voucher_item = new VoucherItem();
         $voucher_item->SLCode = $this->config->newTaxSl;
-        $voucher_item->Description = trans('rahkaran.tax.newTax',[
+        $voucher_item->Description = trans('rahkaran.tax.newTax', [
             'tax' => $invoice->tax_rate
         ]);
 

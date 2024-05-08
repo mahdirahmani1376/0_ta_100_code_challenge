@@ -39,7 +39,7 @@ use Illuminate\Support\Str;
 //10 	‌صادرکننده‌ی کارت نامعتبر می‌باشد.
 //11 	‌خطای سوییچ
 //12 	کارت قابل دسترسی نمی‌باشد.
-class Zibal implements Interface\BankGatewayInterface
+class Zibal extends BaseBankGateway implements Interface\BankGatewayInterface
 {
     private UpdateTransactionService $updateTransactionService;
 
@@ -59,14 +59,16 @@ class Zibal implements Interface\BankGatewayInterface
     {
         $response = Http::withHeader('Accept-Encoding', 'application/json')
             ->post($this->bankGateway->config['request_url'], [
-                'merchant' => $this->bankGateway->config['merchant_id'],
-                'amount' => $transaction->amount,
+                'merchant'    => $this->bankGateway->config['merchant_id'],
+                'amount'      => $transaction->amount,
                 'callbackUrl' => $callbackUrl,
             ]);
 
         if ($response->json('result') != 100) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zibal failed at start, result: ' . $response->json('result')); // TODO maybe use a custom exception class
+            // redirect to failed transaction page
+//            throw new BadRequestException('Zibal failed at start, result: ' . $response->json('result'));
+            return $this->getFailedRedirectUrl($transaction->invoice, $callbackUrl);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('trackId'),]);
@@ -87,7 +89,7 @@ class Zibal implements Interface\BankGatewayInterface
         $response = Http::withHeader('Accept-Encoding', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
                 'merchant' => $this->bankGateway->config['merchant_id'],
-                'trackId' => $transaction->tracking_code,
+                'trackId'  => $transaction->tracking_code,
             ]);
 
         if ($response->json('result') != 100) {
@@ -101,7 +103,7 @@ class Zibal implements Interface\BankGatewayInterface
         }
 
         return ($this->updateTransactionService)($transaction, [
-            'status' => Transaction::STATUS_SUCCESS,
+            'status'       => Transaction::STATUS_SUCCESS,
             'reference_id' => $response->json('refNumber'),
         ]);
     }

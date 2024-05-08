@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Integrations\Rahkaran\ValueObjects;
+
 use stdClass;
 
 /**

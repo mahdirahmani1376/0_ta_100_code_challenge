@@ -20,6 +20,7 @@ class MoadianFactory
     private MoadianInvoice $moadianInvoice;
     private Collection $responseProducts;
     private Collection $responseDomains;
+
     public function createMoadianInvoiceDTO(Invoice $invoice): MoadianInvoice
     {
         self::createInvoiceHeader($invoice)
