@@ -35,7 +35,7 @@ class CallbackFromGatewayAction
         ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_PENDING_BANK_VERIFY,]);
         // Try to verify if this transaction is successful or failed
         $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
-        $transaction = $bankGatewayProvider->callbackFromGateway($transaction, $data);
+        $transaction = $bankGatewayProvider->callbackFromGateway($transaction, $data)->refresh();
 
         if ($transaction->status == Transaction::STATUS_SUCCESS) {
             $invoice = ($this->calcInvoicePriceFieldsService)($transaction->invoice);
