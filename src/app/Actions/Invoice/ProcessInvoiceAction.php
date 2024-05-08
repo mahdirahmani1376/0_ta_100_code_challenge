@@ -32,21 +32,9 @@ class ProcessInvoiceAction
     public function __invoke(Invoice $invoice): Invoice
     {
         $invoice->refresh();
-        // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
-        // so we only change its status to paid and nothing else, this is done in another service
-        if (!is_null($invoice->processed_at)) {
-            return $invoice;
-        }
-        // Normal Invoices must have zero balance to be processed
-        if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
-            return $invoice;
-        }
-        // Collection Invoices can have positive balance and still be processed,
-        // but if an Invoice is not Collection then it MUST have zero balance otherwise cannot be processed until it's paid in full
-        if ($invoice->status != Invoice::STATUS_COLLECTIONS && $invoice->balance > 0) {
-            return $invoice;
-        }
+
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
+
         if ($invoice->status === Invoice::STATUS_REFUNDED) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
                 'amount'      => $invoice->total,
@@ -55,6 +43,20 @@ class ProcessInvoiceAction
             ]);
             ($this->storeRefundTransactionService)($invoice);
             ($this->calcInvoicePriceFieldsService)($invoice);
+        }
+        // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
+        // so we only change its status to paid and nothing else, this is done in another service
+        /*if (!is_null($invoice->processed_at)) {
+            return $invoice;
+        }*/
+        // Normal Invoices must have zero balance to be processed
+        if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
+            return $invoice;
+        }
+        // Collection Invoices can have positive balance and still be processed,
+        // but if an Invoice is not Collection then it MUST have zero balance otherwise cannot be processed until it's paid in full
+        if ($invoice->status != Invoice::STATUS_COLLECTIONS && $invoice->balance > 0) {
+            return $invoice;
         }
 
         // Change status to paid unless it is a REFUND invoice
