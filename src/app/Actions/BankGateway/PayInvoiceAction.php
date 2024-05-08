@@ -3,6 +3,7 @@
 namespace App\Actions\BankGateway;
 
 use App\Actions\Invoice\ProcessInvoiceAction;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Services\BankGateway\MakeBankGatewayProviderByNameService;
@@ -52,9 +53,16 @@ class PayInvoiceAction
         // Prepare callbackUrl e.g. /callback/{transaction}/{gateway}/{source} => callback/1/zibal/cloud
         // Redirect to Gateway via the Transaction
         $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
+
+        $amount = $invoice->balance;
+        $max_transaction_amount = MainAppConfig::get(MainAppConfig::MAX_TRANSACTION_AMOUNT,1_000_000_000);
+        if ($amount > $max_transaction_amount) {
+            $amount = $max_transaction_amount;
+        }
+
         $transaction = ($this->storeTransactionService)($invoice, [
             'status'         => Transaction::STATUS_PENDING,
-            'amount'         => $invoice->balance,
+            'amount'         => $amount,
             'payment_method' => $gatewayName,
         ]);
 
@@ -66,10 +74,10 @@ class PayInvoiceAction
             config('payment.bank_gateway.cloud_callback_url') :
             config('payment.bank_gateway.callback_url'));
 
-        ($this->updateTransactionService)($transaction,[
+        ($this->updateTransactionService)($transaction, [
             'callback_url' => $callbackUrl
         ]);
-        
+
         return $bankGatewayProvider->getRedirectUrlToGateway($transaction, $callbackUrl);
     }
 }

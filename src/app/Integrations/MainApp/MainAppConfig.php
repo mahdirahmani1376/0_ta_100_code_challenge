@@ -24,6 +24,7 @@ class MainAppConfig
     const FINANCE_SERVICE_DEFAULT_TAX = 'FINANCE_SERVICE_DEFAULT_TAX';
     const RAHKARAN_FISCAL_YEAR_REF = 'RAHKARAN_FISCAL_YEAR_REF';
     const FINANCE_TAX_TOTAL_PERCENT = 'FINANCE_TAX_TOTAL_PERCENT';
+    const MAX_TRANSACTION_AMOUNT = 'FIANCE_MAX_TRANSACTION_AMOUNT';
 
     public static function get($key, $default = null, $refresh = false)
     {
