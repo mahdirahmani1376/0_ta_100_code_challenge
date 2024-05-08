@@ -439,6 +439,7 @@ class DataMigration extends Command
                     $newRow['updated_at'] = $row['updated_at'];
                     $newRow['profile_id'] = $row['client_id'];
                     $newRow['due_date'] = $row['due_date'];
+                    $newRow['processed_at'] = $row['created_at'];
                     $newRow['paid_at'] = $row['paid_date'];
                     $newRow['rahkaran_id'] = $row['rahkaran_id'];
                     $newRow['payment_method'] = $row['payment_method'];
@@ -621,6 +622,7 @@ class DataMigration extends Command
                     $newRow['tracking_code'] = $row['tracking_code'];
                     $newRow['mobile'] = $row['mobile'];
                     $newRow['description'] = $row['description'];
+                    $newRow['callback_url'] = $row['callback_url'];
 
                     return $newRow;
                 });

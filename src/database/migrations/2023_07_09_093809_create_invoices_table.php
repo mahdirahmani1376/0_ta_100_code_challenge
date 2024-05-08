@@ -30,7 +30,6 @@ return new class extends Migration
             $table->boolean('is_mass_payment')->default(false);
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->boolean('is_credit')->default(false);
-            $table->text('note')->nullable();
 
             $table->foreign('profile_id')->references('id')->on('profiles');
         });
