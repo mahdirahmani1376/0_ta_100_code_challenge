@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Services\BankGateway\MakeBankGatewayProviderByNameService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Transaction\StoreTransactionService;
+use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Str;
 
 class PayInvoiceAction
@@ -17,6 +18,7 @@ class PayInvoiceAction
         private readonly MakeBankGatewayProviderByNameService $makeBankGatewayProviderByNameService,
         private readonly StoreTransactionService              $storeTransactionService,
         private readonly CalcInvoicePriceFieldsService        $calcInvoicePriceFieldsService,
+        private readonly UpdateTransactionService             $updateTransactionService,
     )
     {
     }
@@ -51,18 +53,23 @@ class PayInvoiceAction
         // Redirect to Gateway via the Transaction
         $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
         $transaction = ($this->storeTransactionService)($invoice, [
-            'status' => Transaction::STATUS_PENDING,
-            'amount' => $invoice->balance,
+            'status'         => Transaction::STATUS_PENDING,
+            'amount'         => $invoice->balance,
             'payment_method' => $gatewayName,
         ]);
+
         $callbackUrl = Str::swap([
             '{transaction}' => $transaction->id,
-            '{gateway}' => $gatewayName,
-            '{source}' => $source,
+            '{gateway}'     => $gatewayName,
+            '{source}'      => $source,
         ], $source == 'cloud' ?
             config('payment.bank_gateway.cloud_callback_url') :
             config('payment.bank_gateway.callback_url'));
 
+        ($this->updateTransactionService)($transaction,[
+            'callback_url' => $callbackUrl
+        ]);
+        
         return $bankGatewayProvider->getRedirectUrlToGateway($transaction, $callbackUrl);
     }
 }
