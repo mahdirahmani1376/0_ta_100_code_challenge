@@ -51,6 +51,7 @@ class ProcessInvoiceAction
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
                 'amount'      => $invoice->total,
                 'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
+                'invoice_id'  => $invoice->getKey()
             ]);
             ($this->storeRefundTransactionService)($invoice);
             ($this->calcInvoicePriceFieldsService)($invoice);
@@ -79,6 +80,7 @@ class ProcessInvoiceAction
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
                 'amount'      => $invoice->total,
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
+                'invoice_id'  => $invoice->getKey()
             ]);
         }
 
