@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class AsanPardakht implements Interface\BankGatewayInterface
+class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInterface
 {
     private UpdateTransactionService $updateTransactionService;
 
@@ -31,19 +31,19 @@ class AsanPardakht implements Interface\BankGatewayInterface
             ->withHeader('usr', $this->bankGateway->config['username'])
             ->withHeader('pwd', $this->bankGateway->config['password'])
             ->post($this->bankGateway->config['request_url'], [
-                'serviceTypeId' => 1,
+                'serviceTypeId'           => 1,
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
-                'localInvoiceId' => $transaction->getKey(),
-                'amountInRials' => $transaction->amount,
-                'localDate' => now()->format("Ymd His"),
-                'callbackURL' => $callbackUrl,
-                'paymentId' => "0",
-                'additionalData' => '',
+                'localInvoiceId'          => $transaction->getKey(),
+                'amountInRials'           => $transaction->amount,
+                'localDate'               => now()->format("Ymd His"),
+                'callbackURL'             => $callbackUrl,
+                'paymentId'               => "0",
+                'additionalData'          => '',
             ]);
 
         if ($response->status() != Response::HTTP_OK) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('AsanPardakht failed at start: ' . $response->status());
+            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
         }
 
         $trackingCode = Str::replace('"', '', $response->body());
@@ -59,20 +59,20 @@ class AsanPardakht implements Interface\BankGatewayInterface
             ->withHeader('pwd', $this->bankGateway->config['password'])
             ->get($this->bankGateway->config['transaction_result_url'], [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
-                'localInvoiceId' => $transaction->getKey(),
+                'localInvoiceId'          => $transaction->getKey(),
             ]);
 
         if ($transactionResultResponse->status() != Response::HTTP_OK) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $amount = data_get($data,'Amount');
-        $transactionId = data_get($data,'PayGateTranID');
+        $amount = data_get($data, 'Amount');
+        $transactionId = data_get($data, 'PayGateTranID');
         if ($amount != $transaction->amount || $transactionId != $transaction->getKey()) {
-            Log::error('transaction possible fraud',[
-                'gateway' => 'asan_pardakht',
+            Log::error('transaction possible fraud', [
+                'gateway'     => 'asan_pardakht',
                 'transaction' => $transaction,
-                'data' => $transactionResultResponse
+                'data'        => $transactionResultResponse
             ]);
         }
 
@@ -81,7 +81,7 @@ class AsanPardakht implements Interface\BankGatewayInterface
             ->withHeader('pwd', $this->bankGateway->config['password'])
             ->post($this->bankGateway->config['verify_url'], [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
-                'payGateTranId' => $transactionResultResponse->json('payGateTranID'),
+                'payGateTranId'           => $transactionResultResponse->json('payGateTranID'),
             ]);
 
         if ($verifyResponse->status() != Response::HTTP_OK) {
@@ -94,7 +94,7 @@ class AsanPardakht implements Interface\BankGatewayInterface
             ->withHeader('pwd', $this->bankGateway->config['password'])
             ->post($this->bankGateway->config['settlement_url'], [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
-                'payGateTranId' => $transactionResultResponse->json('payGateTranID'),
+                'payGateTranId'           => $transactionResultResponse->json('payGateTranID'),
             ]);
 
         if ($settlementResponse->status() != Response::HTTP_OK) {
@@ -103,7 +103,7 @@ class AsanPardakht implements Interface\BankGatewayInterface
         }
 
         return ($this->updateTransactionService)($transaction, [
-            'status' => Transaction::STATUS_SUCCESS,
+            'status'       => Transaction::STATUS_SUCCESS,
             'reference_id' => $transactionResultResponse->json('payGateTranID'),
         ]);
     }

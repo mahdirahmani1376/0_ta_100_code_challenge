@@ -10,7 +10,7 @@ use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class Zarinpal implements BankGatewayInterface
+class Zarinpal extends BaseBankGateway implements BankGatewayInterface
 {
     private UpdateTransactionService $updateTransactionService;
 
@@ -29,15 +29,15 @@ class Zarinpal implements BankGatewayInterface
         $response = Http::withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['request_url'], [
-                'merchant_id' => $this->bankGateway->config['merchant_id'],
-                'amount' => $transaction->amount,
+                'merchant_id'  => $this->bankGateway->config['merchant_id'],
+                'amount'       => $transaction->amount,
                 'callback_url' => $callbackUrl,
-                'description' => 'description', // TODO change this if needed
+                'description'  => 'description', // TODO change this if needed
             ]);
 
         if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zarinpal  failed at start, code: ' . $response->json('data.code')); // TODO maybe use a custom exception class
+            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('data.authority'),]);
@@ -61,8 +61,8 @@ class Zarinpal implements BankGatewayInterface
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
                 'merchant_id' => $this->bankGateway->config['merchant_id'],
-                'amount' => $transaction->amount,
-                'authority' => $transaction->tracking_code,
+                'amount'      => $transaction->amount,
+                'authority'   => $transaction->tracking_code,
             ]);
 
         if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
@@ -71,7 +71,7 @@ class Zarinpal implements BankGatewayInterface
         }
 
         return ($this->updateTransactionService)($transaction, [
-            'status' => Transaction::STATUS_SUCCESS,
+            'status'       => Transaction::STATUS_SUCCESS,
             'reference_id' => $response->json('data.ref_id'),
         ]);
     }
@@ -99,16 +99,16 @@ class Zarinpal implements BankGatewayInterface
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
+            CURLOPT_URL            => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $body,
-            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'POST',
+            CURLOPT_POSTFIELDS     => $body,
+            CURLOPT_HTTPHEADER     => $headers,
         ));
 
         $response = curl_exec($curl);
@@ -156,16 +156,16 @@ class Zarinpal implements BankGatewayInterface
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
+            CURLOPT_URL            => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $body,
-            CURLOPT_HTTPHEADER => $headers
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'POST',
+            CURLOPT_POSTFIELDS     => $body,
+            CURLOPT_HTTPHEADER     => $headers
         ));
 
         $response = curl_exec($curl);

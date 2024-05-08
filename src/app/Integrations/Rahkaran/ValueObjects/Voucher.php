@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Voucher extends Model
 {
-    public const TYPE_SALE   = 'sale';
+    public const TYPE_SALE = 'sale';
     public const TYPE_REFUND = 'refund';
 
     /**
@@ -96,7 +96,7 @@ class Voucher extends Model
     {
         $voucher_items = $this->VoucherItems;
 
-        if($voucherItem->Credit > 0 || $voucherItem->Debit > 0){
+        if ($voucherItem->Credit > 0 || $voucherItem->Debit > 0) {
             $voucher_items->add($voucherItem);
         }
 

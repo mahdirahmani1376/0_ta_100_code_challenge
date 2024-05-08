@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class Saman implements BankGatewayInterface
+class Saman extends BaseBankGateway implements BankGatewayInterface
 {
     private UpdateTransactionService $updateTransactionService;
 
@@ -30,16 +30,16 @@ class Saman implements BankGatewayInterface
         $response = Http::withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['request_url'], [
-                'action' => 'token',
-                'TerminalId' => $this->bankGateway->config['terminal_id'],
-                'Amount' => $transaction->amount,
-                'ResNum' => $transaction->getKey(),
+                'action'      => 'token',
+                'TerminalId'  => $this->bankGateway->config['terminal_id'],
+                'Amount'      => $transaction->amount,
+                'ResNum'      => $transaction->getKey(),
                 'RedirectUrl' => $callbackUrl
             ]);
 
         if ($response->json('status') != 1) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Saman  failed at start, status: ' . $response->json('status'));
+            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('token'),]);
@@ -53,12 +53,12 @@ class Saman implements BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $token = data_get($data,'token');
+        $token = data_get($data, 'token');
         if ($data['ResNum'] != $transaction->getKey() || $token != $transaction->tracking_code) {
-            Log::error('transaction possible fraud',[
-                'gateway' => 'saman',
+            Log::error('transaction possible fraud', [
+                'gateway'     => 'saman',
                 'transaction' => $transaction,
-                'data' => $data
+                'data'        => $data
             ]);
         }
 
@@ -72,10 +72,10 @@ class Saman implements BankGatewayInterface
         $amount = $response->json('TransactionDetail.OrginalAmount');
 
         if ($amount != $transaction->amount) {
-            Log::error('transaction possible fraud',[
-                'gateway' => 'sadad',
+            Log::error('transaction possible fraud', [
+                'gateway'     => 'sadad',
                 'transaction' => $transaction,
-                'data' => $amount
+                'data'        => $amount
             ]);
         }
 

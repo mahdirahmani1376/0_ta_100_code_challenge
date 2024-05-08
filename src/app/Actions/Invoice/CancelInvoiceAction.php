@@ -4,7 +4,9 @@ namespace App\Actions\Invoice;
 
 use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
 use App\Models\Invoice;
+use App\Models\Transaction;
 use App\Services\Invoice\CancelInvoiceService;
+use App\Services\Invoice\Transaction\AttachTransactionToNewInvoiceService;
 use App\Services\Transaction\RefundTransactionService;
 
 class CancelInvoiceAction
@@ -32,8 +34,9 @@ class CancelInvoiceAction
         $refundAmount = ($this->refundTransactionService)($invoice);
         if ($refundAmount > 0) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount' => $refundAmount,
+                'amount'      => $refundAmount,
                 'description' => __('finance.credit.RefundCancelledInvoice', ['invoice_id' => $invoice->getKey()]),
+                'invoice_id'  => $invoice->getKey()
             ]);
         }
 

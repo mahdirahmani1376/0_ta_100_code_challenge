@@ -23,18 +23,18 @@ abstract class BaseMainAppAPIService
 
         if ($log) {
             $systemLog = LogService::store(SystemLog::make(), [
-                'method'      => $method,
-                'endpoint'    => SystemLog::ENDPOINT_MAIN_APP,
-                'request_url' => $url,
-                'request_body' => $body,
+                'method'         => $method,
+                'endpoint'       => SystemLog::ENDPOINT_MAIN_APP,
+                'request_url'    => $url,
+                'request_body'   => $body,
                 'request_header' => $headers,
-                'provider'    => SystemLog::PROVIDER_OUTGOING,
+                'provider'       => SystemLog::PROVIDER_OUTGOING,
             ]);
         }
 
         $response = Http::withHeaders($headers)->$method($url, $body);
 
-        if (isset($systemLog)){
+        if (isset($systemLog)) {
             $customResponse = [
                 'header' => $response->headers(),
                 'body'   => $response->json(),

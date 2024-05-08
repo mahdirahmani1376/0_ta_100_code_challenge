@@ -45,11 +45,11 @@ class VoucherItem extends Model
         'SLCode',
         'PartyRef',
         'TaxAmount',
-	'TollAmount',
-	'TaxStateType',
-	'PurchaseOrSale',
-	'ItemOrService',
-	'TransactionType'
+        'TollAmount',
+        'TaxStateType',
+        'PurchaseOrSale',
+        'ItemOrService',
+        'TransactionType'
     ];
 
 }
