@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string ip
  * @property string tracking_code
  * @property string reference_id
+ * @property string callback_url
  *
  * @property Invoice invoice
  * @property OfflineTransaction offlineTransaction
@@ -72,6 +73,7 @@ class Transaction extends Model
         'ip',
         'tracking_code',
         'reference_id',
+        'callback_url'
     ];
 
     public function invoice(): BelongsTo

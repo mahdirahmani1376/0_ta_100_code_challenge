@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedBigInteger('invoice_id');
+            $table->unsignedBigInteger('invoice_id')->nullable();
             $table->unsignedInteger('invoiceable_id')->nullable();
             $table->string('invoiceable_type')->nullable();
             $table->double('amount');

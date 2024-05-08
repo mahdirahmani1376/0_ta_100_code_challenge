@@ -32,7 +32,9 @@ class UpdateInvoiceRequest extends FormRequest
             'invoice_number' => ['nullable', 'int',],
             'fiscal_year'    => ['nullable', 'string',],
             'note'           => ['nullable',],
-            'source_invoice' => ['nullable', Rule::exists('invoices', 'id')]
+            'source_invoice' => ['nullable', Rule::exists('invoices', 'id')],
+            'created_at'     => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+            'processed_at'     => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
         ];
     }
 }
