@@ -12,7 +12,6 @@ class GenerateInvoiceNumberCommand extends Command
 {
     protected $signature = 'app:generate-invoice-number
                             {--type=paid : Type of InvoiceNumber to be generated, paid refund}
-                            {--fiscal-year=1402 : Fiscal year of InvoiceNumbers}
                             {--count=100 : how many to generate}
                             {--lock-owner=null : Atomic lock owner, this is set only if this command is executed via queue}';
 
@@ -22,7 +21,7 @@ class GenerateInvoiceNumberCommand extends Command
     {
         $this->info('Generating Invoice Numbers started');
         $type = $this->option('type') ?? InvoiceNumber::TYPE_PAID;
-        $fiscalYear = $this->option('fiscal-year') ?? MainAppConfig::get(MainAppConfig::INVOICE_NUMBER_CURRENT_FISCAL_YEAR);
+        $fiscalYear = MainAppConfig::get(MainAppConfig::INVOICE_NUMBER_CURRENT_FISCAL_YEAR);
         $count = $this->option('count') ?? 100;
 
         $this->alert("Generating $count InvoiceNumber with type of $type and fiscalYear of $fiscalYear");
