@@ -209,7 +209,7 @@ if (!function_exists('callback_result_redirect_url')) {
         if (is_null($transactionStatus)) {
             $status = match ($invoiceStatus) {
                 Invoice::STATUS_CANCELED, Invoice::STATUS_DRAFT, Invoice::STATUS_DELETED => Transaction::STATUS_FAIL,
-                Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED, Invoice::STATUS_UNPAID => Transaction::STATUS_SUCCESS,
+                Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED => Transaction::STATUS_SUCCESS,
             };
         } else {
             $status = $transactionStatus;

@@ -39,7 +39,7 @@ class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
 
         if ($response->json('ResCode') != 0) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
+            return $this->getFailedRedirectUrl($transaction, $transaction->callback_url);
         }
 
         ($this->updateTransactionService)($transaction, ['tracking_code' => $response->json('Token'),]);

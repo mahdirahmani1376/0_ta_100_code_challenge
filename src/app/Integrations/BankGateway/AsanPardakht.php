@@ -43,7 +43,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
 
         if ($response->status() != Response::HTTP_OK) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            return $this->getFailedRedirectUrl($transaction->invoice, $transaction->callback_url);
+            return $this->getFailedRedirectUrl($transaction, $transaction->callback_url);
         }
 
         $trackingCode = Str::replace('"', '', $response->body());
