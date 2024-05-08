@@ -19,6 +19,16 @@ class UpdateClientCashoutAction
             throw new BadRequestException(__('finance.error.AccessDeniedToCashout'));
         }
         $oldState = $clientCashout->toArray();
+
+        $bank_account_id = data_get($data, 'client_bank_account_id');
+        if (
+            $clientCashout->client_bank_account_id != $bank_account_id && $bank_account_id > 0
+            &&
+            $clientCashout->status == ClientCashout::STATUS_REJECTED
+        ) {
+            $data['status'] = ClientCashout::STATUS_PENDING;
+        }
+
         $clientCashout = ($this->updateClientCashoutService)($clientCashout, $data);
 
         admin_log(AdminLog::CREATE_CASHOUT, $clientCashout, $clientCashout->getChanges(), $oldState, $data);

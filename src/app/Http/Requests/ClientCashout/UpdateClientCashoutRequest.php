@@ -14,8 +14,9 @@ class UpdateClientCashoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['nullable', 'integer',],
-            'profile_id' => ['nullable', 'integer', 'exists:profiles,id',],
+            'amount'                 => ['nullable', 'integer',],
+            'profile_id'             => ['nullable', 'integer', 'exists:profiles,id',],
+            'client_bank_account_id' => ['nullable', 'exists:client_bank_account,id']
         ];
     }
 }
