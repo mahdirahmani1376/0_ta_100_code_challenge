@@ -3,6 +3,7 @@
 namespace App\Actions\Invoice\Item;
 
 
+use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
@@ -19,8 +20,16 @@ class StoreItemAction
 
     public function __invoke(Invoice $invoice, array $data)
     {
-        if ($data['amount'] != '0') {
+        if ($data['amount'] != 0) {
             check_rahkaran($invoice);
+        }
+
+        if (in_array($invoice->status, [
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_REFUNDED,
+            Invoice::STATUS_COLLECTIONS,
+        ]) && $data['amount'] != 0) {
+            throw UpdatingPaidOrRefundedInvoiceNotAllowedException::make($invoice->getKey(), $invoice->status);
         }
 
         $item = ($this->storeItemService)($invoice, $data);
