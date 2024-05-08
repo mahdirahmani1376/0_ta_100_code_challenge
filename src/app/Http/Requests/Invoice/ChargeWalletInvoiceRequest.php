@@ -25,6 +25,7 @@ class ChargeWalletInvoiceRequest extends FormRequest
             'description' => ['nullable', 'max:255',],
             'profile_id' => ['required', 'integer', 'exists:profiles,id',],
             'admin_id' => ['nullable', 'integer',],
+            'due_date' => ['nullable','date','after:now','date_format:Y-m-d']
         ];
     }
 }

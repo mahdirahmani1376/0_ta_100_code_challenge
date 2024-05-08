@@ -27,8 +27,10 @@ class ChargeWalletInvoiceAction
                     'invoiceable_id' => data_get($data, 'invoiceable_id'),
                     'invoiceable_type' => data_get($data, 'invoiceable_type', Item::TYPE_ADD_CLIENT_CREDIT),
                 ],
-            ]
+            ],
+            'due_date' => data_get($data, 'due_date')
         ];
+
         $invoice = ($this->storeInvoiceAction)($invoiceData);
 
         admin_log(AdminLog::CREATE_INVOICE, $invoice, validatedData: $data);
