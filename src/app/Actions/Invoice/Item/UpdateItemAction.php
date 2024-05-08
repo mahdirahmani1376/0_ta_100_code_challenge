@@ -3,6 +3,7 @@
 namespace App\Actions\Invoice\Item;
 
 
+use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Item;
@@ -21,8 +22,14 @@ class UpdateItemAction
     public function __invoke(Invoice $invoice, Item $item, array $data)
     {
         $oldState = $item->toArray();
-        if ($data['amount'] != 0) {
-            check_rahkaran($invoice);
+        check_rahkaran($invoice);
+
+        if (in_array($invoice->status, [
+                Invoice::STATUS_PAID,
+                Invoice::STATUS_REFUNDED,
+                Invoice::STATUS_COLLECTIONS,
+            ])) {
+            throw UpdatingPaidOrRefundedInvoiceNotAllowedException::make($invoice->getKey(), $invoice->status);
         }
 
         $item = ($this->updateItemService)($item, $data);

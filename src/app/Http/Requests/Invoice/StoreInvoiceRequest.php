@@ -21,7 +21,7 @@ class StoreInvoiceRequest extends FormRequest
             'invoice_date'             => ['nullable', 'date',],
             'due_date'                 => ['nullable', 'date',],
             'paid_at'                  => ['nullable', 'date',],
-            'tax_rate'                 => ['required', 'integer',],
+            'tax_rate'                 => ['nullable', 'integer',],
             'status'                   => ['required', Rule::in([
                 Invoice::STATUS_UNPAID,
                 Invoice::STATUS_DRAFT,

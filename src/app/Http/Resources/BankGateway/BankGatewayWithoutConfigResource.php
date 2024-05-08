@@ -12,13 +12,13 @@ class BankGatewayWithoutConfigResource extends JsonResource
     {
         /** @var BankGateway $this */
         return [
-            'id' => $this->id,
-            'created_at' => $this->created_at?->toDateTimeString(),
-            'updated_at' => $this->updated_at?->toDateTimeString(),
-            'name' => $this->name,
-            'name_fa' => $this->name_fa,
-            'status' => $this->status,
-            'order' => $this->order,
+            'id'                         => $this->id,
+            'created_at'                 => $this->created_at?->toDateTimeString(),
+            'updated_at'                 => $this->updated_at?->toDateTimeString(),
+            'name'                       => $this->name,
+            'name_fa'                    => $this->name_fa,
+            'status'                     => $this->status,
+            'order'                      => $this->order,
             'is_direct_payment_provider' => $this->is_direct_payment_provider,
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Invoice;
 
+use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\AssignInvoiceNumberService;
@@ -21,6 +22,14 @@ class UpdateInvoiceAction
     public function __invoke(Invoice $invoice, array $data)
     {
         check_rahkaran($invoice);
+
+        if (in_array($invoice->status, [
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_REFUNDED,
+            Invoice::STATUS_COLLECTIONS,
+        ])) {
+            throw UpdatingPaidOrRefundedInvoiceNotAllowedException::make($invoice->getKey(), $invoice->status);
+        }
 
         $oldState = $invoice->toArray();
 

@@ -3,6 +3,7 @@
 namespace App\Actions\Invoice;
 
 use App\Events\InvoiceCreated;
+use App\Integrations\MainApp\MainAppConfig;
 use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
@@ -23,6 +24,10 @@ class StoreInvoiceAction
 
     public function __invoke(array $data)
     {
+        if (empty($data['tax_rate'])) {
+            $data['tax_rate'] = MainAppConfig::get(MainAppConfig::FINANCE_TAX_TOTAL_PERCENT);
+        }
+
         $invoice = ($this->storeInvoiceService)($data);
 
         // TODO refactor StoreInvoiceService to take an array or a single item so we have less indents in actions using this service

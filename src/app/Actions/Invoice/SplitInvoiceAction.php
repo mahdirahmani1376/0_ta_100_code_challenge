@@ -27,6 +27,7 @@ class SplitInvoiceAction
         if (in_array($invoice->status, [
             Invoice::STATUS_PAID,
             Invoice::STATUS_REFUNDED,
+            Invoice::STATUS_COLLECTIONS,
         ])) {
             throw UpdatingPaidOrRefundedInvoiceNotAllowedException::make($invoice->getKey(), $invoice->status);
         }
