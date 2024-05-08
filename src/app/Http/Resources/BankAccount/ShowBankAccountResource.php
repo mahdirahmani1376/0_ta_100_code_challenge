@@ -12,8 +12,8 @@ class ShowBankAccountResource extends JsonResource
     {
         /** @var BankAccount $this */
         return [
-            'id' => $this->id,
-            'title' => $this->title,
+            'id'     => $this->id,
+            'title'  => $this->title,
             'status' => $this->status,
         ];
     }

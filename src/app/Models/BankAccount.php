@@ -33,6 +33,10 @@ class BankAccount extends Model
         self::STATUS_INACTIVE,
     ];
 
+    protected $hidden = [
+      'rahkaran_id'
+    ];
+
     protected $fillable = [
         'title',
         'order',

@@ -38,11 +38,16 @@ class BankGateway extends Model
         'config' => 'array',
     ];
 
+    protected $hidden = [
+        'rahkaran_id',
+    ];
+
     protected $fillable = [
         'name',
         'name_fa',
         'config',
         'is_direct_payment_provider',
         'order',
+        'rahkaran_id'
     ];
 }
