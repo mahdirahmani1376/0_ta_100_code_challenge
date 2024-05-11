@@ -196,8 +196,13 @@ Route::namespace('Profile')
         Route::get('{clientId}', ShowProfileIdController::class);
     });
 
+Route::namespace('Tax')
+    ->prefix('tax')
+    ->group(function (){
+        Route::get('/tax-exclude/{amount}', GetTaxExcludeController::class);
+    });
+
 Route::get('report', FinanceServiceReportController::class);
 Route::get('hourly-report', FinanceServiceHourlyReportController::class);
 Route::get('everything', ListEverythingController::class);
 
-Route::get('/tax/tax-exclude/{amount}', GetTaxExcludeController::class);
