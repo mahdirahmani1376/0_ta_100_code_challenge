@@ -16,7 +16,7 @@ class AttachTransactionToNewInvoiceService
     {
         return $this->transactionRepository->update($transaction, [
             'invoice_id' => $newInvoice->getKey(),
-            'status' => Transaction::STATUS_SUCCESS,
+            'status'     => Transaction::STATUS_SUCCESS,
         ], ['invoice_id', 'status']);
     }
 }

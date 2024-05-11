@@ -11,6 +11,7 @@ use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
 use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
+use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Item\FindAddCreditItemService;
 use App\Services\Invoice\OfflineTransaction\AttachOfflineTransactionToNewInvoiceService;
 use App\Services\Invoice\OfflineTransaction\VerifyOfflineTransactionService;
@@ -28,6 +29,7 @@ class VerifyOfflineTransactionAction
         private readonly ApplyBalanceToInvoiceAction                 $applyBalanceToInvoiceAction,
         private readonly VerifyOfflineTransactionService             $verifyOfflineTransactionService,
         private readonly VerifyTransactionAction                     $verifyTransactionAction,
+        private readonly CalcInvoicePriceFieldsService               $calcInvoicePriceFieldsService
     )
     {
     }
@@ -72,10 +74,9 @@ class VerifyOfflineTransactionAction
             ]);
             ($this->attachOfflineTransactionToNewInvoiceService)($offlineTransaction, $chargeWalletInvoice);
             ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $chargeWalletInvoice);
+            ($this->calcInvoicePriceFieldsService)($chargeWalletInvoice);
             ($this->processInvoiceAction)($chargeWalletInvoice);
-
-            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $offlineTransaction->amount]);
-            ($this->processInvoiceAction)($invoice);
+            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $invoice->balance]);
         }
 
         admin_log(AdminLog::VERIFY_OFFLINE_TRANSACTION, $offlineTransaction);

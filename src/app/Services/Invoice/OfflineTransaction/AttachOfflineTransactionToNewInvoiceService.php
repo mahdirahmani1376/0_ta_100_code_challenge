@@ -16,7 +16,7 @@ class AttachOfflineTransactionToNewInvoiceService
     {
         return $this->offlineTransactionRepository->update($offlineTransaction, [
             'invoice_id' => $newInvoice->getKey(),
-            'status' => OfflineTransaction::STATUS_CONFIRMED,
+            'status'     => OfflineTransaction::STATUS_CONFIRMED,
         ], [
             'invoice_id', 'status'
         ]);
