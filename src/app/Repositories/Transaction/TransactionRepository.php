@@ -31,6 +31,21 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->sum('amount');
     }
 
+    public function paidTransactions(Invoice $invoice, bool $onlinePayment = false)
+    {
+        $query = self::newQuery()
+            ->where('invoice_id', $invoice->getKey())
+            ->where('status', Transaction::STATUS_SUCCESS);
+
+        if ($onlinePayment) {
+            $query->where('payment_method', '!=', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+        } else {
+            $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+        }
+
+        return $query->get();
+    }
+
     public function getLastSuccessfulTransaction(Invoice $invoice)
     {
         return self::newQuery()
@@ -197,23 +212,24 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
                 ->where('payment_method', $bankGateway->name)
                 ->where('status', Transaction::STATUS_SUCCESS);
             $onlineTransactionsBasedOnGateway[$bankGateway->name] = [
-                'sum' => $query->sum('amount'),
+                'sum'   => $query->sum('amount'),
                 'count' => $query->count(),
             ];
         }
 
         return [
             'offline' => [
-                'sum' => $offline->sum('amount'),
+                'sum'   => $offline->sum('amount'),
                 'count' => $offline->count(),
             ],
-            'wallet' => [
-                'sum' => $wallet->sum('amount'),
+            'wallet'  => [
+                'sum'   => $wallet->sum('amount'),
                 'count' => $wallet->count(),
             ],
-            'online' => $onlineTransactionsBasedOnGateway,
+            'online'  => $onlineTransactionsBasedOnGateway,
         ];
     }
+
     public function sum(string $column, array $criteria = [], array $scopes = []): float|int
     {
         return self::newQuery()
