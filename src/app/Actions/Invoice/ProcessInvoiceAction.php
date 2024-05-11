@@ -81,7 +81,7 @@ class ProcessInvoiceAction
         // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
         if ($invoice->is_credit) {
-            $this->storeCreditTraction($invoice);
+            $this->storeCreditTraction($invoice, $invoice->total);
         }
 
         if ($invoice->is_credit && !$invoice->admin_id) {
