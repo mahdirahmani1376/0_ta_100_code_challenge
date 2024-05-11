@@ -82,7 +82,7 @@ class ProcessInvoiceAction
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
         if ($invoice->is_credit || $invoice->is_mass_payment) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount'      => $invoice->is_credit ? $invoice->balance : $invoice->items->sum('amount'),
+                'amount'      => $invoice->balance,
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
                 'invoice_id'  => $invoice->getKey()
             ]);
