@@ -52,7 +52,7 @@ class StoreMassPaymentInvoiceService
         /** @var Invoice $invoiceForMassPayment */
         foreach ($invoicesForMassPayment as $invoiceForMassPayment) {
             $invoiceForMassPayment = ($this->calcInvoicePriceFieldsService)($invoiceForMassPayment);
-            if ($invoiceForMassPayment > 0) {
+            if ($invoiceForMassPayment->balance > 0) {
                 $this->itemRepository->create([
                     'invoice_id'       => $massPaymentInvoice->getKey(),
                     'description'      => __('finance.invoice.MassPaymentInvoice', ['id' => $invoiceForMassPayment->getKey()]),
