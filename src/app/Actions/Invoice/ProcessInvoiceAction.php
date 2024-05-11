@@ -94,7 +94,7 @@ class ProcessInvoiceAction
             $invoice->items->each(function (Item $item) use ($invoice, &$amount, &$mass_invoices) {
                 $mass_invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
                 if ($mass_invoice instanceof Invoice) {
-                    $amount += ceil($mass_invoice?->balance ?? 0 / 100) * 100;
+                    $amount += round_amount($mass_invoice?->balance ?? 0);
                     $mass_invoices[] = $mass_invoice;
                 }
             });

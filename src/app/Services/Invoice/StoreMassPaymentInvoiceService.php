@@ -56,7 +56,7 @@ class StoreMassPaymentInvoiceService
                 $this->itemRepository->create([
                     'invoice_id'       => $massPaymentInvoice->getKey(),
                     'description'      => __('finance.invoice.MassPaymentInvoice', ['id' => $invoiceForMassPayment->getKey()]),
-                    'amount'           => ceil($massPaymentInvoice->balance / 100) * 100,
+                    'amount'           => round_amount($massPaymentInvoice->balance),
                     'invoiceable_type' => Item::TYPE_MASS_PAYMENT_INVOICE,
                     'invoiceable_id'   => $invoiceForMassPayment->getKey(),
                 ]);
