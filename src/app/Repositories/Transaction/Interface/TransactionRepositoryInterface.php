@@ -18,6 +18,8 @@ interface TransactionRepositoryInterface extends EloquentRepositoryInterface
 
     public function sumOfPaidTransactions(Invoice $invoice);
 
+    public function paidTransactions(Invoice $invoice, bool $onlinePayment = false);
+
     public function getLastSuccessfulTransaction(Invoice $invoice);
 
     public function findByTrackingCode($trackingCode): ?Transaction;

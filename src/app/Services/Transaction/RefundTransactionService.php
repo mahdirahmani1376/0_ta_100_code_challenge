@@ -7,13 +7,16 @@ use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 
 class RefundTransactionService
 {
-    public function __construct(private readonly TransactionRepositoryInterface $transactionRepository)
+    public function __construct(
+        private readonly TransactionRepositoryInterface $transactionRepository,
+    )
     {
     }
 
-    public function __invoke(Invoice $invoice): float
+    public function __invoke(Invoice $invoice, bool $onlinePayment): float
     {
-        $paidAmount = $this->transactionRepository->sumOfPaidTransactions($invoice);
+        $paidAmount = $this->transactionRepository->paidTransactions(invoice: $invoice, onlinePayment: $onlinePayment)->sum('amount');
+
         $this->transactionRepository->refundSuccessfulTransactions($invoice);
 
         return $paidAmount;
