@@ -11,16 +11,16 @@ use App\Repositories\Invoice\Interface\ItemRepositoryInterface;
 
 class StoreMassPaymentInvoiceService
 {
-    private InvoiceRepositoryInterface $invoiceRepository;
-    private ItemRepositoryInterface $itemRepository;
 
-    public function __construct(InvoiceRepositoryInterface $invoiceRepository, ItemRepositoryInterface $itemRepository)
+    public function __construct(
+        private readonly InvoiceRepositoryInterface    $invoiceRepository,
+        private readonly ItemRepositoryInterface       $itemRepository,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService
+    )
     {
-        $this->invoiceRepository = $invoiceRepository;
-        $this->itemRepository = $itemRepository;
     }
 
-    public function __invoke(array $data)
+    public function __invoke(array $data): Invoice
     {
         // prepare valid invoices to be merged into one mass_payment_invoice
         // a valid invoice has to have UNPAID status and its "is_credit" and "is_mass_payment" fields to be FALSE
@@ -51,13 +51,16 @@ class StoreMassPaymentInvoiceService
         // which is the "remaining" amount of money that needs to be paid until an Invoice is considered "paid"
         /** @var Invoice $invoiceForMassPayment */
         foreach ($invoicesForMassPayment as $invoiceForMassPayment) {
-            $this->itemRepository->create([
-                'invoice_id'       => $massPaymentInvoice->getKey(),
-                'description'      => __('finance.invoice.MassPaymentInvoice', ['id' => $invoiceForMassPayment->getKey()]),
-                'amount'           => $invoiceForMassPayment->balance,
-                'invoiceable_type' => Item::TYPE_MASS_PAYMENT_INVOICE,
-                'invoiceable_id'   => $invoiceForMassPayment->getKey(),
-            ]);
+            $invoiceForMassPayment = ($this->calcInvoicePriceFieldsService)($invoiceForMassPayment);
+            if ($invoiceForMassPayment > 0) {
+                $this->itemRepository->create([
+                    'invoice_id'       => $massPaymentInvoice->getKey(),
+                    'description'      => __('finance.invoice.MassPaymentInvoice', ['id' => $invoiceForMassPayment->getKey()]),
+                    'amount'           => round_amount($massPaymentInvoice->balance),
+                    'invoiceable_type' => Item::TYPE_MASS_PAYMENT_INVOICE,
+                    'invoiceable_id'   => $invoiceForMassPayment->getKey(),
+                ]);
+            }
         }
 
         return $massPaymentInvoice;

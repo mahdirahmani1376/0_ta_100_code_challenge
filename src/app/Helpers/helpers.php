@@ -231,3 +231,10 @@ if (!function_exists('normalise_sheba_number')) {
             ->start('IR');
     }
 }
+
+if (!function_exists('round_amount')) {
+    function round_amount(float $amount): float
+    {
+        return ceil($amount / 100) * 100;
+    }
+}

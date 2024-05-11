@@ -24,7 +24,7 @@ class CalcInvoicePriceFieldsService
         $subTotal = $this->itemRepository->sumAmountByInvoice($invoice);
         $tax = ($subTotal * $invoice->tax_rate) / 100;
         $totalBeforeRounding = $subTotal + $tax;
-        $total = ceil($totalBeforeRounding / 100) * 100;
+        $total = round_amount($totalBeforeRounding);
         $sumOfPaidTransactions = $this->transactionRepository->sumOfPaidTransactions($invoice);
         $balance = $total - $sumOfPaidTransactions;
 
