@@ -80,12 +80,8 @@ class ProcessInvoiceAction
 
         // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
-        if ($invoice->is_credit || $invoice->is_mass_payment) {
-            ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount'      => $invoice->balance,
-                'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
-                'invoice_id'  => $invoice->getKey()
-            ]);
+        if ($invoice->is_credit) {
+            $this->storeCreditTraction($invoice);
         }
 
         if ($invoice->is_credit && !$invoice->admin_id) {
@@ -93,18 +89,40 @@ class ProcessInvoiceAction
         }
 
         if ($invoice->is_mass_payment) {
-            $invoice->items->each(function (Item $item) use ($invoice) {
+            $mass_invoices = [];
+            $amount = 0;
+            $invoice->items->each(function (Item $item) use ($invoice, &$amount, &$mass_invoices) {
                 $mass_invoice = ($this->findInvoiceByIdService)($item->invoiceable_id);
                 if ($mass_invoice instanceof Invoice) {
-                    $applyBalanceToInvoiceAction = app()->make(ApplyBalanceToInvoiceAction::class);
-                    ($applyBalanceToInvoiceAction)($mass_invoice, []);
+                    $amount += $mass_invoice?->balance ?? 0;
+                    $mass_invoices[] = $mass_invoice;
                 }
             });
+
+            if ($amount > 0) {
+                $this->storeCreditTraction($invoice, $amount);
+            }
+
+            $applyBalanceToInvoiceAction = app()->make(ApplyBalanceToInvoiceAction::class);
+
+            foreach ($mass_invoices as $mass_invoice) {
+                ($applyBalanceToInvoiceAction)($mass_invoice, []);
+
+            }
         }
 
         ($this->calcInvoiceProcessedAtService)($invoice);
         InvoiceProcessed::dispatch($invoice);
 
         return $invoice;
+    }
+
+    private function storeCreditTraction(Invoice $invoice, float $amount = 0): void
+    {
+        ($this->storeCreditTransactionAction)($invoice->profile_id, [
+            'amount'      => $amount > 0 ? $amount : $invoice->balance,
+            'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
+            'invoice_id'  => $invoice->getKey()
+        ]);
     }
 }
