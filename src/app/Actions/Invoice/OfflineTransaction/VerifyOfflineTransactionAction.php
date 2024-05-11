@@ -73,9 +73,7 @@ class VerifyOfflineTransactionAction
             ($this->attachOfflineTransactionToNewInvoiceService)($offlineTransaction, $chargeWalletInvoice);
             ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $chargeWalletInvoice);
             ($this->processInvoiceAction)($chargeWalletInvoice);
-
-            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $offlineTransaction->amount]);
-            ($this->processInvoiceAction)($invoice);
+            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $invoice->balance]);
         }
 
         admin_log(AdminLog::VERIFY_OFFLINE_TRANSACTION, $offlineTransaction);
