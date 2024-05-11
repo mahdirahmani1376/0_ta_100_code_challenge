@@ -596,8 +596,6 @@ class RahkaranService
                 $transactions = $invoice->transactions()
                     ->whereIn('status', [
                         Transaction::STATUS_SUCCESS,
-                        Transaction::STATUS_OPG_PAID,
-                        Transaction::STATUS_IPG_PAID,
                     ])
                     ->where('payment_method', Transaction::PAYMENT_METHOD_CREDIT)
                     ->where('amount', '>=', 0)
@@ -1645,8 +1643,6 @@ class RahkaranService
     {
         return [
             Transaction::STATUS_SUCCESS,
-            Transaction::STATUS_IPG_PAID,
-            Transaction::STATUS_OPG_PAID,
         ];
     }
 

@@ -141,8 +141,6 @@ class MoadianFactory
                      ->where('amount', '>', 0)
                      ->whereIn('status', [
                          Transaction::STATUS_SUCCESS,
-                         Transaction::STATUS_OPG_PAID,
-                         Transaction::STATUS_IPG_PAID,
                      ])
                      ->get() as $transaction) {
             $payment = new MoadianPayment();
