@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
  */
 interface TransactionRepositoryInterface extends EloquentRepositoryInterface
 {
-    public function refundSuccessfulTransactions(Invoice $invoice);
+    public function refundSuccessfulTransactions(Invoice $invoice, bool $onlinePayment = false);
 
     public function sumOfPaidTransactions(Invoice $invoice);
 

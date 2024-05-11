@@ -37,6 +37,7 @@ class CancelInvoiceService
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
                 'amount'      => $walletRefundAmount,
                 'description' => __('finance.credit.RefundCancelledInvoice', ['invoice_id' => $invoice->getKey()]),
+                'invoice_id'  => $invoice->id
             ]);
         }
 

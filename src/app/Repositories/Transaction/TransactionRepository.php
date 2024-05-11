@@ -15,12 +15,19 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 {
     public string $model = Transaction::class;
 
-    public function refundSuccessfulTransactions(Invoice $invoice)
+    public function refundSuccessfulTransactions(Invoice $invoice, bool $onlinePayment = false)
     {
-        return self::newQuery()
+        $query = self::newQuery()
             ->where('invoice_id', $invoice->getKey())
-            ->where('status', Transaction::STATUS_SUCCESS)
-            ->update(['status' => Transaction::STATUS_REFUND]);
+            ->where('status', Transaction::STATUS_SUCCESS);
+
+        if ($onlinePayment) {
+            $query->where('payment_method', '!=', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+        } else {
+            $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+        }
+
+        return $query->update(['status' => Transaction::STATUS_REFUND]);
     }
 
     public function sumOfPaidTransactions(Invoice $invoice): float

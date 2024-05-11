@@ -17,7 +17,7 @@ class RefundTransactionService
     {
         $paidAmount = $this->transactionRepository->paidTransactions(invoice: $invoice, onlinePayment: $onlinePayment)->sum('amount');
 
-        $this->transactionRepository->refundSuccessfulTransactions($invoice);
+        $this->transactionRepository->refundSuccessfulTransactions(invoice: $invoice, onlinePayment: $onlinePayment);
 
         return $paidAmount;
     }
