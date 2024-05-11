@@ -78,11 +78,11 @@ class ProcessInvoiceAction
         // Assign InvoiceNumber
         AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
 
-        // If invoice is charge-wallet (is_credit=true),
+        // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
         if ($invoice->is_credit || $invoice->is_mass_payment) {
             ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount'      => $invoice->total,
+                'amount'      => $invoice->balance,
                 'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
                 'invoice_id'  => $invoice->getKey()
             ]);
