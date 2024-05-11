@@ -36,17 +36,17 @@ class ActionOnClientCashoutAction
             $this->acceptClientCashout($clientCashout, $data);
         } elseif ($action === ClientCashout::ACTION_REJECT) {
             ($this->updateClientCashoutService)($clientCashout, [
-                'status' => ClientCashout::STATUS_REJECTED,
+                'status'     => ClientCashout::STATUS_REJECTED,
                 'admin_note' => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
-                'admin_id' => $data['admin_id'],
+                'admin_id'   => $data['admin_id'],
             ]);
         } elseif ($action === ClientCashout::ACTION_REJECT_BANK) {
             ($this->updateClientBankAccountService)($clientCashout->clientBankAccount, ['status' => ClientBankAccount::STATUS_REJECTED]);
             ($this->updateClientCashoutService)($clientCashout, [
-                'status' => ClientCashout::STATUS_REJECTED,
+                'status'           => ClientCashout::STATUS_REJECTED,
                 'rejected_by_bank' => true,
-                'admin_note' => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
-                'admin_id' => $data['admin_id'],
+                'admin_note'       => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
+                'admin_id'         => $data['admin_id'],
             ]);
         }
 
@@ -62,7 +62,7 @@ class ActionOnClientCashoutAction
             throw new BadRequestException(trans('validation.bank_account_not_active'));
         }
 
-        $wallet = ($this->showWalletAction)($clientCashout->profile_id);
+        $wallet = ($this->showWalletAction)($clientCashout->profile_id, true);
         if ($clientCashout->amount > $wallet->balance) {
             throw new BadRequestException(trans('validation.not_enough_credit'));
         }
@@ -76,15 +76,15 @@ class ActionOnClientCashoutAction
             if (!is_null($similarClientBankAccount)) {
                 $clientBankAccount = ($this->updateClientBankAccountService)($clientBankAccount, [
                     'zarinpal_bank_account_id' => $similarClientBankAccount->zarinpal_bank_account_id,
-                    'status' => ClientBankAccount::STATUS_ACTIVE,
-                    'admin_id' => $data['admin_id'],
+                    'status'                   => ClientBankAccount::STATUS_ACTIVE,
+                    'admin_id'                 => $data['admin_id'],
                 ]);
             } else {
                 $zarinpalId = Zarinpal::createBankAccount($clientBankAccount->sheba_number, $clientBankAccount->owner_name);
                 $clientBankAccount = ($this->updateClientBankAccountService)($clientBankAccount, [
                     'zarinpal_bank_account_id' => $zarinpalId,
-                    'status' => ClientBankAccount::STATUS_ACTIVE,
-                    'admin_id' => $data['admin_id'],
+                    'status'                   => ClientBankAccount::STATUS_ACTIVE,
+                    'admin_id'                 => $data['admin_id'],
                 ]);
             }
         }
@@ -93,13 +93,13 @@ class ActionOnClientCashoutAction
             $payoutId = Zarinpal::cashoutToAccount($clientCashout->amount, $clientBankAccount->zarinpal_bank_account_id);
             ($this->updateClientCashoutService)($clientCashout, [
                 'zarinpal_payout_id ' => $payoutId,
-                'admin_id' => $data['admin_id'],
-                'admin_note' => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
+                'admin_id'            => $data['admin_id'],
+                'admin_note'          => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
             ]);
         }
 
         $creditTransaction = ($this->deductBalanceAction)($clientCashout->profile_id, [
-            'amount' => $clientCashout->amount * -1,
+            'amount'      => $clientCashout->amount * -1,
             'description' => 'بازگشت وجه به حساب بانکی کاربر - شماره درخواست : ' . $clientCashout->id,
         ]);
 
