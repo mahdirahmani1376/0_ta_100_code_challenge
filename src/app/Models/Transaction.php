@@ -44,8 +44,6 @@ class Transaction extends Model
     ];
     const STATUS_PENDING = 'pending'; // old status = 0
     const STATUS_SUCCESS = 'success'; // old status = 1
-    public const STATUS_OPG_PAID = 27;
-    public const STATUS_IPG_PAID = 8;
     const STATUS_FAIL = 'fail'; // old status = 2
     const STATUS_REFUND = 'refund'; // old status 30
 
