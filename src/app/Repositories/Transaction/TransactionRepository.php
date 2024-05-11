@@ -27,7 +27,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
         }
 
-        $query->update(['status' => Transaction::STATUS_REFUND]);
+        return $query->update(['status' => Transaction::STATUS_REFUND]);
     }
 
     public function sumOfPaidTransactions(Invoice $invoice): float
