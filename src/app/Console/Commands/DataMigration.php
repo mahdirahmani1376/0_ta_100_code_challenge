@@ -35,7 +35,7 @@ class DataMigration extends Command
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
         self::migrateProfiles();
-        self::updateMainAppClients();
+//        self::updateMainAppClients();
         self::migrateBankAccount();
         self::migrateBankGateway();
         self::migrateWallet();
