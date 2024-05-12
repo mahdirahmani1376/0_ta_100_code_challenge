@@ -565,79 +565,59 @@ class DataMigration extends Command
     private function migrateOfflineTransaction(): void
     {
         $tableName = (new OfflineTransaction())->getTable();
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_offline_payments = $main_db . '.offline_payments';
+        $main_db_invoices = $main_db . '.invoices';
+        $main_db_transactions = $main_db . '.transactions';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $abnormalData = DB::connection('mainapp')
-                ->select('SELECT offline_payments.* ,
-                                        transactions.id as t_id,
-                                        transactions.invoice_id as t_invoice_id,
-                                        invoices.invoice_id as i_invoice_id,
-                                        invoices.client_id as i_client_id
-                                FROM offline_payments
-                                LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
-                                LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                WHERE invoices.client_id IS NULL');
-            if (!empty($abnormalData)) {
-                $this->error('SKIPPING ABNORMAL DATA (transactions.id):');
-                collect((array)$abnormalData)->each(function ($row) {
-                    $row = (array)$row;
-                    $this->error($row['id']);
-                });
-            }
 
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count
-                                                                FROM offline_payments
-                                                                LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
-                                                                LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                                                WHERE invoices.client_id IS NOT NULL')[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')
-                    ->select("SELECT offline_payments.* ,
-                                        transactions.id as t_id,
-                                        transactions.invoice_id as t_invoice_id,
-                                        invoices.invoice_id as i_invoice_id,
-                                        invoices.client_id as i_client_id
+            $query = "
+            INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ paid_at,
+ profile_id,
+ invoice_id,
+ transaction_id,
+ bank_account_id,
+ admin_id,
+ amount,
+ status,
+ payment_method,
+ tracking_code,
+ mobile,
+ description)
+SELECT op.id              as id,
+       op.created_at      as created_at,
+       op.updated_at      as updated_at,
+       op.paid_date       as paid_at,
+       inv.client_id      as profile_id,
+       inv.invoice_id     as invoice_id,
+       op.transaction_id  as transaction_id,
+       op.bank_account_id as bank_account_id,
+       op.admin_user_id   as admin_id,
+       op.amount          as amount,
+       case op.status
+           when op.status = 0 then 'pending'
+           when op.status = 1 then 'confirmed'
+           when op.status = 2 then 'rejected'
+           end            as status,
+       op.payment_method  as payment_method,
+       op.tracking_code   as tracking_code,
+       op.mobile          as mobile,
+       op.description     as description
 
-                                FROM offline_payments
-                                LEFT JOIN transactions ON offline_payments.transaction_id = transactions.id
-                                LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                WHERE invoices.client_id IS NOT NULL
-                                 LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['paid_at'] = $row['paid_date'];
-                    $newRow['profile_id'] = $row['i_client_id'];
-                    $newRow['invoice_id'] = $row['i_invoice_id'];
-                    $newRow['transaction_id'] = $row['transaction_id'];
-                    $newRow['bank_account_id'] = $row['bank_account_id'];
-                    $newRow['admin_id'] = $row['admin_user_id'];
-                    $newRow['amount'] = strlen($row['amount']) > 0 ? $row['amount'] : 0;
-                    if ($row['status'] == 0) {
-                        $newRow['status'] = OfflineTransaction::STATUS_PENDING;
-                    } elseif ($row['status'] == 1) {
-                        $newRow['status'] = OfflineTransaction::STATUS_CONFIRMED;
-                    } elseif ($row['status'] == 2) {
-                        $newRow['status'] = OfflineTransaction::STATUS_REJECTED;
-                    } else {
-                        throw new Exception('invalid offline payment status id:' . $row['id'] . ' status:' . $row['status']);
-                    }
-                    $newRow['payment_method'] = $row['payment_method'];
-                    $newRow['tracking_code'] = $row['tracking_code'];
-                    $newRow['mobile'] = $row['mobile'];
-                    $newRow['description'] = $row['description'];
-                    $newRow['callback_url'] = $row['callback_url'];
+FROM $main_db_offline_payments as op
+         LEFT JOIN $main_db_transactions as trx ON op.transaction_id = trx.id
+         LEFT JOIN $main_db_invoices as inv ON trx.invoice_id = inv.invoice_id
+WHERE inv.client_id IS NOT NULL
+            ";
 
-                    return $newRow;
-                });
+            $this->info($query);
+            $this->ask('please insert credit transactions from above query');
 
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
