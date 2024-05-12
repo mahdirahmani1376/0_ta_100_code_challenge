@@ -1,13 +1,14 @@
-FROM php:8.2.8-fpm
+FROM php:8.2.8-apache
 
 # Arguments defined in docker-compose.yml
-ARG USER
-ARG UID
+ARG WWW_DATA_USER_ID
+ENV TZ=GST-3:30
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    vim \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
@@ -22,6 +23,11 @@ RUN apt-get update && apt-get install -y \
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Instal timezone db
+RUN pecl upgrade timezonedb
+# Change TimeZone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql
@@ -51,13 +57,19 @@ RUN pecl install mongodb-1.16.2.tgz \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $UID -d /home/$USER $USER
-RUN mkdir -p /home/$USER/.composer && \
-    chown -R $USER:$USER /home/$USER
+RUN usermod -u ${WWW_DATA_USER_ID} www-data && \
+    groupmod -g ${WWW_DATA_USER_ID} www-data
 
-COPY php.ini /usr/local/etc/php/php.ini
-COPY horizon.conf /etc/supervisor/conf.d/horizon.conf
+COPY ./php.ini /usr/local/etc/php/php.ini
+COPY ./horizon.conf /etc/supervisor/conf.d/horizon.conf
 COPY ./entrypoint.sh /
+
+# Config apache
+ADD default.conf /etc/apache2/sites-enabled/000-default.conf
+RUN \
+    printf "\nServerName localhost" >> /etc/apache2/apache2.conf  && \
+    a2enmod rewrite && a2enmod headers
+
 
 # Set working directory
 WORKDIR /var/www
