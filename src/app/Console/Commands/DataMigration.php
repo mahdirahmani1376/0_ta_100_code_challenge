@@ -35,7 +35,7 @@ class DataMigration extends Command
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
         self::migrateProfiles();
-        self::updateMainAppClients();
+//        self::updateMainAppClients();
         self::migrateBankAccount();
         self::migrateBankGateway();
         self::migrateWallet();
@@ -375,30 +375,34 @@ class DataMigration extends Command
     private function migrateCreditTransaction(): void
     {
         $tableName = (new CreditTransaction())->getTable();
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_credit_transactions = $main_db . '.credit_transactions';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credit_transactions`')[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')->select("SELECT * FROM `credit_transactions` LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['client_id'];
-                    $newRow['wallet_id'] = 0;
-                    $newRow['invoice_id'] = $row['invoice_id'];
-                    $newRow['admin_id'] = $row['admin_user_id'];
-                    $newRow['amount'] = $row['amount'];
-                    $newRow['description'] = $row['description'];
+            $query = "INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ profile_id,
+ wallet_id,
+ invoice_id,
+ admin_id,
+ amount,
+ description)
+    (SELECT ct.id            as id,
+            ct.created_at    as created_at,
+            ct.updated_at    as updated_at,
+            ct.client_id     as profile_id,
+            0                as wallet_id,
+            ct.invoice_id    as invoice_id,
+            ct.admin_user_id as admin_id,
+            ct.amount        as amount,
+            ct.description   as description
+     from $main_db_credit_transactions as ct)";
 
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
+            $this->info($query);
+            $this->ask('please insert credit transactions from above query');
+            $this->info("End of data migrate for $tableName");
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
@@ -421,64 +425,66 @@ class DataMigration extends Command
     private function migrateInvoice(): void
     {
         $tableName = (new Invoice())->getTable();
+        $main_invoices_table_name = DB::connection('mainapp')->getDatabaseName() . '.invoices';
+        $whmcs_invoices_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
+
         $this->alert("Beginning to migrate $tableName");
         try {
-            $count = DB::connection('mainapp')->select("SELECT count(*) as count FROM `invoices`")[0]->count;
+            $query = "
+            INSERT INTO invoices
+(id,
+ created_at,
+ updated_at,
+ deleted_at,
+ profile_id,
+ due_date,
+ processed_at,
+ paid_at,
+ rahkaran_id,
+ payment_method,
+ balance,
+ total,
+ sub_total,
+ tax_rate,
+ tax,
+ is_mass_payment,
+ admin_id,
+ source_invoice,
+ status)
+    (SELECT inv.invoice_id                        as id,
+            inv.invoice_date                      as created_at,
+            inv.updated_at                        as updated_at,
+            inv.deleted_at                        as deleted_at,
+            inv.client_id                         as profile_id,
+            inv.due_date                          as due_date,
+            inv.created_at                        as processed_at,
+            inv.paid_date                         as paid_at,
+            inv.rahkaran_id                       as rahkaran_id,
+            inv.payment_method                    as payment_method,
+            inv.balance                           as balance,
+            inv.total                             as total,
+            inv.sub_total                         as sub_total,
+            IF(winv.taxrate > 0, winv.taxrate, 0) as tax_rate,
+            inv.tax1 + inv.tax2                   as tax,
+            inv.is_mass_payment                   as is_mass_payment,
+            IF(inv.manual_check = TRUE, 1, NULL)  as admin_id,
+            inv.source_invoice                    as source_invoice,
+            CASE
+                WHEN inv.status = 0 THEN 'unpaid'
+                WHEN inv.status = 1 THEN 'paid'
+                WHEN inv.status = 2 THEN 'draft'
+                WHEN inv.status = 3 THEN 'canceled'
+                WHEN inv.status = 4 THEN 'deleted'
+                WHEN inv.status = 5 THEN 'payment_pending'
+                WHEN inv.status = 6 THEN 'refunded'
+                WHEN inv.status = 7 THEN 'collections'
+                END                               as status
+     FROM $main_invoices_table_name as inv
+              LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)
+            ";
 
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $whmcs_invoices = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
-                $oldData = DB::connection('mainapp')->select(
-                    "SELECT inv.*,winv.taxrate,winv.notes FROM `invoices` as inv LEFT JOIN $whmcs_invoices as winv on winv.id=inv.invoice_id LIMIT $this->chunkSize OFFSET $i"
-                );
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['invoice_id'];
-                    $newRow['created_at'] = $row['invoice_date'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['client_id'];
-                    $newRow['due_date'] = $row['due_date'];
-                    $newRow['processed_at'] = $row['created_at'];
-                    $newRow['paid_at'] = $row['paid_date'];
-                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['payment_method'] = $row['payment_method'];
-                    $newRow['balance'] = $row['balance'];
-                    $newRow['total'] = $row['total'];
-                    $newRow['sub_total'] = $row['sub_total'];
-                    $newRow['tax_rate'] = $row['taxrate'] ?? 0;
-                    $newRow['tax'] = $row['tax1'] + $row['tax2'];
-                    $newRow['deleted_at'] = $row['deleted_at'];
-                    $newStatus = null;
-                    if ($row['status'] == 0) {
-                        $newStatus = Invoice::STATUS_UNPAID;
-                    } elseif ($row['status'] == 1) {
-                        $newStatus = Invoice::STATUS_PAID;
-                    } elseif ($row['status'] == 2) {
-                        $newStatus = Invoice::STATUS_DRAFT;
-                    } elseif ($row['status'] == 3) {
-                        $newStatus = Invoice::STATUS_CANCELED;
-                    } elseif ($row['status'] == 4) {
-                        $newStatus = Invoice::STATUS_DELETED;
-                    } elseif ($row['status'] == 5) {
-                        $newStatus = Invoice::STATUS_PAYMENT_PENDING;
-                    } elseif ($row['status'] == 6) {
-                        $newStatus = Invoice::STATUS_REFUNDED;
-                    } elseif ($row['status'] == 7) {
-                        $newStatus = Invoice::STATUS_COLLECTIONS;
-                    }
-                    $newRow['status'] = $newStatus;
-                    $newRow['is_mass_payment'] = $row['is_mass_payment'];
-                    $newRow['admin_id'] = $row['manual_check'] == 1 ? 1 : null; // TODO check this
-                    $newRow['is_credit'] = $row['is_credit'];
-                    $newRow['note'] = $row['notes'];
-
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
-            $this->newLine();
+            $this->info($query);
+            $this->ask('please insert invoices from above query');
             $this->info("End of data migrate for $tableName");
 
             $this->info('invoice_counts');
@@ -509,32 +515,34 @@ class DataMigration extends Command
     private function migrateItem(): void
     {
         $tableName = (new Item())->getTable();
+        $whmcs_items_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoiceitems';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems`")[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = Carbon::now()->toDateTimeString();
-                    $newRow['updated_at'] = Carbon::now()->toDateTimeString();
-                    $newRow['invoice_id'] = $row['invoiceid'];
-                    $newRow['invoiceable_id'] = $row['relid'];
-                    $newRow['invoiceable_type'] = $row['type'];
-                    $newRow['amount'] = $row['amount'];
-                    $newRow['discount'] = 0;
-                    $newRow['from_date'] = null;
-                    $newRow['to_date'] = null;
-                    $newRow['description'] = $row['description'];
-
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
+            $query = "
+            INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ invoice_id,
+ invoiceable_id,
+ invoiceable_type,
+ amount,
+ discount,
+ description)
+    (SELECT it.id          as id,
+            NOW()          as created_at,
+            NOW()          as updated_at,
+            invoiceid      as invoice_id,
+            it.relid       as invoiceable_id,
+            it.type        as invoiceable_type,
+            it.amount      as amount,
+            0              AS discount,
+            it.description as description
+     FROM $whmcs_items_table_name as it
+     )
+            ";
+            $this->info($query);
+            $this->ask('please insert invoice items from above query');
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
@@ -652,84 +660,61 @@ class DataMigration extends Command
     private function migrateTransaction(): void
     {
         $tableName = (new Transaction())->getTable();
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_transactions = $main_db . '.transactions';
+        $main_db_invoices = $main_db . '.invoices';
         $this->alert("Beginning to migrate $tableName");
         try {
-            /*$abnormalData = DB::connection('mainapp')
-                ->select('SELECT transactions.*,
-                                        invoices.invoice_id as i_invoice_id,
-                                        invoices.client_id as i_client_id
-                                FROM `transactions`
-                                LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                WHERE invoices.client_id IS NULL');
-            if (!empty($abnormalData)) {
-                $this->error('SKIPPING ABNORMAL DATA (transactions.id):');
-                collect((array)$abnormalData)->each(function ($row) {
-                    $row = (array)$row;
-                    $this->error($row['id']);
-                });
-            }*/
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count
-                                                                    FROM `transactions`
-                                                                    LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                                                    WHERE invoices.client_id IS NOT NULL')[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            $mainAppTransactions = [];
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')
-                    ->select("SELECT transactions.*,
-                                        invoices.invoice_id as i_invoice_id,
-                                        invoices.client_id as i_client_id
-                                    FROM `transactions`
-                                    LEFT JOIN invoices ON transactions.invoice_id = invoices.invoice_id
-                                    WHERE invoices.client_id IS NOT NULL
-                                    LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) use (&$mainAppTransactions) {
-                    $row = (array)$row;
-                    $newRow = [];
+            $query = "INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ profile_id,
+ invoice_id,
+ rahkaran_id,
+ amount,
+ status,
+ payment_method,
+ description,
+ ip,
+ tracking_code,
+ reference_id,
+ callback_url)
+SELECT trx.id             as id,
+       trx.created_at     as created_at,
+       trx.updated_at     as updated_at,
+       inv.client_id      as profile_id,
+       inv.invoice_id     as invoice_id,
+       trx.rahkaran_id    as rahkaran_id,
+       trx.amount         as amount,
+       case trx.status
+           when trx.status = 0 OR trx.status = 3 OR trx.status = 4 OR trx.status = 5 then 'pending'
+           when trx.status = 1 OR trx.status = 8 OR trx.status = 25 then 'success'
+           when trx.status = 2 OR trx.status = 7 OR trx.status = 10 OR trx.status = 11 OR trx.status = 12 OR
+                trx.status = 13 OR trx.status = 14 OR trx.status = 15 OR trx.status = 16 OR trx.status = 17 OR
+                trx.status = 18 OR trx.status = 19 OR trx.status = 21 OR trx.status = 22 OR trx.status = 23 OR
+                trx.status = 20 OR trx.status = 26 OR trx.status = 24 OR trx.status = 27 OR trx.status = 28
+               then 'success'
+           when trx.status = 6 OR trx.status = 9 then 'pending_bank_verify'
+           when trx.status = 29 then 'canceled'
+           when trx.status = 30 then 'refund'
+           else 'unknown'
+           end            as status,
+       trx.payment_method as payment_method,
+       trx.description    as description,
+       trx.ip             as ip,
+       trx.tracking_code  as tracking_code,
+       trx.reference_id   as reference_id,
+       trx.callback_url   as callback_url
 
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['i_client_id'];
-                    $newRow['invoice_id'] = $row['invoice_id'];
-                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['amount'] = $row['amount'];
-                    $status = $newRow['status'] = match ($row['status']) {
-                        0, 3, 4, 5 => Transaction::STATUS_PENDING,
-                        1, 8, 25 => Transaction::STATUS_SUCCESS,
-                        2, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 20, 26, 24, 27, 28 => Transaction::STATUS_FAIL,
-                        6, 9 => Transaction::STATUS_PENDING_BANK_VERIFY,
-                        29 => Transaction::STATUS_CANCELED,
-                        30 => Transaction::STATUS_REFUND,
-                        default => throw new Exception('Invalid status in transactions table id:' . $row['id'] . ' status:' . $row['status']),
-                    };
-
-                    $mainAppTransactions[] = $status;
-
-                    $newRow['payment_method'] = $row['payment_method'];
-                    $newRow['description'] = $row['description'];
-                    $newRow['ip'] = $row['ip'];
-                    $newRow['tracking_code'] = $row['tracking_code'];
-                    $newRow['reference_id'] = $row['reference_id'];
-
-                    return $newRow;
-                });
-
-                DB::table($tableName)->insert($mappedData);
-
-                $progress->advance($this->chunkSize);
-            }
+FROM $main_db_transactions as trx
+         LEFT JOIN $main_db_invoices as inv ON trx.invoice_id = inv.invoice_id
+WHERE inv.client_id IS NOT NULL
+";
+            $this->info($query);
+            $this->ask('please insert transactions from above query');
             $this->newLine();
             $this->info("End of data migrate for $tableName");
-
-            $financeTransactionCounts = collect($mappedData)->groupBy('status')->map->count();
-            $mainAppTransactionCounts = collect(array_count_values($mainAppTransactions));
-
-            $this->info('count of each transaction in finance');
-            $this->table([$financeTransactionCounts->keys()->toArray()], [$financeTransactionCounts->values()->toArray()]);
-
-            $this->info('count of each transaction in main_app');
-            $this->table([$mainAppTransactionCounts->keys()->toArray()], [$mainAppTransactionCounts->values()->toArray()]);
 
             $this->compareCounts(
                 'transactions',
@@ -750,33 +735,34 @@ class DataMigration extends Command
     private function migrateInvoiceNumber(): void
     {
         $tableName = (new InvoiceNumber())->getTable();
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_invoice_numbers = $main_db . '.invoice_numbers';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `invoice_numbers`')[0]->count;
-            $progress = $this->output->createProgressBar($count);
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')
-                    ->select("SELECT * FROM `invoice_numbers` LIMIT $this->chunkSize OFFSET $i");
 
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['deleted_at'] = $row['deleted_at'];
-                    $newRow['invoice_number'] = $row['invoice_number'];
-                    $newRow['fiscal_year'] = $row['fiscal_year'];
-                    $newRow['type'] = $row['type'] == 'paid' ? InvoiceNumber::TYPE_PAID : InvoiceNumber::TYPE_REFUNDED;
-                    $newRow['status'] = $row['status'] ? InvoiceNumber::STATUS_ACTIVE : InvoiceNumber::STATUS_PENDING;
-                    $newRow['invoice_id'] = $row['invoice_id'];
-
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-                $progress->advance($this->chunkSize);
-            }
+            $query = "
+            INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ deleted_at,
+ invoice_number,
+ fiscal_year,
+ type,
+ status,
+ invoice_id)
+    SELECT invn.id                                    as id,
+            invn.created_at                            as created_at,
+            invn.updated_at                            as updated_at,
+            invn.deleted_at                            as deleted_at,
+            invn.invoice_number                        as invoice_number,
+            invn.fiscal_year                           as fiscal_year,
+            IF(invn.type = 'paid', 'paid', 'refunded') as type,
+            IF(invn.status = TRUE, '1', '0')           as status,
+            invn.invoice_id                            as invoice_id
+     from $main_db_invoice_numbers as invn";
+            $this->info($query);
+            $this->ask('please insert credit transactions from above query');
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
