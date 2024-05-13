@@ -170,7 +170,7 @@ class MoadianFactory
                     $description = 'پنل نمايندگي هاست وب سايت';
                     break;
                 }
-                if ($product['product_group']['name'] == 'transactional-email') {
+                if (data_get($product,'group.name') == 'transactional-email') {
                     $code = 2330001496259;
                     $description = 'سرويس هاي ايميل هاست وب سايت';
                     break;
@@ -180,7 +180,7 @@ class MoadianFactory
                     $description = 'پشتيبان گيري از زيرساخت ابري';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['ssl-certificate', 'License'])) {
+                if (Str::contains(data_get($product,'group.name'), ['ssl-certificate', 'License'])) {
                     $code = 2330001496181;
                     $description = 'فروش لايسنس و گواهي هاي نرم افزار';
                     break;
@@ -205,52 +205,52 @@ class MoadianFactory
                     $description = 'تخصيص پهناي باند انتقال نقطه به نقطه';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Windows-host'])) {
+                if (Str::contains(data_get($product,'group.name'), ['Windows-host'])) {
                     $code = 2330001496044;
                     $description = 'هاست وب سايت ويندوز';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-backup-ir'])) {
+                if (Str::contains(data_get($product,'group.name'), ['Host-backup-ir'])) {
                     $code = 2330001496082;
                     $description = 'هاست وب سايت بك آپ';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-Download'])) {
+                if (Str::contains(data_get($product,'group.name'), ['Host-Download'])) {
                     $code = 2330001496013;
                     $description = 'هاست دانلود';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-linux'])) {
+                if (Str::contains(data_get($product,'group.name'), ['Host-linux'])) {
                     $code = 2330001496129;
                     $description = 'هاست وب سايت لينوكس';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['wordpress', 'WordPress'])) {
+                if (Str::contains(data_get($product,'group.name'), ['wordpress', 'WordPress'])) {
                     $code = 2330001496068;
                     $description = 'هاست وب سايت ورد پرس';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['anycast'])) {
+                if (Str::contains(data_get($product,'group.name'), ['anycast'])) {
                     $code = 2330001496099;
                     $description = 'هاست وب سايت Anycast';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['dedicate'])) {
+                if (Str::contains(data_get($product,'group.name'), ['dedicate'])) {
                     $code = 2330001496327;
                     $description = 'اجاره سرور اختصاصي';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-Framework-IR'])) {
+                if (Str::contains(data_get($product,'group.name'), ['Host-Framework-IR'])) {
                     $code = 2330001496310; // TODO double check
                     $description = 'هاست وب سايت لاراول';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Digital-Content'])) {
+                if (Str::contains(data_get($product,'group.name'), ['Digital-Content'])) {
                     $code = 2330001496341;
                     $description = 'خدمات تخصيص پهناي باند و برقراري ارتباط اينترنتي';
                     break;
                 }
-                if (Str::contains($product['group']['name'], ['software', 'Software', 'نرم افزار'])) {
+                if (Str::contains(data_get($product,'group.name'), ['software', 'Software', 'نرم افزار'])) {
                     $code = 2330001496136;
                     $description = 'خدمات سفارشي سازي نرم افزار';
                     break;
