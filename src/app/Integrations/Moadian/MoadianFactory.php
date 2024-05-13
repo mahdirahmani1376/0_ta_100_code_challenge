@@ -165,12 +165,13 @@ class MoadianFactory
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
                 $product = $this->responseProducts->where('id', $item->invoiceable_id)->first();
+                $productGroup = data_get($product,'group.name');
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
                     $description = 'پنل نمايندگي هاست وب سايت';
                     break;
                 }
-                if (data_get($product,'group.name') == 'transactional-email') {
+                if ($productGroup == 'transactional-email') {
                     $code = 2330001496259;
                     $description = 'سرويس هاي ايميل هاست وب سايت';
                     break;
@@ -180,7 +181,7 @@ class MoadianFactory
                     $description = 'پشتيبان گيري از زيرساخت ابري';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['ssl-certificate', 'License'])) {
+                if (Str::contains($productGroup, ['ssl-certificate', 'License'])) {
                     $code = 2330001496181;
                     $description = 'فروش لايسنس و گواهي هاي نرم افزار';
                     break;
@@ -205,52 +206,52 @@ class MoadianFactory
                     $description = 'تخصيص پهناي باند انتقال نقطه به نقطه';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['Windows-host'])) {
+                if (Str::contains($productGroup, ['Windows-host'])) {
                     $code = 2330001496044;
                     $description = 'هاست وب سايت ويندوز';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['Host-backup-ir'])) {
+                if (Str::contains($productGroup, ['Host-backup-ir'])) {
                     $code = 2330001496082;
                     $description = 'هاست وب سايت بك آپ';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['Host-Download'])) {
+                if (Str::contains($productGroup, ['Host-Download'])) {
                     $code = 2330001496013;
                     $description = 'هاست دانلود';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['Host-linux'])) {
+                if (Str::contains($productGroup, ['Host-linux'])) {
                     $code = 2330001496129;
                     $description = 'هاست وب سايت لينوكس';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['wordpress', 'WordPress'])) {
+                if (Str::contains($productGroup, ['wordpress', 'WordPress'])) {
                     $code = 2330001496068;
                     $description = 'هاست وب سايت ورد پرس';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['anycast'])) {
+                if (Str::contains($productGroup, ['anycast'])) {
                     $code = 2330001496099;
                     $description = 'هاست وب سايت Anycast';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['dedicate'])) {
+                if (Str::contains($productGroup, ['dedicate'])) {
                     $code = 2330001496327;
                     $description = 'اجاره سرور اختصاصي';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['Host-Framework-IR'])) {
+                if (Str::contains($productGroup, ['Host-Framework-IR'])) {
                     $code = 2330001496310; // TODO double check
                     $description = 'هاست وب سايت لاراول';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['Digital-Content'])) {
+                if (Str::contains($productGroup, ['Digital-Content'])) {
                     $code = 2330001496341;
                     $description = 'خدمات تخصيص پهناي باند و برقراري ارتباط اينترنتي';
                     break;
                 }
-                if (Str::contains(data_get($product,'group.name'), ['software', 'Software', 'نرم افزار'])) {
+                if (Str::contains($productGroup, ['software', 'Software', 'نرم افزار'])) {
                     $code = 2330001496136;
                     $description = 'خدمات سفارشي سازي نرم افزار';
                     break;
