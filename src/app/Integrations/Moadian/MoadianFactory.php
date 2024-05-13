@@ -250,7 +250,13 @@ class MoadianFactory
                     $description = 'خدمات تخصيص پهناي باند و برقراري ارتباط اينترنتي';
                     break;
                 }
+                if (Str::contains($product['group']['name'], ['software', 'Software', 'نرم افزار'])) {
+                    $code = 2330001496136;
+                    $description = 'خدمات سفارشي سازي نرم افزار';
+                    break;
+                }
                 break;
+
             case Item::TYPE_DOMAIN_SERVICE:
                 $domain = $this->responseDomains->where('id', $item->invoiceable_id)->first();
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
