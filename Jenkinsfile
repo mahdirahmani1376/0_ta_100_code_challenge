@@ -17,7 +17,7 @@ String branch = env.BRANCH_NAME
 //devsecops(DDID: "$DDId", Dockerfile: "$Dockerfile")
 
             // mattermostNotifier 
-            mattermostSend channel: 'finance-service', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
+            mattermostSend channel: 'hostiran-staging-cd', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
 
 timestamps {
 node ('public') {
@@ -92,11 +92,11 @@ node ('public') {
             throw e
     } finally {
       if(pipresult == "FAILURE") {
-        mattermostSend channel: 'finance-service', color: 'danger', message: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        mattermostSend channel: 'hostiran-staging-cd', color: 'danger', message: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             
        } 
        else {
-       mattermostSend channel: 'finance-service', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+       mattermostSend channel: 'hostiran-staging-cd', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 
 
       }
