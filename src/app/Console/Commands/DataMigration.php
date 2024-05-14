@@ -30,7 +30,7 @@ class DataMigration extends Command
 
     public function handle()
     {
-        ini_set('memory_limit', '8192M');
+        ini_set('memory_limit', '4096M');
         $this->info("#### START DATA MIGRATION ####");
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
