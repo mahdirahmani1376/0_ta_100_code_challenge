@@ -400,8 +400,7 @@ class DataMigration extends Command
             ct.description   as description
      from $main_db_credit_transactions as ct)";
 
-            $this->info($query);
-            $this->ask('please insert credit transactions from above query');
+            DB::connection('mysql')->select($query);
             $this->info("End of data migrate for $tableName");
             $this->newLine();
             $this->info("End of data migrate for $tableName");
@@ -483,8 +482,7 @@ class DataMigration extends Command
               LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)
             ";
 
-            $this->info($query);
-            $this->ask('please insert invoices from above query');
+            DB::connection('mysql')->select($query);
             $this->info("End of data migrate for $tableName");
 
             $this->info('invoice_counts');
@@ -541,8 +539,7 @@ class DataMigration extends Command
      FROM $whmcs_items_table_name as it
      )
             ";
-            $this->info($query);
-            $this->ask('please insert invoice items from above query');
+            DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
@@ -596,15 +593,16 @@ SELECT op.id              as id,
        inv.client_id      as profile_id,
        inv.invoice_id     as invoice_id,
        op.transaction_id  as transaction_id,
-       op.bank_account_id as bank_account_id,
+       IF(op.bank_account_id > 0, op.bank_account_id, 0) as bank_account_id,
        op.admin_user_id   as admin_id,
        op.amount          as amount,
        case op.status
            when op.status = 0 then 'pending'
            when op.status = 1 then 'confirmed'
            when op.status = 2 then 'rejected'
+           ELSE 'rejected'
            end            as status,
-       op.payment_method  as payment_method,
+       IF(op.payment_method != NULL, op.payment_method, 'unknown')  as payment_method,
        op.tracking_code   as tracking_code,
        op.mobile          as mobile,
        op.description     as description
@@ -615,15 +613,18 @@ FROM $main_db_offline_payments as op
 WHERE inv.client_id IS NOT NULL
             ";
 
-            $this->info($query);
-            $this->ask('please insert credit transactions from above query');
+            DB::connection('mysql')->select($query);
 
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
             $this->compareCounts(
                 'offline_payments',
-                DB::connection('mainapp')->table('offline_payments')->count(),
+                DB::connection('mainapp')->table('offline_payments')
+                    ->leftJoin($main_db_transactions, 'offline_payments.transaction_id', '=', "{$main_db_transactions}.id")
+                    ->leftJoin($main_db_invoices, "$main_db_transactions.invoice_id", '=', "{$main_db_invoices}.invoice_id")
+                    ->where("{$main_db_invoices}.client_id", "!=", NULL)
+                    ->count(),
                 $tableName,
                 OfflineTransaction::count()
             );
@@ -691,8 +692,7 @@ FROM $main_db_transactions as trx
          LEFT JOIN $main_db_invoices as inv ON trx.invoice_id = inv.invoice_id
 WHERE inv.client_id IS NOT NULL
 ";
-            $this->info($query);
-            $this->ask('please insert transactions from above query');
+            DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
@@ -741,8 +741,7 @@ WHERE inv.client_id IS NOT NULL
             IF(invn.status = TRUE, '1', '0')           as status,
             invn.invoice_id                            as invoice_id
      from $main_db_invoice_numbers as invn";
-            $this->info($query);
-            $this->ask('please insert credit transactions from above query');
+            DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
