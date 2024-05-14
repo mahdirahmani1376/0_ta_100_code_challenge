@@ -8,6 +8,7 @@ use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
+use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -18,8 +19,9 @@ class UpdateInvoiceItemsCommand extends Command
     protected $description = 'Update Unpaid Invoice Prices after 72 hours';
 
     public function __construct(
-        public UpdateItemAction           $updateItemAction,
-        public InvoiceRepositoryInterface $invoiceRepository
+        public UpdateItemAction                        $updateItemAction,
+        public InvoiceRepositoryInterface              $invoiceRepository,
+        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService
     )
     {
         parent::__construct();
@@ -30,25 +32,24 @@ class UpdateInvoiceItemsCommand extends Command
         $this->info('getting all unpaid invoices older than 72 hours');
 
         $unpaidInvoices = $this->invoiceRepository->index([
-            'status'  => Invoice::STATUS_UNPAID,
-            'to_date' => now()->subHours(72),
-            'items'   => [
+            'status'     => Invoice::STATUS_UNPAID,
+            'to_date'    => now()->subHours(72),
+            'items'      => [
                 ["invoiceable_type" => Item::TYPE_DOMAIN],
                 ["invoiceable_type" => Item::TYPE_PRODUCT_SERVICE],
             ],
-            'export'           => 1,
+            'export'     => 1,
             'date_field' => 'updated_at'
         ]);
 
         $this->info("count of unpaid invoices: {$unpaidInvoices->count()}");
 
         $unpaidInvoices->each(function (Invoice $invoice) {
-            $invoice->items
-                ->each(function (Item $item) use ($invoice) {
-                    $this->updateItem($item, $invoice);
-                });
+            $invoice->items->each(function (Item $item) use ($invoice) {
+                $this->updateItem($item, $invoice);
+            });
+            ($this->calcInvoicePriceFieldsService)($invoice);
         });
-
         $this->info('Completed');
 
     }
@@ -81,8 +82,8 @@ class UpdateInvoiceItemsCommand extends Command
         } catch (Throwable $e) {
             $this->error("item with id:$item->id with invoice $invoice->id threw exception with message {$e->getMessage()}");
             Log::error("item with id:$item->id with invoice $invoice->id threw exception", [
-                'error'    => $e->getMessage(),
-                'trace'    => $e->getTrace()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTrace()
             ]);
         }
     }
