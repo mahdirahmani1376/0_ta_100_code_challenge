@@ -375,11 +375,12 @@ class DataMigration extends Command
     private function migrateCreditTransaction(): void
     {
         $tableName = (new CreditTransaction())->getTable();
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_credit_transactions = $main_db . '.credit_transactions';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $query = "INSERT INTO $tableName
+            $query = "INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -426,11 +427,11 @@ class DataMigration extends Command
         $tableName = (new Invoice())->getTable();
         $main_invoices_table_name = DB::connection('mainapp')->getDatabaseName() . '.invoices';
         $whmcs_invoices_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
-
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
             $query = "
-            INSERT INTO invoices
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -514,10 +515,11 @@ class DataMigration extends Command
     {
         $tableName = (new Item())->getTable();
         $whmcs_items_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoiceitems';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
             $query = "
-            INSERT INTO $tableName
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -566,11 +568,12 @@ class DataMigration extends Command
         $main_db_offline_payments = $main_db . '.offline_payments';
         $main_db_invoices = $main_db . '.invoices';
         $main_db_transactions = $main_db . '.transactions';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
 
             $query = "
-            INSERT INTO $tableName
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -644,9 +647,10 @@ WHERE inv.client_id IS NOT NULL
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_transactions = $main_db . '.transactions';
         $main_db_invoices = $main_db . '.invoices';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
-            $query = "INSERT INTO $tableName
+            $query = "INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -717,11 +721,12 @@ WHERE inv.client_id IS NOT NULL
         $tableName = (new InvoiceNumber())->getTable();
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_invoice_numbers = $main_db . '.invoice_numbers';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
 
             $query = "
-            INSERT INTO $tableName
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
