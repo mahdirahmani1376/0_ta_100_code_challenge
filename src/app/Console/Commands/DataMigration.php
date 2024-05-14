@@ -26,7 +26,7 @@ class DataMigration extends Command
 
     protected $description = 'Command description';
 
-    protected int $chunkSize = 2000;
+    protected int $chunkSize = 4000;
 
     public function handle()
     {
@@ -61,7 +61,6 @@ class DataMigration extends Command
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `clients` LIMIT $this->chunkSize OFFSET {$i}");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -71,7 +70,6 @@ class DataMigration extends Command
                     $newRow['created_at'] = $newRow['updated_at'] = now();
                     return $newRow;
                 });
-                $this->info('Mapping done');
                 DB::table($profileTableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
@@ -514,34 +512,27 @@ class DataMigration extends Command
     private function migrateItem(): void
     {
         $tableName = (new Item())->getTable();
-        $whmcs_items_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoiceitems';
-        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
-            $query = "
-            INSERT INTO $fulTableName
-(id,
- created_at,
- updated_at,
- invoice_id,
- invoiceable_id,
- invoiceable_type,
- amount,
- discount,
- description)
-    (SELECT it.id          as id,
-            NOW()          as created_at,
-            NOW()          as updated_at,
-            invoiceid      as invoice_id,
-            it.relid       as invoiceable_id,
-            it.type        as invoiceable_type,
-            it.amount      as amount,
-            0              AS discount,
-            it.description as description
-     FROM $whmcs_items_table_name as it
-     )
-            ";
-            DB::connection('mysql')->select($query);
+            $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems`")[0]->count;
+            $progress = $this->output->createProgressBar($count);
+            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
+                $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` LIMIT $this->chunkSize OFFSET $i");
+                $mappedData = Arr::map($oldData, function ($row) {
+                    $row = (array)$row;
+                    $newRow['id'] = $row['id'];
+                    $newRow['created_at'] = Carbon::now()->toDateTimeString();
+                    $newRow['updated_at'] = Carbon::now()->toDateTimeString();
+                    $newRow['invoice_id'] = $row['invoiceid'];
+                    $newRow['invoiceable_id'] = $row['relid'];
+                    $newRow['invoiceable_type'] = $row['type'];
+                    $newRow['amount'] = $row['amount'];
+                    $newRow['description'] = $row['description'];
+                    return $newRow;
+                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
+            }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
