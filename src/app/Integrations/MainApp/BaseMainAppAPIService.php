@@ -5,7 +5,6 @@ namespace App\Integrations\MainApp;
 use App\Jobs\UpdateSystemLog;
 use App\Models\SystemLog;
 use App\Services\LogService;
-use App\ValueObjects\Queue;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -40,7 +39,7 @@ abstract class BaseMainAppAPIService
                 'body'   => $response->json(),
                 'status' => $response->status()
             ];
-            dispatch(new UpdateSystemLog($systemLog, $customResponse))->onQueue(Queue::SYSTEM_LOG_QUEUE);
+            UpdateSystemLog::dispatch($systemLog,$customResponse)->onQueue(UpdateSystemLog::DEFAULT_QUEUE);
         }
 
         return $response;

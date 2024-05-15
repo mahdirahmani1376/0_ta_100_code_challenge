@@ -33,7 +33,6 @@ use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\LogService;
-use App\ValueObjects\Queue;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
@@ -1944,7 +1943,8 @@ class RahkaranService
                 'status' => $getStatusCode
             ];
 
-            dispatch(new UpdateSystemLog($systemLog, $custom_response))->onQueue(Queue::SYSTEM_LOG_QUEUE);
+            UpdateSystemLog::dispatch($systemLog,$custom_response)->onQueue(UpdateSystemLog::DEFAULT_QUEUE);
+
         }
     }
 

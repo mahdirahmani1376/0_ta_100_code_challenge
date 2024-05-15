@@ -71,7 +71,7 @@ class AssignInvoiceNumberService
             }
         }
 
-        GenerateInvoiceNumberJob::dispatch($type, $fiscalYear);
+        GenerateInvoiceNumberJob::dispatch($type, $fiscalYear)->onQueue(GenerateInvoiceNumberJob::DEFAULT_QUEUE);
 
         return $invoice->invoiceNumber;
     }

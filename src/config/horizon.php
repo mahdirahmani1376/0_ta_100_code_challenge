@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\QueueEnum;
 use Illuminate\Support\Str;
 
 return [
@@ -198,18 +199,56 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
+                'connection' => 'redis',
+                'queue'      => QueueEnum::WORKER_1,
+                'balance'    => 'auto',
+                'processes'  => 20,
+                'tries'      => 1,
+                'timeout'    => 600
             ],
+            'supervisor-2' => [
+                'connection' => 'redis',
+                'queue'      => QueueEnum::WORKER_2,
+                'balance'    => 'auto',
+                'processes'  => 40,
+                'tries'      => 1,
+                'timeout'    => 600
+            ],
+            'supervisor-3' => [
+                'connection' => 'redis',
+                'queue'      => QueueEnum::WORKER_3,
+                'balance'    => 'auto',
+                'processes'  => 8,
+                'tries'      => 2,
+                'timeout'    => 600
+            ]
         ],
 
         'local' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
+                'connection' => 'redis',
+                'queue'      => QueueEnum::WORKER_1,
+                'balance'    => 'auto',
+                'processes'  => 25,
+                'tries'      => 1,
+                'timeout'    => 600
             ],
+            'supervisor-2' => [
+                'connection' => 'redis',
+                'queue'      => QueueEnum::WORKER_2,
+                'balance'    => 'auto',
+                'processes'  => 25,
+                'tries'      => 1,
+                'timeout'    => 600
+            ],
+            'supervisor-3' => [
+                'connection' => 'redis',
+                'queue'      => QueueEnum::WORKER_3,
+                'balance'    => 'auto',
+                'processes'  => 8,
+                'tries'      => 2,
+                'timeout'    => 600
+            ]
         ],
     ],
 ];
