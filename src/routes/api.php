@@ -62,6 +62,7 @@ use App\Http\Controllers\Tax\GetTaxExcludeController;
 use App\Http\Controllers\Wallet\CreditTransaction\BulkDeleteCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\DeductBalanceController;
 use App\Http\Controllers\Wallet\CreditTransaction\IndexCreditTransactionController;
+use App\Http\Controllers\Wallet\CreditTransaction\LastCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\ShowCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\StoreCreditTransactionController;
 use App\Http\Controllers\Wallet\CreditTransaction\UpdateCreditTransactionController;
@@ -132,6 +133,7 @@ Route::namespace('Wallet')
         Route::prefix('credit-transaction')
             ->group(function () {
                 Route::get('/', IndexCreditTransactionController::class);
+                Route::get('last-credit-transaction', LastCreditTransactionController::class);
                 Route::delete('bulk-delete', BulkDeleteCreditTransactionController::class);
                 Route::get('{creditTransaction}', ShowCreditTransactionController::class);
                 Route::put('{creditTransaction}', UpdateCreditTransactionController::class);
