@@ -14,9 +14,6 @@ enum QueueEnum: string
 
     const WORKER_2 = [
         self::PROCESS_INVOICE_REMINDER,
-    ];
-
-    const WORKER_3 = [
         self::PROCESS_INVOICE_NUMBER
     ];
 }

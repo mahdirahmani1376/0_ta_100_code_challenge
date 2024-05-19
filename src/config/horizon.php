@@ -213,14 +213,6 @@ return [
                 'processes'  => 40,
                 'tries'      => 1,
                 'timeout'    => 600
-            ],
-            'supervisor-3' => [
-                'connection' => 'redis',
-                'queue'      => QueueEnum::WORKER_3,
-                'balance'    => 'auto',
-                'processes'  => 8,
-                'tries'      => 2,
-                'timeout'    => 600
             ]
         ],
 
@@ -239,14 +231,6 @@ return [
                 'balance'    => 'auto',
                 'processes'  => 25,
                 'tries'      => 1,
-                'timeout'    => 600
-            ],
-            'supervisor-3' => [
-                'connection' => 'redis',
-                'queue'      => QueueEnum::WORKER_3,
-                'balance'    => 'auto',
-                'processes'  => 8,
-                'tries'      => 2,
                 'timeout'    => 600
             ]
         ],
