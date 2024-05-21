@@ -21,7 +21,7 @@ class OverrideInvoiceReminderJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public const DEFAULT_QUEUE = QueueEnum::PROCESS_INVOICE_NUMBER;
+    public const DEFAULT_QUEUE = QueueEnum::PROCESS_INVOICE_REMINDER;
 
 
     public function __construct(private readonly int $invoiceId)
