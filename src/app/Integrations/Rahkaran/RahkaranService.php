@@ -1943,7 +1943,7 @@ class RahkaranService
                 'status' => $getStatusCode
             ];
 
-            UpdateSystemLog::dispatch($systemLog,$custom_response)->onQueue(UpdateSystemLog::DEFAULT_QUEUE);
+            UpdateSystemLog::dispatch($systemLog,$custom_response);
 
         }
     }

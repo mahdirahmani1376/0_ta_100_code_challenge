@@ -23,8 +23,6 @@ class AssignInvoiceNumberJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public const DEFAULT_QUEUE = QueueEnum::PROCESS_INVOICE_NUMBER;
-
     public Invoice $invoice;
 
     public $uniqueFor = 60;
@@ -32,6 +30,7 @@ class AssignInvoiceNumberJob implements ShouldQueue, ShouldBeUnique
     public function __construct(Invoice $invoice)
     {
         $this->invoice = $invoice->withoutRelations();
+        $this->onQueue(QueueEnum::PROCESS_INVOICE_NUMBER);
     }
 
     public function handle(AssignInvoiceNumberService $assignInvoiceNumberService): void

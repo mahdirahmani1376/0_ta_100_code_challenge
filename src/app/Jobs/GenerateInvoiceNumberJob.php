@@ -22,11 +22,9 @@ use Illuminate\Support\Facades\Cache;
 class GenerateInvoiceNumberJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public const DEFAULT_QUEUE = QueueEnum::PROCESS_INVOICE_NUMBER;
-
     public function __construct(private readonly string $type, private readonly string $fiscalYear)
     {
+        $this->onQueue(QueueEnum::PROCESS_INVOICE_NUMBER);
     }
 
     public function handle(InvoiceNumberRepositoryInterface $invoiceNumberRepository): void

@@ -25,8 +25,6 @@ class UpdateSystemLog implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public const DEFAULT_QUEUE = QueueEnum::PROCESS_LOGS;
-
 
     /**
      * @var AbstractBaseLog|null
@@ -47,6 +45,7 @@ class UpdateSystemLog implements ShouldQueue
     {
         $this->baseLog = $baseLog;
         $this->response = $response;
+        $this->onQueue(QueueEnum::PROCESS_LOGS);
     }
 
     /**

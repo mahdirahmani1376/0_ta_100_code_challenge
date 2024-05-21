@@ -22,10 +22,9 @@ class SendInvoiceReminderJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
 
-    public const DEFAULT_QUEUE = QueueEnum::PROCESS_INVOICE_REMINDER;
-
     public function __construct(public readonly array $payload, public readonly string $channel)
     {
+        $this->onQueue(QueueEnum::PROCESS_INVOICE_REMINDER);
     }
 
     public function handle(): void

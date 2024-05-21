@@ -17,6 +17,6 @@ class SendInvoiceReminderAction
             throw new BadRequestException(__('finance.invoice.NotCorrectStatus'));
         }
 
-        OverrideInvoiceReminderJob::dispatch($invoice->id)->onQueue(OverrideInvoiceReminderJob::DEFAULT_QUEUE);
+        OverrideInvoiceReminderJob::dispatch($invoice->id);
     }
 }

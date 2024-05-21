@@ -118,7 +118,7 @@ class AsanPardakhtRefundService
             ];
 
             if ($this->sysLog instanceof AbstractBaseLog)
-                dispatch(new UpdateSystemLog($this->sysLog, $custom_response))->onQueue(UpdateSystemLog::DEFAULT_QUEUE);
+                dispatch(new UpdateSystemLog($this->sysLog, $custom_response));
         } catch (Throwable $exception) {
             Log::error('AsanPardakht Refund Service', $exception->getTrace());
         }

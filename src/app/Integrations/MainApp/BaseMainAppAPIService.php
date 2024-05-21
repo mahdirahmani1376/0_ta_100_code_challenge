@@ -39,7 +39,7 @@ abstract class BaseMainAppAPIService
                 'body'   => $response->json(),
                 'status' => $response->status()
             ];
-            UpdateSystemLog::dispatch($systemLog,$customResponse)->onQueue(UpdateSystemLog::DEFAULT_QUEUE);
+            UpdateSystemLog::dispatch($systemLog,$customResponse);
         }
 
         return $response;
