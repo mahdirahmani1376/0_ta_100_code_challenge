@@ -208,4 +208,3 @@ Route::get('report', FinanceServiceReportController::class);
 Route::get('hourly-report', FinanceServiceHourlyReportController::class);
 Route::get('everything', ListEverythingController::class);
 
-Route::get('/test',\App\Http\Controllers\TestController::class);
