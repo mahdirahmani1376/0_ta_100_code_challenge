@@ -37,7 +37,10 @@ class StoreTransactionAction
         $transaction = ($this->storeTransactionService)($invoice, $data);
 
         $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
-        ($this->processInvoiceAction)($invoice);
+
+        if ($invoice->balance <= 0) {
+            ($this->processInvoiceAction)($invoice);
+        }
 
         admin_log(AdminLog::ADD_INVOICE_TRANSACTION, $transaction, validatedData: $data);
 

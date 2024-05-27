@@ -20,7 +20,6 @@ class ApplyBalanceToInvoiceAction
         private readonly ShowWalletAction       $showWalletAction,
         private readonly DeductBalanceAction    $deductBalanceAction,
         private readonly StoreTransactionAction $storeTransactionAction,
-        private readonly ProcessInvoiceAction   $processInvoiceAction,
     )
     {
     }
@@ -29,15 +28,13 @@ class ApplyBalanceToInvoiceAction
     {
         check_rahkaran($invoice);
 
+        if ($invoice->is_credit) {
+            throw ApplyCreditToCreditInvoiceException::make();
+        }
+
         if (!empty($data['profile_id']) && $data['profile_id'] != $invoice->profile_id) {
             throw new BadRequestException(__('finance.invoice.AccessDeniedToInvoice'));
         }
-
-        if (empty($data['amount'])) {
-            $data['amount'] = $invoice->balance;
-        }
-
-        $oldState = $invoice->toArray();
 
         if (!in_array($invoice->status, [
             Invoice::STATUS_UNPAID,
@@ -47,12 +44,14 @@ class ApplyBalanceToInvoiceAction
             throw InvoiceStatusMustBeUnpaidException::make();
         }
 
-        if ($data['amount'] > $invoice->balance) {
-            throw AmountIsMoreThanInvoiceBalanceException::make();
+        $oldState = $invoice->toArray();
+
+        if (empty($data['amount'])) {
+            $data['amount'] = $invoice->balance;
         }
 
-        if ($invoice->is_credit) {
-            throw ApplyCreditToCreditInvoiceException::make();
+        if ($data['amount'] > $invoice->balance) {
+            throw AmountIsMoreThanInvoiceBalanceException::make();
         }
 
         $wallet = ($this->showWalletAction)(profileId: $invoice->profile_id, recalculateBalance: true);
@@ -80,10 +79,6 @@ class ApplyBalanceToInvoiceAction
         admin_log(AdminLog::ADD_CREDIT_TO_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
 
         $invoice->refresh();
-
-        if ($invoice->balance <= 0) {
-            ($this->processInvoiceAction)($invoice);
-        }
 
         return $invoice;
     }
