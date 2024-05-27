@@ -57,12 +57,8 @@ class ApplyBalanceToInvoiceAction
 
         $wallet = ($this->showWalletAction)(profileId: $invoice->profile_id, recalculateBalance: true);
 
-        if ($wallet->balance <= 0) {
+        if ($wallet->balance <= $data['amount']) {
             throw NotEnoughCreditException::make();
-        }
-
-        if ($data['amount'] > $wallet->balance) {
-            $data['amount'] = $wallet->balance;
         }
 
         ($this->deductBalanceAction)($invoice->profile_id, [
