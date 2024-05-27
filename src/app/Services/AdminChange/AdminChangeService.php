@@ -36,8 +36,8 @@ class AdminChangeService
         $before = collect($before)->only(array_keys($after))->toArray();
 
         return collect([
-           'before' => $before,
-           'after'  => $after,
+            'before' => $before,
+            'after'  => $after,
         ]);
     }
 
