@@ -78,6 +78,10 @@ node ('public') {
 
              // helmDeploywithKong("$fullRegistryUrl", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas", "-f ../deploy/jobs.yml -f ../deploy/consumers.yml")
                 helmDeploywithDomain("$fullRegistryUrl-$environment", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas")
+                // To check rollout of new version
+                timeout(time: 1, unit: 'MINUTES') {
+                         sh "kubectl rollout status -n ${app} deployment ${deployment}"
+                 }
                 
                 }
         
