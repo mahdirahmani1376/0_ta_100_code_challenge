@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\BankGateway;
 
 use App\Actions\BankGateway\CallbackFromGatewayAction;
-use App\Models\BankGateway;
+use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 
-class CallbackFromGatewayController
+class CallbackFromGatewayController extends Controller
 {
     public function __construct(private readonly CallbackFromGatewayAction $callbackFromGatewayAction)
     {
+        parent::__construct();
     }
 
     public function __invoke(string $bankGateway, Transaction $transaction, string $source = null)

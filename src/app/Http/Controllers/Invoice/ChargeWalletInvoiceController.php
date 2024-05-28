@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Invoice;
 
 use App\Actions\Invoice\ChargeWalletInvoiceAction;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\ChargeWalletInvoiceRequest;
 use App\Http\Resources\Invoice\InvoiceResource;
 
-class ChargeWalletInvoiceController
+class ChargeWalletInvoiceController extends Controller
 {
     public function __construct(private readonly ChargeWalletInvoiceAction $chargeWalletInvoiceAction)
     {
+        parent::__construct();
     }
 
     /**

@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Actions\FinanceServiceHourlyReportAction;
 use App\Http\Requests\ReportRequest;
 
-class FinanceServiceHourlyReportController
+class FinanceServiceHourlyReportController extends Controller
 {
     public function __construct(private readonly FinanceServiceHourlyReportAction $financeServiceHourlyReportAction)
     {
+        parent::__construct();
     }
 
     public function __invoke(ReportRequest $request)

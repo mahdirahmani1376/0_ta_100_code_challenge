@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\ClientBankAccount;
 
 use App\Actions\ClientBankAccount\UpdateClientBankAccountAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientBankAccount\UpdateClientBankAccountRequest;
 use App\Http\Resources\ClientBankAccount\ClientBankAccountResource;
 use App\Models\ClientBankAccount;
 
-class UpdateClientBankAccountController
+class UpdateClientBankAccountController extends Controller
 {
     public function __construct(private readonly UpdateClientBankAccountAction $updateClientBankAccountAction)
     {
+        parent::__construct();
     }
 
     /**

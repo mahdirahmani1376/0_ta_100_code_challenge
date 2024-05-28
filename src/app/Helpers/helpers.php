@@ -6,7 +6,9 @@ use App\Models\AdminLog;
 use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
+use App\Services\ChangeLogService;
 use Illuminate\Support\Str;
+
 
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
@@ -236,5 +238,33 @@ if (!function_exists('round_amount')) {
     function round_amount(float $amount): float
     {
         return ceil($amount / 100) * 100;
+    }
+}
+
+if (!function_exists('change_log')) {
+    function change_log(): ChangeLogService
+    {
+        return app()->get(ChangeLogService::class);
+    }
+}
+
+if (!function_exists('array_diff_assoc_recursive')) {
+    function array_diff_assoc_recursive($array1, $array2)
+    {
+        $difference = [];
+        foreach ($array1 as $key => $value) {
+            if (is_array($value)) {
+                if (!isset($array2[$key]) || !is_array($array2[$key])) {
+                    $difference[$key] = $value;
+                } else {
+                    $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+                    if (!empty($new_diff))
+                        $difference[$key] = $new_diff;
+                }
+            } else if (!array_key_exists($key, $array2) || $array2[$key] !== $value) {
+                $difference[$key] = $value;
+            }
+        }
+        return $difference;
     }
 }

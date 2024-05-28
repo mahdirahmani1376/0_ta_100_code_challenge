@@ -14,8 +14,8 @@ use App\Repositories\ClientBankAccount\ClientBankAccountRepository;
 use App\Repositories\ClientBankAccount\Interface\ClientBankAccountRepositoryInterface;
 use App\Repositories\ClientCashout\ClientCashoutRepository;
 use App\Repositories\ClientCashout\Interface\ClientCashoutRepositoryInterface;
-use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Invoice\Interface\InvoiceNumberRepositoryInterface;
+use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Invoice\Interface\ItemRepositoryInterface;
 use App\Repositories\Invoice\Interface\MoadianLogRepositoryInterface;
 use App\Repositories\Invoice\InvoiceNumberRepository;
@@ -32,12 +32,14 @@ use App\Repositories\Wallet\CreditTransactionRepository;
 use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 use App\Repositories\Wallet\Interface\WalletRepositoryInterface;
 use App\Repositories\Wallet\WalletRepository;
+use App\Services\ChangeLogService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(ChangeLogService::class);
         $this->app->bind(EloquentRepositoryInterface::class, BaseRepository::class);
         $this->app->bind(BankAccountRepositoryInterface::class, BankAccountRepository::class);
         $this->app->bind(BankGatewayRepositoryInterface::class, BankGatewayRepository::class);

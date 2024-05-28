@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Wallet\CreditTransaction;
 
 use App\Actions\Wallet\CreditTransaction\IndexCreditTransactionAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Wallet\CreditTransaction\IndexCreditTransactionRequest;
 use App\Http\Resources\Wallet\CreditTransaction\CreditTransactionResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class IndexCreditTransactionController
+class IndexCreditTransactionController extends Controller
 {
     public function __construct(private readonly IndexCreditTransactionAction $indexCreditTransactionAction)
     {
+        parent::__construct();
     }
 
     /**

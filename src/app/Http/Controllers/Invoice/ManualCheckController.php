@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Invoice;
 
 use App\Actions\Invoice\ManualCheckAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\ManualCheckRequest;
 use App\Http\Resources\Invoice\InvoiceResource;
 use App\Models\Invoice;
 
-class ManualCheckController
+class ManualCheckController extends Controller
 {
     public function __construct(private readonly ManualCheckAction $manualCheckAction)
     {
+        parent::__construct();
     }
 
     /**
