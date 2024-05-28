@@ -9,8 +9,6 @@ use MongoDB\Laravel\Eloquent\SoftDeletes;
 /**
  * @property string $logable_type
  * @property int $logable_id
- * @property string $before
- * @property string $after
  * @property string $action
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -28,8 +26,6 @@ class ClientLog extends AbstractBaseLog
         "logable_type",
         "logable_id",
         "request",
-        "before",
-        "after",
         "client_user_id",
         "action",
     ];
