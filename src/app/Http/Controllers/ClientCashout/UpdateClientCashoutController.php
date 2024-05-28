@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\ClientCashout;
 
 use App\Actions\ClientCashout\UpdateClientCashoutAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientCashout\UpdateClientCashoutRequest;
 use App\Http\Resources\ClientCashout\ClientCashoutResource;
 use App\Models\ClientCashout;
 
-class UpdateClientCashoutController
+class UpdateClientCashoutController extends Controller
 {
     public function __construct(private readonly UpdateClientCashoutAction $updateClientCashoutAction)
     {
+        parent::__construct();
     }
 
     /**

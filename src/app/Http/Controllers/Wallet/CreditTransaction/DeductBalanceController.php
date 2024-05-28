@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Wallet\CreditTransaction;
 
 use App\Actions\Wallet\CreditTransaction\DeductBalanceAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Wallet\CreditTransaction\DeductBalanceRequest;
 use App\Http\Resources\Wallet\CreditTransaction\CreditTransactionResource;
 
-class DeductBalanceController
+class DeductBalanceController extends Controller
 {
     public function __construct(private readonly DeductBalanceAction $deductBalanceAction)
     {
+        parent::__construct();
     }
 
     /**

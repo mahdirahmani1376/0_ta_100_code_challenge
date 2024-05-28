@@ -12,6 +12,7 @@ class LastCreditTransactionController extends Controller
         public LastCreditTransactionAction $lastCreditTransactionAction
     )
     {
+        parent::__construct();
     }
 
     public function __invoke(LastCreditTransactionRequest $request)

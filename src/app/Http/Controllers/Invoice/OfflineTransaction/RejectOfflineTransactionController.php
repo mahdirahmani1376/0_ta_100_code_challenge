@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Invoice\OfflineTransaction;
 
 use App\Actions\Invoice\OfflineTransaction\RejectOfflineTransactionAction;
-use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\OfflineTransaction\RejectOfflineTransactionRequest;
 use App\Http\Resources\Invoice\OfflineTransaction\OfflineTransactionResource;
 use App\Http\Resources\Invoice\OfflineTransaction\ShowOfflineTransactionResource;
 use App\Models\OfflineTransaction;
 
-class RejectOfflineTransactionController
+class RejectOfflineTransactionController extends Controller
 {
     public function __construct(private readonly RejectOfflineTransactionAction $rejectOfflineTransactionAction)
     {
+        parent::__construct();
     }
 
     /**

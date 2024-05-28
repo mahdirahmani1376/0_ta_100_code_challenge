@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Actions\ListEverythingAction;
 use App\Http\Requests\ListEverythingRequest;
 
-class ListEverythingController
+class ListEverythingController extends Controller
 {
     public function __construct(private readonly ListEverythingAction $listEverythingAction)
     {
+        parent::__construct();
     }
 
     public function __invoke(ListEverythingRequest $request)

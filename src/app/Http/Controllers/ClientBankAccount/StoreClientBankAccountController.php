@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\ClientBankAccount;
 
 use App\Actions\ClientBankAccount\StoreClientBankAccountAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientBankAccount\StoreClientBankAccountRequest;
 use App\Http\Resources\ClientBankAccount\ClientBankAccountResource;
 
-class StoreClientBankAccountController
+class StoreClientBankAccountController extends Controller
 {
     public function __construct(private readonly StoreClientBankAccountAction $storeClientBankAccountAction)
     {
+        parent::__construct();
     }
 
     /**
