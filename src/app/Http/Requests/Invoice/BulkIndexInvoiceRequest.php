@@ -16,9 +16,10 @@ class BulkIndexInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['nullable', Rule::in(Invoice::STATUSES),],
-            'items' => ['required', 'array',],
-            'items.*.invoiceable_id' => ['required', 'integer',],
+            'status'                   => ['array', 'nullable'],
+            'status.*'                 => ['string', Rule::in(Invoice::STATUSES),],
+            'items'                    => ['required', 'array',],
+            'items.*.invoiceable_id'   => ['required', 'integer',],
             'items.*.invoiceable_type' => ['nullable', 'max:255',],
         ];
     }
