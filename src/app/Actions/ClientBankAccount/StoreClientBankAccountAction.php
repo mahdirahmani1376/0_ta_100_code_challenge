@@ -2,7 +2,6 @@
 
 namespace App\Actions\ClientBankAccount;
 
-use App\Models\AdminLog;
 use App\Models\ClientBankAccount;
 use App\Services\ClientBankAccount\StoreClientBankAccountService;
 
@@ -19,7 +18,6 @@ class StoreClientBankAccountAction
         }
         $clientBankAccount = ($this->storeClientBankAccountService)($data);
 
-        admin_log(AdminLog::CREATE_CLIENT_BANK_ACCOUNT, $clientBankAccount, validatedData: $data);
 
         return $clientBankAccount;
     }

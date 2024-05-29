@@ -4,7 +4,6 @@ namespace App\Actions\Invoice;
 
 use App\Events\InvoiceCreated;
 use App\Integrations\MainApp\MainAppConfig;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Item\StoreItemService;
@@ -45,7 +44,6 @@ class StoreInvoiceAction
             ($this->processInvoiceAction)($invoice);
         }
 
-        admin_log(AdminLog::CREATE_INVOICE, $invoice, validatedData: $data);
 
         return $invoice;
     }

@@ -10,7 +10,6 @@ use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;
 use App\Exceptions\SystemException\InvoiceStatusMustBeUnpaidException;
 use App\Exceptions\SystemException\NotEnoughCreditException;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
 
@@ -76,7 +75,6 @@ class ApplyBalanceToInvoiceAction
             'payment_method' => Transaction::PAYMENT_METHOD_WALLET_BALANCE,
         ]);
 
-        admin_log(AdminLog::ADD_CREDIT_TO_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
 
         $invoice->refresh();
 
