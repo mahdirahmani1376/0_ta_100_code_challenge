@@ -2,7 +2,6 @@
 
 namespace App\Actions\ClientCashout;
 
-use App\Models\AdminLog;
 use App\Models\ClientCashout;
 use App\Services\ClientCashout\StoreClientCashoutService;
 
@@ -20,7 +19,6 @@ class StoreClientCashoutAction
         }
         $clientCashout = ($this->clientCashoutService)($data);
 
-        admin_log(AdminLog::CREATE_CASHOUT, $clientCashout, validatedData: $data);
 
         return $clientCashout;
     }

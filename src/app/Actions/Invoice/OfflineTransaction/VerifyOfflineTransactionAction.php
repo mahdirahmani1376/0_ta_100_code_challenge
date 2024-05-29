@@ -9,7 +9,6 @@ use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Actions\Invoice\Transaction\VerifyTransactionAction;
 use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
-use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Item\FindAddCreditItemService;
@@ -79,7 +78,6 @@ class VerifyOfflineTransactionAction
             ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $invoice->balance]);
         }
 
-        admin_log(AdminLog::VERIFY_OFFLINE_TRANSACTION, $offlineTransaction);
 
         return $offlineTransaction;
     }

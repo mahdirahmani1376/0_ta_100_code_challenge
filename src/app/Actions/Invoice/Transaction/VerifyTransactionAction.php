@@ -4,7 +4,6 @@ namespace App\Actions\Invoice\Transaction;
 
 use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\Http\BadRequestException;
-use App\Models\AdminLog;
 use App\Models\Transaction;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Transaction\VerifyTransactionService;
@@ -36,7 +35,6 @@ class VerifyTransactionAction
         $invoice = ($this->calcInvoicePriceFieldsService)($transaction->invoice);
         ($this->processInvoiceAction)($invoice);
 
-        admin_log(AdminLog::VERIFY_TRANSACTION, $transaction, $transaction->getChanges(), $oldState);
 
         return $transaction;
     }

@@ -2,7 +2,6 @@
 
 namespace App\Actions\BankAccount;
 
-use App\Models\AdminLog;
 use App\Models\BankAccount;
 use App\Services\BankAccount\UpdateBankAccountService;
 
@@ -16,7 +15,6 @@ class UpdateBankAccountAction
     {
         $oldState = $bankAccount->toArray();
         $bankAccount = ($this->updateBankAccountService)($bankAccount, $data);
-        admin_log(AdminLog::UPDATE_BANK_ACCOUNT, $bankAccount, $bankAccount->getChanges(), $oldState, $data);
 
         return $bankAccount;
     }

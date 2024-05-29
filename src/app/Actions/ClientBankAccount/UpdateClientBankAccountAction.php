@@ -2,7 +2,6 @@
 
 namespace App\Actions\ClientBankAccount;
 
-use App\Models\AdminLog;
 use App\Models\ClientBankAccount;
 use App\Services\ClientBankAccount\UpdateClientBankAccountService;
 
@@ -20,7 +19,6 @@ class UpdateClientBankAccountAction
         }
         $clientBankAccount = ($this->updateClientBankAccountService)($clientBankAccount, $data);
 
-        admin_log(AdminLog::UPDATE_CLIENT_BANK_ACCOUNT, $clientBankAccount, $clientBankAccount->getChanges(), $oldState, $data);
 
         return $clientBankAccount;
     }

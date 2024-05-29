@@ -3,7 +3,6 @@
 namespace App\Actions\Invoice\OfflineTransaction;
 
 use App\Exceptions\Http\BadRequestException;
-use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\OfflineTransaction\DeleteOfflineTransactionService;
 use App\Services\Invoice\Transaction\RejectTransactionService;
@@ -28,7 +27,6 @@ class DeleteOfflineTransactionAction
 
         ($this->rejectTransactionService)($offlineTransaction->transaction);
 
-        admin_log(AdminLog::DELETE_OFFLINE_TRANSACTION, $offlineTransaction);
 
         return ($this->offlineTransactionService)($offlineTransaction);
     }

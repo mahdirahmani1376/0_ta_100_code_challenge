@@ -2,7 +2,6 @@
 
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Helpers\JalaliCalender;
-use App\Models\AdminLog;
 use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -92,37 +91,6 @@ if (!function_exists('is_json')) {
     {
         json_decode($string, true);
         return (json_last_error() === JSON_ERROR_NONE);
-    }
-}
-
-if (!function_exists('admin_log')) {
-    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
-    {
-
-        if (is_null($adminId) && is_null(request('admin_id'))) {
-            return;
-        }
-
-        $adminLog = '';
-
-        try {
-            if (!is_array($oldState)) {
-                $oldState = $oldState?->toArray();
-            }
-            $adminLog = AdminLog::query()->create([
-                'admin_user_id' => $adminId ?? request('admin_id'),
-                'action'        => $action,
-                'logable_id'    => $model?->id,
-                'logable_type'  => $model ? get_class($model) : null,
-                'after'         => $changes,
-                'before'        => $oldState,
-                'request'       => $validatedData,
-            ]);
-        } catch (Exception $exception) {
-            // TODO
-        }
-
-        return $adminLog;
     }
 }
 
@@ -249,7 +217,7 @@ if (!function_exists('change_log')) {
 }
 
 if (!function_exists('array_diff_assoc_recursive')) {
-    function array_diff_assoc_recursive($array1, $array2)
+    function array_diff_assoc_recursive($array1, $array2): array
     {
         $difference = [];
         foreach ($array1 as $key => $value) {

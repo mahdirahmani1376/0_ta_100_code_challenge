@@ -5,7 +5,6 @@ namespace App\Actions\Invoice;
 use App\Exceptions\SystemException\AtLeastOneInvoiceItemMustRemainException;
 use App\Exceptions\SystemException\InvoiceHasActiveTransactionsException;
 use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Item\ReAssignItemToInvoiceService;
@@ -58,7 +57,6 @@ class SplitInvoiceAction
         ($this->calcInvoicePriceFieldsService)($invoice);
         $newInvoice = ($this->calcInvoicePriceFieldsService)($newInvoice);
 
-        admin_log(AdminLog::SPLIT_INVOICE, $newInvoice, validatedData: $data);
 
         return $newInvoice;
     }
