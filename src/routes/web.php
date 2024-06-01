@@ -10,3 +10,7 @@
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+use App\Http\Controllers\HealthCheckAction;
+
+Route::get('/health', HealthCheckAction::class);
