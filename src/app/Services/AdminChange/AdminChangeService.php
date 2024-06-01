@@ -3,7 +3,7 @@
 namespace App\Services\AdminChange;
 
 use App\Models\AdminLog;
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class AdminChangeService
 {
@@ -19,7 +19,7 @@ class AdminChangeService
 
         if ($logModel) {
             $changes = $this->getDiff($before, $after);
-            $logModel->update($logModel, [
+            $logModel->update([
                 ...$changes,
                 'action'        => $action,
                 'loggable_id'   => $model?->getKey(),
@@ -30,8 +30,8 @@ class AdminChangeService
 
     private function getDiff(mixed $old, mixed $changes)
     {
-        $before = array_diff_assoc_rec($old,$changes);
-        $after = array_diff_assoc_rec($changes,$old);
+        $before = array_diff_assoc_recursive($old,$changes);
+        $after = array_diff_assoc_recursive($changes,$old);
 
         $before = collect($before)->only(array_keys($after))->toArray();
 
