@@ -23,7 +23,6 @@ use App\Http\Controllers\ClientCashout\StoreClientCashoutController;
 use App\Http\Controllers\ClientCashout\UpdateClientCashoutController;
 use App\Http\Controllers\FinanceServiceHourlyReportController;
 use App\Http\Controllers\FinanceServiceReportController;
-use App\Http\Controllers\HealthCheckAction;
 use App\Http\Controllers\Invoice\ApplyBalanceToInvoiceController;
 use App\Http\Controllers\Invoice\BulkIndexInvoiceController;
 use App\Http\Controllers\Invoice\ChangeInvoiceStatusController;
@@ -69,8 +68,6 @@ use App\Http\Controllers\Wallet\CreditTransaction\StoreCreditTransactionControll
 use App\Http\Controllers\Wallet\CreditTransaction\UpdateCreditTransactionController;
 use App\Http\Controllers\Wallet\ShowWalletAndTransactionController;
 use App\Http\Controllers\Wallet\ShowWalletController;
-
-Route::get('/health', HealthCheckAction::class);
 
 Route::namespace('Invoice')
     ->prefix('invoice')
