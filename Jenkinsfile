@@ -17,7 +17,7 @@ String branch = env.BRANCH_NAME
 //devsecops(DDID: "$DDId", Dockerfile: "$Dockerfile")
 
             // mattermostNotifier 
-            mattermostSend channel: 'finance-service', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
+            mattermostSend channel: 'hostiran-staging-cd', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
 
 timestamps {
 node ('public') {
@@ -33,7 +33,17 @@ node ('public') {
         type="ImplementationSpecific"
         prefix="/"
     }else if( branch.matches("master")) {
-        environment="production"
+        timeout(time: 1, unit: 'DAYS') {
+       //catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+       input(message: "Run ${env.JOB_NAME} on branch MASTER?", ok: 'Run', submitter: "farhad")
+       //}
+       }
+       environment="master"
+       replicas="2"
+       AppDomain="finance-service-prod.cluster.hostiran.com"
+       type="ImplementationSpecific"
+       prefix="/"
+
     }
 
 
@@ -63,8 +73,8 @@ node ('public') {
     stage('deploy') {
 
             // run Container
-            runInHostGroup("kubectl"){
-                git branch: "master", credentialsId: 'Gitlab', url: "$helmRepo"
+            runInHostGroup("kubectl-$environment-1"){
+                git branch: "$environment", credentialsId: 'Gitlab', url: "$helmRepo"
 
                 //namespaceInit(String namespace, String env)
                 namespaceInit("$app", "$environment")
@@ -78,6 +88,10 @@ node ('public') {
 
              // helmDeploywithKong("$fullRegistryUrl", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas", "-f ../deploy/jobs.yml -f ../deploy/consumers.yml")
                 helmDeploywithDomain("$fullRegistryUrl-$environment", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas")
+                // To check rollout of new version
+                timeout(time: 1, unit: 'MINUTES') {
+                         sh "kubectl rollout status -n ${app} deployment ${app}"
+                 }
                 
                 }
         
@@ -92,17 +106,16 @@ node ('public') {
             throw e
     } finally {
       if(pipresult == "FAILURE") {
-        mattermostSend channel: 'finance-service', color: 'danger', message: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        mattermostSend channel: 'hostiran-staging-cd', color: 'danger', message: "@ali.molaie @r.bajelan Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             
        } 
        else {
-       mattermostSend channel: 'finance-service', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+       mattermostSend channel: 'hostiran-staging-cd', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 
 
       }
     }
   }
 }       
-
 
 
