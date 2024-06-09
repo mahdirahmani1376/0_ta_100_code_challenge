@@ -5,7 +5,7 @@ String team="php"
 String app="finance-service"
 String deployment="finance-service"
 String fullRegistryUrl="${registryUrl}/${team}/${app}"
-String dockerfile = ".docker-compose/Dockerfile"
+String dockerfile = "./deploy/Dockerfile"
 String pipresult = "ok"
 String keypath = "./src/storage/"
 String branch = env.BRANCH_NAME
@@ -27,7 +27,7 @@ node ('public') {
     if(branch.matches("release")){
         environment="release"
         replicas="1"
-	dockerfile="./deploy/Dockerfile"
+	      dockerfile="./deploy/Dockerfile"
         jobs_path="../deploy/jobs.yml"
         AppDomain="finance-service.cluster.hostiran.com"
         type="ImplementationSpecific"
@@ -40,6 +40,7 @@ node ('public') {
        }
        environment="master"
        replicas="2"
+       dockerfile="./deploy/Dockerfile"
        AppDomain="finance-service-prod.cluster.hostiran.com"
        type="ImplementationSpecific"
        prefix="/"
@@ -117,5 +118,6 @@ node ('public') {
     }
   }
 }       
+
 
 
