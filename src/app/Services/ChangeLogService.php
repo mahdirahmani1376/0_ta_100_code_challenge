@@ -151,4 +151,17 @@ class ChangeLogService
     {
         return $this->debugMode;
     }
+
+    public function addDebugContext(string $key, $data)
+    {
+        if ($this->debugMode) {
+            $this->debugTrace[$key] = $data;
+        }
+        return $this;
+    }
+
+    public function getDebugTrace()
+    {
+        return $this->debugTrace;
+    }
 }
