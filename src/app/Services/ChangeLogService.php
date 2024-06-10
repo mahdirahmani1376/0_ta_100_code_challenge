@@ -16,11 +16,20 @@ class ChangeLogService
     private null|string $logId = null;
     private string $userType = 'admin';
     private null|string $action = null;
+    private bool $debugMode = false;
+    private array $debugTrace = [];
+
 
     public function init(Request $request)
     {
-        $adminLogId = $request->get('admin_log_id');
-        $clientLogId = $request->get('client_log_id');
+        $adminLogId = $request->header('X-ADMIN-LOG-ID');
+        $clientLogId = $request->header('X-CLIENT-LOG-ID');
+        $debugMode = $request->header('X-DEBUG-MODE');
+
+        if ($debugMode == 1) {
+            $this->setAsDebugMode();
+        }
+
         if ($adminLogId) {
             $this->asAdmin();
             $this->setLogId($adminLogId);
@@ -30,6 +39,12 @@ class ChangeLogService
         }
         return $this;
     }
+
+    public function setAsDebugMode()
+    {
+        $this->debugMode = true;
+    }
+
 
     public function asAdmin()
     {
@@ -109,5 +124,31 @@ class ChangeLogService
             $this->after = $this->model->getChanges();
         }
         return $this;
+    }
+
+    public function setResponse($response)
+    {
+        try {
+            if ($this->isDebugMode()) {
+                $content = json_decode($response->content(), true);
+                $debugTraceData = ['debug_trace' => $this->debugTrace];
+
+                if (json_last_error() == JSON_ERROR_NONE) {
+                    $response->setContent(json_encode(array_merge(
+                        $content,
+                        $debugTraceData
+                    )));
+                }
+            }
+        } catch (\Throwable $exception) {
+            \Log::warning('Set debug trace data failed', $exception->getTrace());
+        }
+
+        return $response;
+    }
+
+    private function isDebugMode()
+    {
+        return $this->debugMode;
     }
 }
