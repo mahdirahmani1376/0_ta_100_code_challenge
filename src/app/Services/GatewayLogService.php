@@ -6,7 +6,7 @@ use App\Jobs\ChangeLogJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class ChangeLogService
+class GatewayLogService
 {
     public const ADMIN_TYPE = 'admin';
     public const CLIENT_TYPE = 'client';
