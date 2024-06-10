@@ -32,14 +32,14 @@ use App\Repositories\Wallet\CreditTransactionRepository;
 use App\Repositories\Wallet\Interface\CreditTransactionRepositoryInterface;
 use App\Repositories\Wallet\Interface\WalletRepositoryInterface;
 use App\Repositories\Wallet\WalletRepository;
-use App\Services\ChangeLogService;
+use App\Services\GatewayLogService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(ChangeLogService::class);
+        $this->app->singleton(GatewayLogService::class);
         $this->app->bind(EloquentRepositoryInterface::class, BaseRepository::class);
         $this->app->bind(BankAccountRepositoryInterface::class, BankAccountRepository::class);
         $this->app->bind(BankGatewayRepositoryInterface::class, BankGatewayRepository::class);

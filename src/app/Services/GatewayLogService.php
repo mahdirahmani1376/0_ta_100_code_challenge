@@ -6,7 +6,7 @@ use App\Jobs\ChangeLogJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class ChangeLogService
+class GatewayLogService
 {
     public const ADMIN_TYPE = 'admin';
     public const CLIENT_TYPE = 'client';
@@ -131,7 +131,7 @@ class ChangeLogService
         try {
             if ($this->isDebugMode()) {
                 $content = json_decode($response->content(), true);
-                $debugTraceData = ['debug_trace' => $this->debugTrace];
+                $debugTraceData = ['debug_trace' => $this->getDebugTrace()];
 
                 if (json_last_error() == JSON_ERROR_NONE) {
                     $response->setContent(json_encode(array_merge(
@@ -150,5 +150,18 @@ class ChangeLogService
     private function isDebugMode()
     {
         return $this->debugMode;
+    }
+
+    public function addDebugContext(string $key, $data)
+    {
+        if ($this->debugMode) {
+            $this->debugTrace[$key] = $data;
+        }
+        return $this;
+    }
+
+    public function getDebugTrace()
+    {
+        return $this->debugTrace;
     }
 }

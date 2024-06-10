@@ -5,7 +5,7 @@ use App\Helpers\JalaliCalender;
 use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
-use App\Services\ChangeLogService;
+use App\Services\GatewayLogService;
 use Illuminate\Support\Str;
 
 
@@ -210,9 +210,9 @@ if (!function_exists('round_amount')) {
 }
 
 if (!function_exists('change_log')) {
-    function change_log(): ChangeLogService
+    function change_log(): GatewayLogService
     {
-        return app()->get(ChangeLogService::class);
+        return app()->get(GatewayLogService::class);
     }
 }
 
