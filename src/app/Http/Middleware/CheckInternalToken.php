@@ -19,10 +19,6 @@ class CheckInternalToken
             throw new AuthenticationException();
         }
 
-        $response = change_log()->setResponse($next($request));
-
-        change_log()->dispatch();
-
-        return $response;
+        return change_log()->setResponse($next($request));
     }
 }

@@ -100,6 +100,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
          *      ...
          *   ]
          */
+
         if (!empty($data['items'])) {
             $query->where(function (Builder $query) use ($data) {
                 foreach ($data['items'] as $item) {
