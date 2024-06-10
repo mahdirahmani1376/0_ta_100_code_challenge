@@ -131,7 +131,7 @@ class GatewayLogService
         try {
             if ($this->isDebugMode()) {
                 $content = json_decode($response->content(), true);
-                $debugTraceData = ['debug_trace' => $this->debugTrace];
+                $debugTraceData = ['debug_trace' => $this->getDebugTrace()];
 
                 if (json_last_error() == JSON_ERROR_NONE) {
                     $response->setContent(json_encode(array_merge(
