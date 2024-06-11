@@ -4,16 +4,12 @@ namespace App\Console\Commands;
 
 use App\Actions\Invoice\CancelInvoiceAction;
 use App\Helpers\JalaliCalender;
-use App\Integrations\MainApp\MainAppAPIService;
-use App\Integrations\MainApp\MainAppConfig;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -120,21 +116,21 @@ class CancelOverDueInvoiceCommand extends Command
     {
         // Edit this list if needed
         $this->thresholds = [
-            Item::TYPE_ADD_CLIENT_CREDIT => 10,
-            Item::TYPE_ADD_FUNDS => 2,
-            Item::TYPE_DOMAIN_SERVICE => 13,
-            Item::TYPE_PRODUCT_SERVICE => 3,
-            Item::TYPE_ADD_CLOUD_CREDIT => 1,
-            Item::TYPE_CLOUD => 1,
-            Item::TYPE_ITEM => 1,
-            Item::TYPE_PRODUCT_SERVICE_UPGRADE => 1,
-            Item::TYPE_MASS_PAYMENT_INVOICE => 1,
-            Item::TYPE_ADMIN_TIME => 1,
-            Item::TYPE_CHANGE_SERVICE => 1,
-            Item::TYPE_PARTNER_DISCOUNT => 1,
-            Item::TYPE_PARTNER_COMMISSION => 1,
-            Item::TYPE_PARTNER_PAYMENT => 1,
-            Item::TYPE_AFFILIATION => 1,
+            Item::TYPE_ADD_CLIENT_CREDIT => 0,
+            Item::TYPE_ADD_FUNDS => 10,
+            Item::TYPE_DOMAIN_SERVICE => 10,
+            Item::TYPE_PRODUCT_SERVICE => 10,
+            Item::TYPE_ADD_CLOUD_CREDIT => 10,
+            Item::TYPE_CLOUD => 10,
+            Item::TYPE_ITEM => 10,
+            Item::TYPE_PRODUCT_SERVICE_UPGRADE => 10,
+            Item::TYPE_MASS_PAYMENT_INVOICE => 10,
+            Item::TYPE_ADMIN_TIME => 10,
+            Item::TYPE_CHANGE_SERVICE => 10,
+            Item::TYPE_PARTNER_DISCOUNT => 10,
+            Item::TYPE_PARTNER_COMMISSION => 10,
+            Item::TYPE_PARTNER_PAYMENT => 10,
+            Item::TYPE_AFFILIATION => 10,
         ];
 
         // Default threshold, this will be used if an Invoice is overdue but doesn't have any Item with types defined above
