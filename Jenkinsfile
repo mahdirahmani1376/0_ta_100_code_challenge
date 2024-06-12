@@ -33,11 +33,6 @@ node ('public') {
         type="ImplementationSpecific"
         prefix="/"
     }else if( branch.matches("master")) {
-        timeout(time: 1, unit: 'DAYS') {
-       //catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-       input(message: "Run ${env.JOB_NAME} on branch MASTER?", ok: 'Run', submitter: "farhad")
-       //}
-       }
        environment="master"
        replicas="2"
        dockerfile="./deploy/Dockerfile"
@@ -61,7 +56,13 @@ node ('public') {
                   	}
 		  }
     }, deploy: {
-
+            if( branch.matches("master")) {
+              skipped="true"
+              timeout(time: 1, unit: 'DAYS') {
+              input(message: "DEPLOY ${env.JOB_NAME} on branch MASTER?", ok: 'DEPLOY', submitter: "farhad")
+              }
+              skipped="false"
+            }
 //    stage('Init') {
 //        // getAppconfig(String app, String env="staging", String envFileName=".env")
  //       getAppconfig("$deployment", "$environment", ".env")
@@ -105,13 +106,19 @@ node ('public') {
     catch(e) {
             pipresult = "FAILURE"
             throw e
-    } finally {
-      if(pipresult == "FAILURE") {
-        mattermostSend channel: 'hostiran-staging-cd', color: 'danger', message: "@ali.molaie @r.bajelan Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-            
-       } 
+    } finally {      if(skipped == "true" && branch.matches("master")) {
+        mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/rage.svg', color: 'warning', message: "Build SKIPPED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build SKIPPED: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+       }
+      else if(pipresult == "FAILURE") {
+        mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/rage.svg', color: 'danger', message: "@ali.molaie @r.bajelan Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+       }
        else {
-       mattermostSend channel: 'hostiran-staging-cd', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+       mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/svgs/logo.svg', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+
+       
 
 
       }
