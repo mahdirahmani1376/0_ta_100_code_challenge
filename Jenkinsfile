@@ -107,7 +107,7 @@ node ('public') {
             pipresult = "FAILURE"
             throw e
     } finally {
-            if(skipped == "true" && branch.matches("master")) {
+      if(skipped == "true" && branch.matches("master")) {
         mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/rage.svg', color: 'warning', message: "Build SKIPPED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build SKIPPED: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 
        }
@@ -117,7 +117,6 @@ node ('public') {
        }
        else {
        mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/svgs/logo.svg', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-
 
        
 
