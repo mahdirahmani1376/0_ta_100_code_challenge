@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Enums\QueueEnum;
 use App\Models\AbstractBaseLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +15,8 @@ use Illuminate\Support\Facades\Log;
 /**
  * Class UpdateSystemLog
  * @package App\Jobs
- * @method static dispatch(AbstractBaseLog $systemLog, array $response)
+ * @method static PendingDispatch dispatch(AbstractBaseLog $baseLog, array $response)
+ * this job is responsible for updating system logs after request
  */
 class UpdateSystemLog implements ShouldQueue
 {
@@ -21,6 +24,7 @@ class UpdateSystemLog implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
     use SerializesModels;
+
 
     /**
      * @var AbstractBaseLog|null
@@ -41,6 +45,7 @@ class UpdateSystemLog implements ShouldQueue
     {
         $this->baseLog = $baseLog;
         $this->response = $response;
+        $this->onQueue(QueueEnum::PROCESS_LOGS);
     }
 
     /**

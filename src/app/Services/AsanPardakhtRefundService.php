@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Jobs\UpdateSystemLog;
 use App\Models\AbstractBaseLog;
 use App\Models\SystemLog;
-use App\ValueObjects\Queue;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -119,7 +118,7 @@ class AsanPardakhtRefundService
             ];
 
             if ($this->sysLog instanceof AbstractBaseLog)
-                dispatch(new UpdateSystemLog($this->sysLog, $custom_response))->onQueue(Queue::SYSTEM_LOG_QUEUE);
+                dispatch(new UpdateSystemLog($this->sysLog, $custom_response));
         } catch (Throwable $exception) {
             Log::error('AsanPardakht Refund Service', $exception->getTrace());
         }
