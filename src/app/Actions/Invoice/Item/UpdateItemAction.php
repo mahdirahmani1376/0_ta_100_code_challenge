@@ -4,7 +4,6 @@ namespace App\Actions\Invoice\Item;
 
 
 use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
@@ -37,7 +36,6 @@ class UpdateItemAction
             ($this->calcInvoicePriceFieldsService)($invoice);
         }
 
-        admin_log(AdminLog::EDIT_INVOICE_ITEM, $item, $item->getChanges(), $oldState, $data);
 
         return $item;
     }

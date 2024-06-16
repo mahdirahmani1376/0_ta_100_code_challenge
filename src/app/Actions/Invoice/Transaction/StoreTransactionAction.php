@@ -4,7 +4,6 @@ namespace App\Actions\Invoice\Transaction;
 
 use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Exceptions\Http\BadRequestException;
-use App\Models\AdminLog;
 use App\Models\Transaction;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\FindInvoiceByIdService;
@@ -37,9 +36,11 @@ class StoreTransactionAction
         $transaction = ($this->storeTransactionService)($invoice, $data);
 
         $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
-        ($this->processInvoiceAction)($invoice);
 
-        admin_log(AdminLog::ADD_INVOICE_TRANSACTION, $transaction, validatedData: $data);
+        if ($invoice->balance <= 0) {
+            ($this->processInvoiceAction)($invoice);
+        }
+
 
         return $transaction;
     }

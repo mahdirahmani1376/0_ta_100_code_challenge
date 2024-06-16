@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\ClientBankAccount;
 
 use App\Actions\ClientBankAccount\IndexClientBankAccountAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientBankAccount\IndexClientBankAccountRequest;
 use App\Http\Resources\ClientBankAccount\ClientBankAccountResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class IndexClientBankAccountController
+class IndexClientBankAccountController extends Controller
 {
     public function __construct(private readonly IndexClientBankAccountAction $indexClientBankAccountAction)
     {
+        parent::__construct();
     }
 
     /**

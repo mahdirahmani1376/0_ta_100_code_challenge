@@ -28,7 +28,8 @@ class BaseRepository implements EloquentRepositoryInterface
      */
     public function newInstance(array $attributes = []): Model
     {
-        return app()->make($this->model, $attributes);
+        $model =  app()->make($this->model, $attributes);
+        return $model;
     }
 
     /**
@@ -38,7 +39,6 @@ class BaseRepository implements EloquentRepositoryInterface
     {
         return $this->newInstance()->newQuery();
     }
-
     public function fill(Model $object, array $attributes, $fillable = []): Model
     {
         if (!empty($fillable)) {
@@ -56,6 +56,9 @@ class BaseRepository implements EloquentRepositoryInterface
     public function create(array $attributes, array $fillable = []): Model
     {
         $object = $this->newInstance($attributes);
+
+        change_log()->setModel($object)->setChanges();
+
         $this->fill($object, $attributes, $fillable)->save();
 
         return $object;
@@ -71,6 +74,8 @@ class BaseRepository implements EloquentRepositoryInterface
 
     public function update(Model $object, array $attributes, array $fillable = []): Model
     {
+        change_log()->setModel($object)->setBefore();
+
         $this->fill($object, $attributes, $fillable)->save();
 
         return $object;
@@ -82,6 +87,8 @@ class BaseRepository implements EloquentRepositoryInterface
     public function delete(Model $object): ?bool
     {
         try {
+            change_log()->setModel($object);
+
             return $object->delete();
         } catch (Throwable $exception) {
             throw DeleteModelException::throw($exception)->params($object::class, $object->getKey());

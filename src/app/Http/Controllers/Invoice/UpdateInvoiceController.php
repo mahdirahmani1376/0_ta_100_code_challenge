@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Invoice;
 
 use App\Actions\Invoice\UpdateInvoiceAction;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\UpdateInvoiceRequest;
 use App\Http\Resources\Invoice\InvoiceResource;
 use App\Models\Invoice;
 
-class UpdateInvoiceController
+class UpdateInvoiceController extends Controller
 {
     public function __construct(private readonly UpdateInvoiceAction $updateInvoiceAction)
     {
+        parent::__construct();
     }
 
     /**

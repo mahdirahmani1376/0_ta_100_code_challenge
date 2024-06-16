@@ -2,7 +2,6 @@
 
 namespace App\Actions\Invoice\OfflineTransaction;
 
-use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\OfflineTransaction\UpdateOfflineTransactionService;
 use App\Services\Invoice\Transaction\UpdateTransactionService;
@@ -29,7 +28,6 @@ class UpdateOfflineTransactionAction
         ];
         ($this->updateTransactionService)($offlineTransaction->transaction, $transactionData);
 
-        admin_log(AdminLog::UPDATE_OFFLINE_TRANSACTION, $offlineTransaction, $offlineTransaction->getChanges(), $oldState, $data);
 
         return $offlineTransaction;
     }

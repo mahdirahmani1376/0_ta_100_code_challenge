@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Invoice\Transaction;
 
 use App\Actions\Invoice\Transaction\VerifyTransactionAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\Transaction\VerifyTransactionRequest;
 use App\Http\Resources\Invoice\Transaction\TransactionResource;
 use App\Models\Transaction;
 
-class VerifyTransactionController
+class VerifyTransactionController extends Controller
 {
     public function __construct(private readonly VerifyTransactionAction $verifyTransactionAction)
     {
+        parent::__construct();
     }
 
     /**

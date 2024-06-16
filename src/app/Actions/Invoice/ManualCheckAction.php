@@ -2,7 +2,6 @@
 
 namespace App\Actions\Invoice;
 
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\ManualCheckService;
 
@@ -18,7 +17,6 @@ class ManualCheckAction
 
         $invoice = ($this->manualCheckService)($invoice, $adminId);
 
-        admin_log(AdminLog::MANUAL_CHECK_INVOICE, $invoice, $invoice->getChanges(), $oldState, ['admin_id' => $adminId]);
 
         return $invoice;
     }
