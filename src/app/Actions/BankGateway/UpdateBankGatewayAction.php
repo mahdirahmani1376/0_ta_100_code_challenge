@@ -2,7 +2,6 @@
 
 namespace App\Actions\BankGateway;
 
-use App\Models\AdminLog;
 use App\Models\BankGateway;
 use App\Services\BankGateway\UpdateBankGatewayService;
 
@@ -17,7 +16,6 @@ class UpdateBankGatewayAction
         $oldState = $bankGateway->toArray();
         $bankGateway = ($this->updateBankGatewayService)($bankGateway, $data);
 
-        admin_log(AdminLog::UPDATE_BANK_GATEWAY, $bankGateway, $bankGateway->getChanges(), $oldState, $data);
 
         return $bankGateway;
     }

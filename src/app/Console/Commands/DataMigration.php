@@ -26,7 +26,7 @@ class DataMigration extends Command
 
     protected $description = 'Command description';
 
-    protected int $chunkSize = 4000;
+    protected int $chunkSize = 10000;
 
     public function handle()
     {
@@ -116,7 +116,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $bankAccountTableName");
         try {
             $oldBankAccounts = DB::connection('mainapp')->select('SELECT * FROM `bank_accounts`');
-            $this->info('Fetched data');
             $newBankAccounts = Arr::map($oldBankAccounts, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -141,10 +140,8 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             DB::table($bankAccountTableName)->insert($newBankAccounts);
             $this->info("End of data migrate for $bankAccountTableName");
-
             $this->compareCounts(
                 'bank_accounts',
                 DB::connection('mainapp')->table('bank_accounts')->count(),
@@ -167,7 +164,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $oldData = DB::connection('mainapp')->select('SELECT * FROM `payment_gateways`');
-            $this->info('Fetched data');
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -214,7 +210,6 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
 
@@ -240,7 +235,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $oldData = DB::connection('mainapp')->select('SELECT * FROM `client_bank_accounts`');
-            $this->info('Fetched data');
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -261,7 +255,6 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
 
@@ -287,7 +280,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $oldData = DB::connection('mainapp')->select('SELECT * FROM `client_cashouts`');
-            $this->info('Fetched data');
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -308,7 +300,6 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             $this->info("Inserting mapped data into $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -336,7 +327,6 @@ class DataMigration extends Command
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credits`')[0]->count;
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `credits` LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -349,7 +339,6 @@ class DataMigration extends Command
                     $newRow['is_active'] = true;
                     return $newRow;
                 });
-                $this->info('Mapping done');
                 DB::table($tableName)->insert($mappedData);
             }
             $this->info("End of data migrate for $tableName");
@@ -521,11 +510,9 @@ class DataMigration extends Command
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = Carbon::now()->toDateTimeString();
-                    $newRow['updated_at'] = Carbon::now()->toDateTimeString();
                     $newRow['invoice_id'] = $row['invoiceid'];
                     $newRow['invoiceable_id'] = $row['relid'];
-                    $newRow['invoiceable_type'] = $row['type'];
+                    $newRow['invoiceable_type'] = $row['type'] ?? NULL;
                     $newRow['amount'] = $row['amount'];
                     $newRow['description'] = $row['description'];
                     return $newRow;

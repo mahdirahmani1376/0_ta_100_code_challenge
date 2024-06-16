@@ -3,7 +3,6 @@
 namespace App\Actions\ClientCashout;
 
 use App\Exceptions\Http\BadRequestException;
-use App\Models\AdminLog;
 use App\Models\ClientCashout;
 use App\Services\ClientCashout\UpdateClientCashoutService;
 
@@ -31,7 +30,6 @@ class UpdateClientCashoutAction
 
         $clientCashout = ($this->updateClientCashoutService)($clientCashout, $data);
 
-        admin_log(AdminLog::CREATE_CASHOUT, $clientCashout, $clientCashout->getChanges(), $oldState, $data);
 
         return $clientCashout;
     }

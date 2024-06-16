@@ -3,7 +3,6 @@
 namespace App\Actions\Invoice;
 
 use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
@@ -43,7 +42,6 @@ class UpdateInvoiceAction
             ($this->assignInvoiceNumberService)($invoice, $data['invoice_number'], $data['fiscal_year']);
         }
 
-        admin_log(AdminLog::UPDATE_INVOICE, $invoice, $invoice->getChanges(), $oldState, $data);
 
         return $invoice;
     }

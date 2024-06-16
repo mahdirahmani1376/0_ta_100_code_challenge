@@ -9,6 +9,7 @@ use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 
 class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInterface
 {
@@ -55,7 +56,10 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             $query->where('payment_method', '=', $data['payment_method']);
         }
         if (!empty($data['status'])) {
-            $query->where('status', '=', $data['status']);
+            if (!is_array($data['status'])) {
+                $data['status'] = Arr::wrap($data['status']);
+            }
+            $query->whereIn('status', $data['status']);
         }
         if (!empty($data['invoice_date'])) {
             $query->whereDate('created_at', '=', $data['invoice_date']);
@@ -96,6 +100,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
          *      ...
          *   ]
          */
+
         if (!empty($data['items'])) {
             $query->where(function (Builder $query) use ($data) {
                 foreach ($data['items'] as $item) {
@@ -206,9 +211,9 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->where('is_mass_payment', false);
 
         return [
-            'count' => $revenue->count(),
+            'count'     => $revenue->count(),
             'sum_total' => $revenue->sum('total'),
-            'sum_tax' => $revenue->sum('tax'),
+            'sum_tax'   => $revenue->sum('tax'),
         ];
     }
 
@@ -249,14 +254,14 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
                 ->where('payment_method', $bankGateway->name)
                 ->where('is_mass_payment', false);
             $onlineGateway[$bankGateway->name] = [
-                'sum' => $query->sum('total'),
+                'sum'   => $query->sum('total'),
                 'count' => $query->count(),
             ];
         }
 
         return [
-            'online' => $onlineGateway,
-            'credit_sum' => $credit->sum('total'),
+            'online'       => $onlineGateway,
+            'credit_sum'   => $credit->sum('total'),
             'credit_count' => $credit->count(),
         ];
     }
@@ -274,7 +279,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
 
         return [
             'count_collection' => $collection->count(),
-            'sum_collection' => $collection->sum('total'),
+            'sum_collection'   => $collection->sum('total'),
         ];
     }
 

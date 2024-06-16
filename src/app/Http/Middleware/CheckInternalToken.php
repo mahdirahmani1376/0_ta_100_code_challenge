@@ -13,10 +13,12 @@ class CheckInternalToken
     {
         $token = config('services.main_app.token');
 
+        change_log()->init($request);
+
         if ($request->bearerToken() != $token || empty($token)) {
             throw new AuthenticationException();
         }
 
-        return $next($request);
+        return change_log()->setResponse($next($request));
     }
 }

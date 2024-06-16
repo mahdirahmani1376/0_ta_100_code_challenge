@@ -7,7 +7,6 @@ use App\Actions\Wallet\ShowWalletAction;
 use App\Exceptions\Http\BadRequestException;
 use App\Integrations\BankGateway\Zarinpal;
 use App\Integrations\Rahkaran\RahkaranService;
-use App\Models\AdminLog;
 use App\Models\ClientBankAccount;
 use App\Models\ClientCashout;
 use App\Services\ClientBankAccount\FindSimilarClientBankAccountWithZarinpalIdService;
@@ -50,7 +49,6 @@ class ActionOnClientCashoutAction
             ]);
         }
 
-        admin_log(AdminLog::ACTION_ON_CASHOUT, $clientCashout, validatedData: $data);
 
         return $clientCashout;
     }

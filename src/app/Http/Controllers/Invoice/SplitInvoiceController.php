@@ -7,14 +7,16 @@ use App\Exceptions\SystemException\AtLeastOneInvoiceItemMustRemainException;
 use App\Exceptions\SystemException\InvoiceHasActiveTransactionsException;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Exceptions\SystemException\UpdatingPaidOrRefundedInvoiceNotAllowedException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\SplitInvoiceRequest;
 use App\Http\Resources\Invoice\InvoiceResource;
 use App\Models\Invoice;
 
-class SplitInvoiceController
+class SplitInvoiceController extends Controller
 {
     public function __construct(private readonly SplitInvoiceAction $splitInvoiceAction)
     {
+        parent::__construct();
     }
 
     /**

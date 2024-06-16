@@ -2,11 +2,12 @@
 
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Helpers\JalaliCalender;
-use App\Models\AdminLog;
 use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
+use App\Services\GatewayLogService;
 use Illuminate\Support\Str;
+
 
 if (!function_exists('get_paginate_params')) {
     function get_paginate_params(): array
@@ -90,37 +91,6 @@ if (!function_exists('is_json')) {
     {
         json_decode($string, true);
         return (json_last_error() === JSON_ERROR_NONE);
-    }
-}
-
-if (!function_exists('admin_log')) {
-    function admin_log(string $action, $model = null, $changes = null, $oldState = null, $validatedData = null, $adminId = null)
-    {
-
-        if (is_null($adminId) && is_null(request('admin_id'))) {
-            return;
-        }
-
-        $adminLog = '';
-
-        try {
-            if (!is_array($oldState)) {
-                $oldState = $oldState?->toArray();
-            }
-            $adminLog = AdminLog::query()->create([
-                'admin_user_id' => $adminId ?? request('admin_id'),
-                'action'        => $action,
-                'logable_id'    => $model?->id,
-                'logable_type'  => $model ? get_class($model) : null,
-                'after'         => $changes,
-                'before'        => $oldState,
-                'request'       => $validatedData,
-            ]);
-        } catch (Exception $exception) {
-            // TODO
-        }
-
-        return $adminLog;
     }
 }
 
@@ -236,5 +206,33 @@ if (!function_exists('round_amount')) {
     function round_amount(float $amount): float
     {
         return ceil($amount / 100) * 100;
+    }
+}
+
+if (!function_exists('change_log')) {
+    function change_log(): GatewayLogService
+    {
+        return app()->get(GatewayLogService::class);
+    }
+}
+
+if (!function_exists('array_diff_assoc_recursive')) {
+    function array_diff_assoc_recursive($array1, $array2): array
+    {
+        $difference = [];
+        foreach ($array1 as $key => $value) {
+            if (is_array($value)) {
+                if (!isset($array2[$key]) || !is_array($array2[$key])) {
+                    $difference[$key] = $value;
+                } else {
+                    $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+                    if (!empty($new_diff))
+                        $difference[$key] = $new_diff;
+                }
+            } else if (!array_key_exists($key, $array2) || $array2[$key] !== $value) {
+                $difference[$key] = $value;
+            }
+        }
+        return $difference;
     }
 }

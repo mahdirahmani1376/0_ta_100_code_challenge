@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Wallet\CreditTransaction;
 
 use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Wallet\CreditTransaction\StoreCreditTransactionRequest;
 use App\Http\Resources\Wallet\CreditTransaction\CreditTransactionResource;
 
-class StoreCreditTransactionController
+class StoreCreditTransactionController extends Controller
 {
     public function __construct(private readonly StoreCreditTransactionAction $storeCreditTransactionAction)
     {
+        parent::__construct();
     }
 
     /**

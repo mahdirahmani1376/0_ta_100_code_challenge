@@ -3,7 +3,6 @@
 namespace App\Actions\Invoice\OfflineTransaction;
 
 use App\Exceptions\SystemException\NotAuthorizedException;
-use App\Models\AdminLog;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\OfflineTransaction\RejectOfflineTransactionService;
 use App\Services\Invoice\Transaction\RejectTransactionService;
@@ -29,7 +28,6 @@ class RejectOfflineTransactionAction
         ($this->rejectOfflineTransactionService)($offlineTransaction);
         ($this->rejectTransactionService)($offlineTransaction->transaction);
 
-        admin_log(AdminLog::REJECT_OFFLINE_TRANSACTION, $offlineTransaction, $offlineTransaction->getChanges(), $oldState);
 
         return $offlineTransaction;
     }
