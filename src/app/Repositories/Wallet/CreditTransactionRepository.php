@@ -20,6 +20,14 @@ class CreditTransactionRepository extends BaseRepository implements CreditTransa
             ->sum('amount');
     }
 
+    public function lastCreditTransaction(int $profileId,int $credit_transaction_id): int
+    {
+        return self::newQuery()
+            ->where('profile_id',$profileId)
+            ->where('id','<=',$credit_transaction_id)
+            ->sum('amount');
+    }
+
     public function index(array $data): Collection|LengthAwarePaginator
     {
         $query = self::newQuery();

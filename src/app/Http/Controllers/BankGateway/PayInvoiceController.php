@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\BankGateway;
 
 use App\Actions\BankGateway\PayInvoiceAction;
-use App\Models\BankGateway;
+use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 
-class PayInvoiceController
+class PayInvoiceController extends Controller
 {
     public function __construct(private readonly PayInvoiceAction $payInvoiceAction)
     {
+        parent::__construct();
     }
 
     public function __invoke(string $bankGateway, Invoice $invoice, string $source = null)

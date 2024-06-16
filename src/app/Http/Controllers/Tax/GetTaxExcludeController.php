@@ -11,6 +11,7 @@ class GetTaxExcludeController extends Controller
         private readonly GetTaxExcludeAction $getTaxExcludeAction
     )
     {
+        parent::__construct();
     }
 
     public function __invoke($amount)

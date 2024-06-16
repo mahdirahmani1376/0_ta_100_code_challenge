@@ -2,7 +2,6 @@
 
 namespace App\Actions\Invoice\OfflineTransaction;
 
-use App\Models\AdminLog;
 use App\Models\Transaction;
 use App\Services\Invoice\FindInvoiceByIdService;
 use App\Services\Invoice\OfflineTransaction\StoreOfflineTransactionService;
@@ -32,7 +31,6 @@ class StoreOfflineTransactionAction
         $data['transaction_id'] = $transaction->id;
         $offlineTransaction = ($this->storeOfflineTransactionService)($invoice, $data);
 
-        admin_log(AdminLog::CREATE_OFFLINE_TRANSACTION, $offlineTransaction, validatedData: $data);
 
         return $offlineTransaction;
     }

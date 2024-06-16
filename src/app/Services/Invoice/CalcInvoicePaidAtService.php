@@ -2,7 +2,6 @@
 
 namespace App\Services\Invoice;
 
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
@@ -42,7 +41,6 @@ class CalcInvoicePaidAtService
                 ['paid_at',]
             );
 
-            admin_log(AdminLog::SET_INVOICE_PAID_AT, $invoice, $invoice->getChanges(), $oldState, ['paid_at' => $lastSuccessfulTransaction->created_at]);
 
             return $invoice;
         }
@@ -53,7 +51,6 @@ class CalcInvoicePaidAtService
             ['paid_at' => $invoice->created_at,],
             ['paid_at',]
         );
-        admin_log(AdminLog::SET_INVOICE_PAID_AT, $invoice, $invoice->getChanges(), $oldState, ['paid_at' => $invoice->created_at]);
 
         return $invoice;
     }

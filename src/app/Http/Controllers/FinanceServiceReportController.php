@@ -6,10 +6,11 @@ use App\Actions\FinanceServiceReportAction;
 use App\Http\Requests\ReportRequest;
 use App\Http\Resources\FinanceReport\FinanceReportResource;
 
-class FinanceServiceReportController
+class FinanceServiceReportController extends Controller
 {
     public function __construct(private readonly FinanceServiceReportAction $financeServiceReportAction)
     {
+        parent::__construct();
     }
 
     public function __invoke(ReportRequest $request)

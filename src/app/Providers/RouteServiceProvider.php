@@ -25,10 +25,15 @@ class RouteServiceProvider extends ServiceProvider
 
     public function bindRoutes(): void
     {
-	Route::prefix('api')
+        Route::prefix('api')
             ->middleware('api')
-	    ->namespace('App\Http\Controllers')
-	    ->group(base_path('routes/api.php'));
+            ->namespace('App\Http\Controllers')
+            ->group(base_path('routes/api.php'));
+
+        Route::prefix('')
+            ->middleware('web')
+            ->namespace('App\Http\Controllers')
+            ->group(base_path('routes/web.php'));
 
     }
 

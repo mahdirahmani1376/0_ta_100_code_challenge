@@ -26,7 +26,7 @@ class DataMigration extends Command
 
     protected $description = 'Command description';
 
-    protected int $chunkSize = 2000;
+    protected int $chunkSize = 10000;
 
     public function handle()
     {
@@ -61,7 +61,6 @@ class DataMigration extends Command
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `clients` LIMIT $this->chunkSize OFFSET {$i}");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -71,7 +70,6 @@ class DataMigration extends Command
                     $newRow['created_at'] = $newRow['updated_at'] = now();
                     return $newRow;
                 });
-                $this->info('Mapping done');
                 DB::table($profileTableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
@@ -118,7 +116,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $bankAccountTableName");
         try {
             $oldBankAccounts = DB::connection('mainapp')->select('SELECT * FROM `bank_accounts`');
-            $this->info('Fetched data');
             $newBankAccounts = Arr::map($oldBankAccounts, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -143,10 +140,8 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             DB::table($bankAccountTableName)->insert($newBankAccounts);
             $this->info("End of data migrate for $bankAccountTableName");
-
             $this->compareCounts(
                 'bank_accounts',
                 DB::connection('mainapp')->table('bank_accounts')->count(),
@@ -169,7 +164,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $oldData = DB::connection('mainapp')->select('SELECT * FROM `payment_gateways`');
-            $this->info('Fetched data');
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -216,7 +210,6 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
 
@@ -242,7 +235,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $oldData = DB::connection('mainapp')->select('SELECT * FROM `client_bank_accounts`');
-            $this->info('Fetched data');
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -263,7 +255,6 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
 
@@ -289,7 +280,6 @@ class DataMigration extends Command
         $this->alert("Beginning to migrate $tableName");
         try {
             $oldData = DB::connection('mainapp')->select('SELECT * FROM `client_cashouts`');
-            $this->info('Fetched data');
             $mappedData = Arr::map($oldData, function ($row) {
                 $row = (array)$row;
                 $newRow = [];
@@ -310,7 +300,6 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info('Mapping done');
             $this->info("Inserting mapped data into $tableName");
             DB::table($tableName)->insert($mappedData);
             $this->info("End of data migrate for $tableName");
@@ -338,7 +327,6 @@ class DataMigration extends Command
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credits`')[0]->count;
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `credits` LIMIT $this->chunkSize OFFSET $i");
-                $this->info('Fetched data');
                 $mappedData = Arr::map($oldData, function ($row) {
                     $row = (array)$row;
                     $newRow = [];
@@ -351,7 +339,6 @@ class DataMigration extends Command
                     $newRow['is_active'] = true;
                     return $newRow;
                 });
-                $this->info('Mapping done');
                 DB::table($tableName)->insert($mappedData);
             }
             $this->info("End of data migrate for $tableName");
@@ -375,11 +362,12 @@ class DataMigration extends Command
     private function migrateCreditTransaction(): void
     {
         $tableName = (new CreditTransaction())->getTable();
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_credit_transactions = $main_db . '.credit_transactions';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $query = "INSERT INTO $tableName
+            $query = "INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -400,8 +388,7 @@ class DataMigration extends Command
             ct.description   as description
      from $main_db_credit_transactions as ct)";
 
-            $this->info($query);
-            $this->ask('please insert credit transactions from above query');
+            DB::connection('mysql')->select($query);
             $this->info("End of data migrate for $tableName");
             $this->newLine();
             $this->info("End of data migrate for $tableName");
@@ -427,11 +414,11 @@ class DataMigration extends Command
         $tableName = (new Invoice())->getTable();
         $main_invoices_table_name = DB::connection('mainapp')->getDatabaseName() . '.invoices';
         $whmcs_invoices_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
-
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
             $query = "
-            INSERT INTO invoices
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -483,8 +470,7 @@ class DataMigration extends Command
               LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)
             ";
 
-            $this->info($query);
-            $this->ask('please insert invoices from above query');
+            DB::connection('mysql')->select($query);
             $this->info("End of data migrate for $tableName");
 
             $this->info('invoice_counts');
@@ -515,34 +501,25 @@ class DataMigration extends Command
     private function migrateItem(): void
     {
         $tableName = (new Item())->getTable();
-        $whmcs_items_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoiceitems';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $query = "
-            INSERT INTO $tableName
-(id,
- created_at,
- updated_at,
- invoice_id,
- invoiceable_id,
- invoiceable_type,
- amount,
- discount,
- description)
-    (SELECT it.id          as id,
-            NOW()          as created_at,
-            NOW()          as updated_at,
-            invoiceid      as invoice_id,
-            it.relid       as invoiceable_id,
-            it.type        as invoiceable_type,
-            it.amount      as amount,
-            0              AS discount,
-            it.description as description
-     FROM $whmcs_items_table_name as it
-     )
-            ";
-            $this->info($query);
-            $this->ask('please insert invoice items from above query');
+            $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems`")[0]->count;
+            $progress = $this->output->createProgressBar($count);
+            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
+                $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` LIMIT $this->chunkSize OFFSET $i");
+                $mappedData = Arr::map($oldData, function ($row) {
+                    $row = (array)$row;
+                    $newRow['id'] = $row['id'];
+                    $newRow['invoice_id'] = $row['invoiceid'];
+                    $newRow['invoiceable_id'] = $row['relid'];
+                    $newRow['invoiceable_type'] = $row['type'] ?? NULL;
+                    $newRow['amount'] = $row['amount'];
+                    $newRow['description'] = $row['description'];
+                    return $newRow;
+                });
+                DB::table($tableName)->insert($mappedData);
+                $progress->advance($this->chunkSize);
+            }
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
@@ -569,11 +546,12 @@ class DataMigration extends Command
         $main_db_offline_payments = $main_db . '.offline_payments';
         $main_db_invoices = $main_db . '.invoices';
         $main_db_transactions = $main_db . '.transactions';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
 
             $query = "
-            INSERT INTO $tableName
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -596,15 +574,16 @@ SELECT op.id              as id,
        inv.client_id      as profile_id,
        inv.invoice_id     as invoice_id,
        op.transaction_id  as transaction_id,
-       op.bank_account_id as bank_account_id,
+       IF(op.bank_account_id > 0, op.bank_account_id, 0) as bank_account_id,
        op.admin_user_id   as admin_id,
        op.amount          as amount,
        case op.status
            when op.status = 0 then 'pending'
            when op.status = 1 then 'confirmed'
            when op.status = 2 then 'rejected'
+           ELSE 'rejected'
            end            as status,
-       op.payment_method  as payment_method,
+       IF(op.payment_method != NULL, op.payment_method, 'unknown')  as payment_method,
        op.tracking_code   as tracking_code,
        op.mobile          as mobile,
        op.description     as description
@@ -615,15 +594,18 @@ FROM $main_db_offline_payments as op
 WHERE inv.client_id IS NOT NULL
             ";
 
-            $this->info($query);
-            $this->ask('please insert credit transactions from above query');
+            DB::connection('mysql')->select($query);
 
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
             $this->compareCounts(
                 'offline_payments',
-                DB::connection('mainapp')->table('offline_payments')->count(),
+                DB::connection('mainapp')->table('offline_payments')
+                    ->leftJoin($main_db_transactions, 'offline_payments.transaction_id', '=', "{$main_db_transactions}.id")
+                    ->leftJoin($main_db_invoices, "$main_db_transactions.invoice_id", '=', "{$main_db_invoices}.invoice_id")
+                    ->where("{$main_db_invoices}.client_id", "!=", NULL)
+                    ->count(),
                 $tableName,
                 OfflineTransaction::count()
             );
@@ -643,9 +625,10 @@ WHERE inv.client_id IS NOT NULL
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_transactions = $main_db . '.transactions';
         $main_db_invoices = $main_db . '.invoices';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
-            $query = "INSERT INTO $tableName
+            $query = "INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -691,8 +674,7 @@ FROM $main_db_transactions as trx
          LEFT JOIN $main_db_invoices as inv ON trx.invoice_id = inv.invoice_id
 WHERE inv.client_id IS NOT NULL
 ";
-            $this->info($query);
-            $this->ask('please insert transactions from above query');
+            DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 
@@ -717,11 +699,12 @@ WHERE inv.client_id IS NOT NULL
         $tableName = (new InvoiceNumber())->getTable();
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_invoice_numbers = $main_db . '.invoice_numbers';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $this->alert("Beginning to migrate $tableName");
         try {
 
             $query = "
-            INSERT INTO $tableName
+            INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -741,8 +724,7 @@ WHERE inv.client_id IS NOT NULL
             IF(invn.status = TRUE, '1', '0')           as status,
             invn.invoice_id                            as invoice_id
      from $main_db_invoice_numbers as invn";
-            $this->info($query);
-            $this->ask('please insert credit transactions from above query');
+            DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
 

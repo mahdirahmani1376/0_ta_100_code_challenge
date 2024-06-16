@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\BankGateway;
 
 use App\Actions\BankGateway\DeleteBankGatewayAction;
+use App\Http\Controllers\Controller;
 use App\Models\BankGateway;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class DeleteBankGatewayController
+class DeleteBankGatewayController extends Controller
 {
     public function __construct(private readonly DeleteBankGatewayAction $deleteBankGatewayAction)
     {
+        parent::__construct();
     }
 
     /**

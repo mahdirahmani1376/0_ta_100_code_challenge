@@ -3,7 +3,6 @@
 namespace App\Actions\Invoice;
 
 use App\Exceptions\SystemException\UpdateStatusUnacceptableException;
-use App\Models\AdminLog;
 use App\Models\Invoice;
 use App\Services\Invoice\ChangeInvoiceStatusService;
 
@@ -37,7 +36,6 @@ class ChangeInvoiceStatusAction
             $invoice = ($this->processInvoiceAction)($invoice);
         }
 
-        admin_log(AdminLog::UPDATE_INVOICE_STATUS, $invoice, $invoice->getChanges(), $oldState, ['status' => $status]);
 
         return $invoice;
     }

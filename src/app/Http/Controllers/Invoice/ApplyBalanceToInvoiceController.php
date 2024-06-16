@@ -7,14 +7,16 @@ use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\AmountIsMoreThanInvoiceBalanceException;
 use App\Exceptions\SystemException\ApplyCreditToCreditInvoiceException;
 use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\ApplyBalanceToInvoiceRequest;
 use App\Http\Resources\Invoice\InvoiceResource;
 use App\Models\Invoice;
 
-class ApplyBalanceToInvoiceController
+class ApplyBalanceToInvoiceController extends Controller
 {
     public function __construct(private readonly ApplyBalanceToInvoiceAction $applyBalanceToInvoiceAction)
     {
+        parent::__construct();
     }
 
     /**
