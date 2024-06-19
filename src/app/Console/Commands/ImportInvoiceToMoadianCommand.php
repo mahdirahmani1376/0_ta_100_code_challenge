@@ -34,7 +34,7 @@ class ImportInvoiceToMoadianCommand extends Command
         }
 
         if ($check = $this->option('check')) {
-            dd(Moadian::inquiryByReferenceNumbers($check)->getBody());
+            dump(Moadian::inquiryByReferenceNumbers($check)->getBody());
             return 0;
         }
 
@@ -91,6 +91,7 @@ class ImportInvoiceToMoadianCommand extends Command
         $query->whereIn('status', [
             Invoice::STATUS_PAID,
             Invoice::STATUS_COLLECTIONS,
+            Invoice::STATUS_REFUNDED,
         ]);
 
         $query->where('is_mass_payment', 0);
@@ -98,13 +99,23 @@ class ImportInvoiceToMoadianCommand extends Command
 
         $query->where('tax', '>', 0);
 
+        $query->where('sub_total', '>', 100);
+
         // Filters out imported invoices
-        $query->where(function (Builder $query) {
-            $query->whereDoesntHave('moadianLog');
-            $query->orWhereHas('moadianLog', function (Builder $query) {
-                $query->where('status', MoadianLog::STATUS_FAILURE);
-            });
-        });
+        $modianLogs = MoadianLog::query()
+            ->whereIn('status', [MoadianLog::STATUS_SUCCESS, MoadianLog::STATUS_INIT, MoadianLog::STATUS_PENDING])
+            ->whereHas('invoice', function ($q) use ($fromDate, $toDate) {
+                $q->whereDate('paid_at', '>=', $fromDate);
+                $q->whereDate('paid_at', '<=', $toDate);
+            })->orWhereHas('invoice', function ($q) use ($fromDate, $toDate) {
+                $q->where('status', Invoice::STATUS_COLLECTIONS);
+                $q->whereDate('created_at', '>=', $fromDate);
+                $q->whereDate('created_at', '<=', $toDate);
+            })
+            ->distinct('invoice_id')
+            ->pluck('invoice_id');
+
+        $query->whereNotIn('invoice_id', $modianLogs);
 
         return $query;
     }
