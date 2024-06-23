@@ -74,7 +74,6 @@ class CancelOverDueInvoiceCommand extends Command
 
             $overDueInvoices = $this->invoiceRepository->newQuery()
                 ->where('status', Invoice::STATUS_UNPAID)
-                ->where('is_mass_payment', 0) // TODO check this
                 ->where('is_credit', 0)
                 ->whereDate('due_date', '<', $dueDate)
                 ->whereHas('items', function ($query) use ($itemType) {
@@ -92,8 +91,8 @@ class CancelOverDueInvoiceCommand extends Command
 
         $overDueInvoices = $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 0)
-            ->where('is_credit', 0)
+            ->where('is_mass_payment', 0) // todo check this
+            ->where('is_credit', 0) // todo check this
             ->whereDate('due_date', '<', $dueDate);
 
         $this->cancelInvoices($overDueInvoices);
