@@ -118,7 +118,6 @@ class CancelOverDueInvoiceCommand extends Command
                 ->whereHas('items', function ($query) use ($itemType) {
                     $query->where('invoiceable_type', $itemType);
                 });
-
             $this->cancelInvoicesAction($overDueInvoices);
         }
     }
