@@ -61,8 +61,10 @@ RUN usermod -u ${WWW_DATA_USER_ID} www-data && \
     groupmod -g ${WWW_DATA_USER_ID} www-data
 
 COPY ./php.ini /usr/local/etc/php/php.ini
-COPY ./horizon.conf /etc/supervisor/conf.d/horizon.conf
 COPY ./entrypoint.sh /
+
+RUN apt-get install -y supervisor
+ADD ./horizon.conf /etc/supervisor/conf.d/horizon.conf
 
 # Config apache
 ADD default.conf /etc/apache2/sites-enabled/000-default.conf
@@ -76,4 +78,4 @@ WORKDIR /var/www
 
 USER $USER
 
-#ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
