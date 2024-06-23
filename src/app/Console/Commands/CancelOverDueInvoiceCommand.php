@@ -42,7 +42,7 @@ class CancelOverDueInvoiceCommand extends Command
         Item::TYPE_AFFILIATION             => 10,
     ];
 
-    public function handle(CancelInvoiceAction $cancelInvoiceAction, InvoiceRepositoryInterface $invoiceRepository)
+    public function handle(CancelInvoiceAction $cancelInvoiceAction, InvoiceRepositoryInterface $invoiceRepository): void
     {
         $this->cancelInvoiceAction = $cancelInvoiceAction;
         $this->invoiceRepository = $invoiceRepository;
@@ -62,43 +62,13 @@ class CancelOverDueInvoiceCommand extends Command
 
     private function cancelUnpaidInvoices(): void
     {
-        $this->info('-------- Canceling every Invoice that is not a DomainService ------');
-
-        foreach (Arr::sort($this->thresholds) as $itemType => $thresholdInDays) {
-            $dueDate = now()
-                ->second(0)
-                ->minute(0)
-                ->subDays($thresholdInDays);
-            $this->info('Canceling Invoices with item type of: ' . $itemType);
-            $this->info('Due Date: ' . JalaliCalender::getJalaliString($dueDate) . ' ' . $dueDate->format('H:i:s'));
-
-            $overDueInvoices = $this->invoiceRepository->newQuery()
-                ->where('status', Invoice::STATUS_UNPAID)
-                ->where('is_credit', 0)
-                ->whereDate('due_date', '<', $dueDate)
-                ->whereHas('items', function ($query) use ($itemType) {
-                    $query->where('invoiceable_type', $itemType);
-                });
-
-            $this->cancelInvoices($overDueInvoices);
-        }
-        $dueDate = now()
-            ->second(0)
-            ->minute(0)
-            ->subDays($this->defaultThreshold);
-        $this->info('Canceling Invoices with item type of: DEFAULT');
-        $this->info('Due Date: ' . JalaliCalender::getJalaliString($dueDate) . ' ' . $dueDate->format('H:i:s'));
-
-        $overDueInvoices = $this->invoiceRepository->newQuery()
-            ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 0) // todo check this
-            ->where('is_credit', 0) // todo check this
-            ->whereDate('due_date', '<', $dueDate);
-
-        $this->cancelInvoices($overDueInvoices);
+        // cancel invoices that contains specific invoice item
+        $this->cancelInvoicesWithItem();
+        // cancel other invoices (Credit,MassPayment,etc)
+        $this->cancelInvoicesWithDefaultItem();
     }
 
-    public function cancelInvoices(Builder $overDueInvoices): void
+    public function cancelInvoicesAction(Builder $overDueInvoices): void
     {
         $this->info("Invoices to cancel count: " . $overDueInvoices->count());
 
@@ -122,5 +92,58 @@ class CancelOverDueInvoiceCommand extends Command
         $this->info("Failed cancelled invoices: " . $errors);
         $this->info('--------------------------------------');
         $this->newLine();
+    }
+
+    /**
+     * @return void
+     * this method cancel invoices that contains specific invoice item
+     * @see self::$thresholds
+     */
+    private function cancelInvoicesWithItem(): void
+    {
+        $this->alert('Canceling Unpaid Invoices');
+        foreach (Arr::sort($this->thresholds) as $itemType => $thresholdInDays) {
+            $dueDate = now()
+                ->second(0)
+                ->minute(0)
+                ->subDays($thresholdInDays);
+            $this->info('Canceling Invoices with item type of: ' . $itemType);
+            $this->info('Due Date: ' . JalaliCalender::getJalaliString($dueDate) . ' ' . $dueDate->format('H:i:s'));
+
+            $overDueInvoices = $this->invoiceRepository->newQuery()
+                ->where('status', Invoice::STATUS_UNPAID)
+                ->where('is_credit', 0)
+                ->where('is_mass_payment', 0)
+                ->whereDate('due_date', '<', $dueDate)
+                ->whereHas('items', function ($query) use ($itemType) {
+                    $query->where('invoiceable_type', $itemType);
+                });
+
+            $this->cancelInvoicesAction($overDueInvoices);
+        }
+    }
+
+    /**
+     * @return void
+     * this method cancel other invoices (Credit,MassPayment,etc) with default threshold
+     * @see self::$defaultThreshold
+     */
+    private function cancelInvoicesWithDefaultItem(): void
+    {
+        $this->alert('Canceling Other Unpaid Invoices');
+        $dueDate = now()
+            ->second(0)
+            ->minute(0)
+            ->subDays($this->defaultThreshold);
+        $this->info('Canceling Invoices with item type of: DEFAULT');
+        $this->info('Due Date: ' . JalaliCalender::getJalaliString($dueDate) . ' ' . $dueDate->format('H:i:s'));
+
+        $overDueInvoices = $this->invoiceRepository->newQuery()
+            ->where('status', Invoice::STATUS_UNPAID)
+            ->where('is_mass_payment', 0) // todo check this
+            ->where('is_credit', 0) // todo check this
+            ->whereDate('due_date', '<', $dueDate);
+
+        $this->cancelInvoicesAction($overDueInvoices);
     }
 }

@@ -27,7 +27,7 @@ class CancelInvoiceService
     {
     }
 
-    public function __invoke(Invoice $invoice)
+    public function __invoke(Invoice $invoice): Invoice
     {
         $invoice = $this->invoiceRepository->update($invoice, ['status' => Invoice::STATUS_CANCELED], ['status']);
 
