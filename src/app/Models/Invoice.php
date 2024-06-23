@@ -59,6 +59,8 @@ class Invoice extends Model
     const STATUS_REFUNDED = 'refunded';
     const STATUS_COLLECTIONS = 'collections'; // old status = 7
 
+    const STATUS_ALL = 'all';
+
     const STATUSES = [
         self::STATUS_CANCELED,
         self::STATUS_UNPAID,
