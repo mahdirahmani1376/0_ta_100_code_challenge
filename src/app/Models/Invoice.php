@@ -34,7 +34,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property boolean is_mass_payment
  * @property int admin_id
  * @property boolean is_credit
- * @property string note
  * @property int $source_invoice
  *
  * @property Collection items
@@ -89,7 +88,6 @@ class Invoice extends Model
         'is_mass_payment',
         'admin_id',
         'is_credit',
-        'note',
         'source_invoice'
     ];
 
