@@ -322,32 +322,40 @@ class DataMigration extends Command
     private function migrateWallet(): void
     {
         $tableName = (new Wallet())->getTable();
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_wallets = $main_db . '.credits';
         $this->alert("Beginning to migrate $tableName");
         try {
-            $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credits`')[0]->count;
-            for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')->select("SELECT * FROM `credits` LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['client_id'];
-                    $newRow['name'] = $row['wallet'];
-                    $newRow['balance'] = $row['credit'];
-                    $newRow['is_active'] = true;
-                    return $newRow;
-                });
-                DB::table($tableName)->insert($mappedData);
-            }
+            $query = "INSERT INTO $fulTableName
+(id,
+ created_at,
+ updated_at,
+ deleted_at,
+ profile_id,
+ name,
+ balance,
+ is_active)
+    (SELECT cc.id         as id,
+            cc.created_at as created_at,
+            cc.updated_at as updated_at,
+            NULL          as deleted_at,
+            cc.client_id  as profile_id,
+            cc.wallet     as name,
+            cc.credit     as balance,
+            1             as is_active
+     from $main_db_wallets as cc)";
+
+            DB::connection('mysql')->select($query);
+            $this->info("End of data migrate for $tableName");
+            $this->newLine();
             $this->info("End of data migrate for $tableName");
 
             $this->compareCounts(
-                'credits',
-                DB::connection('mainapp')->table('credits')->count(),
+                'credit_transactions',
+                DB::connection('mainapp')->table('credit_transactions')->count(),
                 $tableName,
-                Wallet::withTrashed()->count()
+                CreditTransaction::withTrashed()->count()
             );
 
         } catch (Exception $e) {
