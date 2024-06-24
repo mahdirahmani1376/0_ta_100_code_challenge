@@ -60,8 +60,8 @@ class Item extends Model
 
     protected $casts = [
         'deleted_at' => 'datetime',
-        'from_date' => 'datetime',
-        'to_date' => 'datetime',
+        'from_date'  => 'datetime',
+        'to_date'    => 'datetime',
     ];
 
     protected $fillable = [
