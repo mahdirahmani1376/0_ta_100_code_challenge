@@ -47,7 +47,7 @@ class DataMigration extends Command
         self::migrateTransaction();
         self::migrateOfflineTransaction();
         self::migrateInvoiceNumber();
-        self::syncWallets();
+//        self::syncWallets();
         $process_time = Carbon::now()->diffInSeconds($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} seconds");
     }
@@ -526,15 +526,17 @@ class DataMigration extends Command
             $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems`")[0]->count;
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('whmcs')->select("SELECT it.id          as id,
-            NOW()          as created_at,
-            NOW()          as updated_at,
-            invoiceid      as invoice_id,
-            it.relid       as invoiceable_id,
-            it.type        as invoiceable_type,
-            it.amount      as amount,
-            0              AS discount,
-            it.description as description FROM `tblinvoiceitems` as it LIMIT $this->chunkSize OFFSET $i");
+                $oldData = DB::connection('whmcs')->select("SELECT 
+                    it.id          as id,
+                    NOW()          as created_at,
+                    NOW()          as updated_at,
+                    invoiceid      as invoice_id,
+                    it.relid       as invoiceable_id,
+                    it.type        as invoiceable_type,
+                    it.amount      as amount,
+                    0              AS discount,
+                    it.description as description FROM `tblinvoiceitems` as it LIMIT $this->chunkSize OFFSET $i"
+                );
                 $mappedData = [];
                 foreach ($oldData as $row) {
                     $mappedData[] = (array)$row;

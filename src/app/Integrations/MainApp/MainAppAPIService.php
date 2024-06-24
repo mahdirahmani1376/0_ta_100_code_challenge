@@ -164,14 +164,10 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function sendInvoiceCreateEmail(int $clientId, string $subject, string $message)
+    public static function sendInvoiceCreateEmail(Invoice $invoice): void
     {
-        $url = '/api/internal/finance/invoice/create-email';
-        $data = [
-            'client_id' => $clientId,
-            'subject'   => $subject,
-            'message'   => $message,
-        ];
+        $url = '/api/internal/finance/invoice/create/notification';
+        $data = $invoice->load('items')->toArray();
 
         try {
             self::makeRequest('post', $url, $data);
