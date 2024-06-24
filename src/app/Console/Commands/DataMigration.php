@@ -71,15 +71,17 @@ class DataMigration extends Command
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `clients` LIMIT $this->chunkSize OFFSET {$i}");
-                $mappedData = Arr::map($oldData, function ($row) {
+                $mappedData = [];
+                foreach ($oldData as $row) {
                     $row = (array)$row;
-                    $newRow = [];
-                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['client_id'] = $row['id'];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $newRow['updated_at'] = now();
-                    return $newRow;
-                });
+                    $mappedData[] = [
+                        'rahkaran_id' => $row['rahkaran_id'],
+                        'client_id'   => $row['id'],
+                        'id'          => $row['id'],
+                        'created_at'  => $row['updated_at'],
+                    ];
+                }
+
                 DB::table($profileTableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
