@@ -32,13 +32,18 @@ class InvoiceCreatedJob implements ShouldQueue
         $this->onQueue(QueueEnum::PROCESS_INVOICE);
     }
 
+    public function tags(): array
+    {
+        return ['invoice-create-notification:' . $this->invoice->id];
+    }
+
     public function handle(): void
     {
         try {
             MainAppAPIService::sendInvoiceCreateEmail($this->invoice);
         } catch (Throwable $exception) {
-            $this->fail();
-            Log::warning('Send notification to invoice has been failed', $exception->getTrace());
+            $this->fail($exception);
+            Log::warning('Send notification to invoice has been failed!', $exception->getTrace());
         }
     }
 }

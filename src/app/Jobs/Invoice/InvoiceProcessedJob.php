@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Log;
 
 /**
  * this job dispatched after invoice paid and signal to gateway for process invoice items
@@ -27,8 +28,18 @@ class InvoiceProcessedJob implements ShouldQueue
         $this->onQueue(QueueEnum::PROCESS_INVOICE);
     }
 
+    public function tags(): array
+    {
+        return ['invoice-processed:' . $this->invoice->id];
+    }
+
     public function handle(): void
     {
-        MainAppAPIService::invoicePostProcess($this->invoice);
+        try {
+            MainAppAPIService::invoicePostProcess($this->invoice);
+        } catch (\Throwable $exception) {
+            $this->fail($exception);
+            Log::warning('Send invoice signal to gateway has been failed!', $exception->getTrace());
+        }
     }
 }
