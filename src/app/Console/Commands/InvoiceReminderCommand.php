@@ -32,7 +32,7 @@ class InvoiceReminderCommand extends Command
     private string $emailSubject;
     private string $smsMessageTemplate;
     private string $smsLinkTemplate;
-    private array $reminders;
+    private array $reminders = [];
     private ?int $overrideInvoiceId;
 
     public function handle(InvoiceRepositoryInterface $invoiceRepository)
@@ -49,11 +49,12 @@ class InvoiceReminderCommand extends Command
 
         $this->overrideInvoiceId = $this->option('override-invoice-id');
 
+
         $this->prepareConfigVariablesAndData();
+
+
         $this->sendEmailReminder();
-        if (empty($this->overrideInvoiceId)) {
-            $this->sendSMSReminder();
-        }
+        $this->sendSMSReminder();
 
         if (!empty($this->reminders)) {
             Bus::batch($this->reminders)->dispatch();
@@ -208,6 +209,7 @@ class InvoiceReminderCommand extends Command
         return $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
             ->where('is_mass_payment', false)
+            ->where('is_credit', false)
             ->whereNotNull('due_date')
             ->whereDate('due_date', now()->addDays($threshold)->toDateString())
             ->get(['id', 'profile_id']);

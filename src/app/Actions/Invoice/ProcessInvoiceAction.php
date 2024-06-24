@@ -3,8 +3,8 @@
 namespace App\Actions\Invoice;
 
 use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
-use App\Events\InvoiceProcessed;
 use App\Jobs\AssignInvoiceNumberJob;
+use App\Jobs\Invoice\InvoiceProcessedJob;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Services\Invoice\CalcInvoicePaidAtService;
@@ -30,7 +30,6 @@ class ProcessInvoiceAction
     {
     }
 
-    // TODO check usage of this action
     public function __invoke(Invoice $invoice): Invoice
     {
         $invoice->refresh();
@@ -112,7 +111,7 @@ class ProcessInvoiceAction
         }
 
         ($this->calcInvoiceProcessedAtService)($invoice);
-        InvoiceProcessed::dispatch($invoice);
+        InvoiceProcessedJob::dispatch($invoice);
 
         return $invoice;
     }
