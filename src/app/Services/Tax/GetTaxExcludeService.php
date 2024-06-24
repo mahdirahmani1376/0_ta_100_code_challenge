@@ -14,7 +14,7 @@ class GetTaxExcludeService
      */
     public function __invoke($amount)
     {
-        $tax = (MainAppConfig::get(MainAppConfig::FINANCE_TAX_TOTAL_PERCENT) + 100);
+        $tax = (MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX) + 100);
         return [
             'tax'    => $tax,
             'amount' => (($amount * 100) / $tax)

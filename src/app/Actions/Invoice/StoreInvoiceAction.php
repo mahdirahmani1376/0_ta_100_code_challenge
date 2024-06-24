@@ -24,7 +24,7 @@ class StoreInvoiceAction
     public function __invoke(array $data)
     {
         if (empty($data['tax_rate'])) {
-            $data['tax_rate'] = MainAppConfig::get(MainAppConfig::FINANCE_TAX_TOTAL_PERCENT);
+            $data['tax_rate'] = MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX);
         }
 
         $invoice = ($this->storeInvoiceService)($data);
