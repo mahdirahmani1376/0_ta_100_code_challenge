@@ -353,9 +353,10 @@ class DataMigration extends Command
                     1             as is_active 
                     FROM `credits` as cc LIMIT $this->chunkSize OFFSET $i"
                 );
-                $mappedData = Arr::map($oldData, function ($row) {
-                    return (array)$row;
-                });
+                $mappedData = [];
+                foreach ($oldData as $row) {
+                    $mappedData[] = (array)$row;
+                }
                 DB::table($tableName)->insert($mappedData);
             }
             $this->info("End of data migrate for $tableName");
@@ -532,11 +533,10 @@ class DataMigration extends Command
             it.amount      as amount,
             0              AS discount,
             it.description as description FROM `tblinvoiceitems` as it LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    if (count((array)$row) != 9)
-                        dd($row);
-                    return (array)$row;
-                });
+                $mappedData = [];
+                foreach ($oldData as $row) {
+                    $mappedData[] = (array)$row;
+                }
                 DB::table($tableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
