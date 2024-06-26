@@ -43,8 +43,6 @@ class ApplyBalanceToInvoiceAction
             throw InvoiceStatusMustBeUnpaidException::make();
         }
 
-        $oldState = $invoice->toArray();
-
         if (empty($data['amount'])) {
             $data['amount'] = $invoice->balance;
         }
