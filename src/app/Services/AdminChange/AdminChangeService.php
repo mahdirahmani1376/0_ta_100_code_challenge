@@ -13,7 +13,7 @@ class AdminChangeService
         $before = [],
         $after = [],
         $action = null
-    )
+    ): void
     {
         $logModel = AdminLog::find($logId);
 
