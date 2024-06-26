@@ -23,9 +23,7 @@ class StoreInvoiceAction
 
     public function __invoke(array $data)
     {
-        $is_credit = $data['is_credit'] ?? false;
-
-        if (empty($data['tax_rate']) && !$is_credit) {
+        if (!isset($data['tax_rate'])) {
             $data['tax_rate'] = MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX);
         }
 
