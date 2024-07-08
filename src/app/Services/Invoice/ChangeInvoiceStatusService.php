@@ -13,7 +13,6 @@ class ChangeInvoiceStatusService
 
     public function __invoke(Invoice $invoice, string $status): Invoice
     {
-        $data = ['status' => $status];
-        return $this->invoiceRepository->update($invoice, $data, ['status','paid_at']);
+        return $this->invoiceRepository->update($invoice, ['status' => $status,], ['status']);
     }
 }
