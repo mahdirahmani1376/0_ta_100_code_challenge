@@ -4,6 +4,7 @@ namespace App\Actions\Invoice;
 
 use App\Exceptions\SystemException\UpdateStatusUnacceptableException;
 use App\Models\Invoice;
+use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Services\Invoice\ChangeInvoiceStatusService;
 
 class ChangeInvoiceStatusAction
@@ -12,6 +13,7 @@ class ChangeInvoiceStatusAction
         private readonly ChangeInvoiceStatusService $changeInvoiceStatusService,
         private readonly CancelInvoiceAction        $cancelInvoiceAction,
         private readonly ProcessInvoiceAction       $processInvoiceAction,
+        private readonly InvoiceRepositoryInterface $invoiceRepository
     )
     {
     }
@@ -24,7 +26,9 @@ class ChangeInvoiceStatusAction
             throw UpdateStatusUnacceptableException::make($status);
         }
 
-        $oldState = $invoice->toArray();
+        if ($invoice->status === Invoice::STATUS_COLLECTIONS && is_null($invoice->paid_at)){
+            $invoice = $this->invoiceRepository->update($invoice,['paid_at' => now()],['paid_at']);
+        }
 
         if ($status == Invoice::STATUS_CANCELED) {
             $invoice = ($this->cancelInvoiceAction)($invoice);
