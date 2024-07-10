@@ -21,6 +21,7 @@ final class ExceptionCodes
     public const INVOICE_HAS_ACTIVE_TRANSACTIONS = '420032';
     public const AT_LEAST_ONE_INVOICE_ITEM_MUST_REMAIN = '420031';
     public const AMOUNT_IS_MORE_THAN_INVOICE_BALANCE = '410090';
+    public const AMOUNT_IS_MORE_THAN_WALLET_BALANCE = '4100901';
     public const OFFLINE_PAYMENT_APPLY = "410133";
     public const INVOICE_CANCELLATION_FAILED = '410084';
     public const NOT_AUTHORIZED = '410110';
