@@ -67,7 +67,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
 
         if (!empty($data['in_status'])) {
             if (!is_array($data['in_status'])) {
-                $data['status'] = Arr::wrap($data['in_status']);
+                $data['in_status'] = Arr::wrap($data['in_status']);
             }
             $query->whereIn('status', $data['in_status']);
         }
