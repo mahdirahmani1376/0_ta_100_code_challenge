@@ -65,6 +65,13 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             $query->whereIn('status', $data['status']);
         }
 
+        if (!empty($data['in_status'])) {
+            if (!is_array($data['in_status'])) {
+                $data['status'] = Arr::wrap($data['in_status']);
+            }
+            $query->whereIn('status', $data['in_status']);
+        }
+
         if (!empty($data['invoice_date'])) {
             $query->whereDate('created_at', '=', $data['invoice_date']);
         }
