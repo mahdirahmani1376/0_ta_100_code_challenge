@@ -25,6 +25,8 @@ class IndexInvoiceRequest extends FormRequest
             'invoice_ids.*'            => ['integer',],
             'payment_method'           => ['nullable', 'max:255',],
             'status'                   => ['nullable', 'max:255', Rule::in([...Invoice::STATUSES, 'all']),],
+            'in_status'                => ['array', 'nullable'],
+            'in_status.*'              => ['string', Rule::in(Invoice::STATUSES),],
             'date'                     => ['nullable', 'date',],
             'paid_date'                => ['nullable', 'date',],
             'due_date'                 => ['nullable', 'date',],
