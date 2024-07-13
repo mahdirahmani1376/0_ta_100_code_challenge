@@ -3,8 +3,8 @@
 namespace App\Actions\Invoice;
 
 use App\Actions\Wallet\CreditTransaction\StoreCreditTransactionAction;
-use App\Events\InvoiceProcessed;
 use App\Jobs\AssignInvoiceNumberJob;
+use App\Jobs\Invoice\InvoiceProcessedJob;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Services\Invoice\CalcInvoicePaidAtService;
@@ -30,7 +30,6 @@ class ProcessInvoiceAction
     {
     }
 
-    // TODO check usage of this action
     public function __invoke(Invoice $invoice): Invoice
     {
         $invoice->refresh();
@@ -62,9 +61,9 @@ class ProcessInvoiceAction
         }
 
         // Change status to paid unless it is a REFUND invoice
+        $old_status = $invoice->status;
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
-            Invoice::STATUS_COLLECTIONS,
             Invoice::STATUS_REFUNDED,
         ])) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
@@ -111,8 +110,11 @@ class ProcessInvoiceAction
             }
         }
 
-        ($this->calcInvoiceProcessedAtService)($invoice);
-        InvoiceProcessed::dispatch($invoice);
+
+        if ($old_status != Invoice::STATUS_COLLECTIONS) {
+            ($this->calcInvoiceProcessedAtService)($invoice);
+            InvoiceProcessedJob::dispatch($invoice);
+        }
 
         return $invoice;
     }

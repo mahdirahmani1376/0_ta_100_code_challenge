@@ -34,7 +34,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property boolean is_mass_payment
  * @property int admin_id
  * @property boolean is_credit
- * @property string note
  * @property int $source_invoice
  *
  * @property Collection items
@@ -58,6 +57,8 @@ class Invoice extends Model
     const STATUS_PAYMENT_PENDING = 'payment_pending';
     const STATUS_REFUNDED = 'refunded';
     const STATUS_COLLECTIONS = 'collections'; // old status = 7
+
+    const STATUS_ALL = 'all';
 
     const STATUSES = [
         self::STATUS_CANCELED,
@@ -87,7 +88,6 @@ class Invoice extends Model
         'is_mass_payment',
         'admin_id',
         'is_credit',
-        'note',
         'source_invoice'
     ];
 

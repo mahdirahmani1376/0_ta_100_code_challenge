@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Invoice;
 
 use App\Actions\Invoice\ChangeInvoiceStatusAction;
-use App\Exceptions\SystemException\InvoiceLockedAndAlreadyImportedToRahkaranException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Invoice\ChangeInvoiceStatusRequest;
 use App\Http\Resources\Invoice\InvoiceResource;
@@ -20,7 +19,6 @@ class ChangeInvoiceStatusController extends Controller
      * @param Invoice $invoice
      * @param ChangeInvoiceStatusRequest $request
      * @return InvoiceResource
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(Invoice $invoice, ChangeInvoiceStatusRequest $request)
     {

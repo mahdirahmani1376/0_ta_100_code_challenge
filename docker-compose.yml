@@ -15,7 +15,7 @@ services:
       - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
       - EXCLUDE_PORTS=443
     ports:
-      - 6090:80
+      - 127.0.0.1:6090:80
     dns:
       - 172.29.0.100
       - 172.29.2.100

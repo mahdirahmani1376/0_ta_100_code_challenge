@@ -23,14 +23,19 @@ class MoadianFactory
 
     public function createMoadianInvoiceDTO(Invoice $invoice): MoadianInvoice
     {
-        self::createInvoiceHeader($invoice)
-            ->createInvoiceBody($invoice)
+        // # Refunded invoice need source invoice for:
+        // # 1. Tax id required to create refund invoice
+        // # 2. Item type(sstid) must match with source invoice item type.
+        $refunded_invoice_source = $invoice->status == Invoice::STATUS_REFUNDED ? Invoice::query()->find($invoice->source_invoice) : null;
+
+        self::createInvoiceHeader($invoice, $refunded_invoice_source)
+            ->createInvoiceBody($invoice, $refunded_invoice_source)
             ->creatInvoicePayments($invoice);
 
         return $this->moadianInvoice;
     }
 
-    private function createInvoiceHeader(Invoice $invoice): self
+    private function createInvoiceHeader(Invoice $invoice, ?Invoice $refunded_invoice_source = null): self
     {
         $date = str_pad(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
         $header = new InvoiceHeader(config('moadian.username'));
@@ -39,7 +44,7 @@ class MoadianFactory
         $header->indati2m = $date;
         $header->inty = 1; //invoice type
         $header->inno = str_pad($invoice->id, 10, 0, STR_PAD_LEFT);
-        $header->irtaxid = $invoice->status == Invoice::STATUS_REFUNDED ? MoadianLog::query()->where('invoice_id', $invoice->source_invoice)->first()->tax_id : null; // shomare sorathesabe marja baraye refund ha
+        $header->irtaxid = !empty($refunded_invoice_source) ? MoadianLog::query()->where('invoice_id', $refunded_invoice_source->id)->first()?->tax_id : null;
         $header->inp = 1; //invoice pattern
         $header->ins = $invoice->status == Invoice::STATUS_REFUNDED ? 4 : 1; // invoice type
         $header->tins = '10103421620';
@@ -92,7 +97,7 @@ class MoadianFactory
         return $this;
     }
 
-    public function createInvoiceBody(Invoice $invoice): self
+    public function createInvoiceBody(Invoice $invoice, ?Invoice $refunded_invoice_source = null): self
     {
         $items = $invoice->items;
 
@@ -121,7 +126,13 @@ class MoadianFactory
             }
 
             $body = new MoadianInvoiceItem();
-            [$sstid, $sstt] = self::getMappedProductId($item);
+
+            if (empty($refunded_invoice_source)) {
+                [$sstid, $sstt] = self::getMappedProductId($item);
+            } else {
+                [$sstid, $sstt] = self::getMappedProductId($refunded_invoice_source->items->first());
+            }
+
             $body->sstid = $sstid;
             $body->sstt = $sstt;
             $body->am = '1';
@@ -170,7 +181,7 @@ class MoadianFactory
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
                 $product = $this->responseProducts->where('id', $item->invoiceable_id)->first();
-                $productGroup = data_get($product,'group.name');
+                $productGroup = data_get($product, 'group.name');
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
                     $description = 'پنل نمايندگي هاست وب سايت';
@@ -264,7 +275,8 @@ class MoadianFactory
                 break;
 
             case Item::TYPE_DOMAIN_SERVICE:
-                $domain = $this->responseDomains->where('id', $item->invoiceable_id)->first();
+            case Item::TYPE_REFUND_DOMAIN:
+            $domain = $this->responseDomains->where('id', $item->invoiceable_id)->first();
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
                     $code = 2330001496112; // TODO dobuble check دامنه داخلی
                     $description = 'تخصيص و مديريت دامنه هاي داخلي';

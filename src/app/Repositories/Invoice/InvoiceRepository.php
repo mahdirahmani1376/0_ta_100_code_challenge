@@ -55,12 +55,23 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         if (!empty($data['payment_method'])) {
             $query->where('payment_method', '=', $data['payment_method']);
         }
-        if (!empty($data['status'])) {
+
+        if (data_get($data, 'status') == Invoice::STATUS_ALL) {
+            $query->whereNot('status', Invoice::STATUS_CANCELED);
+        } elseif (!empty($data['status'])) {
             if (!is_array($data['status'])) {
                 $data['status'] = Arr::wrap($data['status']);
             }
             $query->whereIn('status', $data['status']);
         }
+
+        if (!empty($data['in_status'])) {
+            if (!is_array($data['in_status'])) {
+                $data['in_status'] = Arr::wrap($data['in_status']);
+            }
+            $query->whereIn('status', $data['in_status']);
+        }
+
         if (!empty($data['invoice_date'])) {
             $query->whereDate('created_at', '=', $data['invoice_date']);
         }
@@ -100,6 +111,7 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
          *      ...
          *   ]
          */
+
         if (!empty($data['items'])) {
             $query->where(function (Builder $query) use ($data) {
                 foreach ($data['items'] as $item) {

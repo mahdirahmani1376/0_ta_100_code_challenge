@@ -8,7 +8,9 @@ use App\Integrations\MainApp\MainAppConfig;
 use App\Jobs\SendInvoiceReminderJob;
 use App\Models\Invoice;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
+use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
 
@@ -30,7 +32,7 @@ class InvoiceReminderCommand extends Command
     private string $emailSubject;
     private string $smsMessageTemplate;
     private string $smsLinkTemplate;
-    private array $reminders;
+    private array $reminders = [];
     private ?int $overrideInvoiceId;
 
     public function handle(InvoiceRepositoryInterface $invoiceRepository)
@@ -47,11 +49,12 @@ class InvoiceReminderCommand extends Command
 
         $this->overrideInvoiceId = $this->option('override-invoice-id');
 
+
         $this->prepareConfigVariablesAndData();
+
+
         $this->sendEmailReminder();
-        if (empty($this->overrideInvoiceId)) {
-            $this->sendSMSReminder();
-        }
+        $this->sendSMSReminder();
 
         if (!empty($this->reminders)) {
             Bus::batch($this->reminders)->dispatch();
@@ -91,14 +94,8 @@ class InvoiceReminderCommand extends Command
             } else {
                 $this->smsThresholds = $this->option('sms-thresholds');
             }
-        } catch (\Exception $exception) {
-            \Log::error('Failed to fetch config values from MainApp', [
-                'class'   => self::class,
-                'message' => $exception->getMessage(),
-            ]);
+        } catch (Exception $exception) {
             $this->error('Failed to fetch config values from MainApp');
-
-            exit(-1);
         }
     }
 
@@ -140,7 +137,7 @@ class InvoiceReminderCommand extends Command
                             $this->reminders[] = new SendInvoiceReminderJob($payload, 'email');
                         }
                         $this->info("Email reminder for client #$clientId sent successfully.");
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         $this->error("Email reminder for client #$clientId failed to process");
                     }
                 });
@@ -179,7 +176,7 @@ class InvoiceReminderCommand extends Command
                             $this->reminders[] = new SendInvoiceReminderJob($payload, 'sms');
                         }
                         $this->info("SMS reminder for client #$clientId sent successfully.");
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         $this->error("SMS reminder for client #$clientId failed to process");
                     }
                 });
@@ -201,7 +198,7 @@ class InvoiceReminderCommand extends Command
         return $message;
     }
 
-    public function prepareInvoices(string $emailThreshold): array|\Illuminate\Database\Eloquent\Collection
+    public function prepareInvoices($threshold): array|Collection
     {
         if (!empty($this->overrideInvoiceId)) {
             return $this->invoiceRepository->newQuery()
@@ -212,8 +209,9 @@ class InvoiceReminderCommand extends Command
         return $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
             ->where('is_mass_payment', false)
+            ->where('is_credit', false)
             ->whereNotNull('due_date')
-            ->whereDate('due_date', now()->addDays($emailThreshold)->toDateString())
+            ->whereDate('due_date', now()->addDays($threshold)->toDateString())
             ->get(['id', 'profile_id']);
     }
 }

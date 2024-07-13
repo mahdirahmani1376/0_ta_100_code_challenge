@@ -26,7 +26,7 @@ class DataMigration extends Command
 
     protected $description = 'Command description';
 
-    protected int $chunkSize = 10000;
+    protected int $chunkSize = 7000;
 
     public function handle()
     {
@@ -47,13 +47,23 @@ class DataMigration extends Command
         self::migrateTransaction();
         self::migrateOfflineTransaction();
         self::migrateInvoiceNumber();
-        self::syncWallets();
+//        self::syncWallets();
         $process_time = Carbon::now()->diffInSeconds($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} seconds");
     }
 
+    private function calcProcessTime($process, $start = null)
+    {
+        if ($start) {
+            $process_time = Carbon::now()->diffInSeconds($start);
+            $minutes = round($process_time / 60);
+            $this->info("#### END $process in {$process_time} seconds $minutes minute");
+        }
+    }
+
     private function migrateProfiles()
     {
+        $now = Carbon::now();
         $profileTableName = (new Profile())->getTable();
         $this->alert("Beginning to migrate $profileTableName");
         try {
@@ -61,15 +71,17 @@ class DataMigration extends Command
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
                 $oldData = DB::connection('mainapp')->select("SELECT * FROM `clients` LIMIT $this->chunkSize OFFSET {$i}");
-                $mappedData = Arr::map($oldData, function ($row) {
+                $mappedData = [];
+                foreach ($oldData as $row) {
                     $row = (array)$row;
-                    $newRow = [];
-                    $newRow['rahkaran_id'] = $row['rahkaran_id'];
-                    $newRow['client_id'] = $row['id'];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $newRow['updated_at'] = now();
-                    return $newRow;
-                });
+                    $mappedData[] = [
+                        'rahkaran_id' => $row['rahkaran_id'],
+                        'client_id'   => $row['id'],
+                        'id'          => $row['id'],
+                        'created_at'  => $row['updated_at'],
+                    ];
+                }
+
                 DB::table($profileTableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
@@ -82,6 +94,7 @@ class DataMigration extends Command
                 $profileTableName,
                 Profile::count()
             );
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (\Throwable $e) {
             $this->error("Something went wrong when migrating $profileTableName");
             dump([
@@ -93,6 +106,7 @@ class DataMigration extends Command
 
     private function updateMainAppClients()
     {
+        $now = Carbon::now();
         try {
             $this->alert('Set client.id to finance profile id');
             DB::connection('mainapp')->select('
@@ -100,7 +114,7 @@ class DataMigration extends Command
                 SET cl.finance_profile_id = cl.id
                 WHERE cl.finance_profile_id IS NULL
             ');
-            $this->info('End Set client.id to finance profile id');
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (\Throwable $exception) {
             dump([
                 'error'  => substr($exception->getMessage(), 0, 500),
@@ -112,6 +126,7 @@ class DataMigration extends Command
 
     private function migrateBankAccount(): void
     {
+        $now = Carbon::now();
         $bankAccountTableName = (new BankAccount)->getTable();
         $this->alert("Beginning to migrate $bankAccountTableName");
         try {
@@ -148,6 +163,7 @@ class DataMigration extends Command
                 $bankAccountTableName,
                 BankAccount::withTrashed()->count()
             );
+            $this->calcProcessTime(__FUNCTION__, $now);
 
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $bankAccountTableName");
@@ -160,6 +176,7 @@ class DataMigration extends Command
 
     private function migrateBankGateway(): void
     {
+        $now = Carbon::now();
         $tableName = (new BankGateway())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
@@ -219,7 +236,7 @@ class DataMigration extends Command
                 $tableName,
                 BankGateway::withTrashed()->count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -231,6 +248,7 @@ class DataMigration extends Command
 
     private function migrateClientBankAccount(): void
     {
+        $now = Carbon::now();
         $tableName = (new ClientBankAccount())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
@@ -264,7 +282,7 @@ class DataMigration extends Command
                 $tableName,
                 ClientBankAccount::withTrashed()->count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -276,6 +294,7 @@ class DataMigration extends Command
 
     private function migrateClientCashout(): void
     {
+        $now = Carbon::now();
         $tableName = (new ClientCashout())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
@@ -300,16 +319,14 @@ class DataMigration extends Command
 
                 return $newRow;
             });
-            $this->info("Inserting mapped data into $tableName");
             DB::table($tableName)->insert($mappedData);
-            $this->info("End of data migrate for $tableName");
             $this->compareCounts(
                 'client_cashouts',
                 DB::connection('mainapp')->table('client_cashouts')->count(),
                 $tableName,
                 ClientCashout::withTrashed()->count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -321,24 +338,27 @@ class DataMigration extends Command
 
     private function migrateWallet(): void
     {
+        $now = Carbon::now();
         $tableName = (new Wallet())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
             $count = DB::connection('mainapp')->select('SELECT count(*) as count FROM `credits`')[0]->count;
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('mainapp')->select("SELECT * FROM `credits` LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow = [];
-                    $newRow['id'] = $row['id'];
-                    $newRow['created_at'] = $row['created_at'];
-                    $newRow['updated_at'] = $row['updated_at'];
-                    $newRow['profile_id'] = $row['client_id'];
-                    $newRow['name'] = $row['wallet'];
-                    $newRow['balance'] = $row['credit'];
-                    $newRow['is_active'] = true;
-                    return $newRow;
-                });
+                $oldData = DB::connection('mainapp')->select("SELECT 
+                    cc.id         as id,
+                    cc.created_at as created_at,
+                    cc.updated_at as updated_at,
+                    NULL          as deleted_at,
+                    cc.client_id  as profile_id,
+                    cc.wallet     as name,
+                    cc.credit     as balance,
+                    1             as is_active 
+                    FROM `credits` as cc LIMIT $this->chunkSize OFFSET $i"
+                );
+                $mappedData = [];
+                foreach ($oldData as $row) {
+                    $mappedData[] = (array)$row;
+                }
                 DB::table($tableName)->insert($mappedData);
             }
             $this->info("End of data migrate for $tableName");
@@ -349,7 +369,7 @@ class DataMigration extends Command
                 $tableName,
                 Wallet::withTrashed()->count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -361,6 +381,7 @@ class DataMigration extends Command
 
     private function migrateCreditTransaction(): void
     {
+        $now = Carbon::now();
         $tableName = (new CreditTransaction())->getTable();
         $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
         $main_db = DB::connection('mainapp')->getDatabaseName();
@@ -381,7 +402,7 @@ class DataMigration extends Command
             ct.created_at    as created_at,
             ct.updated_at    as updated_at,
             ct.client_id     as profile_id,
-            0                as wallet_id,
+            ct.credit_id     as wallet_id,
             ct.invoice_id    as invoice_id,
             ct.admin_user_id as admin_id,
             ct.amount        as amount,
@@ -389,9 +410,6 @@ class DataMigration extends Command
      from $main_db_credit_transactions as ct)";
 
             DB::connection('mysql')->select($query);
-            $this->info("End of data migrate for $tableName");
-            $this->newLine();
-            $this->info("End of data migrate for $tableName");
 
             $this->compareCounts(
                 'credit_transactions',
@@ -399,7 +417,7 @@ class DataMigration extends Command
                 $tableName,
                 CreditTransaction::withTrashed()->count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -411,6 +429,7 @@ class DataMigration extends Command
 
     private function migrateInvoice(): void
     {
+        $now = Carbon::now();
         $tableName = (new Invoice())->getTable();
         $main_invoices_table_name = DB::connection('mainapp')->getDatabaseName() . '.invoices';
         $whmcs_invoices_table_name = DB::connection('whmcs')->getDatabaseName() . '.tblinvoices';
@@ -488,7 +507,7 @@ class DataMigration extends Command
                     ]
                 ]
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -500,23 +519,28 @@ class DataMigration extends Command
 
     private function migrateItem(): void
     {
+        $now = Carbon::now();
         $tableName = (new Item())->getTable();
         $this->alert("Beginning to migrate $tableName");
         try {
             $count = DB::connection('whmcs')->select("SELECT count(*) as count FROM `tblinvoiceitems`")[0]->count;
             $progress = $this->output->createProgressBar($count);
             for ($i = 0; $i <= $count; $i += $this->chunkSize) {
-                $oldData = DB::connection('whmcs')->select("SELECT * FROM `tblinvoiceitems` LIMIT $this->chunkSize OFFSET $i");
-                $mappedData = Arr::map($oldData, function ($row) {
-                    $row = (array)$row;
-                    $newRow['id'] = $row['id'];
-                    $newRow['invoice_id'] = $row['invoiceid'];
-                    $newRow['invoiceable_id'] = $row['relid'];
-                    $newRow['invoiceable_type'] = $row['type'] ?? NULL;
-                    $newRow['amount'] = $row['amount'];
-                    $newRow['description'] = $row['description'];
-                    return $newRow;
-                });
+                $oldData = DB::connection('whmcs')->select("SELECT 
+                    it.id          as id,
+                    NOW()          as created_at,
+                    NOW()          as updated_at,
+                    invoiceid      as invoice_id,
+                    it.relid       as invoiceable_id,
+                    it.type        as invoiceable_type,
+                    it.amount      as amount,
+                    0              AS discount,
+                    it.description as description FROM `tblinvoiceitems` as it LIMIT $this->chunkSize OFFSET $i"
+                );
+                $mappedData = [];
+                foreach ($oldData as $row) {
+                    $mappedData[] = (array)$row;
+                }
                 DB::table($tableName)->insert($mappedData);
                 $progress->advance($this->chunkSize);
             }
@@ -529,6 +553,7 @@ class DataMigration extends Command
                 $tableName,
                 Item::withTrashed()->count()
             );
+            $this->calcProcessTime(__FUNCTION__, $now);
 
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -541,6 +566,7 @@ class DataMigration extends Command
 
     private function migrateOfflineTransaction(): void
     {
+        $now = Carbon::now();
         $tableName = (new OfflineTransaction())->getTable();
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_offline_payments = $main_db . '.offline_payments';
@@ -609,7 +635,7 @@ WHERE inv.client_id IS NOT NULL
                 $tableName,
                 OfflineTransaction::count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -621,6 +647,7 @@ WHERE inv.client_id IS NOT NULL
 
     private function migrateTransaction(): void
     {
+        $now = Carbon::now();
         $tableName = (new Transaction())->getTable();
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_transactions = $main_db . '.transactions';
@@ -684,7 +711,7 @@ WHERE inv.client_id IS NOT NULL
                 $tableName,
                 Transaction::count()
             );
-
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
             dump([
@@ -696,6 +723,7 @@ WHERE inv.client_id IS NOT NULL
 
     private function migrateInvoiceNumber(): void
     {
+        $now = Carbon::now();
         $tableName = (new InvoiceNumber())->getTable();
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_invoice_numbers = $main_db . '.invoice_numbers';
@@ -734,6 +762,7 @@ WHERE inv.client_id IS NOT NULL
                 $tableName,
                 InvoiceNumber::withTrashed()->count()
             );
+            $this->calcProcessTime(__FUNCTION__, $now);
 
         } catch (Exception $e) {
             $this->error("Something went wrong when migrating $tableName");
@@ -746,6 +775,7 @@ WHERE inv.client_id IS NOT NULL
 
     private function syncWallets()
     {
+        $now = Carbon::now();
         try {
             $this->alert('Sync credit transactions with wallet ids');
             DB::connection('mysql')->select('
@@ -754,6 +784,7 @@ WHERE inv.client_id IS NOT NULL
                 where ct.wallet_id = 0
             ');
             $this->info('End sync credit transactions with wallet ids');
+            $this->calcProcessTime(__FUNCTION__, $now);
         } catch (\Throwable $exception) {
             dump([
                 'error'  => substr($exception->getMessage(), 0, 500),

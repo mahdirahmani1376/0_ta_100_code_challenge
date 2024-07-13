@@ -5,10 +5,11 @@ String team="php"
 String app="finance-service"
 String deployment="finance-service"
 String fullRegistryUrl="${registryUrl}/${team}/${app}"
-String dockerfile = ".docker-compose/Dockerfile"
+String dockerfile = "./deploy/Dockerfile"
 String pipresult = "ok"
 String keypath = "./src/storage/"
 String branch = env.BRANCH_NAME
+String skipped = "false"
 
 @Library(['config', 'docker', 'deploy'])_
 
@@ -17,7 +18,7 @@ String branch = env.BRANCH_NAME
 //devsecops(DDID: "$DDId", Dockerfile: "$Dockerfile")
 
             // mattermostNotifier 
-            mattermostSend channel: 'hostiran-staging-cd', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
+            mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/svgs/logo.svg', color: "#2A42EE", message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) and RESULT was ${currentBuild.result} " , text: "BUILD WAS started "
 
 timestamps {
 node ('public') {
@@ -27,19 +28,16 @@ node ('public') {
     if(branch.matches("release")){
         environment="release"
         replicas="1"
-	dockerfile="./deploy/Dockerfile"
+	      dockerfile="./deploy/Dockerfile"
         jobs_path="../deploy/jobs.yml"
         AppDomain="finance-service.cluster.hostiran.com"
         type="ImplementationSpecific"
         prefix="/"
     }else if( branch.matches("master")) {
-        timeout(time: 1, unit: 'DAYS') {
-       //catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-       input(message: "Run ${env.JOB_NAME} on branch MASTER?", ok: 'Run', submitter: "farhad")
-       //}
-       }
        environment="master"
        replicas="2"
+       dockerfile="./deploy/Dockerfile"
+       jobs_path="../deploy/jobs.yml"
        AppDomain="finance-service-prod.cluster.hostiran.com"
        type="ImplementationSpecific"
        prefix="/"
@@ -60,7 +58,6 @@ node ('public') {
                   	}
 		  }
     }, deploy: {
-
 //    stage('Init') {
 //        // getAppconfig(String app, String env="staging", String envFileName=".env")
  //       getAppconfig("$deployment", "$environment", ".env")
@@ -71,7 +68,13 @@ node ('public') {
     }
 
     stage('deploy') {
-
+      if( branch.matches("master")) {
+          skipped="true"
+          timeout(time: 1, unit: 'DAYS') {
+          input(message: "DEPLOY ${env.JOB_NAME} on branch MASTER?", ok: 'DEPLOY', submitter: "farhad")
+          }
+          skipped = "false"
+      }
             // run Container
             runInHostGroup("kubectl-$environment-1"){
                 git branch: "$environment", credentialsId: 'Gitlab', url: "$helmRepo"
@@ -89,7 +92,7 @@ node ('public') {
              // helmDeploywithKong("$fullRegistryUrl", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas", "-f ../deploy/jobs.yml -f ../deploy/consumers.yml")
                 helmDeploywithDomain("$fullRegistryUrl-$environment", "$BUILD_NUMBER", "$app", "./", "$environment", "$AppDomain", "$prefix", "$type", "$replicas")
                 // To check rollout of new version
-                timeout(time: 1, unit: 'MINUTES') {
+                timeout(time: 3, unit: 'MINUTES') {
                          sh "kubectl rollout status -n ${app} deployment ${app}"
                  }
                 
@@ -105,18 +108,21 @@ node ('public') {
             pipresult = "FAILURE"
             throw e
     } finally {
-      if(pipresult == "FAILURE") {
-        mattermostSend channel: 'hostiran-staging-cd', color: 'danger', message: "@ali.molaie @r.bajelan Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-            
-       } 
+      if(skipped == "true" && branch.matches("master")) {
+        mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/rage.svg', color: 'warning', message: "Build SKIPPED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build SKIPPED: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+       }
+      else if(pipresult == "FAILURE") {
+        mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/rage.svg', color: 'danger', message: "@ali.molaie @r.bajelan Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Failure: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+       }
        else {
-       mattermostSend channel: 'hostiran-staging-cd', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+       mattermostSend channel: 'hostiran-staging-cd', icon: 'https://jenkins.hostiran.com/static/10fe7c12/images/svgs/logo.svg', color: 'good', message: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Link to build>)" ,text: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+
+       
 
 
       }
     }
   }
 }       
-
-
-

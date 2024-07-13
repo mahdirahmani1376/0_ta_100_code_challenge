@@ -58,7 +58,7 @@ class VerifyOfflineTransactionAction
             }
         }
 
-        if ($offlineTransaction->amount <= $invoice->balance || $invoice->is_credit) {
+        if ($invoice->is_credit) {
             ($this->verifyOfflineTransactionService)($offlineTransaction);
             ($this->verifyTransactionAction)($offlineTransaction->transaction);
         } else {
@@ -75,7 +75,13 @@ class VerifyOfflineTransactionAction
             ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $chargeWalletInvoice);
             ($this->calcInvoicePriceFieldsService)($chargeWalletInvoice);
             ($this->processInvoiceAction)($chargeWalletInvoice);
-            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $invoice->balance]);
+
+            if ($offlineTransaction->amount < $invoice->balance) {
+                $amount = $offlineTransaction->amount;
+            } else {
+                $amount = $invoice->balance;
+            }
+            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $amount]);
         }
 
 

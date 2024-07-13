@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Services\AdminChange\AdminChangeService;
-use App\Services\ChangeLogService;
 use App\Services\ClientLog\ClientLogService;
+use App\Services\GatewayLogService;
 use App\ValueObjects\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,15 +28,15 @@ class ChangeLogJob implements ShouldQueue
         private readonly string $action,
         private readonly array  $before,
         private readonly array  $after,
-        private readonly string $userType = ChangeLogService::ADMIN_TYPE,
+        private readonly string $userType = GatewayLogService::ADMIN_TYPE,
         private readonly ?Model $model = null,
     )
     {
         $this->onQueue(Queue::DEFAULT_QUEUE);
 
-        if ($userType == ChangeLogService::ADMIN_TYPE) {
+        if ($userType == GatewayLogService::ADMIN_TYPE) {
             $this->logService = App::make(AdminChangeService::class);
-        } elseif ($userType == ChangeLogService::CLIENT_TYPE) {
+        } elseif ($userType == GatewayLogService::CLIENT_TYPE) {
             $this->logService = App::make(ClientLogService::class);
         }
     }
@@ -52,6 +52,7 @@ class ChangeLogJob implements ShouldQueue
                 action: $this->action
             );
         } catch (\Throwable $exception) {
+            \Log::warning("Update change log job failed");
         }
     }
 }

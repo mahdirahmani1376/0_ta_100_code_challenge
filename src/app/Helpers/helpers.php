@@ -5,7 +5,7 @@ use App\Helpers\JalaliCalender;
 use App\Models\FinanceLog;
 use App\Models\Invoice;
 use App\Models\Transaction;
-use App\Services\ChangeLogService;
+use App\Services\GatewayLogService;
 use Illuminate\Support\Str;
 
 
@@ -179,7 +179,7 @@ if (!function_exists('callback_result_redirect_url')) {
         if (is_null($transactionStatus)) {
             $status = match ($invoiceStatus) {
                 Invoice::STATUS_CANCELED, Invoice::STATUS_DRAFT, Invoice::STATUS_DELETED => Transaction::STATUS_FAIL,
-                Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED => Transaction::STATUS_SUCCESS,
+                Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED, Invoice::STATUS_COLLECTIONS => Transaction::STATUS_SUCCESS,
             };
         } else {
             $status = $transactionStatus;
@@ -210,9 +210,9 @@ if (!function_exists('round_amount')) {
 }
 
 if (!function_exists('change_log')) {
-    function change_log(): ChangeLogService
+    function change_log(): GatewayLogService
     {
-        return app()->get(ChangeLogService::class);
+        return app()->get(GatewayLogService::class);
     }
 }
 

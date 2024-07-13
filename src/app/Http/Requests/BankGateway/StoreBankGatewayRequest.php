@@ -18,18 +18,17 @@ class StoreBankGatewayRequest extends FormRequest
         return [
             'name' => ['required', 'max:255',],
             'name_fa' => ['required', 'max:255'], // old 'label' field
-            'provider' => ['required', 'max:255',],
+            'is_direct_payment_provider' => ['nullable', 'boolean',],
             'status' => ['required', 'string', Rule::in(BankGateway::STATUSES),],
-            'order' => ['required', 'integer',],
-            'is_direct_payment_provider' => ['required', 'boolean',],
-            'merchant_id' => ['nullable', 'max:255',],
-            'request_url' => ['nullable', 'max:255',],
-            'verify_url' => ['nullable', 'max:255',],
-            'start_url' => ['nullable', 'max:255',],
-            'username' => ['nullable', 'max:50',],
-            'password' => ['nullable', 'max:50',],
-            'terminal_id' => ['nullable', 'max:255',],
-            'api_key' => ['nullable', 'max:255',],
+            'order' => ['nullable', 'integer',],
+            'config.merchant_id' => ['nullable', 'max:255',],
+            'config.request_url' => ['nullable', 'max:255',],
+            'config.verify_url' => ['nullable', 'max:255',],
+            'config.start_url' => ['nullable', 'max:255',],
+            'config.username' => ['nullable', 'max:50',],
+            'config.password' => ['nullable', 'max:50',],
+            'config.terminal_id' => ['nullable', 'max:255',],
+            'config.api_key' => ['nullable', 'max:255',],
         ];
     }
 }
