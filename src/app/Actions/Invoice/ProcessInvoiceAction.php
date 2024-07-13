@@ -61,9 +61,9 @@ class ProcessInvoiceAction
         }
 
         // Change status to paid unless it is a REFUND invoice
+        $old_status = $invoice->status;
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
-            Invoice::STATUS_COLLECTIONS,
             Invoice::STATUS_REFUNDED,
         ])) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
@@ -110,8 +110,11 @@ class ProcessInvoiceAction
             }
         }
 
-        ($this->calcInvoiceProcessedAtService)($invoice);
-        InvoiceProcessedJob::dispatch($invoice);
+
+        if ($old_status != Invoice::STATUS_COLLECTIONS) {
+            ($this->calcInvoiceProcessedAtService)($invoice);
+            InvoiceProcessedJob::dispatch($invoice);
+        }
 
         return $invoice;
     }
