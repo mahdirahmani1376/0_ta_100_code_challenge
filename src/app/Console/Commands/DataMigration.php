@@ -402,7 +402,7 @@ class DataMigration extends Command
             ct.created_at    as created_at,
             ct.updated_at    as updated_at,
             ct.client_id     as profile_id,
-            0                as wallet_id,
+            ct.credit_id     as wallet_id,
             ct.invoice_id    as invoice_id,
             ct.admin_user_id as admin_id,
             ct.amount        as amount,
