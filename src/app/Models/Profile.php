@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int id
  * @property int client_id
  * @property int rahkaran_id
+ * @property HasMany invoices
  */
 class Profile extends Model
 {
@@ -18,4 +20,9 @@ class Profile extends Model
         'created_at',
         'updated_at'
     ];
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'profile_id');
+    }
 }
