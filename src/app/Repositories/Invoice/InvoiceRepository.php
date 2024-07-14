@@ -333,4 +333,12 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->where('paid_at', '<=', $to)
             ->sum('total');
     }
+
+    public function getLatestInvoices($profileId)
+    {
+        return self::newQuery()
+            ->where('profile_id', $profileId)
+            ->whereIn('status', [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])
+            ->get();
+    }
 }

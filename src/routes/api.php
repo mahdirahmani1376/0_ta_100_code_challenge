@@ -57,6 +57,7 @@ use App\Http\Controllers\Invoice\Transaction\StoreTransactionController;
 use App\Http\Controllers\Invoice\Transaction\VerifyTransactionController;
 use App\Http\Controllers\Invoice\UpdateInvoiceController;
 use App\Http\Controllers\ListEverythingController;
+use App\Http\Controllers\Profile\GetProfileSummaryController;
 use App\Http\Controllers\Profile\ShowProfileIdController;
 use App\Http\Controllers\Tax\GetTaxExcludeController;
 use App\Http\Controllers\Wallet\CreditTransaction\BulkDeleteCreditTransactionController;
@@ -196,6 +197,7 @@ Route::namespace('Profile')
     ->prefix('profile')
     ->group(function () {
         Route::get('{clientId}', ShowProfileIdController::class);
+        Route::get('{id}/summary', GetProfileSummaryController::class);
     });
 
 Route::namespace('Tax')
