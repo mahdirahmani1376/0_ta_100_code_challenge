@@ -120,7 +120,7 @@ class MoadianFactory
                     $amount = $amount - $negativeItems;
                     $negativeItems = 0;
                 } else {
-                    $negativeItems = $negativeItems - $amount;
+                    $negativeItems -= $amount;
                     $discount = $amount;
                 }
             }
