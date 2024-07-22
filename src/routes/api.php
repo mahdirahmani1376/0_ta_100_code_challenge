@@ -32,6 +32,7 @@ use App\Http\Controllers\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Invoice\InvoiceNumber\IndexInvoiceNumberController;
 use App\Http\Controllers\Invoice\InvoiceReportController;
 use App\Http\Controllers\Invoice\Item\DeleteItemController;
+use App\Http\Controllers\Invoice\Item\IndexItemInvoiceableTypesController;
 use App\Http\Controllers\Invoice\Item\StoreItemController;
 use App\Http\Controllers\Invoice\Item\UpdateItemController;
 use App\Http\Controllers\Invoice\ManualCheckController;
@@ -209,4 +210,4 @@ Route::namespace('Tax')
 Route::get('report', FinanceServiceReportController::class);
 Route::get('hourly-report', FinanceServiceHourlyReportController::class);
 Route::get('everything', ListEverythingController::class);
-
+Route::get('item/invoiceable-types', IndexItemInvoiceableTypesController::class);

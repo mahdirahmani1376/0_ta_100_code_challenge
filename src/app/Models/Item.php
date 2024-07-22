@@ -58,6 +58,35 @@ class Item extends Model
     const TYPE_PARTNER_PAYMENT = 'PartnerPayment';
     const TYPE_AFFILIATION = 'affiliation';
 
+    public const Invoiceable_Types = [
+        self::TYPE_MASS_PAYMENT_INVOICE,
+        self::TYPE_ADD_CLIENT_CREDIT,
+        self::TYPE_ADD_CLOUD_CREDIT,
+        self::TYPE_DOMAIN_SERVICE,
+        self::TYPE_HOSTING,
+        self::TYPE_PRODUCT_SERVICE,
+        self::TYPE_ADMIN_TIME,
+        self::TYPE_CLOUD,
+        self::TYPE_CLOUD_IP,
+        self::TYPE_REFUND_DOMAIN,
+        self::TYPE_ADD_FUNDS,
+        self::TYPE_DOMAIN_ADDON_DNS,
+        self::TYPE_PROMO_DOMAIN,
+        self::TYPE_DOMAIN_TRANSFER,
+        self::TYPE_DOMAIN_ADDON_IP,
+        self::TYPE_DOMAIN_REGISTER,
+        self::TYPE_DOMAIN,
+        self::TYPE_UPGRADE,
+        self::TYPE_DOMAIN_HOSTING,
+        self::TYPE_ITEM,
+        self::TYPE_PRODUCT_SERVICE_UPGRADE,
+        self::TYPE_CHANGE_SERVICE,
+        self::TYPE_PARTNER_DISCOUNT,
+        self::TYPE_PARTNER_COMMISSION,
+        self::TYPE_PARTNER_PAYMENT,
+        self::TYPE_AFFILIATION,
+    ];
+
     protected $casts = [
         'deleted_at' => 'datetime',
         'from_date'  => 'datetime',
