@@ -57,6 +57,17 @@ class Item extends Model
     const TYPE_PARTNER_COMMISSION = 'PartnerCommission';
     const TYPE_PARTNER_PAYMENT = 'PartnerPayment';
     const TYPE_AFFILIATION = 'affiliation';
+    const TYPE_MIHAN_NIC_IR = 'MihanNicIr';
+    const TYPE_MIHAN_NIC_COM = 'MihanNicCom';
+
+    public const Invoiceable_Types = [
+        self::TYPE_DOMAIN_SERVICE,
+        self::TYPE_PRODUCT_SERVICE,
+        self::TYPE_PRODUCT_SERVICE_UPGRADE,
+        self::TYPE_CLOUD,
+        self::TYPE_MIHAN_NIC_IR,
+        self::TYPE_MIHAN_NIC_COM
+    ];
 
     protected $casts = [
         'deleted_at' => 'datetime',

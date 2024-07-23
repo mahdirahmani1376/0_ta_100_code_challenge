@@ -52,6 +52,7 @@ class ChangeLogJob implements ShouldQueue
                 action: $this->action
             );
         } catch (\Throwable $exception) {
+            \Log::warning("Update change log job failed");
         }
     }
 }

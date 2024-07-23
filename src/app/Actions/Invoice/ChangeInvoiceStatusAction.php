@@ -11,7 +11,7 @@ class ChangeInvoiceStatusAction
     public function __construct(
         private readonly ChangeInvoiceStatusService $changeInvoiceStatusService,
         private readonly CancelInvoiceAction        $cancelInvoiceAction,
-        private readonly ProcessInvoiceAction       $processInvoiceAction,
+        private readonly ProcessInvoiceAction       $processInvoiceAction
     )
     {
     }
@@ -24,15 +24,13 @@ class ChangeInvoiceStatusAction
             throw UpdateStatusUnacceptableException::make($status);
         }
 
-        $oldState = $invoice->toArray();
-
         if ($status == Invoice::STATUS_CANCELED) {
             $invoice = ($this->cancelInvoiceAction)($invoice);
         } else {
             $invoice = ($this->changeInvoiceStatusService)($invoice, $status);
         }
 
-        if (in_array($status, [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS])) {
+        if ($status == Invoice::STATUS_PAID) {
             $invoice = ($this->processInvoiceAction)($invoice);
         }
 

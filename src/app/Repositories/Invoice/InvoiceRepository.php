@@ -65,6 +65,13 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             $query->whereIn('status', $data['status']);
         }
 
+        if (!empty($data['in_status'])) {
+            if (!is_array($data['in_status'])) {
+                $data['in_status'] = Arr::wrap($data['in_status']);
+            }
+            $query->whereIn('status', $data['in_status']);
+        }
+
         if (!empty($data['invoice_date'])) {
             $query->whereDate('created_at', '=', $data['invoice_date']);
         }
@@ -325,5 +332,13 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->where('paid_at', '>=', $from)
             ->where('paid_at', '<=', $to)
             ->sum('total');
+    }
+
+    public function getLatestInvoices($profileId)
+    {
+        return self::newQuery()
+            ->where('profile_id', $profileId)
+            ->whereIn('status', [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])
+            ->get();
     }
 }

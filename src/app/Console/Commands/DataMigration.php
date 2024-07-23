@@ -402,7 +402,7 @@ class DataMigration extends Command
             ct.created_at    as created_at,
             ct.updated_at    as updated_at,
             ct.client_id     as profile_id,
-            0                as wallet_id,
+            ct.credit_id     as wallet_id,
             ct.invoice_id    as invoice_id,
             ct.admin_user_id as admin_id,
             ct.amount        as amount,
@@ -485,9 +485,9 @@ class DataMigration extends Command
                 WHEN inv.status = 6 THEN 'refunded'
                 WHEN inv.status = 7 THEN 'collections'
                 END                               as status
-     FROM $main_invoices_table_name as inv
-              LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)
-            ";
+     FROM $main_invoices_table_name as inv";
+//              LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)
+
 
             DB::connection('mysql')->select($query);
             $this->info("End of data migrate for $tableName");
@@ -699,8 +699,8 @@ SELECT trx.id             as id,
 
 FROM $main_db_transactions as trx
          LEFT JOIN $main_db_invoices as inv ON trx.invoice_id = inv.invoice_id
-WHERE inv.client_id IS NOT NULL
-";
+WHERE inv.client_id IS NOT NULL";
+
             DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
