@@ -280,6 +280,13 @@ class MoadianFactory
                     $description = 'تخصيص و مديريت دامنه بين المللي';
                 }
                 break;
+            case Item::TYPE_MIHAN_NIC_IR:
+                $code = 2330001496112; // TODO dobuble check دامنه داخلی
+                $description = 'تخصيص و مديريت دامنه هاي داخلي';
+            case Item::TYPE_MIHAN_NIC_COM:
+                $code = 2330001496266;
+                $description = 'تخصيص و مديريت دامنه بين المللي';
+
             case Item::TYPE_CLOUD:
                 $code = 2330001496273; // TODO double check
                 $description = 'ارائه زيرساخت سرورهاي ابري';
