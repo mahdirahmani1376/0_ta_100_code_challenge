@@ -57,6 +57,8 @@ class Item extends Model
     const TYPE_PARTNER_COMMISSION = 'PartnerCommission';
     const TYPE_PARTNER_PAYMENT = 'PartnerPayment';
     const TYPE_AFFILIATION = 'affiliation';
+    const TYPE_MIHAN_NIC_IR = 'MihanNicIr';
+    const TYPE_MIHAN_NIC_COM = 'MihanNicCom';
 
     protected $casts = [
         'deleted_at' => 'datetime',
