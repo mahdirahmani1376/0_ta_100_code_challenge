@@ -21,6 +21,9 @@ class StoreInvoiceService
         if ($data['status'] == Invoice::STATUS_REFUNDED && empty($data['paid_at'])) {
             $data['paid_at'] = $data['created_at'];
         }
+        if (!empty($data['manual'])){
+            $data['processed_at'] = now();
+        }
 
 
         return $this->invoiceRepository->create($data);
