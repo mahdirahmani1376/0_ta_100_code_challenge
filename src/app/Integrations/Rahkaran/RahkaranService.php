@@ -545,23 +545,13 @@ class RahkaranService
 
             $items = $invoice->items;
 
-            $negativeAmount = $items->where('amount', '<', 0)->sum('amount');
-
             // Voucher items base on invoice items
             foreach ($items as $item) {
 
                 if ($item->amount < 0) {
+                    $voucher_item = $this->addDiscountVoucherItem($item, $is_refund);
+                    $voucher->addVoucherItem($voucher_item);
                     continue;
-                }
-
-                if ($negativeAmount && $negativeAmount != 0) {
-                    if ($item->amount > abs($negativeAmount)) {
-                        $item->amount = $item->amount - abs($negativeAmount);
-                        $negativeAmount = 0;
-                    } else {
-                        $negativeAmount = -1 * (abs($negativeAmount) - $item->amount);
-                        continue;
-                    }
                 }
 
                 $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
@@ -2372,5 +2362,65 @@ class RahkaranService
         } else {
             return $dl_object;
         }
+    }
+
+    private function addDiscountVoucherItem(mixed $item, bool $is_refund) : VoucherItem
+    {
+        $voucher_item = new VoucherItem();
+
+        $level_4 = null;
+        $level_5 = null;
+        $level_6 = null;
+
+        switch ($item->invoiceable_type) {
+            case Item::TYPE_HOSTING:
+            case Item::TYPE_PRODUCT_SERVICE:
+            case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
+                $service = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id);
+                $level_6 = $this->getTotalDL6Code('product', $service['product']);
+                $level_5 = $this->getTotalDL5Code('product', $service['product']);
+                $level_4 = $this->getTotalDL4Code('product', $service['product']['product_group']);
+                break;
+            case Item::TYPE_DOMAIN_SERVICE:
+                // Todo: Load domain tld to find region
+                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
+                $level_6 = $this->getTotalDL6Code('domain', null, $domain);
+                $level_5 = $this->getTotalDL5Code('domain', null, $domain);
+                $level_4 = $this->getTotalDL4Code('domain');
+                break;
+            case Item::TYPE_ADMIN_TIME:
+                $level_6 = $this->getTotalDL6Code('adminTime');
+                $level_5 = $this->getTotalDL5Code('adminTime');
+                $level_4 = $this->getTotalDL4Code('adminTime');
+                break;
+            case Item::TYPE_CLOUD :
+                $level_6 = $this->getTotalDL6Code('cloud');
+                $level_5 = $this->getTotalDL5Code('cloud');
+                $level_4 = $this->getTotalDL4Code('cloud');
+                break;
+            default:
+                $level_6 = $this->getTotalDL6Code('global');
+                $level_5 = $this->getTotalDL5Code('global');
+                $level_4 = $this->getTotalDL4Code('global');
+                break;
+        }
+
+        if ($level_4 && $level_5 && $level_6) {
+            $voucher_item->DL4 = $level_4->Code;
+            $voucher_item->DL5 = $level_5->Code;
+            $voucher_item->DL6 = $level_6->Code;
+            $voucher_item->DLLevel4Title = $level_4->Title;
+            $voucher_item->DLLevel5Title = $level_5->Title;
+            $voucher_item->DLLevel6Title = $level_6->Title;
+        } else {
+            $voucher_item->DL4 = $is_refund ? $this->config->refundDl4Code : $this->config->generalDl4Code;
+            $voucher_item->DL5 = $this->config->generalDl5Code;
+            $voucher_item->DL6 = $this->config->generalDl6Code;
+        }
+
+        $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
+        $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
+
+        return $voucher_item;
     }
 }
