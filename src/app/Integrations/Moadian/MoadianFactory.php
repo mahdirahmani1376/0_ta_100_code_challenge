@@ -118,7 +118,6 @@ class MoadianFactory
                     $negativeItems = 0;
                 } else {
                     $negativeItems = $negativeItems - $amount;
-                    continue;
                 }
             }
 
