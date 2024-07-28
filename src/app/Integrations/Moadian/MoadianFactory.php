@@ -73,8 +73,11 @@ class MoadianFactory
             $itemSum += floor($item->amount);
         }
 
+        // sum price before discount
         $header->tprdis = floor($itemSum);
+        // sum discounts
         $header->tdis = 0;
+        // sum price after discount
         $header->tadis = floor($itemSum);
         $header->tvam = $tax;
         $header->todam = 0;
@@ -107,7 +110,7 @@ class MoadianFactory
         foreach ($positiveItems->all() as $item) {
 
             $amount = $item->amount;
-
+            $amountBeforeDiscount = $item->amount;
 
             if ($negativeItems && $negativeItems > 0) {
 
@@ -133,8 +136,11 @@ class MoadianFactory
             $body->am = '1';
             $body->mu = 1627;
             $body->fee = floor($amount);
-            $body->prdis = floor($amount);
-            $body->dis = 0;
+            // sum price before discount
+            $body->prdis = floor($amountBeforeDiscount);
+            // discount
+            $body->dis = $negativeItems;
+            // price after discount
             $body->adis = floor($amount);
             $body->vra = 9;
             //$body->vam = round(config('payment.tax.total') * $item->amount / 100); // or directly calculate here like floor($body->adis * $body->vra / 100)
