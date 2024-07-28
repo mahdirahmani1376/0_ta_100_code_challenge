@@ -110,7 +110,6 @@ class MoadianFactory
         foreach ($positiveItems->all() as $item) {
 
             $amount = $item->amount;
-            $amountBeforeDiscount = $item->amount;
 
             if ($negativeItems && $negativeItems > 0) {
 
@@ -137,7 +136,7 @@ class MoadianFactory
             $body->mu = 1627;
             $body->fee = floor($amount);
             // sum price before discount
-            $body->prdis = floor($amountBeforeDiscount);
+            $body->prdis = floor($item->amount);
             // discount
             $body->dis = $negativeItems;
             // price after discount
