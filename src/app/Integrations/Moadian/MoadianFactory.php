@@ -82,7 +82,7 @@ class MoadianFactory
         $header->tdis = $negativeItems;
 
         // sum price after discount
-        $header->tadis = floor($itemSum);
+        $header->tadis = floor($itemSum) - $negativeItems;
 
 
         $header->tvam = $tax;
