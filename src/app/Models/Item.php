@@ -65,6 +65,8 @@ class Item extends Model
         self::TYPE_PRODUCT_SERVICE,
         self::TYPE_PRODUCT_SERVICE_UPGRADE,
         self::TYPE_CLOUD,
+        self::TYPE_MIHAN_NIC_IR,
+        self::TYPE_MIHAN_NIC_COM
     ];
 
     protected $casts = [

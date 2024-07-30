@@ -699,8 +699,8 @@ SELECT trx.id             as id,
 
 FROM $main_db_transactions as trx
          LEFT JOIN $main_db_invoices as inv ON trx.invoice_id = inv.invoice_id
-WHERE inv.client_id IS NOT NULL
-";
+WHERE inv.client_id IS NOT NULL";
+
             DB::connection('mysql')->select($query);
             $this->newLine();
             $this->info("End of data migrate for $tableName");
