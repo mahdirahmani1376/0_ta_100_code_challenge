@@ -72,13 +72,19 @@ class MoadianFactory
             $tax += floor(floor($item->amount) * 9 / 100);
             $itemSum += floor($item->amount);
         }
+        
+        $negativeItems = abs($invoice->items->where('amount', '<', 0)->sum('amount'));
 
         // sum price before discount
         $header->tprdis = floor($itemSum);
+
         // sum discounts
-        $header->tdis = 0;
+        $header->tdis = $negativeItems;
+
         // sum price after discount
         $header->tadis = floor($itemSum);
+
+
         $header->tvam = $tax;
         $header->todam = 0;
         $header->tbill = floor($tax) + floor($itemSum);
@@ -111,13 +117,16 @@ class MoadianFactory
 
             $amount = $item->amount;
 
+            $discount = 0;
             if ($negativeItems && $negativeItems > 0) {
 
                 if ($amount > $negativeItems) {
+                    $discount = $negativeItems;
                     $amount = $amount - $negativeItems;
                     $negativeItems = 0;
                 } else {
-                    $negativeItems = $negativeItems - $amount;
+                    $negativeItems -= $amount;
+                    $discount = $amount;
                 }
             }
 
