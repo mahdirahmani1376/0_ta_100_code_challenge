@@ -146,7 +146,7 @@ class MoadianFactory
             // sum price before discount
             $body->prdis = floor($item->amount);
             // discount
-            $body->dis = $negativeItems;
+            $body->dis = $discount;
             // price after discount
             $body->adis = floor($amount);
             $body->vra = 9;
