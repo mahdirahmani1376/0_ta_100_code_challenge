@@ -485,8 +485,8 @@ class DataMigration extends Command
                 WHEN inv.status = 6 THEN 'refunded'
                 WHEN inv.status = 7 THEN 'collections'
                 END                               as status
-     FROM $main_invoices_table_name as inv";
-//              LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)
+            FROM $main_invoices_table_name as inv
+              LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)";
 
 
             DB::connection('mysql')->select($query);
