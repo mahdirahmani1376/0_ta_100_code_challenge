@@ -1900,7 +1900,7 @@ class RahkaranService
      * @param $headers
      * @return AbstractBaseLog
      */
-    private function createRequestLog($method, $url, $requestBody, $headers): AbstractBaseLog
+    private function createRequestLog($method, $url, $requestBody, $headers)
     {
         $requestBody = $requestBody && is_string($requestBody) && is_json($requestBody) ? json_decode($requestBody, true) : $requestBody;
 
