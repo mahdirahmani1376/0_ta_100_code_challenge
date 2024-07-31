@@ -403,8 +403,12 @@ class DataMigration extends Command
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_credit_transactions = $main_db . '.credit_transactions';
         $this->alert("Beginning to migrate $tableName");
+        $total = DB::connection('mainapp')->table('credit_transactions')->count();
+        $chunkSize = 10_000; // Define your chunk size here
         try {
-            $query = "INSERT INTO $fulTableName
+            $progress = $this->output->createProgressBar($total);
+            for ($offset = 0; $offset < $total; $offset += $chunkSize) {
+                $query = "INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -423,9 +427,12 @@ class DataMigration extends Command
             ct.admin_user_id as admin_id,
             ct.amount        as amount,
             ct.description   as description
-     from $main_db_credit_transactions as ct)";
+     from $main_db_credit_transactions as ct LIMIT $chunkSize OFFSET $offset)";
 
-            DB::connection('mysql')->select($query);
+                DB::connection('mysql')->select($query);
+                $progress->advance($chunkSize);
+            }
+            $this->newLine();
 
             $this->compareCounts(
                 'credit_transactions',
