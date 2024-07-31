@@ -289,6 +289,7 @@ return [
         "bandwidth_plan_id" => "پلن پهنای باند",
         "campaign" => "کمپین",
         "delay" => "تاریخ اجرا",
+        "client_bank_account_id" => "شماره حساب بانکی ",
     ],
     'username' => ':attribute باید معتبر باشد',
     'ir_mobile' => ':attribute باید یک شماره تلفن همراه معتبر باشد',
