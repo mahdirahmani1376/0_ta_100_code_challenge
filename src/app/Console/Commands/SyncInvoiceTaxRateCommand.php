@@ -27,7 +27,7 @@ class SyncInvoiceTaxRateCommand extends Command
                     $finance_invoices = DB::connection('mysql')->table('invoices')
                         ->whereIn('id', $whmcs_invoices->pluck('id'))
                         ->update([
-                            'tax_rate' => $rate
+                            'tax_rate' => is_numeric($rate) ? $rate : 0
                         ]);
 
                     $this->info("Update {$finance_invoices} rows successfully tax rate to => $rate");
