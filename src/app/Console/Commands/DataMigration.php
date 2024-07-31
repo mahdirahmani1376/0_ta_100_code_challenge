@@ -48,7 +48,6 @@ class DataMigration extends Command
             self::migrateBankGateway();
             self::migrateClientBankAccount();
             self::migrateClientCashout();
-            self::syncInvoiceTaxRates();
         }
 
         if ($action == 'Invoice') {
@@ -57,6 +56,7 @@ class DataMigration extends Command
             self::migrateTransaction();
             self::migrateOfflineTransaction();
             self::migrateInvoiceNumber();
+            self::syncInvoiceTaxRates();
         }
 
         if ($action == 'Wallet') {
