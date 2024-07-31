@@ -7,7 +7,6 @@ use App\Exceptions\SystemException\MinDateIsOutOfRangeFiscalYearException;
 use App\Helpers\JalaliCalender;
 use App\Integrations\Rahkaran\RahkaranService;
 use App\Models\ClientCashout;
-use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
@@ -107,7 +106,6 @@ class ImportInvoicesToRahkaranCommand extends Command
             } catch (Throwable $exception) {
                 $errors++;
                 $this->error($exception->getMessage());
-                $this->logError('transactions', $index, $transaction->id, $exception->getMessage());
                 Log::error("ImportInvoicesToRahkaranCommand Transaction #{$transaction->id} failed, {$exception->getMessage()}");
             }
 
