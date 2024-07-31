@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class DataMigration extends Command
@@ -34,20 +35,35 @@ class DataMigration extends Command
         $this->info("#### START DATA MIGRATION ####");
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
-        self::migrateProfiles();
-//        self::updateMainAppClients();
-        self::migrateBankAccount();
-        self::migrateBankGateway();
-        self::migrateWallet();
-        self::migrateInvoice();
-        self::migrateClientBankAccount();
-        self::migrateClientCashout();
-        self::migrateCreditTransaction();
-        self::migrateItem();
-        self::migrateTransaction();
-        self::migrateOfflineTransaction();
-        self::migrateInvoiceNumber();
-//        self::syncWallets();
+        $action = $this->choice('Which command to execute?', [
+            'General',
+            'Invoice',
+            'Wallet'
+        ]);
+
+        if ($action == 'General') {
+//            self::updateMainAppClients();
+            self::migrateProfiles();
+            self::migrateBankAccount();
+            self::migrateBankGateway();
+            self::migrateClientBankAccount();
+            self::migrateClientCashout();
+            self::syncInvoiceTaxRates();
+        }
+
+        if ($action == 'Invoice') {
+            self::migrateInvoice();
+            self::migrateItem();
+            self::migrateTransaction();
+            self::migrateOfflineTransaction();
+            self::migrateInvoiceNumber();
+        }
+
+        if ($action == 'Wallet') {
+            self::migrateWallet();
+            self::migrateCreditTransaction();
+        }
+
         $process_time = Carbon::now()->diffInSeconds($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} seconds");
     }
@@ -798,5 +814,29 @@ WHERE inv.client_id IS NOT NULL";
         $this->table(["main_app:$mainAppTableName", "finance:$financeTableName"], [
             [$mainAppCount, $financeCount]
         ]);
+    }
+
+    private function syncInvoiceTaxRates()
+    {
+        $whmcs_tax_rates = [
+            3, 9, 4, 5, 0, 6, 10, ""
+        ];
+
+        foreach ($whmcs_tax_rates as $rate) {
+            $this->info('Start invoices with tax : ' . $rate);
+            $invoices = DB::connection('whmcs')->table('tblinvoices')
+                ->select(['id', 'taxrate'])->where('taxrate', 3)
+                ->orderBy('id')
+                ->chunk(10000, function (Collection $whmcs_invoices) use ($rate) {
+                    $finance_invoices = DB::connection('mysql')->table('invoices')
+                        ->whereIn('id', $whmcs_invoices->pluck('id'))
+                        ->update([
+                            'tax_rate' => is_numeric($rate) ? $rate : 0
+                        ]);
+
+                    $this->info("Update {$finance_invoices} rows successfully tax rate to => $rate");
+                });
+
+        }
     }
 }
