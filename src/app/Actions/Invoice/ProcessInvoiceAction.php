@@ -47,9 +47,9 @@ class ProcessInvoiceAction
         }
         // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
         // so we only change its status to paid and nothing else, this is done in another service
-        /*if (!is_null($invoice->processed_at)) {
+        if ($invoice->processed_at) {
             return $invoice;
-        }*/
+        }
         // Normal Invoices must have zero balance to be processed
         if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
             return $invoice;

@@ -470,7 +470,7 @@ class DataMigration extends Command
             inv.balance                           as balance,
             inv.total                             as total,
             inv.sub_total                         as sub_total,
-            IF(winv.taxrate > 0, winv.taxrate, 0) as tax_rate,
+            10 as tax_rate,
             inv.tax1 + inv.tax2                   as tax,
             inv.is_mass_payment                   as is_mass_payment,
             IF(inv.manual_check = TRUE, 1, NULL)  as admin_id,
@@ -485,9 +485,7 @@ class DataMigration extends Command
                 WHEN inv.status = 6 THEN 'refunded'
                 WHEN inv.status = 7 THEN 'collections'
                 END                               as status
-            FROM $main_invoices_table_name as inv
-              LEFT JOIN $whmcs_invoices_table_name as winv on winv.id = inv.invoice_id)";
-
+            FROM $main_invoices_table_name as inv)";
 
             DB::connection('mysql')->select($query);
             $this->info("End of data migrate for $tableName");
