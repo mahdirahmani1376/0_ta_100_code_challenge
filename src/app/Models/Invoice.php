@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Integrations\Rahkaran\ValueObjects\Client;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -100,6 +101,8 @@ class Invoice extends Model
     ];
 
     protected $casts = [
+        'created_at'   => 'datetime',
+        'updated_at'   => 'datetime',
         'due_date'     => 'datetime',
         'paid_at'      => 'datetime',
         'processed_at' => 'datetime',
@@ -120,14 +123,17 @@ class Invoice extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
     public function moadianLog(): HasOne
     {
         return $this->hasOne(MoadianLog::class, 'invoice_id', 'id');
     }
+
     public function profile(): BelongsTo
     {
         return $this->belongsTo(Profile::class);
     }
+
     public function offlineTransactions(): HasMany
     {
         return $this->hasMany(OfflineTransaction::class);
@@ -175,6 +181,11 @@ class Invoice extends Model
         }
 
         return $status;
+    }
+
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
 }
