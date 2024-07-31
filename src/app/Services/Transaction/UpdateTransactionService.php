@@ -17,6 +17,7 @@ class UpdateTransactionService
             'tracking_code',
             'status',
             'reference_id',
+	    'callback_url'
         ]);
     }
 }
