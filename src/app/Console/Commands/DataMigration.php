@@ -10,6 +10,7 @@ use App\Models\CreditTransaction;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Models\Item;
+use App\Models\MoadianLog;
 use App\Models\OfflineTransaction;
 use App\Models\Profile;
 use App\Models\Transaction;
@@ -43,11 +44,12 @@ class DataMigration extends Command
 
         if ($action == 'General') {
 //            self::updateMainAppClients();
-            self::migrateProfiles();
-            self::migrateBankAccount();
-            self::migrateBankGateway();
-            self::migrateClientBankAccount();
-            self::migrateClientCashout();
+//            self::migrateProfiles();
+//            self::migrateBankAccount();
+//            self::migrateBankGateway();
+//            self::migrateClientBankAccount();
+//            self::migrateClientCashout();
+            self::migrateMoadianLog();
         }
 
         if ($action == 'Invoice') {
@@ -844,6 +846,55 @@ WHERE inv.client_id IS NOT NULL";
                     $this->info("Update {$finance_invoices} rows successfully tax rate to => $rate");
                 });
 
+        }
+    }
+
+    private function migrateMoadianLog()
+    {
+        $now = Carbon::now();
+        $tableName = (new MoadianLog())->getTable();
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_moadian = $main_db . '.moadian_logs';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
+        $this->alert("Beginning to migrate $tableName");
+        try {
+
+            $query = "INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ invoice_id,
+ status,
+ reference_code,
+ tax_id,
+ error)
+SELECT id,
+       created_at,
+       updated_at,
+       invoice_id,
+       status,
+       reference_code,
+       tax_id,
+       error
+from $main_db_moadian as ml";
+            DB::connection('mysql')->select($query);
+            $this->newLine();
+            $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'moadian_logs',
+                DB::connection('mainapp')->table('moadian_logs')->count(),
+                $tableName,
+                MoadianLog::count()
+            );
+            $this->calcProcessTime(__FUNCTION__, $now);
+
+        } catch (Exception $e) {
+            $this->error("Something went wrong when migrating $tableName");
+            dump([
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
         }
     }
 }
