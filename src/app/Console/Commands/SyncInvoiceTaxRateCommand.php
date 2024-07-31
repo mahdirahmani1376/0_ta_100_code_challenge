@@ -30,7 +30,7 @@ class SyncInvoiceTaxRateCommand extends Command
                             'tax_rate' => $rate
                         ]);
 
-                    $this->info("Update {$finance_invoices} rows successfully");
+                    $this->info("Update {$finance_invoices} rows successfully tax rate to => $rate");
                 });
 
         }
