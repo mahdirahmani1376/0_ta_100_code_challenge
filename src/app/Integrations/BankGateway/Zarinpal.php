@@ -30,9 +30,9 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['request_url'], [
                 'merchant_id'  => $this->bankGateway->config['merchant_id'],
-                'amount'       => $transaction->amount,
+                'amount'       => (int)($transaction->amount / 10) * 10,
                 'callback_url' => $callbackUrl,
-                'description'  => 'description', // TODO change this if needed
+                'description'  => "Invoice ID {$transaction->invoice_id}",
             ]);
 
         if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
@@ -47,10 +47,17 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
-        if ($data['status'] == 'NOK') {
+        $this->callbackLog($transaction, $data);
+
+        $status = $data['status'] ?? null;
+        $authority = $data['Authority'] ?? null;
+        $amount = $data['amount'] ?? null;
+
+        if ($status == 'NOK') {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
-        if ($data['Authority'] != $transaction->tracking_code || $data['amount'] != $transaction->amount) {
+
+        if ($authority != $transaction->tracking_code || $amount != $transaction->amount) {
             ($this->updateTransactionService)($transaction, [
                 'status' => Transaction::STATUS_FRAUD,
             ]);

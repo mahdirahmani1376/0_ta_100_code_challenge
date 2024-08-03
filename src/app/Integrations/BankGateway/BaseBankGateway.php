@@ -4,6 +4,7 @@ namespace App\Integrations\BankGateway;
 
 use App\Models\Invoice;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BaseBankGateway
@@ -20,5 +21,13 @@ class BaseBankGateway
             invoiceId: $transaction->invoice->id,
             transactionStatus: $transaction->status
         );
+    }
+
+    protected function callbackLog(Transaction $transaction, $data): void
+    {
+        Log::info(__CLASS__ . ' callback from gateway result.', [
+            'transaction' => $transaction->toArray(),
+            'data'        => $data
+        ]);
     }
 }

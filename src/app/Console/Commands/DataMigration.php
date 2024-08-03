@@ -10,6 +10,7 @@ use App\Models\CreditTransaction;
 use App\Models\Invoice;
 use App\Models\InvoiceNumber;
 use App\Models\Item;
+use App\Models\MoadianLog;
 use App\Models\OfflineTransaction;
 use App\Models\Profile;
 use App\Models\Transaction;
@@ -18,6 +19,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class DataMigration extends Command
@@ -34,20 +36,36 @@ class DataMigration extends Command
         $this->info("#### START DATA MIGRATION ####");
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         $start_time = Carbon::now();
-        self::migrateProfiles();
-//        self::updateMainAppClients();
-        self::migrateBankAccount();
-        self::migrateBankGateway();
-        self::migrateWallet();
-        self::migrateInvoice();
-        self::migrateClientBankAccount();
-        self::migrateClientCashout();
-        self::migrateCreditTransaction();
-        self::migrateItem();
-        self::migrateTransaction();
-        self::migrateOfflineTransaction();
-        self::migrateInvoiceNumber();
-//        self::syncWallets();
+        $action = $this->choice('Which command to execute?', [
+            'General',
+            'Invoice',
+            'Wallet'
+        ]);
+
+        if ($action == 'General') {
+//            self::updateMainAppClients();
+//            self::migrateProfiles();
+//            self::migrateBankAccount();
+//            self::migrateBankGateway();
+//            self::migrateClientBankAccount();
+//            self::migrateClientCashout();
+            self::migrateMoadianLog();
+        }
+
+        if ($action == 'Invoice') {
+            self::migrateInvoice();
+            self::migrateItem();
+            self::migrateTransaction();
+            self::migrateOfflineTransaction();
+            self::migrateInvoiceNumber();
+            self::syncInvoiceTaxRates();
+        }
+
+        if ($action == 'Wallet') {
+            self::migrateWallet();
+            self::migrateCreditTransaction();
+        }
+
         $process_time = Carbon::now()->diffInSeconds($start_time);
         $this->info("#### END DATA MIGRATION in {$process_time} seconds");
     }
@@ -387,8 +405,12 @@ class DataMigration extends Command
         $main_db = DB::connection('mainapp')->getDatabaseName();
         $main_db_credit_transactions = $main_db . '.credit_transactions';
         $this->alert("Beginning to migrate $tableName");
+        $total = DB::connection('mainapp')->table('credit_transactions')->count();
+        $chunkSize = 10_000; // Define your chunk size here
         try {
-            $query = "INSERT INTO $fulTableName
+            $progress = $this->output->createProgressBar($total);
+            for ($offset = 0; $offset < $total; $offset += $chunkSize) {
+                $query = "INSERT INTO $fulTableName
 (id,
  created_at,
  updated_at,
@@ -407,9 +429,12 @@ class DataMigration extends Command
             ct.admin_user_id as admin_id,
             ct.amount        as amount,
             ct.description   as description
-     from $main_db_credit_transactions as ct)";
+     from $main_db_credit_transactions as ct LIMIT $chunkSize OFFSET $offset)";
 
-            DB::connection('mysql')->select($query);
+                DB::connection('mysql')->select($query);
+                $progress->advance($chunkSize);
+            }
+            $this->newLine();
 
             $this->compareCounts(
                 'credit_transactions',
@@ -798,5 +823,78 @@ WHERE inv.client_id IS NOT NULL";
         $this->table(["main_app:$mainAppTableName", "finance:$financeTableName"], [
             [$mainAppCount, $financeCount]
         ]);
+    }
+
+    private function syncInvoiceTaxRates()
+    {
+        $whmcs_tax_rates = [
+            3, 9, 4, 5, 0, 6, 10, ""
+        ];
+
+        foreach ($whmcs_tax_rates as $rate) {
+            $this->info('Start invoices with tax : ' . $rate);
+            $invoices = DB::connection('whmcs')->table('tblinvoices')
+                ->select(['id', 'taxrate'])->where('taxrate', 3)
+                ->orderBy('id')
+                ->chunk(10000, function (Collection $whmcs_invoices) use ($rate) {
+                    $finance_invoices = DB::connection('mysql')->table('invoices')
+                        ->whereIn('id', $whmcs_invoices->pluck('id'))
+                        ->update([
+                            'tax_rate' => is_numeric($rate) ? $rate : 0
+                        ]);
+
+                    $this->info("Update {$finance_invoices} rows successfully tax rate to => $rate");
+                });
+
+        }
+    }
+
+    private function migrateMoadianLog()
+    {
+        $now = Carbon::now();
+        $tableName = (new MoadianLog())->getTable();
+        $main_db = DB::connection('mainapp')->getDatabaseName();
+        $main_db_moadian = $main_db . '.moadian_logs';
+        $fulTableName = DB::connection('mysql')->getDatabaseName() . '.' . $tableName;
+        $this->alert("Beginning to migrate $tableName");
+        try {
+
+            $query = "INSERT INTO $tableName
+(id,
+ created_at,
+ updated_at,
+ invoice_id,
+ status,
+ reference_code,
+ tax_id,
+ error)
+SELECT id,
+       created_at,
+       updated_at,
+       invoice_id,
+       status,
+       reference_code,
+       tax_id,
+       error
+from $main_db_moadian as ml";
+            DB::connection('mysql')->select($query);
+            $this->newLine();
+            $this->info("End of data migrate for $tableName");
+
+            $this->compareCounts(
+                'moadian_logs',
+                DB::connection('mainapp')->table('moadian_logs')->count(),
+                $tableName,
+                MoadianLog::count()
+            );
+            $this->calcProcessTime(__FUNCTION__, $now);
+
+        } catch (Exception $e) {
+            $this->error("Something went wrong when migrating $tableName");
+            dump([
+                'error'  => substr($e->getMessage(), 0, 500),
+                'method' => __FUNCTION__
+            ]);
+        }
     }
 }

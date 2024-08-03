@@ -49,17 +49,17 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
-        if ($data['state'] != 'OK') {
+        $this->callbackLog($transaction, $data);
+        $state = $data['State'] ?? null;
+        $successful = $state == 'OK';
+        if (!$successful) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $token = data_get($data, 'token');
-        if ($data['ResNum'] != $transaction->getKey() || $token != $transaction->tracking_code) {
-            Log::error('transaction possible fraud', [
-                'gateway'     => 'saman',
-                'transaction' => $transaction,
-                'data'        => $data
-            ]);
+        $token = data_get($data, 'Token');
+        $resNumber = $data['ResNum'] ?? null;
+        if ($resNumber != $transaction->getKey() || $token != $transaction->tracking_code) {
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
         }
 
         $response = Http::withHeader('Accept', 'application/json')
@@ -72,11 +72,7 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
         $amount = $response->json('TransactionDetail.OrginalAmount');
 
         if ($amount != $transaction->amount) {
-            Log::error('transaction possible fraud', [
-                'gateway'     => 'sadad',
-                'transaction' => $transaction,
-                'data'        => $amount
-            ]);
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
         }
 
 

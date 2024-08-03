@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create('moadian_logs', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->softDeletes();
             $table->unsignedBigInteger('invoice_id');
             $table->string('status')->default(MoadianLog::STATUS_INIT);
             $table->text('reference_code')->nullable();

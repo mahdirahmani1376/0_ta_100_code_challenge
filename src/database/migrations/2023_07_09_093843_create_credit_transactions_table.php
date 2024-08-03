@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedBigInteger('profile_id');
-            $table->unsignedBigInteger('wallet_id');
+            $table->unsignedBigInteger('wallet_id')->nullable();
             $table->unsignedBigInteger('invoice_id')->nullable();
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->double('amount')->comment('can be negative');

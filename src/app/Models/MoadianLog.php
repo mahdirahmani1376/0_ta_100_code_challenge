@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class MoadianLog extends Model
 {
+    use SoftDeletes;
     public const STATUS_INIT = 'init';
     public const STATUS_PENDING = 'pending';
     public const STATUS_SUCCESS = 'success';
