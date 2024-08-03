@@ -49,16 +49,16 @@ class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
-        if ($data['ResCode'] != 0) {
+        $this->callbackLog($transaction, $data);
+        $resCode = $data['ResCode'] ?? null;
+        $orderId = $data['OrderId'] ?? null;
+        $token = $data['Token'] ?? null;
+        if ($resCode != 0 || $orderId != $transaction->getKey()) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        if ($data['Token'] != $transaction->tracking_code) {
-            Log::error('transaction possible fraud', [
-                'gateway'     => 'sadad',
-                'transaction' => $transaction,
-                'data'        => $data
-            ]);
+        if ($token != $transaction->tracking_code) {
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
         }
 
         $response = Http::withHeader('Content-Type', 'application/json')
@@ -67,22 +67,19 @@ class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
                 'SignData' => $this->encrypt($transaction->tracking_code, $this->bankGateway->config['api_key']),
             ]);
 
-        if (!$response->json('ResCode') != 0) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Sadad verify ResCode: ' . $response->json('ResCode'));
+        Log::info('Sadad verify result', ['result' => $response->json()]);
+
+        if (!$response->json('content.ResCode') != 0) {
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        if ($response->json('Amount') != $transaction->amount) {
-            Log::error('transaction possible fraud', [
-                'gateway'     => 'sadad',
-                'transaction' => $transaction,
-                'data'        => $response
-            ]);
-        }
+        /*if ($response->json('Amount') != $transaction->amount) {
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
+        }*/
 
         return ($this->updateTransactionService)($transaction, [
             'status'       => Transaction::STATUS_SUCCESS,
-            'reference_id' => $response->json('RetrivalRefNo'),
+            'reference_id' => $response->json('content.RetrivalRefNo'),
         ]);
     }
 
