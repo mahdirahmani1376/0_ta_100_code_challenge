@@ -54,6 +54,8 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
+        $this->callbackLog($transaction, $data);
+
         $transactionResultResponse = Http::withHeader('Content-Type', 'application/json')
             ->withHeader('usr', $this->bankGateway->config['username'])
             ->withHeader('pwd', $this->bankGateway->config['password'])
