@@ -23,5 +23,6 @@ return [
     ExceptionCodes::INVOICE_STATUS_UNACCEPTABLE                   => 'وضعیت صورتحساب نمیتواند :status باشد.',
     ExceptionCodes::INVOICE_STATUS_MUST_BE_UNPAID                 => 'وضعیت صورتحساب معتبر نمیباشد.',
     ExceptionCodes::MAKE_BANK_GATEWAY_FAILED                      => 'درگاه :name پیدا نشد.',
-    ExceptionCodes::NOT_ENOUGH_CREDIT                             => 'اعتبار شما کافی نیست.'
+    ExceptionCodes::NOT_ENOUGH_CREDIT                             => 'اعتبار شما کافی نیست.',
+    ExceptionCodes::USER_NOT_FOUND_EXCEPTION                      => 'این کاربر یافت نشد.',
 ];

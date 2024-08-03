@@ -6,6 +6,7 @@ use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\Http\FatalErrorException;
 use App\Exceptions\Repository\ModelNotFoundException;
 use App\Exceptions\SystemException\MainAppInternalAPIException;
+use App\Exceptions\SystemException\UserNotFoundOnMainAppException;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\MainApp\MainAppConfig;
 use App\Integrations\Rahkaran\ValueObjects\Client;
@@ -540,7 +541,10 @@ class RahkaranService
         foreach ($processInvoices as $invoice) {
 
             $is_refund = $invoice->status == Invoice::STATUS_REFUNDED;
-            $invoice->client = MainAppAPIService::getClients($invoice->profile->client_id)[0];
+            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile->client_id),0);
+            if (empty($invoice->client)){
+                throw UserNotFoundOnMainAppException::make($invoice->id);
+            }
             $client_dl_code = $this->getClientDl($invoice->client)->Code;
 
             $items = $invoice->items;
