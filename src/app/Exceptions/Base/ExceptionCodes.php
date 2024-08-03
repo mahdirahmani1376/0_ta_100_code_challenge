@@ -30,4 +30,6 @@ final class ExceptionCodes
     public const MAKE_BANK_GATEWAY_FAILED = '410087';
     public const APPLY_CREDIT_TO_CREDIT_INVOICE_NOT_ALLOWED = '410088';
     public const NOT_ENOUGH_CREDIT = '410089';
+    public const USER_NOT_FOUND_EXCEPTION = '410092';
+
 }

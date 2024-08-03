@@ -4,7 +4,6 @@ namespace App\Integrations\Moadian;
 
 use App\Models\Invoice;
 use App\Models\MoadianLog;
-use Illuminate\Support\Facades\Response;
 use Jooyeshgar\Moadian\Facades\Moadian;
 use Jooyeshgar\Moadian\Invoice as MoadianInvoice;
 
@@ -21,13 +20,14 @@ class MoadianService
 
         /** @var MoadianLog $moadianLog */
         $moadianLog = MoadianLog::query()->create([
-            'invoice_id' => $invoice->invoice_id,
+            'invoice_id' => $invoice->id,
             'tax_id'     => $moadianInvoice->toArray()['header']['taxid'],
             'status'     => MoadianLog::STATUS_INIT,
         ]);
 
-//        $response = Moadian::sendInvoice($moadianInvoice);
-        $response = Response::make('');
+        /** @var \Jooyeshgar\Moadian\Http\Response $response */
+        $response = Moadian::sendInvoice($moadianInvoice);
+//        $response = Response::make('');
         $body = $response->getBody();
         $moadianLog->status = MoadianLog::STATUS_PENDING;
         $moadianLog->reference_code = $body['result'][0]['referenceNumber'];

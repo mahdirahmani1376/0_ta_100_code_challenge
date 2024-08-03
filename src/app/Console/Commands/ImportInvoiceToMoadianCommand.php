@@ -51,16 +51,16 @@ class ImportInvoiceToMoadianCommand extends Command
 
         /** @var Invoice $invoice */
         foreach ($invoices->cursor() as $invoice) {
-            $this->info('Preparing invoice: ' . $invoice->invoice_id);
+            $this->info('Preparing invoice: ' . $invoice->id);
             // TODO maybe sleep or something to prevent sending too many requests to the moadian server
             // TODO or maybe queue all of these sendInvoices and chain em synchronously using
             // TODO https://laravel.com/docs/10.x/queues#dispatching-batches
             try {
                 $this->sendInvoice($invoice);
-                $this->info('Sent invoice: ' . $invoice->invoice_id);
+                $this->info('Sent invoice: ' . $invoice->id);
             } catch (\Exception $exception) {
                 $this->error($exception->getMessage());
-                $this->info('skipping Invoice#' . $invoice->invoice_id);
+                $this->info('skipping Invoice#' . $invoice->id);
             }
         }
 
@@ -72,7 +72,7 @@ class ImportInvoiceToMoadianCommand extends Command
     {
         if (!empty($this->option('override-id'))) {
             $this->info('override id = ' . $this->option('override-id'));
-            return Invoice::query()->where('invoice_id', $this->option('override-id'));
+            return Invoice::query()->where('id', $this->option('override-id'));
         }
         // query copied from ImportInvoicesToRahkaranCommand.php
         $query = Invoice::query()->where(function (Builder $query) use ($fromDate, $toDate) {
@@ -112,10 +112,10 @@ class ImportInvoiceToMoadianCommand extends Command
                 $q->whereDate('created_at', '>=', $fromDate);
                 $q->whereDate('created_at', '<=', $toDate);
             })
-            ->distinct('invoice_id')
-            ->pluck('invoice_id');
+            ->distinct('id')
+            ->pluck('id');
 
-        $query->whereNotIn('invoice_id', $modianLogs);
+        $query->whereNotIn('id', $modianLogs);
 
         return $query;
     }

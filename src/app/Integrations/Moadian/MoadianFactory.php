@@ -2,6 +2,7 @@
 
 namespace App\Integrations\Moadian;
 
+use App\Exceptions\SystemException\UserNotFoundOnMainAppException;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Models\Invoice;
 use App\Models\Item;
@@ -48,7 +49,10 @@ class MoadianFactory
         $header->inp = 1; //invoice pattern
         $header->ins = $invoice->status == Invoice::STATUS_REFUNDED ? 4 : 1; // invoice type
         $header->tins = '10103421620';
-        $client = MainAppAPIService::getClients($invoice->profile->client_id)[0];
+        $client = data_get(MainAppAPIService::getClients($invoice->profile->client_id),0);
+        if (empty($client)){
+            throw UserNotFoundOnMainAppException::make($invoice->id);
+        }
         $invoice->client = $client;
         $header->tob = $invoice->client->is_legal == 1 ? 2 : 1;
         $header->bid = ($invoice->client->is_legal == 1 && $invoice->client->company_national_code) ?
