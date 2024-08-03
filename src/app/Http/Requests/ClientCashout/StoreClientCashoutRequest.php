@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\ClientCashout;
 
+use App\Models\ClientBankAccount;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,6 +22,7 @@ class StoreClientCashoutRequest extends FormRequest
                 'integer',
                 Rule::exists('client_bank_accounts', 'id')
                     ->where('profile_id', request('profile_id')),
+                Rule::in([ClientBankAccount::STATUS_ACTIVE])
             ],
             'admin_id' => ['nullable', 'integer',],
             'amount' => ['nullable', 'integer',],
