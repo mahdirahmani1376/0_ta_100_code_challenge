@@ -11,7 +11,7 @@ use App\Exceptions\Base\ExceptionTypes;
  * Class UserNotFoundOnMainAppException
  * @package App\Exceptions\ApplicationException
  * @method static self make(int $invoice_id)
- * @method self params(int $invoice_id, $status)
+ * @method self params(int $invoice_id)
  */
 class UserNotFoundOnMainAppException extends BaseApplicationException
 {
@@ -24,6 +24,5 @@ class UserNotFoundOnMainAppException extends BaseApplicationException
 
     protected array $messageParams = [
         'invoice_id' => '',
-        'status'     => ''
     ];
 }
