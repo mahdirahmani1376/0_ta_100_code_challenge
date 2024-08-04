@@ -29,6 +29,7 @@ use App\Models\Item;
 use App\Models\Profile;
 use App\Models\SystemLog;
 use App\Models\Transaction;
+use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
 use App\Services\BankGateway\FindBankGatewayByNameService;
@@ -55,13 +56,15 @@ class RahkaranService
     private string $sessionId = '';
     private array $rsaParams = [];
     private array $regions = [];
+    private Collection $bankGateWays;
 
     public function __construct(
         private readonly TransactionRepositoryInterface $transactionRepository,
         private readonly InvoiceRepositoryInterface     $invoiceRepository,
         private readonly AssignInvoiceNumberService     $assignInvoiceNumberService,
         private readonly FindBankGatewayByNameService   $findBankGatewayByNameService,
-        public RahkaranConfig                           $config
+        public RahkaranConfig                           $config,
+        private readonly BankGatewayRepositoryInterface $bankGatewayRepository
     )
     {
 
@@ -553,12 +556,11 @@ class RahkaranService
             foreach ($items as $item) {
 
                 if ($item->amount < 0) {
-                    $voucher_item = $this->addDiscountVoucherItem($item, $is_refund);
-                    $voucher->addVoucherItem($voucher_item);
-                    continue;
+                    $voucher_item = $this->getDiscountCollectionVouchetItem($item, $is_refund);
                 }
-
-                $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
+                else {
+                    $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
+                }
 
                 $voucher_item_description = trim(str_replace(["\n", "\r", "\t"], [' '], $item->description));
                 $voucher_item_description = mb_substr($voucher_item_description, 0, 511);
@@ -735,35 +737,35 @@ class RahkaranService
     private function getBankAccountId(Transaction $transaction): int
     {
         if ($transaction->amount < 10) {
-            return $this->config->roundingBankId;
+            return $this->findRahkaranIdByName('roundingBank');
         }
         switch ($transaction->payment_method) {
             case 'sermelli':
             case 'sadad_meli':
-                return $this->config->sadadBankId;
+                return $this->findRahkaranIdByName('sadad_meli');
             case 'irankish':
-                return $this->config->iranKishBankId;
+                return $this->findRahkaranIdByName('irankish');
 
             case 'mellatbank':
-                return $this->config->mellatBankId;
+                return $this->findRahkaranIdByName('mellatbank');
 
             case 'parsianbank':
-                return $this->config->parsianBankId;
+                return $this->findRahkaranIdByName('parsianbank');
 
             case 'zarinpal':
-                return $this->config->zarinpalBankId;
+                return $this->findRahkaranIdByName('zarinpal');
 
             case 'zarinpal_sms':
-                return $this->config->zarinpalSmsBankId;
+                return $this->findRahkaranIdByName('zarinpal_sms');
 
             case 'zibal':
-                return $this->config->zibalBankId;
+                return $this->findRahkaranIdByName('zibal');
 
             case 'asanpardakht':
-                return $this->config->asanpardakhtBankId;
+                return $this->findRahkaranIdByName('asanpardakht');
 
             case 'saman':
-                $bankGateway = ($this->findBankGatewayByNameService)($transaction->payment_method);
+                $bankGateway = $this->findRahkaranIdByName($transaction->payment_method);
                 if (is_null($bankGateway) || is_null($bankGateway->rahkaran_id)) {
                     throw new BadRequestException(trans('rahkaran.error.NOT_FOUND_TRANSACTION_BANK_ACCOUNT_ID', [
                         'transaction_id' => $transaction->id
@@ -772,7 +774,8 @@ class RahkaranService
 
                 return $bankGateway->rahkaran_id;
             case 'client_credit':
-                return $this->config->creditBankId;
+
+                return $this->findRahkaranIdByName('client_credit');
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':
@@ -2368,7 +2371,7 @@ class RahkaranService
         }
     }
 
-    private function addDiscountVoucherItem(mixed $item, bool $is_refund) : VoucherItem
+    private function getDiscountCollectionVouchetItem(mixed $item, bool $is_refund) : VoucherItem
     {
         $voucher_item = new VoucherItem();
 
@@ -2426,5 +2429,18 @@ class RahkaranService
         $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
 
         return $voucher_item;
+    }
+
+    public function setBankGateways(): void
+    {
+        $this->bankGateWays = $this->bankGatewayRepository->all();
+    }
+
+    private function findRahkaranIdByName($name)
+    {
+        return $this->bankGateWays
+            ->where('name','=',$name)
+            ->where('status','=','active')
+            ->firstOrFail()->rahkaran_id;
     }
 }

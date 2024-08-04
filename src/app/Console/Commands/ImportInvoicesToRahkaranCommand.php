@@ -95,6 +95,8 @@ class ImportInvoicesToRahkaranCommand extends Command
         $errors = 0;
         $index = 0;
 
+        $this->rahkaranService->setBankGateways();
+
         /**
          * @var Transaction $transaction
          */
