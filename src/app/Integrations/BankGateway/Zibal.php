@@ -78,6 +78,7 @@ class Zibal extends BaseBankGateway implements Interface\BankGatewayInterface
 
     public function callbackFromGateway(Transaction $transaction, array $data): Transaction
     {
+        $this->callbackLog($transaction, $data);
         if (!$data['success']) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
