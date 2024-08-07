@@ -5,7 +5,9 @@ namespace App\Console\Commands;
 use App\Integrations\MainApp\MainAppAPIService;
 use App\Integrations\Rahkaran\RahkaranService;
 use App\Integrations\Rahkaran\ValueObjects\Client;
+use App\Models\Profile;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -27,11 +29,18 @@ class ImportClientsToRahkaranCommand extends Command
         App::setLocale('fa');
         $this->alert('Import clients into Rahkaran Date Time ' . now()->toDateTimeString());
 
-        $clients = self::getClients(); // TODO fetch clients from MainApp
+        $profiles = $this->getProfiles();
 
-        $bar = $this->output->createProgressBar($clients->count());
+        $bar = $this->output->createProgressBar($profiles->count());
 
-        foreach ($clients as $client) {
+        foreach ($profiles as $profile) {
+            $client = data_get($profile->toArray(), 'client');
+
+            if (!$client) {
+                $this->info('Client not found for profile #' . $profile->id);
+                continue;
+            }
+
             $this->import($client, [], true);
             $bar->advance();
         }
@@ -43,20 +52,20 @@ class ImportClientsToRahkaranCommand extends Command
         return 0;
     }
 
-    protected function getClients()
+    protected function getProfiles(): \Illuminate\Support\Collection
     {
-        $financeProfileIds = [
-            4,
-        ];
-        if (!empty($this->argument('clients'))) {
-            $financeProfileIds = array_merge($financeProfileIds, $this->argument('clients'));
-        }
-        $this->info('Fetching client data from MainApp for: ' . implode(',', $financeProfileIds));
-        $clients = MainAppAPIService::getClients($financeProfileIds, true);
+        $clients = collect([]);
 
-        $this->info('Clients received, count:' . count($clients));
+        Profile::query()->whereNull('rahkaran_id')->chunk(1000, function (Collection $profiles) use (&$clients) {
+            $mainAppClients = MainAppAPIService::getClients($profiles->pluck('id')->toArray(), true);
+            $mainAppClients = collect($mainAppClients);
+            $profiles->each(function (Profile $profile) use ($mainAppClients) {
+                $profile->offsetSet('client', $mainAppClients->firstWhere('finance_profile_id', $profile->id));
+            });
+            $clients->push($profiles);
+        });
 
-        return collect($clients);
+        return $clients->flatten();
     }
 
     protected function import(Client $client, array $ignore_fields = [], bool $retry = false)
