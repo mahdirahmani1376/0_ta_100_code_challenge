@@ -13,11 +13,6 @@ class ManualCheckAction
 
     public function __invoke(Invoice $invoice, int $adminId): Invoice
     {
-        $oldState = $invoice->toArray();
-
-        $invoice = ($this->manualCheckService)($invoice, $adminId);
-
-
-        return $invoice;
+        return ($this->manualCheckService)($invoice, $adminId);
     }
 }
