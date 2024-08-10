@@ -51,9 +51,15 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
     {
         $this->callbackLog($transaction, $data);
         $state = $data['State'] ?? null;
+        $refNumber = $data['RefNum'] ?? null;
         $successful = $state == 'OK';
+        // refNu
         if (!$successful) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
+        }
+
+        if ($refNumber) {
+            $transaction = ($this->updateTransactionService)($transaction, ['reference_id' => $refNumber,]);
         }
 
         $token = data_get($data, 'Token');
@@ -65,7 +71,7 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
         $response = Http::withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/json')
             ->post($this->bankGateway->config['verify_url'], [
-                'RefNum'         => $transaction->tracking_code,
+                'RefNum'         => $transaction->reference_id,
                 'TerminalNumber' => $this->bankGateway->config['terminal_id'],
             ]);
 
@@ -77,15 +83,13 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
 
 
         if (!$response->json('Success') || $response->json('ResultCode') != 0) {
-            ($this->updateTransactionService)($transaction, [
+            return ($this->updateTransactionService)($transaction, [
                 'status' => Transaction::STATUS_FAIL,
             ]);
-            throw new BadRequestException('Saman verify ResultCode: ' . $response->json('ResultCode'));
         }
 
         return ($this->updateTransactionService)($transaction, [
             'status'       => Transaction::STATUS_SUCCESS,
-            'reference_id' => $response->json('TransactionDetail.RefNum'),
         ]);
     }
 }
