@@ -44,11 +44,11 @@ class DataMigration extends Command
 
         if ($action == 'General') {
 //            self::updateMainAppClients();
-//            self::migrateProfiles();
-//            self::migrateBankAccount();
-//            self::migrateBankGateway();
-//            self::migrateClientBankAccount();
-//            self::migrateClientCashout();
+            self::migrateProfiles();
+            self::migrateBankAccount();
+            self::migrateBankGateway();
+            self::migrateClientBankAccount();
+            self::migrateClientCashout();
             self::migrateMoadianLog();
         }
 
@@ -488,7 +488,12 @@ class DataMigration extends Command
             inv.deleted_at                        as deleted_at,
             inv.client_id                         as profile_id,
             inv.due_date                          as due_date,
-            inv.created_at                        as processed_at,
+            CASE
+                WHEN inv.status = 1 THEN inv.paid_date
+                WHEN inv.status = 6 THEN inv.paid_date
+                WHEN inv.status = 7 THEN inv.paid_date
+                ELSE NULL
+                END                               as processed_at,
             inv.paid_date                         as paid_at,
             inv.rahkaran_id                       as rahkaran_id,
             inv.payment_method                    as payment_method,
