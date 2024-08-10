@@ -203,7 +203,10 @@ class RahkaranService
     public function createTransaction(Transaction $transaction): Transaction|Model
     {
         /** @var Client $client */
-        $client = MainAppAPIService::getClients($transaction->invoice->profile->client_id)[0];
+        $client = data_get(MainAppAPIService::getClients($transaction->invoice->profile->client_id),0);
+        if (empty($client)){
+            throw UserNotFoundOnMainAppException::make($transaction->invoice_id);
+        }
 
         if (!$transaction->invoice || !$transaction->invoice->client = $client) {
             throw new ModelNotFoundException('rahkaran');
@@ -1439,11 +1442,9 @@ class RahkaranService
 
         $total_tax = round(abs($invoice->tax), 0, PHP_ROUND_HALF_DOWN);
 
-        $tax_percent = config('tax.tax');
+        $tax_percent = $invoice->tax_rate;
 
-        $total_tax_percent = config('tax.total');
-
-        return round(($total_tax * $tax_percent) / $total_tax_percent, 0, PHP_ROUND_HALF_DOWN);
+        return round(($total_tax * $tax_percent) / $tax_percent, 0, PHP_ROUND_HALF_DOWN);
     }
 
     /**
@@ -1452,15 +1453,13 @@ class RahkaranService
      * @param $invoice
      * @return int|float
      */
-    public function getRawInvoiceToll($invoice)
+    public function getRawInvoiceToll(Invoice $invoice): float|int
     {
         $total_tax = $this->getRawInvoiceTotalTax($invoice);
 
-        $toll_percent = config('tax.toll');
+        $toll_percent = $invoice->tax_rate;
 
-        $total_tax_percent = config('tax.total');
-
-        return round(($total_tax * $toll_percent) / $total_tax_percent, 0, PHP_ROUND_HALF_DOWN);
+        return round(($total_tax * $toll_percent) / $toll_percent, 0, PHP_ROUND_HALF_DOWN);
     }
 
     /**
@@ -1484,7 +1483,7 @@ class RahkaranService
         if ($item->amount == 0)
             return 0;
 
-        $tax_percent = config('tax.tax');
+        $tax_percent = $item->invoice->tax_rate;
 
         $tax = round(($tax_percent / 100) * $item->amount, 0, PHP_ROUND_HALF_DOWN);
 
