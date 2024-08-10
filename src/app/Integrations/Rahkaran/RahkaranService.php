@@ -562,8 +562,6 @@ class RahkaranService
                     $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
                 }
 
-
-
                 $voucher_item_description = trim(str_replace(["\n", "\r", "\t"], [' '], $item->description));
                 $voucher_item_description = mb_substr($voucher_item_description, 0, 511);
 
