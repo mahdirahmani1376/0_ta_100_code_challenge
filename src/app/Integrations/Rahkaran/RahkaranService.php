@@ -1342,10 +1342,6 @@ class RahkaranService
     // ########## ########## ##########
     private function getAllTypesVoucherItem(Item $item, bool $is_refund): VoucherItem
     {
-        if ($item->amount < 0) {
-            throw new BadRequestException("Rahkaran negative service item {$item->invoice_id}");
-        }
-
         $voucher_item = new VoucherItem();
 
         $level_4 = null;
