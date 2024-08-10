@@ -203,8 +203,8 @@ class RahkaranService
     public function createTransaction(Transaction $transaction): Transaction|Model
     {
         /** @var Client $client */
-        $client = data_get(MainAppAPIService::getClients($transaction->invoice->profile_id),0);
-        if (empty($client)){
+        $client = data_get(MainAppAPIService::getClients($transaction->invoice->profile_id), 0);
+        if (empty($client)) {
             throw UserNotFoundOnMainAppException::make($transaction->invoice_id);
         }
 
@@ -545,8 +545,8 @@ class RahkaranService
         foreach ($processInvoices as $invoice) {
 
             $is_refund = $invoice->status == Invoice::STATUS_REFUNDED;
-            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile_id),0);
-            if (empty($invoice->client)){
+            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile_id), 0);
+            if (empty($invoice->client)) {
                 throw UserNotFoundOnMainAppException::make($invoice->id);
             }
             $client_dl_code = $this->getClientDl($invoice->client)->Code;
@@ -557,8 +557,7 @@ class RahkaranService
             foreach ($items as $item) {
                 if ($item->amount < 0) {
                     $voucher_item = $this->getDiscountVoucherItem($item, $is_refund);
-                }
-                else {
+                } else {
                     $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
                 }
 
@@ -571,7 +570,7 @@ class RahkaranService
                 /// ########
                 /// Check and complete voucher item
                 /// ########
-                $voucher_item->PartyRef = $invoice->client->rahkaran_id;
+                $voucher_item->PartyRef = $invoice->profile->rahkaran_id;
                 $voucher_item->TaxAmount = $this->getItemTax($item);
                 $voucher_item->TollAmount = $this->getItemToll($item);
                 $voucher_item->TaxStateType = 1;
@@ -583,7 +582,7 @@ class RahkaranService
             }
 
             // Tax Voucher Item
-            $voucher->addVoucherItem($this->getNewTaxVoucherItem($invoice, $invoice->client->rahkaran_id));
+            $voucher->addVoucherItem($this->getNewTaxVoucherItem($invoice, $invoice->profile->rahkaran_id));
 
             if ($invoice->status == Invoice::STATUS_PAID || $invoice->status == Invoice::STATUS_COLLECTIONS) {
 
@@ -1263,12 +1262,12 @@ class RahkaranService
         $result = $this->makeRequest($this->baseUrl . '/Financial/COAManagement/Services/COAService.svc/RegisterDL',
             'post',
             [[
-                'Code'        => $code,
-                'DLTypeRef'   => $dl_type_ref,
-                'Description' => $description,
-                'Title'       => $title,
-                'Title_En'    => ''
-            ]],
+                 'Code'        => $code,
+                 'DLTypeRef'   => $dl_type_ref,
+                 'Description' => $description,
+                 'Title'       => $title,
+                 'Title_En'    => ''
+             ]],
             $this->getHeaders());
 
         $result = $this->validatePartyResult($result);
@@ -1348,9 +1347,9 @@ class RahkaranService
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
                 $service = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id);
-                $level_6 = $this->getTotalDL6Code('product', $service['product']);
-                $level_5 = $this->getTotalDL5Code('product', $service['product']);
-                $level_4 = $this->getTotalDL4Code('product', $service['product']['product_group']);
+                $level_6 = $this->getTotalDL6Code('product', $service);
+                $level_5 = $this->getTotalDL5Code('product', $service);
+                $level_4 = $this->getTotalDL4Code('product', $service['group']);
                 break;
             case Item::TYPE_DOMAIN_SERVICE:
                 // Todo: Load domain tld to find region
@@ -1394,6 +1393,7 @@ class RahkaranService
 
         return $voucher_item;
     }
+
     private function getDiscountVoucherItem(Item $item, bool $is_refund): VoucherItem
     {
         $voucher_item = new VoucherItem();
@@ -1992,7 +1992,7 @@ class RahkaranService
                 'status' => $getStatusCode
             ];
 
-            UpdateSystemLog::dispatch($systemLog,$custom_response);
+            UpdateSystemLog::dispatch($systemLog, $custom_response);
 
         }
     }
@@ -2276,7 +2276,7 @@ class RahkaranService
                     $description = 'نمایندگی هاست لینوکس';
                     break;
                 }
-                if ($product['product_group']['name'] == 'transactional-email') {
+                if ($product['group']['name'] == 'transactional-email') {
                     $code = 50002001;
                     $description = 'سرویس های ایمیل';
                     break;
@@ -2286,7 +2286,7 @@ class RahkaranService
                     $description = 'Backup Storage';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['ssl-certificate', 'License']) || Str::contains($product['name'], ['ssl-certificate', 'License'])) {
+                if (Str::contains($product['group']['name'], ['ssl-certificate', 'License']) || Str::contains($product['name'], ['ssl-certificate', 'License'])) {
                     $code = 50002014;
                     $description = 'لایسنس و گواهی ها';
                     break;
@@ -2311,42 +2311,42 @@ class RahkaranService
                     $description = 'سرویس های انتقال';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Windows-host'])) {
+                if (Str::contains($product['group']['name'], ['Windows-host'])) {
                     $code = 50002007;
                     $description = 'هاست ویندوز';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-backup-ir'])) {
+                if (Str::contains($product['group']['name'], ['Host-backup-ir'])) {
                     $code = 50001129;
                     $description = 'هاست بک آپ';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-Download'])) {
+                if (Str::contains($product['group']['name'], ['Host-Download'])) {
                     $code = 50001108;
                     $description = 'هاست دانلود';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-linux', 'Host-Linux'])) {
+                if (Str::contains($product['group']['name'], ['Host-linux', 'Host-Linux'])) {
                     $code = 50002008;
                     $description = 'هاست لینوکس';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['wordpress', 'WordPress'])) {
+                if (Str::contains($product['group']['name'], ['wordpress', 'WordPress'])) {
                     $code = 50002009;
                     $description = 'هاست وردپرس';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['anycast', 'Anycast'])) {
+                if (Str::contains($product['group']['name'], ['anycast', 'Anycast'])) {
                     $code = 50002010;
                     $description = 'هاست Anycast';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['dedicate', 'Dedicate'])) {
+                if (Str::contains($product['group']['name'], ['dedicate', 'Dedicate'])) {
                     $code = 50002011;
                     $description = 'سرور اختصاصی';
                     break;
                 }
-                if (Str::contains($product['product_group']['name'], ['Host-Framework-IR'])) {
+                if (Str::contains($product['group']['name'], ['Host-Framework-IR'])) {
                     $code = 50002012;
                     $description = 'هاست فریم ورک';
                     break;
@@ -2431,8 +2431,8 @@ class RahkaranService
     private function findRahkaranIdByName($name)
     {
         return $this->bankGateWays
-            ->where('name','=',$name)
-            ->where('status','=','active')
+            ->where('name', '=', $name)
+            ->where('status', '=', 'active')
             ->firstOrFail()->rahkaran_id;
     }
 }
