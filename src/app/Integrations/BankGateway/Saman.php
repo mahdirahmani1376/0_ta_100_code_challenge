@@ -81,7 +81,6 @@ class Saman extends BaseBankGateway implements BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
         }
 
-
         if (!$response->json('Success') || $response->json('ResultCode') != 0) {
             return ($this->updateTransactionService)($transaction, [
                 'status' => Transaction::STATUS_FAIL,
