@@ -203,7 +203,7 @@ class RahkaranService
     public function createTransaction(Transaction $transaction): Transaction|Model
     {
         /** @var Client $client */
-        $client = data_get(MainAppAPIService::getClients($transaction->invoice->profile->client_id),0);
+        $client = data_get(MainAppAPIService::getClients($transaction->invoice->profile_id),0);
         if (empty($client)){
             throw UserNotFoundOnMainAppException::make($transaction->invoice_id);
         }
@@ -545,7 +545,7 @@ class RahkaranService
         foreach ($processInvoices as $invoice) {
 
             $is_refund = $invoice->status == Invoice::STATUS_REFUNDED;
-            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile->client_id),0);
+            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile_id),0);
             if (empty($invoice->client)){
                 throw UserNotFoundOnMainAppException::make($invoice->id);
             }
@@ -1954,7 +1954,7 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client = MainAppAPIService::getClients($credit_transaction->profile->client_id)[0];
+        $client = MainAppAPIService::getClients($credit_transaction->profile_id)[0];
         $client_party_dl = $this->getClientDl($client);
 
         $receipt = new Receipt();
@@ -2026,7 +2026,7 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client = MainAppAPIService::getClients($credit_transaction->profile->client_id)[0];
+        $client = MainAppAPIService::getClients($credit_transaction->profile_id)[0];
         $client_party_dl = $this->getClientDl($client);
 
         $payment = new Payment();
@@ -2070,7 +2070,7 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client = MainAppAPIService::getClients($credit_transaction->profile->client_id)[0];
+        $client = MainAppAPIService::getClients($credit_transaction->profile_id)[0];
         $client_party_dl = $this->getClientDl($client);
 
         $payment = new Payment();
