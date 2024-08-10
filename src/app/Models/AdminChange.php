@@ -18,26 +18,26 @@ use MongoDB\Laravel\Eloquent\SoftDeletes;
 * @property Carbon $updated_at
 * @property Carbon deleted_at
  */
-class AdminLog extends AbstractBaseLog
+class AdminChange extends AbstractBaseLog
 {
     use SoftDeletes, MongoDate;
 
-    protected $connection = "mongodb";
+    protected $connection = 'mongodb';
 
     protected $collection = 'admin_changes';
 
     protected $fillable = [
-        "logable_type",
-        "logable_id",
-        "request",
-        "before",
-        "after",
-        "admin_user_id",
-        "action",
+        'logable_type',
+        'logable_id',
+        'request',
+        'before',
+        'after',
+        'admin_user_id',
+        'action',
     ];
 
     protected $casts = [
-        "created_at" => 'datetime',
-        "updated_at" => 'datetime'
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 }
