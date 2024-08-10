@@ -97,11 +97,11 @@ return [
 
         'mongodb' => [
             'driver'   => 'mongodb',
-            'host'     => env('MONGO_HOST', '127.0.0.1'),
-            'port'     => env('MONGO_PORT', 27017),
-            'database' => env('MONGO_DATABASE', 'homestead'),
-            'username' => env('MONGO_USERNAME', 'homestead'),
-            'password' => env('MONGO_PASSWORD', 'secret'),
+            'host'     => env('MONGO_DB_HOST', '127.0.0.1'),
+            'port'     => env('MONGO_DB_PORT', 27017),
+            'database' => env('MONGO_DB_DATABASE', 'homestead'),
+            'username' => env('MONGO_DB_USERNAME', 'homestead'),
+            'password' => env('MONGO_DB_PASSWORD', 'secret'),
             'options'  => [
                 'appname' => 'finance_service',
             ],
