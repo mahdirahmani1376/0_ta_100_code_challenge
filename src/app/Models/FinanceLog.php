@@ -16,6 +16,7 @@ use MongoDB\Laravel\Eloquent\SoftDeletes;
 class FinanceLog extends AbstractBaseLog
 {
     const EDIT_INVOICE_ITEM = "edit_invoice_item";
+    const CALLBACK_DATA = "gateway_callback";
 
     use SoftDeletes;
 

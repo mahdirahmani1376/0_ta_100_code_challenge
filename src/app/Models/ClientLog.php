@@ -26,7 +26,6 @@ class ClientLog extends AbstractBaseLog
         "logable_type",
         "logable_id",
         "request",
-        "client_user_id",
         "action",
     ];
 

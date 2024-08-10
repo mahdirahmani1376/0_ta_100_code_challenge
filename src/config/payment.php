@@ -14,9 +14,13 @@ return [
         'invoice_number_refund_offset' => env('INVOICE_NUMBER_REFUND_OFFSET', 1),
     ],
     'bank_gateway'   => [ // TODO callback urls should be main-app urls
-        'callback_url'              => env('MAINAPP_PUBLIC_BASE_URL') . '/api/finance-service/public/bank-gateway/{gateway}/callback/{transaction}/{source}',
-        'cloud_callback_url'        => env('MAINAPP_PUBLIC_BASE_URL') . '/api/finance-service/public/bank-gateway/{gateway}/callback/{transaction}/{source}',
-        'result_redirect_url'       => env('FRONT_END_BASE_URL') . '/callback/{invoice}?status={status}',
-        'result_cloud_redirect_url' => env('FRONT_END_CLOUD_BASE_URL') . '/callback/{invoice}?status={status}',
+                          'callback_url'              => env('MAINAPP_PUBLIC_BASE_URL') . '/api/finance-service/public/bank-gateway/{gateway}/callback/{transaction}/{source}',
+                          'cloud_callback_url'        => env('MAINAPP_PUBLIC_BASE_URL') . '/api/finance-service/public/bank-gateway/{gateway}/callback/{transaction}/{source}',
+                          'result_redirect_url'       => env('FRONT_END_BASE_URL') . '/callback/{invoice}?status={status}',
+                          'result_cloud_redirect_url' => env('FRONT_END_CLOUD_BASE_URL') . '/callback/{invoice}?status={status}',
     ],
+    'refund'        => [
+        'refund_provider'             => env('REFUND_PROVIDER'),
+        'refund_provider_rahkaran_id' => env('REFUND_PROVIDER_RAHKARAN_ID'),
+    ]
 ];

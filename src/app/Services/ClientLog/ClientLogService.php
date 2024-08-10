@@ -20,8 +20,8 @@ class ClientLogService
         if ($logModel) {
             $logModel->update([
                 'action'        => $action,
-                'loggable_id'   => $model?->getKey(),
-                'loggable_type' => $model?->getMorphClass()
+                'logable_id'   => $model?->getKey(),
+                'logable_type' => $model?->getMorphClass()
             ]);
         }
     }
