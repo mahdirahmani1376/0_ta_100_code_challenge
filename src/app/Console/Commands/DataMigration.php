@@ -491,7 +491,7 @@ class DataMigration extends Command
             CASE
                 WHEN inv.status = 1 THEN inv.paid_date
                 WHEN inv.status = 6 THEN inv.paid_date
-                WHEN inv.status = 7 THEN inv.paid_date
+                WHEN inv.status = 7 THEN inv.invoice_date
                 ELSE NULL
                 END                               as processed_at,
             inv.paid_date                         as paid_at,
