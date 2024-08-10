@@ -32,7 +32,6 @@ use App\Models\Transaction;
 use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
-use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\LogService;
 use GuzzleHttp\Client as HttpClient;
@@ -62,7 +61,6 @@ class RahkaranService
         private readonly TransactionRepositoryInterface $transactionRepository,
         private readonly InvoiceRepositoryInterface     $invoiceRepository,
         private readonly AssignInvoiceNumberService     $assignInvoiceNumberService,
-        private readonly FindBankGatewayByNameService   $findBankGatewayByNameService,
         public RahkaranConfig                           $config,
         private readonly BankGatewayRepositoryInterface $bankGatewayRepository
     )
@@ -554,13 +552,17 @@ class RahkaranService
 
             // Voucher items base on invoice items
             foreach ($items as $item) {
+                $voucher_item = new VoucherItem();
 
                 if ($item->amount < 0) {
-                    $voucher_item = $this->getDiscountCollectionVouchetItem($item, $is_refund);
+                    $voucher_item->SLCode = 2111512;
                 }
                 else {
-                    $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
+                    $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
                 }
+
+                $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
+
 
                 $voucher_item_description = trim(str_replace(["\n", "\r", "\t"], [' '], $item->description));
                 $voucher_item_description = mb_substr($voucher_item_description, 0, 511);
@@ -1393,7 +1395,6 @@ class RahkaranService
             $voucher_item->DL6 = $this->config->generalDl6Code;
         }
 
-        $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
         $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
 
         return $voucher_item;
@@ -1725,7 +1726,7 @@ class RahkaranService
     private function getPaymentFeeTransactionVoucherItem($item, $amount): VoucherItem
     {
         $voucher_item = new VoucherItem();
-        $voucher_item->SLCode = $this->config->bankBaseSl;
+        $voucher_item->SLCode = config('payment.cashout.refund_provider_rahkaran_id');
         $voucher_item->DL4 = $this->config->zarinpalDL4;
         $voucher_item->Credit = round($amount);
 
@@ -2369,66 +2370,6 @@ class RahkaranService
         } else {
             return $dl_object;
         }
-    }
-
-    private function getDiscountCollectionVouchetItem(mixed $item, bool $is_refund) : VoucherItem
-    {
-        $voucher_item = new VoucherItem();
-
-        $level_4 = null;
-        $level_5 = null;
-        $level_6 = null;
-
-        switch ($item->invoiceable_type) {
-            case Item::TYPE_HOSTING:
-            case Item::TYPE_PRODUCT_SERVICE:
-            case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $service = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id);
-                $level_6 = $this->getTotalDL6Code('product', $service['product']);
-                $level_5 = $this->getTotalDL5Code('product', $service['product']);
-                $level_4 = $this->getTotalDL4Code('product', $service['product']['product_group']);
-                break;
-            case Item::TYPE_DOMAIN_SERVICE:
-                // Todo: Load domain tld to find region
-                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
-                $level_6 = $this->getTotalDL6Code('domain', null, $domain);
-                $level_5 = $this->getTotalDL5Code('domain', null, $domain);
-                $level_4 = $this->getTotalDL4Code('domain');
-                break;
-            case Item::TYPE_ADMIN_TIME:
-                $level_6 = $this->getTotalDL6Code('adminTime');
-                $level_5 = $this->getTotalDL5Code('adminTime');
-                $level_4 = $this->getTotalDL4Code('adminTime');
-                break;
-            case Item::TYPE_CLOUD :
-                $level_6 = $this->getTotalDL6Code('cloud');
-                $level_5 = $this->getTotalDL5Code('cloud');
-                $level_4 = $this->getTotalDL4Code('cloud');
-                break;
-            default:
-                $level_6 = $this->getTotalDL6Code('global');
-                $level_5 = $this->getTotalDL5Code('global');
-                $level_4 = $this->getTotalDL4Code('global');
-                break;
-        }
-
-        if ($level_4 && $level_5 && $level_6) {
-            $voucher_item->DL4 = $level_4->Code;
-            $voucher_item->DL5 = $level_5->Code;
-            $voucher_item->DL6 = $level_6->Code;
-            $voucher_item->DLLevel4Title = $level_4->Title;
-            $voucher_item->DLLevel5Title = $level_5->Title;
-            $voucher_item->DLLevel6Title = $level_6->Title;
-        } else {
-            $voucher_item->DL4 = $is_refund ? $this->config->refundDl4Code : $this->config->generalDl4Code;
-            $voucher_item->DL5 = $this->config->generalDl5Code;
-            $voucher_item->DL6 = $this->config->generalDl6Code;
-        }
-
-        $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
-        $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
-
-        return $voucher_item;
     }
 
     public function setBankGateways(): void
