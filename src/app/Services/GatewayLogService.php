@@ -144,6 +144,8 @@ class GatewayLogService
             \Log::warning('Set debug trace data failed', $exception->getTrace());
         }
 
+        $this->addDebugContext('data', $this->toArray());
+
         $this->dispatch();
 
         return $response;
