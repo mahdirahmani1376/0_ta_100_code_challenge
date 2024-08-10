@@ -21,10 +21,12 @@ class AdminChangeService
             $changes = $this->getDiff($before, $after);
             $logModel->update([
                 ...$changes,
-                'action'        => $action,
+                'action'       => $action,
                 'logable_id'   => $model?->getKey(),
                 'logable_type' => $model?->getMorphClass()
             ]);
+        } else {
+            \Log::info('Admin change log not found', ['logId' => $logId]);
         }
     }
 

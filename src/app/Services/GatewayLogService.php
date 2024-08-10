@@ -72,7 +72,6 @@ class GatewayLogService
     public function setModel(Model $model): static
     {
         if (!isset($this->model)) {
-            \Log::info('Set model', $model->toArray());
             $this->model = $model;
         }
         return $this;
@@ -81,7 +80,6 @@ class GatewayLogService
     public function setChanges(): static
     {
         if (isset($this->model)) {
-            \Log::info('Set model changes', $this->model->getChanges());
             $this->after = $this->model->getChanges();
         }
         return $this;
@@ -165,8 +163,6 @@ class GatewayLogService
         } catch (\Throwable $exception) {
             \Log::warning('Set debug trace data failed', $exception->getTrace());
         }
-
-        \Log::info('change log service array', $this->toArray());
 
         $this->dispatch();
 
