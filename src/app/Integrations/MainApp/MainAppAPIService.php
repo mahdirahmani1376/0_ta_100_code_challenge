@@ -141,6 +141,8 @@ class MainAppAPIService extends BaseMainAppAPIService
 
             if ($response->status() == Response::HTTP_OK) {
                 return;
+            } else {
+                throw MainAppInternalAPIException::make($url, json_encode($data));
             }
         } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));
