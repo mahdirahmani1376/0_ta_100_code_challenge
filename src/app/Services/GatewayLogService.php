@@ -122,7 +122,7 @@ class GatewayLogService
             &&
             !empty($this->action)
         ) {
-            ChangeLogJob::dispatch(
+            ChangeLogJob::dispatchSync(
                 logId: $this->logId,
                 action: $this->action,
                 before: $this->before,

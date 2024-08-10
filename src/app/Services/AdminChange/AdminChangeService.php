@@ -26,6 +26,7 @@ class AdminChangeService
                     'logable_id'   => $model?->getKey(),
                     'logable_type' => $model?->getMorphClass()
                 ]);
+                \Log::info('Admin change log updated', $logModel->toArray());
             } else {
                 \Log::info('Admin change log not found', ['logId' => $logId]);
             }
