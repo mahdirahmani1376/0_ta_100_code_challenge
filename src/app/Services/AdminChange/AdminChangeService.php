@@ -15,7 +15,7 @@ class AdminChangeService
         $action = null
     ): void
     {
-        $logModel = AdminChange::find($logId);
+        $logModel = AdminChange::findOrFail($logId);
 
         if ($logModel) {
             $changes = $this->getDiff($before, $after);
