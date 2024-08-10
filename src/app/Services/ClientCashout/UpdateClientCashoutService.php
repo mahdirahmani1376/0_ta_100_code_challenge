@@ -22,6 +22,7 @@ class UpdateClientCashoutService
             'admin_note',
             'status',
             'rejected_by_bank',
+            'source'
         ]);
     }
 }

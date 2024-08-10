@@ -27,7 +27,7 @@ class ImportInvoicesToRahkaranCommand extends Command
                     {--month=0 : Jalali Month}
                     {--day=0 : Jalali Day}
                     {--days=1 : Days}
-                    {--max-rounding-amount=null : Max Rounding Amount}';
+                    {--max-rounding-amount= : Max Rounding Amount}';
 
 
     protected $description = 'Imports invoices to rahkaran';
@@ -94,6 +94,8 @@ class ImportInvoicesToRahkaranCommand extends Command
 
         $errors = 0;
         $index = 0;
+
+        $this->rahkaranService->setBankGateways();
 
         /**
          * @var Transaction $transaction

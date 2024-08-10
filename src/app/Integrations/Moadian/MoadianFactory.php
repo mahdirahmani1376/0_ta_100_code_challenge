@@ -49,7 +49,7 @@ class MoadianFactory
         $header->inp = 1; //invoice pattern
         $header->ins = $invoice->status == Invoice::STATUS_REFUNDED ? 4 : 1; // invoice type
         $header->tins = '10103421620';
-        $client = data_get(MainAppAPIService::getClients($invoice->profile->client_id),0);
+        $client = data_get(MainAppAPIService::getClients($invoice->profile_id),0);
         if (empty($client)){
             throw UserNotFoundOnMainAppException::make($invoice->id);
         }

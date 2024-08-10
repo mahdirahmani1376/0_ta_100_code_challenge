@@ -29,9 +29,9 @@ use App\Models\Item;
 use App\Models\Profile;
 use App\Models\SystemLog;
 use App\Models\Transaction;
+use App\Repositories\BankGateway\Interface\BankGatewayRepositoryInterface;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
 use App\Repositories\Transaction\Interface\TransactionRepositoryInterface;
-use App\Services\BankGateway\FindBankGatewayByNameService;
 use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\LogService;
 use GuzzleHttp\Client as HttpClient;
@@ -55,13 +55,14 @@ class RahkaranService
     private string $sessionId = '';
     private array $rsaParams = [];
     private array $regions = [];
+    private Collection $bankGateWays;
 
     public function __construct(
         private readonly TransactionRepositoryInterface $transactionRepository,
         private readonly InvoiceRepositoryInterface     $invoiceRepository,
         private readonly AssignInvoiceNumberService     $assignInvoiceNumberService,
-        private readonly FindBankGatewayByNameService   $findBankGatewayByNameService,
-        public RahkaranConfig                           $config
+        public RahkaranConfig                           $config,
+        private readonly BankGatewayRepositoryInterface $bankGatewayRepository
     )
     {
 
@@ -202,7 +203,10 @@ class RahkaranService
     public function createTransaction(Transaction $transaction): Transaction|Model
     {
         /** @var Client $client */
-        $client = MainAppAPIService::getClients($transaction->invoice->profile->client_id)[0];
+        $client = data_get(MainAppAPIService::getClients($transaction->invoice->profile_id),0);
+        if (empty($client)){
+            throw UserNotFoundOnMainAppException::make($transaction->invoice_id);
+        }
 
         if (!$transaction->invoice || !$transaction->invoice->client = $client) {
             throw new ModelNotFoundException('rahkaran');
@@ -541,7 +545,7 @@ class RahkaranService
         foreach ($processInvoices as $invoice) {
 
             $is_refund = $invoice->status == Invoice::STATUS_REFUNDED;
-            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile->client_id),0);
+            $invoice->client = data_get(MainAppAPIService::getClients($invoice->profile_id),0);
             if (empty($invoice->client)){
                 throw UserNotFoundOnMainAppException::make($invoice->id);
             }
@@ -551,14 +555,17 @@ class RahkaranService
 
             // Voucher items base on invoice items
             foreach ($items as $item) {
+                $voucher_item = new VoucherItem();
 
                 if ($item->amount < 0) {
-                    $voucher_item = $this->addDiscountVoucherItem($item, $is_refund);
-                    $voucher->addVoucherItem($voucher_item);
-                    continue;
+                    $voucher_item->SLCode = 2111512;
+                }
+                else {
+                    $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
                 }
 
                 $voucher_item = $this->getAllTypesVoucherItem($item, $is_refund);
+
 
                 $voucher_item_description = trim(str_replace(["\n", "\r", "\t"], [' '], $item->description));
                 $voucher_item_description = mb_substr($voucher_item_description, 0, 511);
@@ -735,35 +742,35 @@ class RahkaranService
     private function getBankAccountId(Transaction $transaction): int
     {
         if ($transaction->amount < 10) {
-            return $this->config->roundingBankId;
+            return $this->findRahkaranIdByName('roundingBank');
         }
         switch ($transaction->payment_method) {
             case 'sermelli':
             case 'sadad_meli':
-                return $this->config->sadadBankId;
+                return $this->findRahkaranIdByName('sadad_meli');
             case 'irankish':
-                return $this->config->iranKishBankId;
+                return $this->findRahkaranIdByName('irankish');
 
             case 'mellatbank':
-                return $this->config->mellatBankId;
+                return $this->findRahkaranIdByName('mellatbank');
 
             case 'parsianbank':
-                return $this->config->parsianBankId;
+                return $this->findRahkaranIdByName('parsianbank');
 
             case 'zarinpal':
-                return $this->config->zarinpalBankId;
+                return $this->findRahkaranIdByName('zarinpal');
 
             case 'zarinpal_sms':
-                return $this->config->zarinpalSmsBankId;
+                return $this->findRahkaranIdByName('zarinpal_sms');
 
             case 'zibal':
-                return $this->config->zibalBankId;
+                return $this->findRahkaranIdByName('zibal');
 
             case 'asanpardakht':
-                return $this->config->asanpardakhtBankId;
+                return $this->findRahkaranIdByName('asanpardakht');
 
             case 'saman':
-                $bankGateway = ($this->findBankGatewayByNameService)($transaction->payment_method);
+                $bankGateway = $this->findRahkaranIdByName($transaction->payment_method);
                 if (is_null($bankGateway) || is_null($bankGateway->rahkaran_id)) {
                     throw new BadRequestException(trans('rahkaran.error.NOT_FOUND_TRANSACTION_BANK_ACCOUNT_ID', [
                         'transaction_id' => $transaction->id
@@ -772,7 +779,8 @@ class RahkaranService
 
                 return $bankGateway->rahkaran_id;
             case 'client_credit':
-                return $this->config->creditBankId;
+
+                return $this->findRahkaranIdByName('client_credit');
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':
@@ -1390,7 +1398,6 @@ class RahkaranService
             $voucher_item->DL6 = $this->config->generalDl6Code;
         }
 
-        $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
         $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
 
         return $voucher_item;
@@ -1435,11 +1442,9 @@ class RahkaranService
 
         $total_tax = round(abs($invoice->tax), 0, PHP_ROUND_HALF_DOWN);
 
-        $tax_percent = config('tax.tax');
+        $tax_percent = $invoice->tax_rate;
 
-        $total_tax_percent = config('tax.total');
-
-        return round(($total_tax * $tax_percent) / $total_tax_percent, 0, PHP_ROUND_HALF_DOWN);
+        return round(($total_tax * $tax_percent) / $tax_percent, 0, PHP_ROUND_HALF_DOWN);
     }
 
     /**
@@ -1448,15 +1453,13 @@ class RahkaranService
      * @param $invoice
      * @return int|float
      */
-    public function getRawInvoiceToll($invoice)
+    public function getRawInvoiceToll(Invoice $invoice): float|int
     {
         $total_tax = $this->getRawInvoiceTotalTax($invoice);
 
-        $toll_percent = config('tax.toll');
+        $toll_percent = $invoice->tax_rate;
 
-        $total_tax_percent = config('tax.total');
-
-        return round(($total_tax * $toll_percent) / $total_tax_percent, 0, PHP_ROUND_HALF_DOWN);
+        return round(($total_tax * $toll_percent) / $toll_percent, 0, PHP_ROUND_HALF_DOWN);
     }
 
     /**
@@ -1480,7 +1483,7 @@ class RahkaranService
         if ($item->amount == 0)
             return 0;
 
-        $tax_percent = config('tax.tax');
+        $tax_percent = $item->invoice->tax_rate;
 
         $tax = round(($tax_percent / 100) * $item->amount, 0, PHP_ROUND_HALF_DOWN);
 
@@ -1722,7 +1725,7 @@ class RahkaranService
     private function getPaymentFeeTransactionVoucherItem($item, $amount): VoucherItem
     {
         $voucher_item = new VoucherItem();
-        $voucher_item->SLCode = $this->config->bankBaseSl;
+        $voucher_item->SLCode = config('payment.cashout.refund_provider_rahkaran_id');
         $voucher_item->DL4 = $this->config->zarinpalDL4;
         $voucher_item->Credit = round($amount);
 
@@ -1951,7 +1954,7 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client = MainAppAPIService::getClients($credit_transaction->profile->client_id)[0];
+        $client = MainAppAPIService::getClients($credit_transaction->profile_id)[0];
         $client_party_dl = $this->getClientDl($client);
 
         $receipt = new Receipt();
@@ -2023,7 +2026,7 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client = MainAppAPIService::getClients($credit_transaction->profile->client_id)[0];
+        $client = MainAppAPIService::getClients($credit_transaction->profile_id)[0];
         $client_party_dl = $this->getClientDl($client);
 
         $payment = new Payment();
@@ -2067,7 +2070,7 @@ class RahkaranService
         $config = $this->getConfig();
 
         // Fetches client party dl from rahkaran service and generate party and its dl if the party not exists
-        $client = MainAppAPIService::getClients($credit_transaction->profile->client_id)[0];
+        $client = MainAppAPIService::getClients($credit_transaction->profile_id)[0];
         $client_party_dl = $this->getClientDl($client);
 
         $payment = new Payment();
@@ -2368,63 +2371,16 @@ class RahkaranService
         }
     }
 
-    private function addDiscountVoucherItem(mixed $item, bool $is_refund) : VoucherItem
+    public function setBankGateways(): void
     {
-        $voucher_item = new VoucherItem();
+        $this->bankGateWays = $this->bankGatewayRepository->all();
+    }
 
-        $level_4 = null;
-        $level_5 = null;
-        $level_6 = null;
-
-        switch ($item->invoiceable_type) {
-            case Item::TYPE_HOSTING:
-            case Item::TYPE_PRODUCT_SERVICE:
-            case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $service = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id);
-                $level_6 = $this->getTotalDL6Code('product', $service['product']);
-                $level_5 = $this->getTotalDL5Code('product', $service['product']);
-                $level_4 = $this->getTotalDL4Code('product', $service['product']['product_group']);
-                break;
-            case Item::TYPE_DOMAIN_SERVICE:
-                // Todo: Load domain tld to find region
-                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
-                $level_6 = $this->getTotalDL6Code('domain', null, $domain);
-                $level_5 = $this->getTotalDL5Code('domain', null, $domain);
-                $level_4 = $this->getTotalDL4Code('domain');
-                break;
-            case Item::TYPE_ADMIN_TIME:
-                $level_6 = $this->getTotalDL6Code('adminTime');
-                $level_5 = $this->getTotalDL5Code('adminTime');
-                $level_4 = $this->getTotalDL4Code('adminTime');
-                break;
-            case Item::TYPE_CLOUD :
-                $level_6 = $this->getTotalDL6Code('cloud');
-                $level_5 = $this->getTotalDL5Code('cloud');
-                $level_4 = $this->getTotalDL4Code('cloud');
-                break;
-            default:
-                $level_6 = $this->getTotalDL6Code('global');
-                $level_5 = $this->getTotalDL5Code('global');
-                $level_4 = $this->getTotalDL4Code('global');
-                break;
-        }
-
-        if ($level_4 && $level_5 && $level_6) {
-            $voucher_item->DL4 = $level_4->Code;
-            $voucher_item->DL5 = $level_5->Code;
-            $voucher_item->DL6 = $level_6->Code;
-            $voucher_item->DLLevel4Title = $level_4->Title;
-            $voucher_item->DLLevel5Title = $level_5->Title;
-            $voucher_item->DLLevel6Title = $level_6->Title;
-        } else {
-            $voucher_item->DL4 = $is_refund ? $this->config->refundDl4Code : $this->config->generalDl4Code;
-            $voucher_item->DL5 = $this->config->generalDl5Code;
-            $voucher_item->DL6 = $this->config->generalDl6Code;
-        }
-
-        $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
-        $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
-
-        return $voucher_item;
+    private function findRahkaranIdByName($name)
+    {
+        return $this->bankGateWays
+            ->where('name','=',$name)
+            ->where('status','=','active')
+            ->firstOrFail()->rahkaran_id;
     }
 }
