@@ -15,18 +15,22 @@ class AdminChangeService
         $action = null
     ): void
     {
-        $logModel = AdminChange::findOrFail($logId);
+        try {
+            $logModel = AdminChange::findOrFail($logId);
 
-        if ($logModel) {
-            $changes = $this->getDiff($before, $after);
-            $logModel->update([
-                ...$changes,
-                'action'       => $action,
-                'logable_id'   => $model?->getKey(),
-                'logable_type' => $model?->getMorphClass()
-            ]);
-        } else {
-            \Log::info('Admin change log not found', ['logId' => $logId]);
+            if ($logModel) {
+                $changes = $this->getDiff($before, $after);
+                $logModel->update([
+                    ...$changes,
+                    'action'       => $action,
+                    'logable_id'   => $model?->getKey(),
+                    'logable_type' => $model?->getMorphClass()
+                ]);
+            } else {
+                \Log::info('Admin change log not found', ['logId' => $logId]);
+            }
+        } catch (\Throwable $exception) {
+            \Log::error('Update admin change failed', $exception->getTrace());
         }
     }
 
