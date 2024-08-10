@@ -555,8 +555,6 @@ class RahkaranService
 
             // Voucher items base on invoice items
             foreach ($items as $item) {
-                $voucher_item = new VoucherItem();
-
                 if ($item->amount < 0) {
                     $voucher_item = $this->getDiscountVoucherItem($item, $is_refund);
                 }
