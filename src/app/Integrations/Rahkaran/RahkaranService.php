@@ -1533,7 +1533,6 @@ class RahkaranService
         }
 
         $voucher_item = new VoucherItem();
-        // Todo ovverrides slcode
         $voucher_item->SLCode = $this->config->newTaxSl;
         $voucher_item->Description = trans('rahkaran.tax.newTax', [
             'tax' => $invoice->tax_rate
