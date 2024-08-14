@@ -96,7 +96,7 @@ class Voucher extends Model
     {
         $voucher_items = $this->VoucherItems;
 
-        if ($voucherItem->Credit > 0 || $voucherItem->Debit > 0) {
+        if ($voucherItem->Credit || $voucherItem->Debit) {
             $voucher_items->add($voucherItem);
         }
 

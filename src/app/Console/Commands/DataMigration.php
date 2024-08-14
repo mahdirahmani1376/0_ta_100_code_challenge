@@ -562,6 +562,7 @@ class DataMigration extends Command
                 );
                 $mappedData = [];
                 foreach ($oldData as $row) {
+                    $row->invoiceable_type = ucfirst($row->invoiceable_type);
                     $mappedData[] = (array)$row;
                 }
                 DB::table($tableName)->insert($mappedData);

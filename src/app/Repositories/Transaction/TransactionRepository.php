@@ -173,26 +173,27 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
             ->where(function (Builder $query) {
-                $query->whereHas('invoice', function (Builder $query) {
-                    $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS]);
-                    $query->where('is_credit', false);
+                $query
+                    ->where(function (Builder $query) {
+                        $query->whereHas('invoice', function (Builder $query) {
+                            $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS]);
+                            $query->where('is_credit', false);
+                        });
+                        $query->where('status', Transaction::STATUS_SUCCESS);
+                    })
+                    ->orWhere(function (Builder $query) {
+                        $query->whereHas('invoice', function (Builder $query) {
+                            $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
+                            $query->where('is_credit', false);
+                        });
+                        $query->where('status', Transaction::STATUS_REFUND);
+                        $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_CREDIT);
                 });
-                $query->where('status', Transaction::STATUS_SUCCESS);
-            });
-        $query->orWhere(function (Builder $query) {
-            $query->whereHas('invoice', function (Builder $query) {
-                $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
-                $query->where('is_credit', false);
-            });
-            $query->where('status', Transaction::STATUS_REFUND);
-            $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_CREDIT);
-        });
-
-        // Filters out imported transactions
-        $query->whereNull('rahkaran_id');
-
-        // Filter Barter Transactions
-        $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_BARTER);
+            })
+            // Filters out imported transactions
+            ->whereNull('rahkaran_id')
+            // Filter Barter Transactions
+            ->where('payment_method', '<>', Transaction::PAYMENT_METHOD_BARTER);
 
         return $query;
     }

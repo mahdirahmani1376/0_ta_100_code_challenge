@@ -200,7 +200,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         try {
             $response = self::makeRequest('get', $url, $data);
             if ($response->successful()) {
-                return $response->json('data');
+                return $response->json();
             }
 
             throw MainAppInternalAPIException::make($url, json_encode($data));
