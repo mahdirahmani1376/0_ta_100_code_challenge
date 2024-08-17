@@ -28,7 +28,7 @@ class BaseRepository implements EloquentRepositoryInterface
      */
     public function newInstance(array $attributes = []): Model
     {
-        $model =  app()->make($this->model, $attributes);
+        $model = app()->make($this->model, $attributes);
         return $model;
     }
 
@@ -39,6 +39,7 @@ class BaseRepository implements EloquentRepositoryInterface
     {
         return $this->newInstance()->newQuery();
     }
+
     public function fill(Model $object, array $attributes, $fillable = []): Model
     {
         if (!empty($fillable)) {
@@ -77,7 +78,6 @@ class BaseRepository implements EloquentRepositoryInterface
         change_log()->setModel($object)->setBefore();
 
         $this->fill($object, $attributes, $fillable)->save();
-
         return $object;
     }
 
