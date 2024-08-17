@@ -67,8 +67,6 @@ class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
                 'SignData' => $this->encrypt($transaction->tracking_code, $this->bankGateway->config['api_key']),
             ]);
 
-        Log::info('Sadad verify result', ['result' => $response->json()]);
-
         if (!$response->json('content.ResCode') != 0) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }

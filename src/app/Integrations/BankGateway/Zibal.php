@@ -83,8 +83,7 @@ class Zibal extends BaseBankGateway implements Interface\BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
         if ($data['trackId'] != $transaction->tracking_code) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD]);
-            throw new BadRequestException("Zibal miss match tracking_code, transactionId: $transaction->id , trackId: " . $data['trackId']);
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD]);
         }
 
         $response = Http::withHeader('Accept-Encoding', 'application/json')
@@ -94,13 +93,11 @@ class Zibal extends BaseBankGateway implements Interface\BankGatewayInterface
             ]);
 
         if ($response->json('result') != 100) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zibal result: ' . $response->json('result')); // TODO maybe use a custom exception class
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         if ($response->json('amount') != $transaction->amount) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
-            throw new BadRequestException('Zibal status: ' . $response->json('status')); // TODO maybe use a custom exception class
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
         }
 
         return ($this->updateTransactionService)($transaction, [

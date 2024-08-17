@@ -23,6 +23,8 @@ class MainAppAPIService extends BaseMainAppAPIService
 
             if ($response->status() == Response::HTTP_OK) {
                 return $response->json('data');
+            } else {
+                \Log::warning("Get config from main application failed ($key)");
             }
         } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
@@ -141,6 +143,8 @@ class MainAppAPIService extends BaseMainAppAPIService
 
             if ($response->status() == Response::HTTP_OK) {
                 return;
+            } else {
+                throw MainAppInternalAPIException::make($url, json_encode($data));
             }
         } catch (Exception $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($data));

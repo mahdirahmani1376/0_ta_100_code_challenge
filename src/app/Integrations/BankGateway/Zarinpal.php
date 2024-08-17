@@ -58,10 +58,9 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
         }
 
         if ($authority != $transaction->tracking_code || $amount != $transaction->amount) {
-            ($this->updateTransactionService)($transaction, [
+            return ($this->updateTransactionService)($transaction, [
                 'status' => Transaction::STATUS_FRAUD,
             ]);
-            throw new BadRequestException("Zarinpal miss match tracking_code, transactionId: $transaction->id , Authority: " . $data['Authority']);
         }
 
         $response = Http::withHeader('Accept', 'application/json')
@@ -73,8 +72,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
             ]);
 
         if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('Zarinpal verify code: ' . $response->json('data.code')); // TODO maybe use a custom exception class
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         return ($this->updateTransactionService)($transaction, [

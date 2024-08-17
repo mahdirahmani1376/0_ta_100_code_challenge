@@ -71,11 +71,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
         $amount = data_get($data, 'Amount');
         $transactionId = data_get($data, 'PayGateTranID');
         if ($amount != $transaction->amount || $transactionId != $transaction->getKey()) {
-            Log::error('transaction possible fraud', [
-                'gateway'     => 'asan_pardakht',
-                'transaction' => $transaction,
-                'data'        => $transactionResultResponse
-            ]);
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         $verifyResponse = Http::withHeader('Content-Type', 'application/json')
@@ -87,8 +83,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
             ]);
 
         if ($verifyResponse->status() != Response::HTTP_OK) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('AsanPardakht verify status: ' . $verifyResponse->status());
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         $settlementResponse = Http::withHeader('Content-Type', 'application/json')
@@ -100,8 +95,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
             ]);
 
         if ($settlementResponse->status() != Response::HTTP_OK) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException('AsanPardakht settlement status: ' . $settlementResponse->status());
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         return ($this->updateTransactionService)($transaction, [
