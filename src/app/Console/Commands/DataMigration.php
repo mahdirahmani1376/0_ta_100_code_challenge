@@ -43,7 +43,7 @@ class DataMigration extends Command
         ]);
 
         if ($action == 'General') {
-//            self::updateMainAppClients();
+            self::updateMainAppClients();
             self::migrateProfiles();
             self::migrateBankAccount();
             self::migrateBankGateway();
