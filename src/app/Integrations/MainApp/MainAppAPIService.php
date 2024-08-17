@@ -21,6 +21,10 @@ class MainAppAPIService extends BaseMainAppAPIService
         try {
             $response = self::makeRequest('get', $url, $param);
 
+            \Log::info('Get config from main application response', [
+                'data' => $response->json()
+            ]);
+
             if ($data = $response->json('data')) {
                 return $data;
             } else {
