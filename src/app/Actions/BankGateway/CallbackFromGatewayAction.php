@@ -37,10 +37,10 @@ class CallbackFromGatewayAction
         $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
         $transaction = $bankGatewayProvider->callbackFromGateway($transaction, $data)->refresh();
 
-        if ($transaction->status == Transaction::STATUS_SUCCESS) {
+//        if ($transaction->status == Transaction::STATUS_SUCCESS) {
             $invoice = ($this->calcInvoicePriceFieldsService)($transaction->invoice);
             ($this->processInvoiceAction)($invoice);
-        }
+//        }
 
         return callback_result_redirect_url($rawRedirectUrl, $transaction->invoice_id, transactionStatus: $transaction->status);
     }
