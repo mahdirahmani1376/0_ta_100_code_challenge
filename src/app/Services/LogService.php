@@ -21,7 +21,7 @@ class LogService
                 'response_body'   => data_get($data, 'response_body'),
                 'response_status' => data_get($data, 'response_status')
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('fail to store information in mongoDB', ['message' => $e->getMessage()]);
             return null;
         }
