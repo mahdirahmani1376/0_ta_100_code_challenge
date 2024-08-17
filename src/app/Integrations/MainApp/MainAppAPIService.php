@@ -21,12 +21,14 @@ class MainAppAPIService extends BaseMainAppAPIService
         try {
             $response = self::makeRequest('get', $url, $param);
 
-            if ($response->status() == Response::HTTP_OK) {
-                return $response->json('data');
+            if ($data = $response->json('data')) {
+                return $data;
             } else {
                 \Log::warning("Get config from main application failed ($key)");
+                return null;
             }
         } catch (Exception $exception) {
+            \Log::warning("Get $key from main app failed", $exception->getTrace());
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
