@@ -1392,7 +1392,6 @@ class RahkaranService
     }
     private function getAllTypesVoucherItem(Item $item, bool $is_refund): VoucherItem
     {
-        dump($item->amount);
         $voucher_item = $this->makeVoucherItem($item,$is_refund);
         $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
         $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
