@@ -1388,14 +1388,14 @@ class RahkaranService
             $voucher_item->DL6 = $this->config->generalDl6Code;
         }
 
-        $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
-
         return $voucher_item;
     }
     private function getAllTypesVoucherItem(Item $item, bool $is_refund): VoucherItem
     {
+        dump($item->amount);
         $voucher_item = $this->makeVoucherItem($item,$is_refund);
         $voucher_item->SLCode = $is_refund ? $this->config->refundSl : $this->config->saleSl;
+        $voucher_item->{$is_refund ? 'Debit' : 'Credit'} = round($item->amount, 0, PHP_ROUND_HALF_DOWN);
         return $voucher_item;
     }
 
@@ -1403,6 +1403,7 @@ class RahkaranService
     {
         $voucher_item = $this->makeVoucherItem($item,$is_refund);
         $voucher_item->SLCode = 2111512;
+        $voucher_item->Debit  = round(abs($item->amount), 0, PHP_ROUND_HALF_DOWN);
         return $voucher_item;
     }
 

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -57,7 +56,7 @@ class Item extends Model
     const TYPE_PARTNER_DISCOUNT = 'PartnerDiscount';
     const TYPE_PARTNER_COMMISSION = 'PartnerCommission';
     const TYPE_PARTNER_PAYMENT = 'PartnerPayment';
-    const TYPE_AFFILIATION = 'Affiliation';
+    const TYPE_AFFILIATION = 'affiliation';
     const TYPE_MIHAN_NIC_IR = 'MihanNicIr';
     const TYPE_MIHAN_NIC_COM = 'MihanNicCom';
 
@@ -109,12 +108,5 @@ class Item extends Model
             ->where('invoiceable_id', $this->invoiceable_id)
             ->whereIn('invoiceable_type', $types)
             ->count() == 0 ? 'register' : 'renew';
-    }
-
-    protected function invoiceableType(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value) => ucfirst($value),
-        );
     }
 }
