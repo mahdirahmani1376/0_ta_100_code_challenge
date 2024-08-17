@@ -26,7 +26,7 @@ class MainAppAPIService extends BaseMainAppAPIService
             } else {
                 return null;
             }
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
