@@ -15,16 +15,18 @@ class ShowWalletAndTransactionResource extends JsonResource
         $credit_transactions = $this['credit_transactions']; // TODO Maybe find a better and cleaner way to append credit_transactions into wallet and paginate it
         /** @var Wallet $this */
         return [
-            'id' => $this->id,
-            'created_at' => $this->created_at?->toDateTimeString(),
-            'updated_at' => $this->updated_at?->toDateTimeString(),
-            'profile_id' => $this->profile_id,
-            'name' => $this->name,
-            'balance' => $this->balance,
-            'is_active' => $this->is_active,
+            'id'                  => $this->id,
+            'created_at'          => $this->created_at?->toDateTimeString(),
+            'updated_at'          => $this->updated_at?->toDateTimeString(),
+            'profile_id'          => $this->profile_id,
+            'name'                => $this->name,
+            'balance'             => $this->balance,
+            'is_active'           => $this->is_active,
             'credit_transactions' => $credit_transactions->items(),
-            'current_page' => $credit_transactions->currentPage(),
-            'last_page' => $credit_transactions->lastPage(),
+            'current_page'        => $credit_transactions->currentPage(),
+            'last_page'           => $credit_transactions->lastPage(),
+            'per_page'            => $credit_transactions->perPage(),
+            'total'               => $credit_transactions->total(),
         ];
     }
 }
