@@ -19,7 +19,7 @@ class MainAppAPIService extends BaseMainAppAPIService
         $param = ['key' => $key];
 
         try {
-            $response = self::makeRequest('get', $url, $param);
+            $response = self::makeRequest(method: 'get', path: $url, body: $param, log: false);
 
             if ($data = $response->json('data')) {
                 return $data;
@@ -27,7 +27,6 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return null;
             }
         } catch (\Throwable $exception) {
-            \Log::warning('get config error', $exception->getTrace());
             throw MainAppInternalAPIException::make($url, $key);
         }
     }
@@ -35,30 +34,8 @@ class MainAppAPIService extends BaseMainAppAPIService
     /**
      * @throws MainAppInternalAPIException
      */
-    public static function storeConfig(string $key, string $value)
-    {
-        $url = '/api/internal/finance/config';
-        $param = [
-            'key'   => $key,
-            'value' => $value,
-        ];
-
-        try {
-            $response = self::makeRequest('post', $url, $param);
-
-            if ($response->successful()) {
-                return $response->json('data');
-            }
-        } catch (Exception $exception) {
-            throw MainAppInternalAPIException::make($url, json_encode($param));
-        }
-    }
-
-    /**
-     * @throws MainAppInternalAPIException
-     */
     public static function getClients(int|array $clientIds, bool $noRahkaranId = false): array
-    {// todo use profile_id
+    {
         if (!is_array($clientIds)) {
             $clientIds = [$clientIds];
         }
