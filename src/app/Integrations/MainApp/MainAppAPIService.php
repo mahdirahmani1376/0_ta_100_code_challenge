@@ -27,7 +27,8 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return null;
             }
         } catch (\Throwable $exception) {
-            throw MainAppInternalAPIException::make($url, json_encode($param));
+            \Log::warning('get config error', $exception->getTrace());
+            throw MainAppInternalAPIException::make($url, $key);
         }
     }
 
