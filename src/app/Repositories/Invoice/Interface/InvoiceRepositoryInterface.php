@@ -36,4 +36,6 @@ interface InvoiceRepositoryInterface extends EloquentRepositoryInterface
     public function rahkaranQuery($from, $to): Builder;
 
     public function hourlyReport($from, $to): float;
+
+    public function findOneByCriteria($data = [], $throwException = false);
 }
