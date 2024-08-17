@@ -13,6 +13,7 @@ abstract class BaseMainAppAPIService
     protected static function makeRequest(string $method, string $path, array $body = [], array $header = [], bool $log = true): Response
     {
         $url = config('services.main_app.base_url', 'main-application_hostiran_app_1') . $path;
+
         $headers = [
             'Accept'        => 'application/json',
             'Content-Type'  => 'application/json',
@@ -20,15 +21,21 @@ abstract class BaseMainAppAPIService
             ...$header
         ];
 
+        $systemLog = null;
+
         if ($log) {
-            $systemLog = LogService::store(SystemLog::make(), [
-                'method'         => $method,
-                'endpoint'       => SystemLog::ENDPOINT_MAIN_APP,
-                'request_url'    => $url,
-                'request_body'   => $body,
-                'request_header' => $headers,
-                'provider'       => SystemLog::PROVIDER_OUTGOING,
-            ]);
+            try {
+                $systemLog = LogService::store(SystemLog::make(), [
+                    'method'         => $method,
+                    'endpoint'       => SystemLog::ENDPOINT_MAIN_APP,
+                    'request_url'    => $url,
+                    'request_body'   => $body,
+                    'request_header' => $headers,
+                    'provider'       => SystemLog::PROVIDER_OUTGOING,
+                ]);
+            } catch (\Throwable $throwable) {
+                \Log::warning('Store System Log Error', $throwable->getTrace());
+            }
         }
 
         $response = Http::withHeaders($headers)->$method($url, $body);
@@ -39,7 +46,7 @@ abstract class BaseMainAppAPIService
                 'body'   => $response->json(),
                 'status' => $response->status()
             ];
-            UpdateSystemLog::dispatch($systemLog,$customResponse);
+            UpdateSystemLog::dispatch($systemLog, $customResponse);
         }
 
         return $response;
