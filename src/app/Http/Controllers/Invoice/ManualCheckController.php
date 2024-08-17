@@ -23,8 +23,6 @@ class ManualCheckController extends Controller
      */
     public function __invoke(Invoice $invoice, ManualCheckRequest $request)
     {
-        $test = MainAppConfig::get(key: MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX, refresh: true);
-        dd($test);
         $invoice = ($this->manualCheckAction)($invoice, $request->validated('admin_id'));
 
         return InvoiceResource::make($invoice);
