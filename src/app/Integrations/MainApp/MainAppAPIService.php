@@ -32,7 +32,7 @@ class MainAppAPIService extends BaseMainAppAPIService
                 return null;
             }
         } catch (Exception $exception) {
-            \Log::warning("Get $key from main app failed", $exception->getTrace());
+            \Log::warning("Get $key from main app failed {$exception->getMessage()}", $exception->getTrace());
             throw MainAppInternalAPIException::make($url, json_encode($param));
         }
     }
