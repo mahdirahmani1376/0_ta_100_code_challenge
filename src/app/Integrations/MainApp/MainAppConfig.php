@@ -33,6 +33,7 @@ class MainAppConfig
             try {
                 return MainAppAPIService::getConfig($key);
             } catch (Throwable $exception) {
+                \Log::warning("Get cache value failed ($key) / {$exception->getMessage()}", $exception->getTrace());
                 return null;
             }
         });

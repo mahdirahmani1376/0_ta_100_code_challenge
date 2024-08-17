@@ -120,6 +120,7 @@ class MoadianFactory
         foreach ($positiveItems->all() as $item) {
 
             $amount = $item->amount;
+            $priceAfterDiscount = $amount;
 
             $discount = 0;
             if ($negativeItems && $negativeItems > 0) {
@@ -127,10 +128,12 @@ class MoadianFactory
                 if ($amount > $negativeItems) {
                     $discount = $negativeItems;
                     $amount = $amount - $negativeItems;
+                    $priceAfterDiscount = $amount;
                     $negativeItems = 0;
                 } else {
                     $negativeItems -= $amount;
                     $discount = $amount;
+                    $priceAfterDiscount = 0;
                 }
             }
 
@@ -152,7 +155,7 @@ class MoadianFactory
             // discount
             $body->dis = $discount;
             // price after discount
-            $body->adis = floor($amount);
+            $body->adis = floor($priceAfterDiscount);
             $body->vra = 9;
             //$body->vam = round(config('payment.tax.total') * $item->amount / 100); // or directly calculate here like floor($body->adis * $body->vra / 100)
             $body->vam = floor($body->adis * $body->vra / 100);
