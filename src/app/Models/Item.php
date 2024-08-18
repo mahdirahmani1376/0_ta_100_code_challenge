@@ -109,4 +109,11 @@ class Item extends Model
             ->whereIn('invoiceable_type', $types)
             ->count() == 0 ? 'register' : 'renew';
     }
+
+    public function setDescriptionAttribute($value): void
+    {
+        if (isset($this->attributes) and !empty($value)) {
+            $this->attributes['description'] = html_entity_decode($value);
+        }
+    }
 }
