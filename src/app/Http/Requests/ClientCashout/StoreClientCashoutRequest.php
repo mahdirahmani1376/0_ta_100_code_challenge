@@ -23,7 +23,6 @@ class StoreClientCashoutRequest extends FormRequest
                 Rule::exists('client_bank_accounts', 'id')
                     ->where('status',ClientBankAccount::STATUS_ACTIVE)
                     ->where('profile_id', request('profile_id')),
-                Rule::in([ClientBankAccount::STATUS_ACTIVE])
             ],
             'admin_id' => ['nullable', 'integer',],
             'amount' => ['nullable', 'integer',],
