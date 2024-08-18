@@ -35,14 +35,14 @@ class CalcInvoicePaidAtService
         /** @var Transaction $lastSuccessfulTransaction */
         $lastSuccessfulTransaction = $this->transactionRepository->getLastSuccessfulTransaction($invoice);
         if (!is_null($lastSuccessfulTransaction)) {
-            $invoice = $this->invoiceRepository->update(
+            return $this->invoiceRepository->update(
                 $invoice,
-                ['paid_at' => $lastSuccessfulTransaction->created_at,],
-                ['paid_at',]
+                [
+                    'paid_at'        => $lastSuccessfulTransaction->created_at,
+                    'payment_method' => $lastSuccessfulTransaction->payment_method,
+                ],
+                ['paid_at', 'payment_method']
             );
-
-
-            return $invoice;
         }
 
         // If of the above happened use invoice's created_at as for when it was paid at !!
