@@ -112,7 +112,7 @@ class ProcessInvoiceAction
 
         if ($old_status != Invoice::STATUS_COLLECTIONS) {
             ($this->calcInvoiceProcessedAtService)($invoice);
-            if (!$invoice->is_credit || !$invoice->is_mass_payment) {
+            if (!($invoice->is_credit && $invoice->is_mass_payment)) {
                 InvoiceProcessedJob::dispatch($invoice);
             }
         }
