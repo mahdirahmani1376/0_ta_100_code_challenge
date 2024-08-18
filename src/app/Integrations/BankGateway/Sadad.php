@@ -52,7 +52,7 @@ class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
         $this->callbackLog($transaction, $data);
         $resCode = $data['ResCode'] ?? null;
         $orderId = $data['OrderId'] ?? null;
-        $token = $data['Token'] ?? null;
+        $token = $data['token'] ?? null;
         if ($resCode != 0 || $orderId != $transaction->getKey()) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }

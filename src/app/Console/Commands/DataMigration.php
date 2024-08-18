@@ -28,7 +28,7 @@ class DataMigration extends Command
 
     protected $description = 'Command description';
 
-    protected int $chunkSize = 7000;
+    protected int $chunkSize = 2000;
 
     public function handle()
     {
@@ -43,13 +43,13 @@ class DataMigration extends Command
         ]);
 
         if ($action == 'General') {
-            self::updateMainAppClients();
+         //   self::updateMainAppClients();
             self::migrateProfiles();
-            self::migrateBankAccount();
-            self::migrateBankGateway();
-            self::migrateClientBankAccount();
-            self::migrateClientCashout();
-            self::migrateMoadianLog();
+           // self::migrateBankAccount();
+           // self::migrateBankGateway();
+            //self::migrateClientBankAccount();
+            //self::migrateClientCashout();
+            //self::migrateMoadianLog();
         }
 
         if ($action == 'Invoice') {
@@ -63,7 +63,7 @@ class DataMigration extends Command
 
         if ($action == 'Wallet') {
             self::migrateWallet();
-            self::migrateCreditTransaction();
+            //self::migrateCreditTransaction();
         }
 
         $process_time = Carbon::now()->diffInSeconds($start_time);
