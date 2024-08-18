@@ -341,4 +341,12 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             ->whereIn('status', [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])
             ->get();
     }
+
+    public function findOneByCriteria($data = [], $throwException = false)
+    {
+        $query = self::newQuery()
+            ->where($data);
+
+        return $throwException ? $query->firstOrFail() : $query->first();
+    }
 }

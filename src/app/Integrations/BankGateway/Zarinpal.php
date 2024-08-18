@@ -35,7 +35,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
                 'description'  => "Invoice ID {$transaction->invoice_id}",
             ]);
 
-        if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
+        if ( ! ($response->json('data.code') == 100 || $response->json('data.code') == 101 ) ) {
             ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
             return $this->getFailedRedirectUrl($transaction, $transaction->callback_url);
         }
@@ -49,7 +49,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
     {
         $this->callbackLog($transaction, $data);
 
-        $status = $data['status'] ?? null;
+        $status = $data['Status'] ?? null;
         $authority = $data['Authority'] ?? null;
         $amount = $data['amount'] ?? null;
 
@@ -57,7 +57,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        if ($authority != $transaction->tracking_code || $amount != $transaction->amount) {
+        if ($authority != $transaction->tracking_code) {
             return ($this->updateTransactionService)($transaction, [
                 'status' => Transaction::STATUS_FRAUD,
             ]);
@@ -71,7 +71,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
                 'authority'   => $transaction->tracking_code,
             ]);
 
-        if ($response->json('data.code') != 100 || $response->json('data.code') != 101) {
+	if ( ! ($response->json('data.code') == 100 || $response->json('data.code') == 101 ) ) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 

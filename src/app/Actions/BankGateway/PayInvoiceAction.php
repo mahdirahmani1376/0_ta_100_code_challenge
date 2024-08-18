@@ -52,7 +52,11 @@ class PayInvoiceAction
         // Prepare a "pending" transaction for this Invoice
         // Prepare callbackUrl e.g. /callback/{transaction}/{gateway}/{source} => callback/1/zibal/cloud
         // Redirect to Gateway via the Transaction
-        $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
+        try {
+            $bankGatewayProvider = ($this->makeBankGatewayProviderByNameService)($gatewayName);
+        } catch (\Throwable $exception) {
+            return callback_result_redirect_url($rawRedirectUrl, $invoice->id, transactionStatus: Transaction::STATUS_FAIL);
+        }
 
         $amount = $invoice->balance;
         $max_transaction_amount = MainAppConfig::get(MainAppConfig::MAX_TRANSACTION_AMOUNT, 1_000_000_000);

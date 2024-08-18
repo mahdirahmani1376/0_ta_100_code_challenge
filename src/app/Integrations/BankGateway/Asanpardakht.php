@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInterface
+class Asanpardakht extends BaseBankGateway implements Interface\BankGatewayInterface
 {
     private UpdateTransactionService $updateTransactionService;
 
@@ -27,10 +27,11 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
 
     public function getRedirectUrlToGateway(Transaction $transaction, string $callbackUrl): string
     {
+
         $response = Http::withHeader('Content-Type', 'application/json')
             ->withHeader('usr', $this->bankGateway->config['username'])
             ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->post($this->bankGateway->config['request_url'], [
+            ->post($this->bankGateway->config['request_url'] . 'Token', [
                 'serviceTypeId'           => 1,
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
                 'localInvoiceId'          => $transaction->getKey(),
@@ -59,7 +60,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
         $transactionResultResponse = Http::withHeader('Content-Type', 'application/json')
             ->withHeader('usr', $this->bankGateway->config['username'])
             ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->get($this->bankGateway->config['transaction_result_url'], [
+            ->get($this->bankGateway->config['request_url'] . 'TranResult', [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
                 'localInvoiceId'          => $transaction->getKey(),
             ]);
@@ -77,7 +78,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
         $verifyResponse = Http::withHeader('Content-Type', 'application/json')
             ->withHeader('usr', $this->bankGateway->config['username'])
             ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->post($this->bankGateway->config['verify_url'], [
+            ->post($this->bankGateway->config['request_url'] . 'Verify', [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
                 'payGateTranId'           => $transactionResultResponse->json('payGateTranID'),
             ]);
@@ -89,7 +90,7 @@ class AsanPardakht extends BaseBankGateway implements Interface\BankGatewayInter
         $settlementResponse = Http::withHeader('Content-Type', 'application/json')
             ->withHeader('usr', $this->bankGateway->config['username'])
             ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->post($this->bankGateway->config['settlement_url'], [
+            ->post($this->bankGateway->config['request_url'] . 'Settlement', [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
                 'payGateTranId'           => $transactionResultResponse->json('payGateTranID'),
             ]);

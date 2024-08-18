@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 class GenerateInvoiceNumberCommand extends Command
 {
     protected $signature = 'app:generate-invoice-number
-                            {--type=paid : Type of InvoiceNumber to be generated, paid refund}
+                            {--type=paid : Type of InvoiceNumber to be generated, paid refunded}
                             {--count=100 : how many to generate}
                             {--lock-owner=null : Atomic lock owner, this is set only if this command is executed via queue}';
 

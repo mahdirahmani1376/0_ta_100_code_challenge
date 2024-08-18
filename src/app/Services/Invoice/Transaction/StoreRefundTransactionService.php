@@ -20,12 +20,14 @@ class StoreRefundTransactionService
             'status'         => Transaction::STATUS_SUCCESS,
             'amount'         => $invoice->total,
             'profile_id'     => $invoice->profile_id,
+            'source_invoice' => $invoice->source_invoice,
         ], [
             'payment_method',
             'invoice_id',
             'status',
             'amount',
             'profile_id',
+            'source_invoice'
         ]);
     }
 }
