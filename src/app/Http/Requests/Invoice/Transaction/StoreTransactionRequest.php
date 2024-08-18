@@ -21,27 +21,25 @@ class StoreTransactionRequest extends FormRequest
         $indexBankGatewayService = app(IndexBankGatewayService::class);
         $allowedPaymentMethods = $indexBankGatewayService([
             'export' => 1,
-            'status' => BankGateway::STATUS_ACTIVE,
-        ])
-            ->pluck('name')
-            ->toArray();
+        ])->pluck('name')->toArray();
+
         $allowedPaymentMethods = array_merge($allowedPaymentMethods, Transaction::PAYMENT_METHODS);
 
         return [
-            'invoice_id' => ['required', Rule::exists('invoices', 'id'),],
-            'amount' => ['required', 'numeric', 'gte:0'],
-            'reference_id' => [
+            'invoice_id'     => ['required', Rule::exists('invoices', 'id'),],
+            'amount'         => ['required', 'numeric', 'gte:0'],
+            'reference_id'   => [
                 'nullable',
                 'string',
                 Rule::unique('transactions', 'reference_id')->where('invoice_id', request('invoice_id'))
             ],
-            'description' => ['nullable', 'string'],
+            'description'    => ['nullable', 'string'],
             'payment_method' => [
                 'required',
                 Rule::in($allowedPaymentMethods)
             ],
-            'tracking_code' => ['required', 'string'],
-            'created_at' => ['filled', 'date',],
+            'tracking_code'  => ['required', 'string'],
+            'created_at'     => ['filled', 'date',],
         ];
     }
 }
