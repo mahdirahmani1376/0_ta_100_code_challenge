@@ -79,7 +79,7 @@ class Asanpardakht extends BaseBankGateway implements Interface\BankGatewayInter
 
         $amount = $transactionResultResponse->json('amount');
         $transactionId = $transactionResultResponse->json('payGateTranID');
-        if ($amount != $transaction->amount || $transactionId != $transaction->getKey()) {
+        if ($amount != $transaction->amount) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
