@@ -33,12 +33,10 @@ class Transaction extends Model
 {
     public const PREFIX_CREDIT_TRANSACTION = 'CREDIT_TRANSACTION_';
     const PAYMENT_METHOD_OFFLINE = 'offline';
-    const PAYMENT_METHOD_WALLET_BALANCE = 'wallet_balance';
     const PAYMENT_METHOD_BARTER = 'barter';
     const PAYMENT_METHOD_CREDIT = 'client_credit';
     const PAYMENT_METHODS = [
         self::PAYMENT_METHOD_OFFLINE,
-        self::PAYMENT_METHOD_WALLET_BALANCE,
         self::PAYMENT_METHOD_BARTER,
         self::PAYMENT_METHOD_CREDIT,
     ];
