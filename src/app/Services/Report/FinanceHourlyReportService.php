@@ -66,7 +66,7 @@ class FinanceHourlyReportService
 
         $bankIcon = "🏦";
 
-        $totalBankInput = "\n\n$bankIcon Total Bank Input: \n\n*" . number_format($totalBankInput) . " IRR*";
+        $totalBankInput = "\n\n$bankIcon Total Bank Input: \n*" . number_format($totalBankInput) . " IRR*";
 
         return $report . $totalBankInput;
     }

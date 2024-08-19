@@ -253,7 +253,8 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
         foreach ($criteria as $key => $value) {
             if ($key == 'created_at') {
-                $query = $query->whereDate('created_at', $value);
+                $query = $query->where('created_at', ">=", $value->startOfDay()->format('Y-m-d H:i:s'))
+                    ->where('created_at', "<=", $value->startOfHour()->format('Y-m-d H:i:s'));
             }
         }
 
