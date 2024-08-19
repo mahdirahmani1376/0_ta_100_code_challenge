@@ -93,7 +93,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
         }
 
         $body = '{"query":"\\nmutation BankAccountAdd($iban:String!, $is_legal: Boolean!, $name:String!, $type: BankAccountTypeEnum) \\n{\\n    BankAccountAdd(iban:$iban, is_legal:$is_legal, name:$name, type:$type) {    \\n        id\\n        iban \\n        name\\n        status\\n        type\\n        is_legal\\n        holder_name\\n        issuing_bank {\\n            name\\n            slug\\n        } \\n        expired_at deleted_at\\n    }\\n} \\n",
-                "variables":{"iban":"IR' . $iban . '","is_legal":false,"name":"' . $name . '","type":"SHARE"}}';
+                "variables":{"iban":"' . $iban . '","is_legal":false,"name":"' . $name . '","type":"SHARE"}}';
 
         $headers = array(
             'Accept: application/json',
@@ -199,10 +199,10 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
         }
 
         $data = data_get($response, 'data.PayoutAdd');
-        if (empty($data) || empty(data_get($data, 'data.PayoutAdd')) || !isset($data['data']['PayoutAdd']['id'])) {
+        if ( empty($data) ) {
             throw new BadRequestException(trans('validation.cashout_zarinpal_fail'));
         }
 
-        return $data['data']['PayoutAdd']['id'];
+        return $data['id'];
     }
 }
