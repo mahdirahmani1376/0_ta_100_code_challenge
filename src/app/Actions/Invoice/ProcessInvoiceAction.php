@@ -42,8 +42,10 @@ class ProcessInvoiceAction
                 'invoice_id'  => $invoice->getKey()
             ]);
             ($this->storeRefundTransactionService)($invoice);
-            ($this->calcInvoicePriceFieldsService)($invoice);
         }
+
+        $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
+
         // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
         // so we only change its status to paid and nothing else, this is done in another service
         if ($invoice->processed_at) {
