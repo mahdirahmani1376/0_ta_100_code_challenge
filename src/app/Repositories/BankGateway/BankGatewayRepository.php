@@ -43,7 +43,7 @@ class BankGatewayRepository extends BaseRepository implements BankGatewayReposit
         }
 
         if (isset($data['export']) && $data['export']) {
-            return $query->orderByDesc('order')->get();
+            return $query->orderBy('order')->get();
         }
 
         return self::paginate($query);
