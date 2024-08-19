@@ -253,7 +253,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
         foreach ($criteria as $key => $value) {
             if ($key == 'created_at') {
-                $query = $query->where('created_at', ">=", $value->startOfDay()->format('Y-m-d H:i:s'))
+                $query = $query->where('created_at', ">=", $value->clone()->startOfDay()->format('Y-m-d H:i:s'))
                     ->where('created_at', "<=", $value->startOfHour()->format('Y-m-d H:i:s'));
             }
         }
@@ -267,6 +267,8 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
         }
 
-        return $query->sum('amount');
+        $sum = $query->sum('amount');
+
+        return $sum;
     }
 }
