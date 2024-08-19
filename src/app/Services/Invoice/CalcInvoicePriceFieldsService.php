@@ -42,6 +42,6 @@ class CalcInvoicePriceFieldsService
                 'total',
                 'balance',
             ],
-        );
+        )->refresh();
     }
 }
