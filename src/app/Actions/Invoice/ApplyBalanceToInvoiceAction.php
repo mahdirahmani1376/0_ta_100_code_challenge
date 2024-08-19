@@ -70,7 +70,7 @@ class ApplyBalanceToInvoiceAction
         ($this->storeTransactionAction)([
             'invoice_id'     => $invoice->id,
             'amount'         => $data['amount'],
-            'payment_method' => Transaction::PAYMENT_METHOD_WALLET_BALANCE,
+            'payment_method' => Transaction::PAYMENT_METHOD_CREDIT,
         ]);
 
 
