@@ -51,11 +51,13 @@ class ProcessInvoiceAction
         }
         // Normal Invoices must have zero balance to be processed
         if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
+            \Log::info("(1) Invoice #{$invoice->id} process finished", $invoice->toArray());
             return $invoice;
         }
         // Collection Invoices can have positive balance and still be processed,
         // but if an Invoice is not Collection then it MUST have zero balance otherwise cannot be processed until it's paid in full
         if ($invoice->status != Invoice::STATUS_COLLECTIONS && $invoice->balance > 0) {
+            \Log::info("(2) Invoice #{$invoice->id} process finished", $invoice->toArray());
             return $invoice;
         }
 
