@@ -188,7 +188,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
                         });
                         $query->where('status', Transaction::STATUS_REFUND);
                         $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_CREDIT);
-                });
+                    });
             })
             // Filters out imported transactions
             ->whereNull('rahkaran_id')
@@ -244,5 +244,28 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where($criteria)
             ->scopes($scopes)
             ->sum($column);
+    }
+
+    public function sumOfPaidTransactionsByCriteria($criteria = [], bool $onlinePayment = false)
+    {
+        $query = self::newQuery()
+            ->where('status', Transaction::STATUS_SUCCESS);
+
+        foreach ($criteria as $key => $value) {
+            if ($key == 'created_at') {
+                $query = $query->whereDate('created_at', $value);
+            }
+        }
+
+        if ($onlinePayment) {
+            $query->whereNotIn('payment_method', [
+                Transaction::PAYMENT_METHOD_WALLET_BALANCE,
+                Transaction::PAYMENT_METHOD_OFFLINE,
+            ]);
+        } else {
+            $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+        }
+
+        return $query->sum('amount');
     }
 }
