@@ -22,11 +22,11 @@ class VerifyTransactionAction
     {
         check_rahkaran($transaction->invoice);
 
-        $oldState = $transaction->toArray();
-
         if (!in_array($transaction->status, [
             Transaction::STATUS_PENDING,
             Transaction::STATUS_PENDING_BANK_VERIFY,
+            Transaction::STATUS_FAIL,
+            Transaction::STATUS_FRAUD,
         ])) {
             throw new BadRequestException(trans('finance.ipg.OnlyUnknownAndReadyToPayStatusAreAllowed'));
         }

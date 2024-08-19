@@ -29,9 +29,7 @@ class StoreOfflineTransactionAction
         ]);
 
         $data['transaction_id'] = $transaction->id;
-        $offlineTransaction = ($this->storeOfflineTransactionService)($invoice, $data);
 
-
-        return $offlineTransaction;
+        return ($this->storeOfflineTransactionService)($invoice, $data);
     }
 }
