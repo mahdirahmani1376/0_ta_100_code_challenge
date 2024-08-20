@@ -126,7 +126,6 @@ class InvoiceReminderCommand extends Command
                             'reminders' => [
                                 [
                                     'profile_id'  => $clientId,
-                                    'message'     => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->emailMessageTemplate, $this->emailLinkTemplate),
                                     'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ]
                             ],
@@ -167,8 +166,8 @@ class InvoiceReminderCommand extends Command
                         $payload = [
                             'reminders' => [
                                 [
-                                    'profile_id' => $clientId,
-                                    'message'    => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->smsMessageTemplate, $this->smsLinkTemplate),
+                                    'profile_id'  => $clientId,
+                                    'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ],
                             ]
                         ];
