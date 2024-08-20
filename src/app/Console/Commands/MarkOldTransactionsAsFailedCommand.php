@@ -30,17 +30,17 @@ class MarkOldTransactionsAsFailedCommand extends Command
 
         $threshold = Carbon::now()->subHours($this->argument('hourAgo'))->format('Y-m-d H:00:00');
 
-        $count = $transactionRepository->newQuery()
+        $transactions = $transactionRepository->newQuery()
             ->whereIn('status', [Transaction::STATUS_PENDING, Transaction::STATUS_PENDING_BANK_VERIFY])
             ->where('created_at', '<=', $threshold);
 
         if ($this->test) {
-            $count = $count->count();
+            $this->info('Transactions matched: ' . $transactions->count());
         } else {
-            $count = $count->update(['status' => Transaction::STATUS_FAIL]);
+            $transactions->update(['status' => Transaction::STATUS_FAIL]);
         }
 
-        $this->info('Number of old Transactions: ' . $count);
+        $this->info('Number of old Transactions: ' . $transactions->count());
 
         $this->info('Completed');
     }

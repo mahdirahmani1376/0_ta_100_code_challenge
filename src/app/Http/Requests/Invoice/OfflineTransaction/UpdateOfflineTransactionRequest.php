@@ -24,6 +24,7 @@ class UpdateOfflineTransactionRequest extends FormRequest
             'tracking_code' => ['required', Rule::unique('offline_transactions')->ignore(request('offlineTransaction')),],
             'bank_account_id' => ['required', 'exists:bank_accounts,id',],
             'admin_id' => ['required', 'integer',],
+	    'amount' => ['required', 'integer']
         ];
     }
 }

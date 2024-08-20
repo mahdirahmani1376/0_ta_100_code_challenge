@@ -25,7 +25,7 @@ class StoreClientCashoutRequest extends FormRequest
                     ->where('profile_id', request('profile_id')),
             ],
             'admin_id' => ['nullable', 'integer',],
-            'amount' => ['nullable', 'integer',],
+            'amount' => ['nullable', 'integer'],
             'admin_note' => ['nullable', 'max:255',],
         ];
     }
