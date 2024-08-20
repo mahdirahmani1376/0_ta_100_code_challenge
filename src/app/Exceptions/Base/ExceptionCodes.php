@@ -31,5 +31,6 @@ final class ExceptionCodes
     public const APPLY_CREDIT_TO_CREDIT_INVOICE_NOT_ALLOWED = '410088';
     public const NOT_ENOUGH_CREDIT = '410089';
     public const USER_NOT_FOUND_EXCEPTION = '410092';
+    public const INVOICE_ALREADY_CHECKED = '410093';
 
 }
