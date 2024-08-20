@@ -3,6 +3,7 @@
 namespace App\Actions\ClientCashout;
 
 use App\Exceptions\SystemException\AmountIsMoreThanWalletBalanceException;
+use App\Exceptions\SystemException\AmountMustBeGreaterThanZeroException;
 use App\Models\ClientCashout;
 use App\Services\ClientCashout\StoreClientCashoutService;
 use App\Services\Wallet\FindWalletByProfileIdService;
@@ -18,6 +19,11 @@ class StoreClientCashoutAction
 
     public function __invoke(array $data)
     {
+        $amount = data_get($data,'amount');
+        if ($amount <= 0) {
+            throw AmountMustBeGreaterThanZeroException::make();
+        }
+
         $wallet = ($this->findWalletByProfileIdService)(data_get($data,'profile_id'));
         if (data_get($data,'amount') > $wallet->balance){
             throw AmountIsMoreThanWalletBalanceException::make();
