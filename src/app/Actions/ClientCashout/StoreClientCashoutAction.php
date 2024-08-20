@@ -25,7 +25,7 @@ class StoreClientCashoutAction
         }
 
         $wallet = ($this->findWalletByProfileIdService)(data_get($data,'profile_id'));
-        if (data_get($data,'amount') > $wallet->balance){
+        if ($amount > $wallet->balance){
             throw AmountIsMoreThanWalletBalanceException::make();
         }
 
