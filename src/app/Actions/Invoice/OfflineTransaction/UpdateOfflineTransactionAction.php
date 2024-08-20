@@ -24,10 +24,11 @@ class UpdateOfflineTransactionAction
 
         $transactionData = [
             'created_at' => $data['paid_at'],
-            'tracking_code' => $data['tracking_code']
+            'tracking_code' => $data['tracking_code'],
+            'amount' => $data['amount']
         ];
-        ($this->updateTransactionService)($offlineTransaction->transaction, $transactionData);
 
+        ($this->updateTransactionService)($offlineTransaction->transaction, $transactionData);
 
         return $offlineTransaction;
     }

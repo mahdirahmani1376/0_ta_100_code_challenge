@@ -150,6 +150,7 @@ class Zarinpal extends BaseBankGateway implements BankGatewayInterface
         $token = config('services.zarinpal.next.token');
         $terminalId = config('services.zarinpal.next.terminal_id');
 
+
         $body = '{"query":"mutation PayoutAdd($terminal_id: ID!,$bank_account_id: ID!,$amount: BigInteger!,$description: String,$reconciliation_parts: ReconciliationPartsEnum) \\n{\\n    PayoutAdd(terminal_id:$terminal_id,bank_account_id:$bank_account_id,amount:$amount,description:$description,reconciliation_parts:$reconciliation_parts)\\n    { \\n        reconciliation_parts\\n        id\\n        description\\n        terminal{ preferred_bank_account_id id }\\n        bank_account{ id iban holder_name issuing_bank{ slug name } } \\n        status\\n        amount\\n        percent\\n        created_at\\n        updated_at\\n    }\\n}\\n","variables":{"amount":"' . $amount . '","bank_account_id":"' . $zarinpalBankAccountId . '","description":"برگشت وجه سیستمی","reconciliation_parts":"SINGLE","terminal_id":"' . $terminalId . '"}}';
 
         $headers = array(
