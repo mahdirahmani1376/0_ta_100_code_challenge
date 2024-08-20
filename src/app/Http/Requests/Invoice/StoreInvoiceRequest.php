@@ -16,7 +16,6 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_id'                 => ['nullable', 'integer',],
             'profile_id'               => ['required', 'integer', 'exists:profiles,id',],
             'invoice_date'             => ['nullable', 'date',],
             'due_date'                 => ['nullable', 'date', 'date_format:Y-m-d'],
@@ -36,7 +35,7 @@ class StoreInvoiceRequest extends FormRequest
             'items.*.to_date'          => ['nullable', 'date',],
             'note'                     => ['nullable',],
             'manual'                   => ['nullable', 'boolean'],
-            'source_invoice'           => ['required_if:status,' . Invoice::STATUS_REFUNDED, 'integer'],
+            'source_invoice'           => ['required_if:status,' . Invoice::STATUS_REFUNDED],
             'transactions'             => ['nullable', 'array']
         ];
     }
