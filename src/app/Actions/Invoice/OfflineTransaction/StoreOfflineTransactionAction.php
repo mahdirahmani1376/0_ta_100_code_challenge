@@ -2,6 +2,7 @@
 
 namespace App\Actions\Invoice\OfflineTransaction;
 
+use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Services\Invoice\FindInvoiceByIdService;
 use App\Services\Invoice\OfflineTransaction\StoreOfflineTransactionService;
@@ -20,12 +21,15 @@ class StoreOfflineTransactionAction
     public function __invoke(array $data)
     {
         $invoice = ($this->findInvoiceByIdService)($data['invoice_id']);
-        check_rahkaran($invoice);
+
+        if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
+            check_rahkaran($invoice);
+        }
 
         $transaction = ($this->storeTransactionService)($invoice, [
             ...$data,
             'payment_method' => Transaction::PAYMENT_METHOD_OFFLINE,
-            'status' => Transaction::STATUS_PENDING,
+            'status'         => Transaction::STATUS_PENDING,
         ]);
 
         $data['transaction_id'] = $transaction->id;

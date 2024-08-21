@@ -9,6 +9,7 @@ use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Actions\Invoice\Transaction\VerifyTransactionAction;
 use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
+use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Item\FindAddCreditItemService;
@@ -35,7 +36,11 @@ class VerifyOfflineTransactionAction
 
     public function __invoke(OfflineTransaction $offlineTransaction)
     {
-        check_rahkaran($offlineTransaction->invoice);
+        $invoice = $offlineTransaction->invoice;
+
+        if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
+            check_rahkaran($invoice);
+        }
 
         if ($offlineTransaction->status === OfflineTransaction::STATUS_REJECTED) {
             throw NotAuthorizedException::make();
@@ -44,7 +49,6 @@ class VerifyOfflineTransactionAction
             throw OfflinePaymentApplyException::make($offlineTransaction->getKey());
         }
 
-        $invoice = $offlineTransaction->invoice;
         // If Invoice is type of credit and client paid a different amount than what he was supposed to
         // then update that Invoice's Item with type of AddCredit or AddCloudCredit with the amount of
         // this $offlineTransaction->amount PLUS the sum of successful transactions on that invoice (total - balance)
