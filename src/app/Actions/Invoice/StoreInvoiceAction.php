@@ -40,9 +40,15 @@ class StoreInvoiceAction
 
         $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
 
+
         if ($invoice->status == Invoice::STATUS_REFUNDED) {
             ($this->processInvoiceAction)($invoice);
-        } else {
+            return $invoice;
+        }
+
+        $notification = data_get($data, 'notification', true);
+
+        if ($notification) {
             InvoiceCreatedJob::dispatch($invoice);
         }
 
