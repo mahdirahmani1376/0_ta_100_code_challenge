@@ -56,9 +56,9 @@ class InvoiceReminderCommand extends Command
         $this->sendEmailReminder();
         $this->sendSMSReminder();
 
-        if (!empty($this->reminders)) {
-            Bus::batch($this->reminders)->dispatch();
-        }
+//        if (!empty($this->reminders)) {
+//            Bus::batch($this->reminders)->dispatch();
+//        }
 
         $this->newLine(2);
         $this->info('Completed');
