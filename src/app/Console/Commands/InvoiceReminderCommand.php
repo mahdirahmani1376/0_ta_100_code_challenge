@@ -56,10 +56,6 @@ class InvoiceReminderCommand extends Command
         $this->sendEmailReminder();
         $this->sendSMSReminder();
 
-//        if (!empty($this->reminders)) {
-//            Bus::batch($this->reminders)->dispatch();
-//        }
-
         $this->newLine(2);
         $this->info('Completed');
     }
@@ -133,7 +129,7 @@ class InvoiceReminderCommand extends Command
                         ];
 
                         if (!$this->test) {
-                            SendInvoiceReminderJob::dispatchSync($payload, 'email');
+                            SendInvoiceReminderJob::dispatch($payload, 'email');
                         }
                         $this->info("Email reminder for client #$clientId sent successfully.");
                     } catch (Exception $e) {
@@ -169,10 +165,10 @@ class InvoiceReminderCommand extends Command
                                     'profile_id'  => $clientId,
                                     'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ],
-                            ]
+                            ],
                         ];
                         if (!$this->test) {
-                            SendInvoiceReminderJob::dispatchSync($payload, 'sms');
+                            SendInvoiceReminderJob::dispatch($payload, 'sms');
                         }
                         $this->info("SMS reminder for client #$clientId sent successfully.");
                     } catch (Exception $e) {
