@@ -12,11 +12,13 @@ class AttachTransactionToNewInvoiceService
     {
     }
 
-    public function __invoke(Transaction $transaction, Invoice $newInvoice)
+    public function __invoke(Transaction $transaction, Invoice $newInvoice, $data = [])
     {
+        // ofp->paid_at => tr->created_at
         return $this->transactionRepository->update($transaction, [
             'invoice_id' => $newInvoice->getKey(),
             'status'     => Transaction::STATUS_SUCCESS,
-        ], ['invoice_id', 'status']);
+            ...$data
+        ], ['invoice_id', 'status', ...array_keys($data)]);
     }
 }

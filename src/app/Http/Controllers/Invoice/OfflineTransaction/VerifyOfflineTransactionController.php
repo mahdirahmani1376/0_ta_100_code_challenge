@@ -19,9 +19,8 @@ class VerifyOfflineTransactionController extends Controller
 
     /**
      * @param OfflineTransaction $offlineTransaction
+     * @param VerifyOfflineTransactionRequest $request
      * @return ShowOfflineTransactionResource
-     * @throws OfflinePaymentApplyException
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(OfflineTransaction $offlineTransaction, VerifyOfflineTransactionRequest $request)
     {
