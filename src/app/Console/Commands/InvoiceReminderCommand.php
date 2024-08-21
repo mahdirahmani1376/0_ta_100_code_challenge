@@ -133,7 +133,7 @@ class InvoiceReminderCommand extends Command
                         ];
 
                         if (!$this->test) {
-                            $this->reminders[] = new SendInvoiceReminderJob($payload, 'email');
+                            SendInvoiceReminderJob::dispatchSync($payload, 'email');
                         }
                         $this->info("Email reminder for client #$clientId sent successfully.");
                     } catch (Exception $e) {
@@ -172,7 +172,7 @@ class InvoiceReminderCommand extends Command
                             ]
                         ];
                         if (!$this->test) {
-                            $this->reminders[] = new SendInvoiceReminderJob($payload, 'sms');
+                            SendInvoiceReminderJob::dispatchSync($payload, 'sms');
                         }
                         $this->info("SMS reminder for client #$clientId sent successfully.");
                     } catch (Exception $e) {
