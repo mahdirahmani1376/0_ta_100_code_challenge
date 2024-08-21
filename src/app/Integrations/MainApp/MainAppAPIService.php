@@ -7,6 +7,7 @@ use App\Integrations\Rahkaran\ValueObjects\Client;
 use App\Models\Invoice;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class MainAppAPIService extends BaseMainAppAPIService
 {
@@ -140,8 +141,18 @@ class MainAppAPIService extends BaseMainAppAPIService
         ];
 
         try {
-            self::makeRequest('post', $url, $data);
+            $sms_response = self::makeRequest('post', $url, $data);
+
+            Log::info("Notification Response", [
+                'response' => $sms_response->json(),
+                'payload'  => $data
+            ]);
         } catch (Exception $exception) {
+            Log::error("Notification Response Error", [
+                'response' => $exception->getTrace(),
+                'message'  => $exception->getMessage(),
+                'payload'  => $data
+            ]);
             throw MainAppInternalAPIException::make($url, json_encode($data));
         }
     }
