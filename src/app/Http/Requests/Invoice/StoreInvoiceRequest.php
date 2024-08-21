@@ -37,7 +37,8 @@ class StoreInvoiceRequest extends FormRequest
             'manual'                   => ['nullable', 'boolean'],
             'source_invoice'           => ['required_if:status,' . Invoice::STATUS_REFUNDED],
             'transactions'             => ['nullable', 'array'],
-            'admin_checked'            => 'nullable|boolean'
+            'admin_checked'            => 'nullable|boolean',
+            'notification'             => 'nullable|boolean',
         ];
     }
 }
