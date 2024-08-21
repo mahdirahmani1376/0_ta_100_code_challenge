@@ -1888,7 +1888,6 @@ class RahkaranService
 
         $this->updateRequestLog($log_system, $response_body, $response->getHeaders(), $response->getStatusCode());
 
-        Log::info("result $url", json_decode($response_body, true) ?? []);
         return json_decode($response_body, true);
     }
 

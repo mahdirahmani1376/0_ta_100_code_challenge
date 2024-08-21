@@ -4,6 +4,8 @@ namespace App\Services\AdminChange;
 
 use App\Models\AdminChange;
 use Illuminate\Database\Eloquent\Model;
+use Log;
+use Throwable;
 
 class AdminChangeService
 {
@@ -26,12 +28,9 @@ class AdminChangeService
                     'logable_id'   => $model?->getKey(),
                     'logable_type' => $model?->getMorphClass()
                 ]);
-                \Log::info('Admin change log updated', $logModel->toArray());
-            } else {
-                \Log::info('Admin change log not found', ['logId' => $logId]);
             }
-        } catch (\Throwable $exception) {
-            \Log::error('Update admin change failed', $exception->getTrace());
+        } catch (Throwable $exception) {
+            Log::error('Update admin change failed', $exception->getTrace());
         }
     }
 
