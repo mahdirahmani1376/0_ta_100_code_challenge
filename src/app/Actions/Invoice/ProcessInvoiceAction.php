@@ -75,7 +75,11 @@ class ProcessInvoiceAction
         }
 
         // Assign InvoiceNumber
-        AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
+        try {
+            AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
+        } catch (\Throwable $throwable) {
+            \Log::warning('Assign invoice number failed', $throwable->getTrace());
+        }
 
         // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
