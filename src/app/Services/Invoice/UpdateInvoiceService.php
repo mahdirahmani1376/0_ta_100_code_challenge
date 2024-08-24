@@ -13,6 +13,10 @@ class UpdateInvoiceService
 
     public function __invoke(Invoice $invoice, array $data): Invoice
     {
+        if (isset($data['invoice_date'])) {
+            $data['created_at'] = $data['invoice_date'];
+        }
+
         return $this->invoiceRepository->update($invoice, $data, [
             'created_at',
             'due_date',
