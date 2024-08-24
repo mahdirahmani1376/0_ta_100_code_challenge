@@ -2,6 +2,7 @@
 
 namespace App\Services\Invoice;
 
+use App\Jobs\CalcInvoicePaidAtJob;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
@@ -16,7 +17,7 @@ class CalcInvoicePaidAtService
     {
     }
 
-    public function __invoke(Invoice $invoice): Invoice
+    public function __invoke(Invoice $invoice, $async = false): Invoice
     {
         if ($invoice->balance > 0) {
             return $invoice;
@@ -30,10 +31,10 @@ class CalcInvoicePaidAtService
         if (!is_null($invoice->paid_at)) {
             return $invoice;
         }
-        $oldState = $invoice->toArray();
         // Try to find the last successful transaction and use its 'created_at' timestamp as when invoice was paid at
         /** @var Transaction $lastSuccessfulTransaction */
         $lastSuccessfulTransaction = $this->transactionRepository->getLastSuccessfulTransaction($invoice);
+
         if (!is_null($lastSuccessfulTransaction)) {
             return $this->invoiceRepository->update(
                 $invoice,
@@ -43,14 +44,14 @@ class CalcInvoicePaidAtService
                 ],
                 ['paid_at', 'payment_method']
             );
+        } else {
+            if (!$async) {
+                CalcInvoicePaidAtJob::dispatch($invoice)->delay(30);
+                return $invoice;
+            }
         }
 
-        // If of the above happened use invoice's created_at as for when it was paid at !!
-        $invoice = $this->invoiceRepository->update(
-            $invoice,
-            ['paid_at' => $invoice->created_at,],
-            ['paid_at',]
-        );
+        \Log::warning('Calculate Paid at failed for invoice #' . $invoice->getKey(), $invoice->toArray());
 
         return $invoice;
     }
