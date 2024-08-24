@@ -4,13 +4,11 @@ namespace App\Jobs;
 
 use App\Enums\QueueEnum;
 use App\Models\Invoice;
-use App\Services\Invoice\AssignInvoiceNumberService;
 use App\Services\Invoice\CalcInvoicePaidAtService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -22,7 +20,7 @@ class CalcInvoicePaidAtJob implements ShouldQueue, ShouldBeUnique
 
     public function __construct(Invoice $invoice)
     {
-        $this->invoice = $invoice->withoutRelations();
+        $this->invoice = $invoice;
         $this->onQueue(QueueEnum::PROCESS_INVOICE);
     }
 

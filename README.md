@@ -45,13 +45,14 @@ This application developed and customized by [Laravel Framework](https://laravel
 ## Commands/Cron
     - TODO complete later
 ## Jobs
-| Job                         | Queue                   | Worker    |
-|-----------------------------|-------------------------|-----------|
-| AssignInvoiceNumberJob      | process_invoices_number | WORKER_2  |
-| GenerateInvoiceNumberJob    | process_invoices_number | WORKER_2  |
-| OverrideInvoiceReminderJob  | process_invoice_reminder| WORKER_2  |
-| SendInvoiceReminderJob      | process_invoice_reminder| WORKER_2  |
-| UpdateSystemLog             | update_system_log       | WORKER_1  |
+| Job                        | Queue                    | Worker    |
+|----------------------------|--------------------------|-----------|
+| AssignInvoiceNumberJob     | process_invoices_number  | WORKER_2  |
+| GenerateInvoiceNumberJob   | process_invoices_number  | WORKER_2  |
+| CalcInvoicePaidAtJob       | process_invoice          | WORKER_2  |
+| OverrideInvoiceReminderJob | process_invoice_reminder | WORKER_2  |
+| SendInvoiceReminderJob     | process_invoice_reminder | WORKER_2  |
+| UpdateSystemLog            | update_system_log        | WORKER_1  |
 
 ### Author
 * **Esmaeel Cheshmeh Khavar** ([Gmail](mailto:e.cheshmehkhavar@gmail.com))
