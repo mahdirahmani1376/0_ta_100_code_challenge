@@ -205,7 +205,7 @@ if (!function_exists('normalise_sheba_number')) {
 if (!function_exists('round_amount')) {
     function round_amount(float $amount): float
     {
-        return ceil(round($amount, 0) / 100) * 100;
+        return ceil((int)$amount / 10) * 10;
     }
 }
 
