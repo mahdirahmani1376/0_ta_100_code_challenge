@@ -46,6 +46,7 @@ class CalcInvoicePaidAtService
             );
         } else {
             if (!$async) {
+                // call this service again after 30 seconds
                 CalcInvoicePaidAtJob::dispatch($invoice)->delay(30);
                 return $invoice;
             }
