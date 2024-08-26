@@ -95,7 +95,7 @@ class ActionOnClientCashoutAction
                 'zarinpal_payout_id ' => $payoutId,
                 'admin_id'            => $data['admin_id'],
                 'admin_note'          => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
-                'source'              => config('payment.cashout.refund_provider')
+                'source'              => 'zarinpal'
             ]);
         }
 
