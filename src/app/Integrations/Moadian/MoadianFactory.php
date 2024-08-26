@@ -19,8 +19,8 @@ use Jooyeshgar\Moadian\Payment as MoadianPayment;
 class MoadianFactory
 {
     private MoadianInvoice $moadianInvoice;
-    private Collection $responseProducts;
-    private Collection $responseDomains;
+    private Collection $services;
+    private Collection $domains;
 
     public function createMoadianInvoiceDTO(Invoice $invoice): MoadianInvoice
     {
@@ -50,8 +50,8 @@ class MoadianFactory
         $header->inp = 1; //invoice pattern
         $header->ins = $invoice->status == Invoice::STATUS_REFUNDED ? 4 : 1; // invoice type
         $header->tins = '10103421620';
-        $client = data_get(MainAppAPIService::getClients($invoice->profile_id),0);
-        if (empty($client)){
+        $client = data_get(MainAppAPIService::getClients($invoice->profile_id), 0);
+        if (empty($client)) {
             throw UserNotFoundOnMainAppException::make($invoice->id);
         }
         $invoice->client = $client;
@@ -77,7 +77,7 @@ class MoadianFactory
             $tax += floor(floor($item->amount) * 9 / 100);
             $itemSum += floor($item->amount);
         }
-        
+
         $negativeItems = abs($invoice->items->where('amount', '<', 0)->sum('amount'));
 
         // sum price before discount
@@ -169,7 +169,7 @@ class MoadianFactory
 
     private function creatInvoicePayments(Invoice $invoice): self
     {
-	    
+
         foreach ($invoice->transactions()
                      ->where('amount', '>', 0)
                      ->whereIn('status', [
@@ -197,7 +197,7 @@ class MoadianFactory
             case Item::TYPE_HOSTING:
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $product = $this->responseProducts->where('id', $item->invoiceable_id)->first();
+                $product = $this->services->where('id', $item->invoiceable_id)->first();
                 $productGroup = data_get($product, 'group.name');
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
@@ -293,7 +293,7 @@ class MoadianFactory
 
             case Item::TYPE_DOMAIN_SERVICE:
             case Item::TYPE_REFUND_DOMAIN:
-            $domain = $this->responseDomains->where('id', $item->invoiceable_id)->first();
+                $domain = $this->domains->where('id', $item->invoiceable_id)->first();
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
                     $code = 2330001496112; // TODO dobuble check دامنه داخلی
                     $description = 'تخصيص و مديريت دامنه هاي داخلي';
@@ -329,9 +329,9 @@ class MoadianFactory
     }
 
 
-    public function getProductsAndDomainsList($positiveItems)
+    public function getProductsAndDomainsList($positiveItems): void
     {
-        $productListById = collect();
+        $serviceListById = collect();
         $domainListById = collect();
 
         $positiveItems
@@ -340,8 +340,8 @@ class MoadianFactory
                 Item::TYPE_PRODUCT_SERVICE,
                 Item::TYPE_PRODUCT_SERVICE_UPGRADE
             ])
-            ->each(function (Item $item) use (&$productListById) {
-                $productListById->push($item->invoiceable_id);
+            ->each(function (Item $item) use (&$serviceListById) {
+                $serviceListById->push($item->invoiceable_id);
             })
             ->whereIn('invoiceable_type', [
                 Item::TYPE_DOMAIN_SERVICE
@@ -350,8 +350,17 @@ class MoadianFactory
                 $domainListById->push($item->invoiceable_id);
             });
 
-        $this->responseProducts = collect(MainAppAPIService::getProductsById($productListById->toArray()));
-        $this->responseDomains = collect(MainAppAPIService::getServicesById($domainListById->toArray()));
+        $this->services = collect(
+            MainAppAPIService::getServices(
+                serviceIds: $serviceListById->toArray()
+            )
+        );
 
+        $this->domains = collect(
+            MainAppAPIService::getServices(
+                serviceIds: $domainListById->toArray(),
+                type: 'domain'
+            )
+        );
     }
 }
