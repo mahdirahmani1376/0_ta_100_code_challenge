@@ -98,7 +98,7 @@ class ActionOnClientCashoutAction
                     'zarinpal_payout_id ' => $payoutId,
                     'admin_id'            => $data['admin_id'],
                     'admin_note'          => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
-                    'source'              => 'zarinpal'
+                    'source'              => config('payment.refund.refund_provider')
                 ]);
                 DB::commit();
             } catch (\Throwable $exception) {
