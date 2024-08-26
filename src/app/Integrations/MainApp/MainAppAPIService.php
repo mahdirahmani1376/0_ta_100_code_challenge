@@ -210,7 +210,7 @@ class MainAppAPIService extends BaseMainAppAPIService
      * return list of services or domains of clients
      * type => (service,domain)
      */
-    public function getServices(array $serviceIds, string $type = 'service')
+    public static function getServices(array $serviceIds, string $type = 'service')
     {
         $url = "/api/internal/finance/client-services";
 
