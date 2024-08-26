@@ -38,6 +38,7 @@ class MoadianFactory
 
     private function createInvoiceHeader(Invoice $invoice, ?Invoice $refunded_invoice_source = null): self
     {
+
         $date = str_pad(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
         $header = new InvoiceHeader(config('moadian.username'));
         $header->setTaxID(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at), $invoice->id);
@@ -168,6 +169,7 @@ class MoadianFactory
 
     private function creatInvoicePayments(Invoice $invoice): self
     {
+	    
         foreach ($invoice->transactions()
                      ->where('amount', '>', 0)
                      ->whereIn('status', [

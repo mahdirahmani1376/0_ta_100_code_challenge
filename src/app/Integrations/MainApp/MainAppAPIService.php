@@ -180,14 +180,13 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getProductsById($productIds)
+    public static function getProductsById($serviceIds)
     {
         $url = '/api/internal/finance/products';
 
         $data = [
-            'profile_ids' => [
-                $productIds
-            ]
+            'service_ids' => $serviceIds
+            
         ];
 
         try {
