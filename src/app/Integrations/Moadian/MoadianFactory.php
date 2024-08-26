@@ -344,7 +344,8 @@ class MoadianFactory
                 $serviceListById->push($item->invoiceable_id);
             });
 
-        $positiveItems->whereIn('invoiceable_type', [
+        $positiveItems
+            ->whereIn('invoiceable_type', [
                 Item::TYPE_DOMAIN_SERVICE
             ])
             ->each(function (Item $item) use (&$domainListById) {
