@@ -180,49 +180,6 @@ class MainAppAPIService extends BaseMainAppAPIService
         }
     }
 
-    public static function getProductsById($serviceIds)
-    {
-        $url = '/api/internal/finance/products';
-
-        $data = [
-            'service_ids' => $serviceIds
-            
-        ];
-
-        try {
-            $response = self::makeRequest('get', $url, $data);
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            throw MainAppInternalAPIException::make($url, json_encode($data));
-        } catch (Exception $exception) {
-            throw MainAppInternalAPIException::make($url, json_encode($data));
-        }
-    }
-
-    public static function getServicesById($profileIds)
-    {
-        $url = '/api/internal/finance/services';
-
-        $data = [
-            'profile_ids' => [
-                $profileIds
-            ]
-        ];
-
-        try {
-            $response = self::makeRequest('get', $url, $data);
-
-            if ($response->successful()) {
-                return $response->json('data');
-            }
-
-        } catch (Exception $exception) {
-            throw MainAppInternalAPIException::make($url, json_encode($data));
-        }
-    }
-
     public static function recalculateDomainServicePrice($domainId)
     {
         $url = "/api/internal/finance/$domainId/recalculate-domain";
@@ -241,6 +198,28 @@ class MainAppAPIService extends BaseMainAppAPIService
         $url = "/api/internal/finance/$serviceId/recalculate-service";
 
         $response = self::makeRequest('get', $url);
+
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            throw MainAppInternalAPIException::make($url);
+        }
+    }
+
+    /**
+     * return list of services or domains of clients
+     * type => (service,domain)
+     */
+    public function getServices(array $serviceIds, string $type = 'service')
+    {
+        $url = "/api/internal/finance/client-services";
+
+        $data = [
+            'service_ids' => $serviceIds,
+            'type'        => $type
+        ];
+
+        $response = self::makeRequest('post', $url, $data);
 
         if ($response->successful()) {
             return $response->json();
