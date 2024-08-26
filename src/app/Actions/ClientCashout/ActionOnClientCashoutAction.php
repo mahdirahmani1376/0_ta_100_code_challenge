@@ -104,10 +104,20 @@ class ActionOnClientCashoutAction
             'description' => 'بازگشت وجه به حساب بانکی کاربر - شماره درخواست : ' . $clientCashout->id,
         ]);
 
-        /** @var RahkaranService $rahkaranService */
-        $rahkaranService = app(RahkaranService::class);
-        if (!$rahkaranService->isTestMode()) {
-            $rahkaranService->createPayment($rahkaranService->getPaymentInstanceForCashout($creditTransaction));
+        try {
+            $rahkaranService = app(RahkaranService::class);
+            if (!$rahkaranService->isTestMode()) {
+                $rahkaranService->createPayment($rahkaranService->getPaymentInstanceForCashout($creditTransaction));
+            }
+        } catch (\Throwable $exception) {
+            \Log::warning(
+                'Create payment in rahkaran failed. for cashout',
+                [
+                    'client_cashout_id' => $clientCashout->getKey(),
+                    'trace'             => $exception->getTrace(),
+                    'message'           => $exception->getMessage(),
+                ]
+            );
         }
 
         ($this->updateClientCashoutService)($clientCashout, ['status' => ClientCashout::STATUS_ACTIVE]);
