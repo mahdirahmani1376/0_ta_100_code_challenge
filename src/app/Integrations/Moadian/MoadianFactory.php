@@ -39,12 +39,12 @@ class MoadianFactory
     private function createInvoiceHeader(Invoice $invoice, ?Invoice $refunded_invoice_source = null): self
     {
 
-        $date = str_pad(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
+        $date = str_pad(Carbon::parse($invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
         $header = new InvoiceHeader(config('moadian.username'));
-        $header->setTaxID(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at), $invoice->id);
+        $header->setTaxID(Carbon::parse($invoice->paid_at), $invoice->id);
         $header->indatim = $date;
         $header->indati2m = $date;
-        $header->inty = 1; //invoice type
+        $header->inty = 1;
         $header->inno = str_pad($invoice->id, 10, 0, STR_PAD_LEFT);
         $header->irtaxid = !empty($refunded_invoice_source) ? MoadianLog::query()->where('invoice_id', $refunded_invoice_source->id)->first()?->tax_id : null;
         $header->inp = 1; //invoice pattern
@@ -74,7 +74,7 @@ class MoadianFactory
         $tax = 0;
         $itemSum = 0;
         foreach ($invoice->items->all() as $item) {
-            $tax += floor(floor($item->amount) * 9 / 100);
+            $tax += floor(floor($item->amount) * $invoice->tax_rate / 100);
             $itemSum += floor($item->amount);
         }
 
@@ -197,8 +197,9 @@ class MoadianFactory
             case Item::TYPE_HOSTING:
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $product = $this->services->where('id', $item->invoiceable_id)->first();
-                $productGroup = data_get($product, 'group.name');
+                $service = $this->services->where('id', $item->invoiceable_id)->first();
+		$product = data_get($service, 'product');
+                $productGroup = data_get($product, 'product.group.name');
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
                     $description = 'پنل نمايندگي هاست وب سايت';
@@ -242,6 +243,11 @@ class MoadianFactory
                 if (Str::contains($productGroup, ['Windows-host'])) {
                     $code = 2330001496044;
                     $description = 'هاست وب سايت ويندوز';
+                    break;
+                }
+                if (Str::contains($product['name'], ['internet', 'Internet', 'Internet BW'])) {
+                    $code = 2330001496334;
+                    $description = 'خدمات تخصيص پهناي باند و برقراري ارتباط اينترنتي';
                     break;
                 }
                 if (Str::contains($productGroup, ['Host-backup-ir'])) {
@@ -321,7 +327,7 @@ class MoadianFactory
 
         if (is_null($code)) {
             info('mapping not found for relId: ' . $item->invoiceable_id . ' - type: ' . $item->invoiceable_type);
-            $code = 2330001496013;
+            $code = 2330001496129;
             $description = 'خدمات هاست وب سايت';
         }
 
