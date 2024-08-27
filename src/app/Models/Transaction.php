@@ -33,12 +33,10 @@ class Transaction extends Model
 {
     public const PREFIX_CREDIT_TRANSACTION = 'CREDIT_TRANSACTION_';
     const PAYMENT_METHOD_OFFLINE = 'offline';
-    const PAYMENT_METHOD_WALLET_BALANCE = 'wallet_balance';
     const PAYMENT_METHOD_BARTER = 'barter';
     const PAYMENT_METHOD_CREDIT = 'client_credit';
     const PAYMENT_METHODS = [
         self::PAYMENT_METHOD_OFFLINE,
-        self::PAYMENT_METHOD_WALLET_BALANCE,
         self::PAYMENT_METHOD_BARTER,
         self::PAYMENT_METHOD_CREDIT,
     ];
@@ -47,7 +45,7 @@ class Transaction extends Model
     const STATUS_FAIL = 'fail'; // old status = 2
     const STATUS_REFUND = 'refund'; // old status 30
 
-    public const STATUS_FRAUD  = 'fraud'; // old status 21
+    public const STATUS_FRAUD = 'fraud'; // old status 21
     const STATUS_PENDING_BANK_VERIFY = 'pending_bank_verify'; // old status 6
     const STATUS_CANCELED = 'canceled';
     const STATUSES = [
@@ -62,6 +60,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'profile_id',
+        'created_at',
         'invoice_id',
         'rahkaran_id',
         'amount',

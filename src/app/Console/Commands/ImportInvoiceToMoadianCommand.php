@@ -75,17 +75,10 @@ class ImportInvoiceToMoadianCommand extends Command
             return Invoice::query()->where('id', $this->option('override-id'));
         }
         // query copied from ImportInvoicesToRahkaranCommand.php
-        $query = Invoice::query()->where(function (Builder $query) use ($fromDate, $toDate) {
-            $query->orWhere(function (Builder $status_query) use ($fromDate, $toDate) {
-                $status_query->whereDate('created_at', '>=', $fromDate);
-                $status_query->whereDate('created_at', '<=', $toDate);
-                $status_query->where('status', Invoice::STATUS_COLLECTIONS);
-            });
-            $query->orWhere(function (Builder $status_query) use ($fromDate, $toDate) {
-                $status_query->whereDate('paid_at', '>=', $fromDate);
-                $status_query->whereDate('paid_at', '<=', $toDate);
-            });
-        });
+	$query = Invoice::query()
+		->whereDate('paid_at', '>=', $fromDate)
+		->whereDate('paid_at', '<=', $toDate);
+		
 
         // Only paid or refunded invoices can be imported
         $query->whereIn('status', [
@@ -107,13 +100,9 @@ class ImportInvoiceToMoadianCommand extends Command
             ->whereHas('invoice', function ($q) use ($fromDate, $toDate) {
                 $q->whereDate('paid_at', '>=', $fromDate);
                 $q->whereDate('paid_at', '<=', $toDate);
-            })->orWhereHas('invoice', function ($q) use ($fromDate, $toDate) {
-                $q->where('status', Invoice::STATUS_COLLECTIONS);
-                $q->whereDate('created_at', '>=', $fromDate);
-                $q->whereDate('created_at', '<=', $toDate);
-            })
-            ->distinct('id')
-            ->pluck('id');
+	    })
+            ->distinct('invoice_id')
+            ->pluck('invoice_id');
 
         $query->whereNotIn('id', $modianLogs);
 

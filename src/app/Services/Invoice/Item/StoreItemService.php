@@ -13,6 +13,7 @@ class StoreItemService
 
     public function __invoke(Invoice $invoice, array $data)
     {
+        $data['amount'] = (int)$data['amount'];
         return $this->itemRepository->create(
             array_merge($data, ['invoice_id' => $invoice->id,])
         );

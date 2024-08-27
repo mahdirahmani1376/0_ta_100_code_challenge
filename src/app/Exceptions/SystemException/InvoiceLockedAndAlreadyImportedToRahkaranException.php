@@ -19,7 +19,7 @@ class InvoiceLockedAndAlreadyImportedToRahkaranException extends BaseSystemExcep
 
     protected int $logType = ExceptionTypes::TYPE_ACTION;
 
-    protected int $errorCode = 500;
+    protected int $errorCode = 400;
 
     protected array $messageParams = [
         'invoice_id' => '',

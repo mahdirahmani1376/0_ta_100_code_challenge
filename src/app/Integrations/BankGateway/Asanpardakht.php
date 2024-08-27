@@ -57,51 +57,61 @@ class Asanpardakht extends BaseBankGateway implements Interface\BankGatewayInter
     {
         $this->callbackLog($transaction, $data);
 
-        $transactionResultResponse = Http::withHeader('Content-Type', 'application/json')
-            ->withHeader('usr', $this->bankGateway->config['username'])
-            ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->get($this->bankGateway->config['request_url'] . 'TranResult', [
+        $transactionResultResponse = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'usr'          => $this->bankGateway->config['username'],
+            'pwd'          => $this->bankGateway->config['password']
+        ])->get(
+            $this->bankGateway->config['request_url'] . 'TranResult',
+            [
                 'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
                 'localInvoiceId'          => $transaction->getKey(),
-            ]);
+            ]
+        );
 
-        if ($transactionResultResponse->status() != Response::HTTP_OK) {
+        // "{\"cardNumber\":\"502229xxxx4837\",\"rrn\":\"055340189442\",\"refID\":\"177e41239094221f1\",\"amount\":\"3168000\",\"payGateTranID\":\"1938987738\",\"salesOrderID\":\"1094803\",\"hash\":null,\"serviceTypeId\":1,\"serviceStatusCode\":null,\"destinationMobile\":null,\"productId\":null,\"productNameFa\":null,\"productPrice\":null,\"operatorId\":null,\"operatorNameFa\":null,\"simTypeId\":null,\"simTypeTitleFa\":null,\"billId\":null,\"payId\":null,\"billOrganizationNameFa\":null,\"payGateTranDate\":\"2024-03-25T13:05:04.7777189\",\"payGateTranDateEpoch\":1711359304.0}",
+
+        $verifyStatus = $transactionResultResponse->status();
+
+        if ($verifyStatus != 200) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $amount = data_get($data, 'Amount');
-        $transactionId = data_get($data, 'PayGateTranID');
-        if ($amount != $transaction->amount || $transactionId != $transaction->getKey()) {
+        $amount = $transactionResultResponse->json('amount');
+        $transactionId = $transactionResultResponse->json('payGateTranID');
+        if ($amount != $transaction->amount) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $verifyResponse = Http::withHeader('Content-Type', 'application/json')
-            ->withHeader('usr', $this->bankGateway->config['username'])
-            ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->post($this->bankGateway->config['request_url'] . 'Verify', [
-                'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
-                'payGateTranId'           => $transactionResultResponse->json('payGateTranID'),
-            ]);
+        $verifyResponse = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'usr'          => $this->bankGateway->config['username'],
+            'pwd'          => $this->bankGateway->config['password']
+        ])->post($this->bankGateway->config['request_url'] . 'Verify', [
+            'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
+            'payGateTranId'           => $transactionId,
+        ]);
 
-        if ($verifyResponse->status() != Response::HTTP_OK) {
+        if ($verifyResponse->status() != 200) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        $settlementResponse = Http::withHeader('Content-Type', 'application/json')
-            ->withHeader('usr', $this->bankGateway->config['username'])
-            ->withHeader('pwd', $this->bankGateway->config['password'])
-            ->post($this->bankGateway->config['request_url'] . 'Settlement', [
-                'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
-                'payGateTranId'           => $transactionResultResponse->json('payGateTranID'),
-            ]);
+        $settlementResponse = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'usr'          => $this->bankGateway->config['username'],
+            'pwd'          => $this->bankGateway->config['password']
+        ])->post($this->bankGateway->config['request_url'] . 'Settlement', [
+            'merchantConfigurationId' => $this->bankGateway->config['merchant_id'],
+            'payGateTranId'           => $transactionId,
+        ]);
 
-        if ($settlementResponse->status() != Response::HTTP_OK) {
+        if ($settlementResponse->status() != 200) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
         return ($this->updateTransactionService)($transaction, [
             'status'       => Transaction::STATUS_SUCCESS,
-            'reference_id' => $transactionResultResponse->json('payGateTranID'),
+            'reference_id' => $transactionId,
         ]);
     }
 }

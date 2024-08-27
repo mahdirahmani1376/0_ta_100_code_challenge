@@ -56,10 +56,6 @@ class InvoiceReminderCommand extends Command
         $this->sendEmailReminder();
         $this->sendSMSReminder();
 
-        if (!empty($this->reminders)) {
-            Bus::batch($this->reminders)->dispatch();
-        }
-
         $this->newLine(2);
         $this->info('Completed');
     }
@@ -126,7 +122,6 @@ class InvoiceReminderCommand extends Command
                             'reminders' => [
                                 [
                                     'profile_id'  => $clientId,
-                                    'message'     => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->emailMessageTemplate, $this->emailLinkTemplate),
                                     'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ]
                             ],
@@ -134,7 +129,7 @@ class InvoiceReminderCommand extends Command
                         ];
 
                         if (!$this->test) {
-                            $this->reminders[] = new SendInvoiceReminderJob($payload, 'email');
+                            SendInvoiceReminderJob::dispatch($payload, 'email');
                         }
                         $this->info("Email reminder for client #$clientId sent successfully.");
                     } catch (Exception $e) {
@@ -167,13 +162,13 @@ class InvoiceReminderCommand extends Command
                         $payload = [
                             'reminders' => [
                                 [
-                                    'profile_id' => $clientId,
-                                    'message'    => $this->prepareMessage($clientId, $invoices->pluck('id')->toArray(), $this->smsMessageTemplate, $this->smsLinkTemplate),
+                                    'profile_id'  => $clientId,
+                                    'invoice_ids' => $invoices->pluck('id')->toArray(),
                                 ],
-                            ]
+                            ],
                         ];
                         if (!$this->test) {
-                            $this->reminders[] = new SendInvoiceReminderJob($payload, 'sms');
+                            SendInvoiceReminderJob::dispatch($payload, 'sms');
                         }
                         $this->info("SMS reminder for client #$clientId sent successfully.");
                     } catch (Exception $e) {

@@ -19,8 +19,8 @@ use Jooyeshgar\Moadian\Payment as MoadianPayment;
 class MoadianFactory
 {
     private MoadianInvoice $moadianInvoice;
-    private Collection $responseProducts;
-    private Collection $responseDomains;
+    private Collection $services;
+    private Collection $domains;
 
     public function createMoadianInvoiceDTO(Invoice $invoice): MoadianInvoice
     {
@@ -38,19 +38,20 @@ class MoadianFactory
 
     private function createInvoiceHeader(Invoice $invoice, ?Invoice $refunded_invoice_source = null): self
     {
-        $date = str_pad(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
+
+        $date = str_pad(Carbon::parse($invoice->paid_at)->timestamp, 13, 0, STR_PAD_RIGHT);
         $header = new InvoiceHeader(config('moadian.username'));
-        $header->setTaxID(Carbon::parse($invoice->status == Invoice::STATUS_COLLECTIONS ? $invoice->created_at : $invoice->paid_at), $invoice->id);
+        $header->setTaxID(Carbon::parse($invoice->paid_at), $invoice->id);
         $header->indatim = $date;
         $header->indati2m = $date;
-        $header->inty = 1; //invoice type
+        $header->inty = 1;
         $header->inno = str_pad($invoice->id, 10, 0, STR_PAD_LEFT);
         $header->irtaxid = !empty($refunded_invoice_source) ? MoadianLog::query()->where('invoice_id', $refunded_invoice_source->id)->first()?->tax_id : null;
         $header->inp = 1; //invoice pattern
         $header->ins = $invoice->status == Invoice::STATUS_REFUNDED ? 4 : 1; // invoice type
         $header->tins = '10103421620';
-        $client = data_get(MainAppAPIService::getClients($invoice->profile_id),0);
-        if (empty($client)){
+        $client = data_get(MainAppAPIService::getClients($invoice->profile_id), 0);
+        if (empty($client)) {
             throw UserNotFoundOnMainAppException::make($invoice->id);
         }
         $invoice->client = $client;
@@ -73,10 +74,10 @@ class MoadianFactory
         $tax = 0;
         $itemSum = 0;
         foreach ($invoice->items->all() as $item) {
-            $tax += floor(floor($item->amount) * 9 / 100);
+            $tax += floor(floor($item->amount) * ($invoice->tax_rate / 100));
             $itemSum += floor($item->amount);
         }
-        
+
         $negativeItems = abs($invoice->items->where('amount', '<', 0)->sum('amount'));
 
         // sum price before discount
@@ -91,7 +92,7 @@ class MoadianFactory
 
         $header->tvam = $tax;
         $header->todam = 0;
-        $header->tbill = floor($tax) + floor($itemSum);
+        $header->tbill = $tax + $itemSum;
 
         if ($invoice->status == Invoice::STATUS_COLLECTIONS) { // Collection Invoices
             $header->setm = 2;
@@ -156,7 +157,7 @@ class MoadianFactory
             $body->dis = $discount;
             // price after discount
             $body->adis = floor($priceAfterDiscount);
-            $body->vra = 9;
+            $body->vra = $invoice->tax_rate;
             //$body->vam = round(config('payment.tax.total') * $item->amount / 100); // or directly calculate here like floor($body->adis * $body->vra / 100)
             $body->vam = floor($body->adis * $body->vra / 100);
             $body->tsstam = round($body->fee + $body->vam);
@@ -168,6 +169,7 @@ class MoadianFactory
 
     private function creatInvoicePayments(Invoice $invoice): self
     {
+
         foreach ($invoice->transactions()
                      ->where('amount', '>', 0)
                      ->whereIn('status', [
@@ -195,8 +197,9 @@ class MoadianFactory
             case Item::TYPE_HOSTING:
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $product = $this->responseProducts->where('id', $item->invoiceable_id)->first();
-                $productGroup = data_get($product, 'group.name');
+                $service = $this->services->where('id', $item->invoiceable_id)->first();
+		$product = data_get($service, 'product');
+                $productGroup = data_get($product, 'product.group.name');
                 if (Str::contains($product['name'], ['نمایندگی'])) {
                     $code = 2330001496167;
                     $description = 'پنل نمايندگي هاست وب سايت';
@@ -242,6 +245,11 @@ class MoadianFactory
                     $description = 'هاست وب سايت ويندوز';
                     break;
                 }
+                if (Str::contains($product['name'], ['internet', 'Internet', 'Internet BW'])) {
+                    $code = 2330001496334;
+                    $description = 'خدمات تخصيص پهناي باند و برقراري ارتباط اينترنتي';
+                    break;
+                }
                 if (Str::contains($productGroup, ['Host-backup-ir'])) {
                     $code = 2330001496082;
                     $description = 'هاست وب سايت بك آپ';
@@ -252,7 +260,7 @@ class MoadianFactory
                     $description = 'هاست دانلود';
                     break;
                 }
-                if (Str::contains($productGroup, ['Host-linux'])) {
+                if (Str::contains($productGroup, ['Host-Linux'])) {
                     $code = 2330001496129;
                     $description = 'هاست وب سايت لينوكس';
                     break;
@@ -291,7 +299,7 @@ class MoadianFactory
 
             case Item::TYPE_DOMAIN_SERVICE:
             case Item::TYPE_REFUND_DOMAIN:
-            $domain = $this->responseDomains->where('id', $item->invoiceable_id)->first();
+                $domain = $this->domains->where('id', $item->invoiceable_id)->first();
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
                     $code = 2330001496112; // TODO dobuble check دامنه داخلی
                     $description = 'تخصيص و مديريت دامنه هاي داخلي';
@@ -319,7 +327,7 @@ class MoadianFactory
 
         if (is_null($code)) {
             info('mapping not found for relId: ' . $item->invoiceable_id . ' - type: ' . $item->invoiceable_type);
-            $code = 2330001496013;
+            $code = 2330001496129;
             $description = 'خدمات هاست وب سايت';
         }
 
@@ -327,9 +335,9 @@ class MoadianFactory
     }
 
 
-    public function getProductsAndDomainsList($positiveItems)
+    public function getProductsAndDomainsList($positiveItems): void
     {
-        $productListById = collect();
+        $serviceListById = collect();
         $domainListById = collect();
 
         $positiveItems
@@ -338,9 +346,11 @@ class MoadianFactory
                 Item::TYPE_PRODUCT_SERVICE,
                 Item::TYPE_PRODUCT_SERVICE_UPGRADE
             ])
-            ->each(function (Item $item) use (&$productListById) {
-                $productListById->push($item->invoiceable_id);
-            })
+            ->each(function (Item $item) use (&$serviceListById) {
+                $serviceListById->push($item->invoiceable_id);
+            });
+
+        $positiveItems
             ->whereIn('invoiceable_type', [
                 Item::TYPE_DOMAIN_SERVICE
             ])
@@ -348,8 +358,17 @@ class MoadianFactory
                 $domainListById->push($item->invoiceable_id);
             });
 
-        $this->responseProducts = collect(MainAppAPIService::getProductsById($productListById->toArray()));
-        $this->responseDomains = collect(MainAppAPIService::getServicesById($domainListById->toArray()));
+        $this->services = collect(
+            MainAppAPIService::getServices(
+                serviceIds: $serviceListById->toArray()
+            )
+        );
 
+        $this->domains = collect(
+            MainAppAPIService::getServices(
+                serviceIds: $domainListById->toArray(),
+                type: 'domain'
+            )
+        );
     }
 }

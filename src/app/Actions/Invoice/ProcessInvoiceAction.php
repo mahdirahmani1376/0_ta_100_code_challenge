@@ -26,25 +26,25 @@ class ProcessInvoiceAction
         private readonly FindInvoiceByIdService        $findInvoiceByIdService,
         private readonly CalcInvoiceProcessedAtService $calcInvoiceProcessedAtService,
         private readonly ManualCheckService            $manualCheckService,
+        private readonly ShowInvoiceByCriteriaAction   $showInvoiceByCriteriaAction,
     )
     {
     }
 
     public function __invoke(Invoice $invoice): Invoice
     {
-        $invoice->refresh();
+        // Get invoice and recalculate price fields
+        $invoice = ($this->showInvoiceByCriteriaAction)([
+            'id' => $invoice->getKey()
+        ], true);
 
         // If REFUNDED Invoice then charge client's wallet and store a transaction for this Invoice
-
         if ($invoice->status === Invoice::STATUS_REFUNDED) {
-            ($this->storeCreditTransactionAction)($invoice->profile_id, [
-                'amount'      => $invoice->total,
-                'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
-                'invoice_id'  => $invoice->getKey()
-            ]);
-            ($this->storeRefundTransactionService)($invoice);
-            ($this->calcInvoicePriceFieldsService)($invoice);
+            $this->processRefundedInvoice($invoice);
         }
+
+        $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
+
         // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
         // so we only change its status to paid and nothing else, this is done in another service
         if ($invoice->processed_at) {
@@ -75,7 +75,11 @@ class ProcessInvoiceAction
         }
 
         // Assign InvoiceNumber
-        AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
+        try {
+            AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
+        } catch (\Throwable $throwable) {
+            \Log::warning('Assign invoice number failed', $throwable->getTrace());
+        }
 
         // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
@@ -119,12 +123,23 @@ class ProcessInvoiceAction
         return $invoice;
     }
 
-    private function storeCreditTraction(Invoice $invoice, float $amount = 0): void
+    private function storeCreditTraction(Invoice $invoice, float $amount): void
     {
         ($this->storeCreditTransactionAction)($invoice->profile_id, [
-            'amount'      => $amount > 0 ? $amount : $invoice->balance,
+            'amount'      => $amount,
             'description' => __('finance.credit.AddCreditInvoice', ['invoice_id' => $invoice->getKey()]),
+            'invoice_id'  => $invoice->getKey(),
+            'date'        => $invoice->paid_at
+        ]);
+    }
+
+    private function processRefundedInvoice(Invoice $invoice): void
+    {
+        ($this->storeCreditTransactionAction)($invoice->profile_id, [
+            'amount'      => $invoice->total,
+            'description' => __('finance.credit.RefundRefundedInvoiceCredit', ['invoice_id' => $invoice->getKey()]),
             'invoice_id'  => $invoice->getKey()
         ]);
+        ($this->storeRefundTransactionService)($invoice);
     }
 }

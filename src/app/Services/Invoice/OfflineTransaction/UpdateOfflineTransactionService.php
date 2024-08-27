@@ -21,6 +21,7 @@ class UpdateOfflineTransactionService
             'tracking_code',
             'mobile',
             'description',
+	    'amount'
         ]);
     }
 }

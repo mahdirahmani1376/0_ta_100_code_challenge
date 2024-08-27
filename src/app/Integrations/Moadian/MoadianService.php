@@ -38,7 +38,7 @@ class MoadianService
     {
         $response = Moadian::inquiryByReferenceNumbers($moadianLog->reference_code)->getBody()[0];
         $status = $response['status'];
-        if ($status == 'PENDING') {
+        if ( in_array($status, ['PENDING', 'IN_PROGRESS']) ) {
             return $response;
         }
         $moadianLog->status = match ($status) {

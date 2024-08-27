@@ -191,7 +191,7 @@ Route::namespace('ClientCashout')
         Route::post('/', StoreClientCashoutController::class);
         Route::get('{clientCashout}', ShowClientCashoutController::class);
         Route::put('{clientCashout}', UpdateClientCashoutController::class);
-        Route::get('{clientCashout}/{action}', ActionOnClientCashoutController::class);
+        Route::post('{clientCashout}/{action}', ActionOnClientCashoutController::class);
     });
 
 Route::namespace('Profile')

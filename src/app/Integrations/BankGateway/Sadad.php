@@ -2,12 +2,10 @@
 
 namespace App\Integrations\BankGateway;
 
-use App\Exceptions\Http\BadRequestException;
 use App\Models\BankGateway;
 use App\Models\Transaction;
 use App\Services\Transaction\UpdateTransactionService;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
@@ -67,17 +65,18 @@ class Sadad extends BaseBankGateway implements Interface\BankGatewayInterface
                 'SignData' => $this->encrypt($transaction->tracking_code, $this->bankGateway->config['api_key']),
             ]);
 
-        if (!$response->json('content.ResCode') != 0) {
+        // {"ResCode":"0","Description":"عملیات با موفقیت انجام شد","Amount":"2500000","RetrivalRefNo":"322100129162","SystemTraceNo":"091805","OrderId":"1094769","SwitchResCode":"00","TransactionDate":"3/25/2024 12:42:33 PM","AdditionalData":null,"CardHolderFullName":null}
+        if ($response->json('Amount') != $transaction->amount) {
+            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
+        }
+
+        if ($response->json('ResCode') != 0) {
             return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
         }
 
-        /*if ($response->json('Amount') != $transaction->amount) {
-            return ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FRAUD,]);
-        }*/
-
         return ($this->updateTransactionService)($transaction, [
             'status'       => Transaction::STATUS_SUCCESS,
-            'reference_id' => $response->json('content.RetrivalRefNo'),
+            'reference_id' => $response->json('RetrivalRefNo'),
         ]);
     }
 

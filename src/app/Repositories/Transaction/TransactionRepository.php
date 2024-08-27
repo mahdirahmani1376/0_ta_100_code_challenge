@@ -22,9 +22,12 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where('status', Transaction::STATUS_SUCCESS);
 
         if ($onlinePayment) {
-            $query->where('payment_method', '!=', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+            $query->whereNotIn('payment_method', [
+                Transaction::PAYMENT_METHOD_CREDIT,
+                Transaction::PAYMENT_METHOD_OFFLINE,
+            ]);
         } else {
-            $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+            $query->where('payment_method', Transaction::PAYMENT_METHOD_CREDIT);
         }
 
         return $query->update(['status' => Transaction::STATUS_REFUND]);
@@ -45,9 +48,12 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where('status', Transaction::STATUS_SUCCESS);
 
         if ($onlinePayment) {
-            $query->where('payment_method', '!=', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+            $query->whereNotIn('payment_method', [
+                Transaction::PAYMENT_METHOD_CREDIT,
+                Transaction::PAYMENT_METHOD_OFFLINE,
+            ]);
         } else {
-            $query->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE);
+            $query->where('payment_method', Transaction::PAYMENT_METHOD_CREDIT);
         }
 
         return $query->get();
@@ -123,7 +129,6 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where('profile_id', $profileId)
             ->where('status', Transaction::STATUS_SUCCESS)
             ->whereNotIn('payment_method', [
-                Transaction::PAYMENT_METHOD_WALLET_BALANCE,
                 Transaction::PAYMENT_METHOD_CREDIT,
             ])
             ->where('amount', '>=', 50000)
@@ -172,28 +177,13 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         $query = self::newQuery()
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
-            ->where(function (Builder $query) {
-                $query
-                    ->where(function (Builder $query) {
-                        $query->whereHas('invoice', function (Builder $query) {
-                            $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS]);
-                            $query->where('is_credit', false);
-                        });
-                        $query->where('status', Transaction::STATUS_SUCCESS);
-                    })
-                    ->orWhere(function (Builder $query) {
-                        $query->whereHas('invoice', function (Builder $query) {
-                            $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
-                            $query->where('is_credit', false);
-                        });
-                        $query->where('status', Transaction::STATUS_REFUND);
-                        $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_CREDIT);
-                });
+	    ->where('reference_id', 'NOT LIKE', 'ROUND%')
+	    ->where('status', Transaction::STATUS_SUCCESS)
+	    ->whereNotIn('payment_method', [Transaction::PAYMENT_METHOD_CREDIT, Transaction::PAYMENT_METHOD_BARTER])
+	    ->whereHas('invoice', function (Builder $query) {
+                $query->whereNotIn('status', [Invoice::STATUS_REFUNDED]);
             })
-            // Filters out imported transactions
-            ->whereNull('rahkaran_id')
-            // Filter Barter Transactions
-            ->where('payment_method', '<>', Transaction::PAYMENT_METHOD_BARTER);
+            ->whereNull('rahkaran_id');
 
         return $query;
     }
@@ -210,7 +200,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         $wallet = self::newQuery()
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
-            ->where('payment_method', Transaction::PAYMENT_METHOD_WALLET_BALANCE)
+            ->where('payment_method', Transaction::PAYMENT_METHOD_CREDIT)
             ->where('status', Transaction::STATUS_SUCCESS);
         $onlineTransactionsBasedOnGateway = [];
         foreach (BankGateway::cursor() as $bankGateway) {
@@ -244,5 +234,31 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->where($criteria)
             ->scopes($scopes)
             ->sum($column);
+    }
+
+    public function sumOfPaidTransactionsByCriteria($criteria = [], bool $onlinePayment = false)
+    {
+        $query = self::newQuery()
+            ->where('status', Transaction::STATUS_SUCCESS);
+
+        foreach ($criteria as $key => $value) {
+            if ($key == 'created_at') {
+                $query = $query->where('created_at', ">=", $value->clone()->startOfDay()->format('Y-m-d H:i:s'))
+                    ->where('created_at', "<=", $value->startOfHour()->format('Y-m-d H:i:s'));
+            }
+        }
+
+        if ($onlinePayment) {
+            $query->whereNotIn('payment_method', [
+                Transaction::PAYMENT_METHOD_CREDIT,
+                Transaction::PAYMENT_METHOD_OFFLINE,
+            ]);
+        } else {
+            $query->where('payment_method', Transaction::PAYMENT_METHOD_CREDIT);
+        }
+
+        $sum = $query->sum('amount');
+
+        return $sum;
     }
 }

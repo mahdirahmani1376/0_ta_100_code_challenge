@@ -30,8 +30,6 @@ class UpdateInvoiceAction
             throw UpdatingPaidOrRefundedInvoiceNotAllowedException::make($invoice->getKey(), $invoice->status);
         }
 
-        $oldState = $invoice->toArray();
-
         $invoice = ($this->updateInvoiceService)($invoice, $data);
 
         if (isset($data['tax_rate'])) {
