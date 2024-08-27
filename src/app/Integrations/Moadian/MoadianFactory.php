@@ -260,7 +260,7 @@ class MoadianFactory
                     $description = 'هاست دانلود';
                     break;
                 }
-                if (Str::contains($productGroup, ['Host-linux'])) {
+                if (Str::contains($productGroup, ['Host-Linux'])) {
                     $code = 2330001496129;
                     $description = 'هاست وب سايت لينوكس';
                     break;
