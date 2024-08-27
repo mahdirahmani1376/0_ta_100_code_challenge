@@ -775,6 +775,7 @@ class RahkaranService
             case 'client_credit':
 
                 return $this->findRahkaranIdByName('client_credit');
+            case 'offline':
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':

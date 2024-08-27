@@ -177,28 +177,13 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         $query = self::newQuery()
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
-            ->where(function (Builder $query) {
-                $query
-                    ->where(function (Builder $query) {
-                        $query->whereHas('invoice', function (Builder $query) {
-                            $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_COLLECTIONS]);
-                            $query->where('is_credit', false);
-                        });
-                        $query->where('status', Transaction::STATUS_SUCCESS);
-                    })
-                    ->orWhere(function (Builder $query) {
-                        $query->whereHas('invoice', function (Builder $query) {
-                            $query->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_CANCELED]);
-                            $query->where('is_credit', false);
-                        });
-                        $query->where('status', Transaction::STATUS_REFUND);
-                        $query->where('payment_method', '<>', Transaction::PAYMENT_METHOD_CREDIT);
-                    });
+	    ->where('reference_id', 'NOT LIKE', 'ROUND%')
+	    ->where('status', Transaction::STATUS_SUCCESS)
+	    ->whereNotIn('payment_method', [Transaction::PAYMENT_METHOD_CREDIT, Transaction::PAYMENT_METHOD_BARTER])
+	    ->whereHas('invoice', function (Builder $query) {
+                $query->whereNotIn('status', [Invoice::STATUS_REFUNDED]);
             })
-            // Filters out imported transactions
-            ->whereNull('rahkaran_id')
-            // Filter Barter Transactions
-            ->where('payment_method', '<>', Transaction::PAYMENT_METHOD_BARTER);
+            ->whereNull('rahkaran_id');
 
         return $query;
     }
