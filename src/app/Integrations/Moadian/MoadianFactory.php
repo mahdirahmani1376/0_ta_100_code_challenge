@@ -74,7 +74,7 @@ class MoadianFactory
         $tax = 0;
         $itemSum = 0;
         foreach ($invoice->items->all() as $item) {
-            $tax += floor(floor($item->amount) * $invoice->tax_rate / 100);
+            $tax += floor(floor($item->amount) * ($invoice->tax_rate / 100));
             $itemSum += floor($item->amount);
         }
 
@@ -92,7 +92,7 @@ class MoadianFactory
 
         $header->tvam = $tax;
         $header->todam = 0;
-        $header->tbill = floor($tax) + floor($itemSum);
+        $header->tbill = $tax + $itemSum;
 
         if ($invoice->status == Invoice::STATUS_COLLECTIONS) { // Collection Invoices
             $header->setm = 2;
@@ -157,7 +157,7 @@ class MoadianFactory
             $body->dis = $discount;
             // price after discount
             $body->adis = floor($priceAfterDiscount);
-            $body->vra = 9;
+            $body->vra = $invoice->tax_rate;
             //$body->vam = round(config('payment.tax.total') * $item->amount / 100); // or directly calculate here like floor($body->adis * $body->vra / 100)
             $body->vam = floor($body->adis * $body->vra / 100);
             $body->tsstam = round($body->fee + $body->vam);
