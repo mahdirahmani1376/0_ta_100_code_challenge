@@ -73,21 +73,27 @@ class MoadianFactory
 
         $tax = 0;
         $itemSum = 0;
+        $sumItemsBeforeDiscount = 0;
+        $negativeItems = 0;
         foreach ($invoice->items->all() as $item) {
-            $tax += floor(floor($item->amount) * ($invoice->tax_rate / 100));
+            if ($item->amount > 0){
+                $tax += floor(floor($item->amount) * ($invoice->tax_rate / 100));
+                $sumItemsBeforeDiscount += floor($item->amount);
+            } else {
+                $negativeItems += floor($item->amount);
+            }
             $itemSum += floor($item->amount);
         }
 
-        $negativeItems = abs($invoice->items->where('amount', '<', 0)->sum('amount'));
 
         // sum price before discount
-        $header->tprdis = floor($itemSum);
+        $header->tprdis = $sumItemsBeforeDiscount;
 
         // sum discounts
-        $header->tdis = $negativeItems;
+        $header->tdis = abs($negativeItems);
 
         // sum price after discount
-        $header->tadis = floor($itemSum) - $negativeItems;
+        $header->tadis = $itemSum;
 
 
         $header->tvam = $tax;
@@ -115,7 +121,6 @@ class MoadianFactory
 
         $positiveItems = $items->where('amount', '>', 0);
 
-        $this->getProductsAndDomainsList($positiveItems);
 
         /** @var Item $item */
         foreach ($positiveItems->all() as $item) {
@@ -139,6 +144,8 @@ class MoadianFactory
             }
 
             $body = new MoadianInvoiceItem();
+
+            $this->getProductsAndDomainsList($positiveItems);
 
             if (empty($refunded_invoice_source)) {
                 [$sstid, $sstt] = self::getMappedProductId($item);
