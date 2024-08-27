@@ -112,7 +112,7 @@ class RahkaranService
      */
     public function createClientParty(Client $client, array $ignored_fields = []): ?RahkaranParty
     {
-        if (!$this->isTestMode() && $client->rahkaran_id) {
+        if (!$this->isTestMode() && !empty($client->rahkaran_id)) {
             return $this->getClientParty($client);
         }
 
@@ -178,7 +178,7 @@ class RahkaranService
      */
     public function getClientParty(Client $client): ?RahkaranParty
     {
-        if (!$client->rahkaran_id) {
+        if (empty($client->rahkaran_id)) {
             try {
                 return $this->createClientParty($client);
             } catch (Throwable $exception) {
@@ -237,7 +237,7 @@ class RahkaranService
         $receipt->IsApproved = true;
         $receipt->Number = $reference_id;
         $receipt->SecondNumber = $transaction->invoice_id;
-        $receipt->CounterPartDLCode = $client_party->Code;
+        $receipt->CounterPartDLCode = $client_party?->Code;
         $receipt->Date = $transaction->created_at;
         $receipt->ApproveDate = $transaction->created_at;
         $receipt->TotalOperationalCurrencyAmount = $transaction->amount;
@@ -250,7 +250,7 @@ class RahkaranService
         $receipt_deposit->AccountingOperationID = $this->config->receiptAccountingOperationID;
         $receipt_deposit->CashFlowFactorID = $this->config->receiptCashFlowFactorID;
 
-        $receipt_deposit->CounterPartDLCode = $client_party->Code;
+        $receipt_deposit->CounterPartDLCode = $client_party?->Code;
         $receipt_deposit->Number = $reference_id;
 
         if ($receipt_deposit->Amount == 0) {
@@ -775,7 +775,6 @@ class RahkaranService
             case 'client_credit':
 
                 return $this->findRahkaranIdByName('client_credit');
-            case 'offline':
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':
