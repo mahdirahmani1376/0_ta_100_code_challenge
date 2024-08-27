@@ -17,6 +17,7 @@ class UpdateTransactionService
             'created_at',
             'tracking_code',
             'status',
+	    'amount'
         ]);
     }
 }

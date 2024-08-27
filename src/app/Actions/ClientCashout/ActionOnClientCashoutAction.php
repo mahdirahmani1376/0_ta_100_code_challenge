@@ -12,6 +12,7 @@ use App\Models\ClientCashout;
 use App\Services\ClientBankAccount\FindSimilarClientBankAccountWithZarinpalIdService;
 use App\Services\ClientBankAccount\UpdateClientBankAccountService;
 use App\Services\ClientCashout\UpdateClientCashoutService;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class ActionOnClientCashoutAction
@@ -87,27 +88,41 @@ class ActionOnClientCashoutAction
             }
         }
 
-        if (is_null($clientCashout->zarinpal_payout_id)) {
-            $payoutId = Zarinpal::cashoutToAccount($clientCashout->amount, $clientBankAccount->zarinpal_bank_account_id);
-            ($this->updateClientCashoutService)($clientCashout, [
-                'zarinpal_payout_id ' => $payoutId,
-                'admin_id'            => $data['admin_id'],
-                'admin_note'          => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
-                'source'              => config('payment.cashout.refund_provider')
+
+        if (!$clientCashout->zarinpal_payout_id) {
+            DB::beginTransaction();
+            try {
+                $payoutId = Zarinpal::cashoutToAccount($clientCashout->amount, $clientBankAccount->zarinpal_bank_account_id);
+
+                ($this->updateClientCashoutService)($clientCashout, [
+                    'zarinpal_payout_id ' => $payoutId,
+                    'admin_id'            => $data['admin_id'],
+                    'admin_note'          => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
+                    'source'              => config('payment.refund.refund_provider')
+                ]);
+                DB::commit();
+            } catch (\Throwable $exception) {
+                DB::rollBack();
+                throw $exception;
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            $creditTransaction = ($this->deductBalanceAction)($clientCashout->profile_id, [
+                'amount'      => $clientCashout->amount * -1,
+                'description' => 'بازگشت وجه به حساب بانکی کاربر - شماره درخواست : ' . $clientCashout->id,
             ]);
+
+            $rahkaranService = app(RahkaranService::class);
+            if (!$rahkaranService->isTestMode()) {
+                $rahkaranService->createPayment($rahkaranService->getPaymentInstanceForCashout($creditTransaction));
+            }
+            ($this->updateClientCashoutService)($clientCashout, ['status' => ClientCashout::STATUS_ACTIVE]);
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
         }
-
-        $creditTransaction = ($this->deductBalanceAction)($clientCashout->profile_id, [
-            'amount'      => $clientCashout->amount * -1,
-            'description' => 'بازگشت وجه به حساب بانکی کاربر - شماره درخواست : ' . $clientCashout->id,
-        ]);
-
-        /** @var RahkaranService $rahkaranService */
-        $rahkaranService = app(RahkaranService::class);
-        if (!$rahkaranService->isTestMode()) {
-            $rahkaranService->createPayment($rahkaranService->getPaymentInstanceForCashout($creditTransaction));
-        }
-
-        ($this->updateClientCashoutService)($clientCashout, ['status' => ClientCashout::STATUS_ACTIVE]);
     }
 }

@@ -9,6 +9,7 @@ use App\Actions\Invoice\ProcessInvoiceAction;
 use App\Actions\Invoice\Transaction\VerifyTransactionAction;
 use App\Exceptions\SystemException\NotAuthorizedException;
 use App\Exceptions\SystemException\OfflinePaymentApplyException;
+use App\Models\Invoice;
 use App\Models\OfflineTransaction;
 use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\Item\FindAddCreditItemService;
@@ -35,7 +36,11 @@ class VerifyOfflineTransactionAction
 
     public function __invoke(OfflineTransaction $offlineTransaction)
     {
-        check_rahkaran($offlineTransaction->invoice);
+        $invoice = $offlineTransaction->invoice;
+
+        if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
+            check_rahkaran($invoice);
+        }
 
         if ($offlineTransaction->status === OfflineTransaction::STATUS_REJECTED) {
             throw NotAuthorizedException::make();
@@ -44,7 +49,6 @@ class VerifyOfflineTransactionAction
             throw OfflinePaymentApplyException::make($offlineTransaction->getKey());
         }
 
-        $invoice = $offlineTransaction->invoice;
         // If Invoice is type of credit and client paid a different amount than what he was supposed to
         // then update that Invoice's Item with type of AddCredit or AddCloudCredit with the amount of
         // this $offlineTransaction->amount PLUS the sum of successful transactions on that invoice (total - balance)
@@ -62,29 +66,35 @@ class VerifyOfflineTransactionAction
             ($this->verifyOfflineTransactionService)($offlineTransaction);
             ($this->verifyTransactionAction)($offlineTransaction->transaction);
         } else {
-            // create a charge wallet invoice
-            // attach this offlineTransaction and its transaction to the new invoice
-            // pay the new charge-wallet-invoice -> because is_credit -> charge the wallet
-            // use the wallet balance to pay the first invoice
-            $chargeWalletInvoice = ($this->chargeWalletInvoiceAction)([
-                'profile_id' => $invoice->profile_id,
-                'admin_id'   => request('admin_id'),
-                'amount'     => $offlineTransaction->amount,
-            ]);
-            ($this->attachOfflineTransactionToNewInvoiceService)($offlineTransaction, $chargeWalletInvoice);
-            ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $chargeWalletInvoice);
-            ($this->calcInvoicePriceFieldsService)($chargeWalletInvoice);
-            ($this->processInvoiceAction)($chargeWalletInvoice);
 
-            if ($offlineTransaction->amount < $invoice->balance) {
-                $amount = $offlineTransaction->amount;
+            if ($offlineTransaction->amount > $invoice->balance) {
+                // create a charge wallet invoice
+                // attach this offlineTransaction and its transaction to the new invoice
+                // pay the new charge-wallet-invoice -> because is_credit -> charge the wallet
+                // use the wallet balance to pay the first invoice
+                $chargeWalletInvoice = ($this->chargeWalletInvoiceAction)([
+                    'profile_id' => $invoice->profile_id,
+                    'admin_id'   => request('admin_id'),
+                    'amount'     => $offlineTransaction->amount,
+                ]);
+                // attach this offlineTransaction and its transaction to the new invoice
+                $this->processOfflinePayment($chargeWalletInvoice, $offlineTransaction);
+                ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $invoice->balance]);
             } else {
-                $amount = $invoice->balance;
+                $this->processOfflinePayment($invoice, $offlineTransaction);
             }
-            ($this->applyBalanceToInvoiceAction)($invoice, ['amount' => $amount]);
         }
 
 
         return $offlineTransaction;
+    }
+
+    private function processOfflinePayment(Invoice $invoice, OfflineTransaction $offlineTransaction): Invoice
+    {
+        ($this->attachOfflineTransactionToNewInvoiceService)($offlineTransaction, $invoice);
+        ($this->attachTransactionToNewInvoiceService)($offlineTransaction->transaction, $invoice, ['created_at' => $offlineTransaction->paid_at]);
+        ($this->calcInvoicePriceFieldsService)($invoice);
+        ($this->processInvoiceAction)($invoice);
+        return $invoice->refresh();
     }
 }

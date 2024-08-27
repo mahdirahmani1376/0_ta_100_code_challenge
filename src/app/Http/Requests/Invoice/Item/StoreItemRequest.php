@@ -14,12 +14,12 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required', 'string',],
-            'amount' => ['required', 'numeric',],
+            'description'      => ['required', 'string',],
+            'amount'           => ['required', 'numeric',],
             'invoiceable_type' => ['nullable', 'string',],
-            'invoiceable_id' => ['nullable', 'integer',],
-            'from_date' => ['nullable', 'date',],
-            'to_date' => ['nullable', 'date',],
+            'invoiceable_id'   => ['nullable', 'integer',],
+            'from_date'        => ['nullable', 'date',],
+            'to_date'          => ['nullable', 'date',],
         ];
     }
 }

@@ -65,7 +65,8 @@ class CancelOverDueInvoiceCommand extends Command
         // cancel invoices that contains specific invoice item
         $this->cancelInvoicesWithItem();
         // cancel other invoices (Credit,MassPayment,etc)
-        $this->cancelInvoicesWithDefaultItem();
+	// TODO: Fix default invoice cancelation it means not defined item types wrote above.
+        //$this->cancelInvoicesWithDefaultItem();
     }
 
     public function cancelInvoicesAction(Builder $overDueInvoices): void
@@ -112,8 +113,6 @@ class CancelOverDueInvoiceCommand extends Command
 
             $overDueInvoices = $this->invoiceRepository->newQuery()
                 ->where('status', Invoice::STATUS_UNPAID)
-                ->where('is_credit', 0)
-                ->where('is_mass_payment', 0)
                 ->whereDate('due_date', '<', $dueDate)
                 ->whereHas('items', function ($query) use ($itemType) {
                     $query->where('invoiceable_type', $itemType);
@@ -139,8 +138,6 @@ class CancelOverDueInvoiceCommand extends Command
 
         $overDueInvoices = $this->invoiceRepository->newQuery()
             ->where('status', Invoice::STATUS_UNPAID)
-            ->where('is_mass_payment', 0) // todo check this
-            ->where('is_credit', 0) // todo check this
             ->whereDate('due_date', '<', $dueDate);
 
         $this->cancelInvoicesAction($overDueInvoices);

@@ -20,7 +20,6 @@ class StoreItemController extends Controller
      * @param Invoice $invoice
      * @param StoreItemRequest $request
      * @return ItemResource
-     * @throws InvoiceLockedAndAlreadyImportedToRahkaranException
      */
     public function __invoke(Invoice $invoice, StoreItemRequest $request)
     {

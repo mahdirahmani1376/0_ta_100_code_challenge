@@ -14,17 +14,21 @@ class StoreInvoiceService
 
     public function __invoke(array $data)
     {
-        $data['due_date'] = data_get($data,'due_date') ?? now()->addDays(10);
+        $data['due_date'] = data_get($data, 'due_date') ?? now()->addDays(10);
         $data['tax_rate'] = $data['tax_rate'] ?? MainAppConfig::get(MainAppConfig::FINANCE_SERVICE_DEFAULT_TAX);
         $data['payment_method'] = Invoice::PAYMENT_METHOD_CREDIT;
         $data['created_at'] = $data['invoice_date'] ?? now();
         if ($data['status'] == Invoice::STATUS_REFUNDED && empty($data['paid_at'])) {
             $data['paid_at'] = $data['created_at'];
         }
-        if (!empty($data['manual'])){
+        if (!empty($data['manual'])) {
             $data['processed_at'] = now();
         }
 
+        $admin_checked = data_get($data, 'admin_checked');
+        if ($admin_checked == 1) {
+            $data['admin_id'] = 1;
+        }
 
         return $this->invoiceRepository->create($data);
     }

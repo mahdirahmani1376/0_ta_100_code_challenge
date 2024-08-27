@@ -3,12 +3,14 @@
 namespace App\Services\Report;
 
 use App\Repositories\Invoice\Interface\InvoiceRepositoryInterface;
+use App\Repositories\Transaction\TransactionRepository;
 use Illuminate\Support\Carbon;
 
 class FinanceHourlyReportService
 {
     public function __construct(
         private readonly InvoiceRepositoryInterface $invoiceRepository,
+        private readonly TransactionRepository      $transactionRepository,
     )
     {
     }
@@ -54,7 +56,19 @@ class FinanceHourlyReportService
 
         $lastDayTotalIncome = $this->invoiceRepository->hourlyReport($date1->format('Y-m-d 00:00:00'), $date2->format('Y-m-d 23:59:59'));
 
-        return $content . "*" . number_format($lastDayTotalIncome) . " IRR*";
+        $report = $content . "*" . number_format($lastDayTotalIncome) . " IRR*";
+
+        $totalBankInput = $this->transactionRepository->sumOfPaidTransactionsByCriteria(
+            criteria: [
+                'created_at' => now()
+            ], onlinePayment: true
+        );
+
+        $bankIcon = "🏦";
+
+        $totalBankInput = "\n\n$bankIcon Total Bank Input: \n*" . number_format($totalBankInput) . " IRR*";
+
+        return $report . $totalBankInput;
     }
 
     private function getDiff($newIncome, $lastIncome)

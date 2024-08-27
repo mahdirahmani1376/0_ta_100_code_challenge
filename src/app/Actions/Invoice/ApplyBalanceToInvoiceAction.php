@@ -25,7 +25,9 @@ class ApplyBalanceToInvoiceAction
 
     public function __invoke(Invoice $invoice, array $data): Invoice
     {
-        check_rahkaran($invoice);
+        if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
+            check_rahkaran($invoice);
+        }
 
         if ($invoice->is_credit) {
             throw ApplyCreditToCreditInvoiceException::make();
@@ -70,7 +72,7 @@ class ApplyBalanceToInvoiceAction
         ($this->storeTransactionAction)([
             'invoice_id'     => $invoice->id,
             'amount'         => $data['amount'],
-            'payment_method' => Transaction::PAYMENT_METHOD_WALLET_BALANCE,
+            'payment_method' => Transaction::PAYMENT_METHOD_CREDIT,
         ]);
 
 

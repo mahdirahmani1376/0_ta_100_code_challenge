@@ -775,6 +775,7 @@ class RahkaranService
             case 'client_credit':
 
                 return $this->findRahkaranIdByName('client_credit');
+            case 'offline':
             case 'offline_bank':
             case 'offline-bank':
             case 'offlinebank':
@@ -1888,7 +1889,6 @@ class RahkaranService
 
         $this->updateRequestLog($log_system, $response_body, $response->getHeaders(), $response->getStatusCode());
 
-        Log::info("result $url", json_decode($response_body, true) ?? []);
         return json_decode($response_body, true);
     }
 
