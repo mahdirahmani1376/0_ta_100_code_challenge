@@ -237,7 +237,7 @@ class RahkaranService
         $receipt->IsApproved = true;
         $receipt->Number = $reference_id;
         $receipt->SecondNumber = $transaction->invoice_id;
-        $receipt->CounterPartDLCode = $client_party?->Code;
+        $receipt->CounterPartDLCode = $client_party->Code;
         $receipt->Date = $transaction->created_at;
         $receipt->ApproveDate = $transaction->created_at;
         $receipt->TotalOperationalCurrencyAmount = $transaction->amount;
@@ -250,7 +250,7 @@ class RahkaranService
         $receipt_deposit->AccountingOperationID = $this->config->receiptAccountingOperationID;
         $receipt_deposit->CashFlowFactorID = $this->config->receiptCashFlowFactorID;
 
-        $receipt_deposit->CounterPartDLCode = $client_party?->Code;
+        $receipt_deposit->CounterPartDLCode = $client_party->Code;
         $receipt_deposit->Number = $reference_id;
 
         if ($receipt_deposit->Amount == 0) {

@@ -160,7 +160,7 @@ class MoadianFactory
             $body->vra = $invoice->tax_rate;
             //$body->vam = round(config('payment.tax.total') * $item->amount / 100); // or directly calculate here like floor($body->adis * $body->vra / 100)
             $body->vam = floor($body->adis * $body->vra / 100);
-            $body->tsstam = round($body->fee + $body->vam);
+            $body->tsstam = round($body->prdis + $body->vam);
             $this->moadianInvoice->addItem($body);
         }
 
