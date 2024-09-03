@@ -110,14 +110,15 @@ class ProcessInvoiceAction
 
             foreach ($mass_invoices as $mass_invoice) {
                 ($applyBalanceToInvoiceAction)($mass_invoice, []);
-
             }
         }
 
 
         if ($old_status != Invoice::STATUS_COLLECTIONS) {
             ($this->calcInvoiceProcessedAtService)($invoice);
-            InvoiceProcessedJob::dispatch($invoice);
+            if (!$invoice->is_credit) {
+                InvoiceProcessedJob::dispatch($invoice);
+            }
         }
 
         return $invoice;
