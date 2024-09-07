@@ -6,14 +6,11 @@ use App\Actions\Invoice\StoreInvoiceAction;
 use App\Actions\Invoice\Transaction\StoreTransactionAction;
 use App\Actions\Wallet\CreditTransaction\BulkDeleteCreditTransactionAction;
 use App\Actions\Wallet\CreditTransaction\DeductBalanceAction;
+use App\Models\CreditTransaction;
 use App\Models\Invoice;
 use App\Models\Item;
-use App\Models\Transaction;
 use App\Services\Profile\FindOrCreateProfileService;
 use App\Services\Tax\GetTaxExcludeService;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class MonthlyInvoiceService
 {
@@ -34,60 +31,67 @@ class MonthlyInvoiceService
         $creditTransaction = null;
 
 
-        try {
-            DB::beginTransaction();
+//        try {
+//            DB::beginTransaction();
 
-            $financeProfileId = ($this->findOrCreateProfileService)($data['client_id'])->id;
+        $financeProfileId = ($this->findOrCreateProfileService)($data['client_id'])->id;
 
-            $data['admin_id'] = 1;
+        $creditTransaction = CreditTransaction::where('profile_id',$financeProfileId)
+                ->whereNotNull('invoice_id')
+                ->where('created_at','>=','2024-09-07 17:00:00')
+                ->orderBy('id','desc')
+                ->first();
 
-            $invoice = $this->createInvoice($data, $financeProfileId);
-
-            if (!empty($invoice)) {
-                $bulkDeleteResponse = ($this->bulkDeleteCreditTransactionAction)([
-                    'credit_transaction_ids' => $data['credit_transaction_ids'],
-                ]);
-
-                if ($bulkDeleteResponse['sum'] != 0) {
-                    $creditTransaction = ($this->deductBalanceAction)($financeProfileId, [
-                        'amount'      => $bulkDeleteResponse['sum'],
-                        'description' => __('finance.credit.ApplyCreditToInvoiceWithCloud', [
-                            'invoice_id' => $invoice->id
-                        ]),
-                        'invoice_id'  => $invoice->id,
-                    ]);
-
-//                $invoice = $this->financeAPIService()->parseResponse()
-//                    ->showInvoice($invoice->id, false);
-
-                    ($this->storeTransactionAction)([
-                        'invoice_id'     => $invoice->id,
-                        'amount'         => $invoice->balance,
-                        'created_at'     => data_get($data, 'invoice_paid_date') ?? now(),
-                        'payment_method' => Transaction::PAYMENT_METHOD_CREDIT,
-                        'tracking_code'  => 'NO_TRACKING_CODE'
-                    ]);
-                } else {
-                    DB::rollBack();
-                    $invoice = null;
-                }
-            }
-
-            Log::info('check-monthly-command-log', [
-                'id'                    => $invoice?->id,
-                'credit_transaction_id' => $creditTransaction?->id,
-            ]);
-
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::info('check-monthly-command-log-error', [
-                'error' => $e->getMessage()
-            ]);
-        }
+//            $data['admin_id'] = 1;
+//
+//            $invoice = $this->createInvoice($data, $financeProfileId);
+//
+//            if (!empty($invoice)) {
+//                $bulkDeleteResponse = ($this->bulkDeleteCreditTransactionAction)([
+//                    'credit_transaction_ids' => $data['credit_transaction_ids'],
+//                ]);
+//
+//                if ($bulkDeleteResponse['sum'] != 0) {
+//                    $creditTransaction = ($this->deductBalanceAction)($financeProfileId, [
+//                        'amount'      => $bulkDeleteResponse['sum'],
+//                        'description' => __('finance.credit.ApplyCreditToInvoiceWithCloud', [
+//                            'invoice_id' => $invoice->id
+//                        ]),
+//                        'invoice_id'  => $invoice->id,
+//                    ]);
+//
+////                $invoice = $this->financeAPIService()->parseResponse()
+////                    ->showInvoice($invoice->id, false);
+//
+//                    ($this->storeTransactionAction)([
+//                        'invoice_id'     => $invoice->id,
+//                        'amount'         => $invoice->balance,
+//                        'created_at'     => data_get($data, 'invoice_paid_date') ?? now(),
+//                        'payment_method' => Transaction::PAYMENT_METHOD_CREDIT,
+//                        'tracking_code'  => 'NO_TRACKING_CODE'
+//                    ]);
+//                } else {
+//                    DB::rollBack();
+//                    $invoice = null;
+//                }
+//            }
+//
+//            Log::info('check-monthly-command-log', [
+//                'id'                    => $invoice?->id,
+//                'credit_transaction_id' => $creditTransaction?->id,
+//            ]);
+//
+//            DB::commit();
+//        } catch (Exception $e) {
+//            DB::rollBack();
+//            Log::info('check-monthly-command-log-error', [
+//                'error' => $e->getMessage()
+//            ]);
+//        }
 
         return [
-            'id'                    => $invoice?->id,
+//            'id'                    => $invoice?->id,
+            'id'                    => $creditTransaction?->invoice_id,
             'credit_transaction_id' => $creditTransaction?->id,
         ];
 
