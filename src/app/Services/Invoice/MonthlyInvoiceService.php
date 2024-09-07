@@ -61,7 +61,7 @@ class MonthlyInvoiceService
                     ($this->storeTransactionAction)([
                         'invoice_id'     => $invoice->id,
                         'amount'         => $invoice->balance,
-                        'created_at'     => $request->invoice_paid_date ?? now(),
+                        'created_at'     => data_get($data,'invoice_paid_date') ?? now(),
                         'payment_method' => Transaction::PAYMENT_METHOD_CREDIT,
                         'tracking_code'  => 'NO_TRACKING_CODE'
                     ]);
