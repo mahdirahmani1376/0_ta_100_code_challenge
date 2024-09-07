@@ -116,7 +116,8 @@ class MonthlyInvoiceService
             'due_date'       => data_get($data, 'invoice_due_date') ?? now()->addMonth()->format('Y-m-d H:i:s'),
             'paid_at'        => data_get($data, 'invoice_paid_date') ?? now()->format('Y-m-d H:i:s'),
             'status'         => Invoice::STATUS_UNPAID,
-            'notification'   => false
+            'notification'   => false,
+            'admin_id'       => data_get($data,'admin_id')
         ]);
     }
 }
