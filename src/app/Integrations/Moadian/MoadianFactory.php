@@ -77,11 +77,11 @@ class MoadianFactory
         $negativeItems = 0;
         foreach ($invoice->items->all() as $item) {
             if ($item->amount > 0){
-                $tax += floor(floor($item->amount) * ($invoice->tax_rate / 100));
                 $sumItemsBeforeDiscount += floor($item->amount);
             } else {
                 $negativeItems += floor($item->amount);
             }
+            $tax += floor(floor($item->amount) * ($invoice->tax_rate / 100));
             $itemSum += floor($item->amount);
         }
 
@@ -98,7 +98,7 @@ class MoadianFactory
 
         $header->tvam = $tax;
         $header->todam = 0;
-        $header->tbill = $tax + $itemSum;
+        $header->tbill = $tax + $sumItemsBeforeDiscount;
 
         if ($invoice->status == Invoice::STATUS_COLLECTIONS) { // Collection Invoices
             $header->setm = 2;
@@ -157,7 +157,7 @@ class MoadianFactory
             $body->sstt = $sstt;
             $body->am = '1';
             $body->mu = 1627;
-            $body->fee = floor($amount);
+            $body->fee = floor($item->amount);
             // sum price before discount
             $body->prdis = floor($item->amount);
             // discount
@@ -167,7 +167,7 @@ class MoadianFactory
             $body->vra = $invoice->tax_rate;
             //$body->vam = round(config('payment.tax.total') * $item->amount / 100); // or directly calculate here like floor($body->adis * $body->vra / 100)
             $body->vam = floor($body->adis * $body->vra / 100);
-            $body->tsstam = round($body->prdis + $body->vam);
+            $body->tsstam = round($body->adis + $body->vam);
             $this->moadianInvoice->addItem($body);
         }
 
