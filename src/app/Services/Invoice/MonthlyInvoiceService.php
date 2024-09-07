@@ -67,6 +67,7 @@ class MonthlyInvoiceService
                     ]);
                 } else {
                     DB::rollBack();
+                    $invoice = null;
                 }
             }
 
