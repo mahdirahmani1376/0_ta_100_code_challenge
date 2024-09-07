@@ -18,12 +18,12 @@ use Illuminate\Support\Facades\Log;
 class MonthlyInvoiceService
 {
     public function __construct(
-        private readonly FindOrCreateProfileService           $findOrCreateProfileService,
-        private readonly GetTaxExcludeService                 $getTaxExcludeService,
-        private readonly StoreInvoiceAction                   $storeInvoiceAction,
-        private readonly BulkDeleteCreditTransactionAction    $bulkDeleteCreditTransactionAction,
-        private readonly DeductBalanceAction                  $deductBalanceAction,
-        private readonly StoreTransactionAction               $storeTransactionAction,
+        private readonly FindOrCreateProfileService        $findOrCreateProfileService,
+        private readonly GetTaxExcludeService              $getTaxExcludeService,
+        private readonly StoreInvoiceAction                $storeInvoiceAction,
+        private readonly BulkDeleteCreditTransactionAction $bulkDeleteCreditTransactionAction,
+        private readonly DeductBalanceAction               $deductBalanceAction,
+        private readonly StoreTransactionAction            $storeTransactionAction,
     )
     {
     }
@@ -69,8 +69,8 @@ class MonthlyInvoiceService
             }
 
             Log::info('check-monthly-command-log', [
-                'invoice_id'            => $invoice->id,
-                'credit_transaction_id' => $creditTransaction->id,
+                'id'                    => $invoice?->id,
+                'credit_transaction_id' => $creditTransaction?->id,
             ]);
 
             DB::commit();
@@ -82,8 +82,8 @@ class MonthlyInvoiceService
         }
 
         return [
-            'invoice_id'            => $invoice?->id,
-            'credit_transaction_id' => $creditTransaction->id,
+            'id'            => $invoice?->id,
+            'credit_transaction_id' => $creditTransaction?->id,
         ];
 
     }
@@ -93,10 +93,10 @@ class MonthlyInvoiceService
         $items = [];
         foreach ($data['invoice_items'] as $item) {
 
-            $amount = data_get(($this->getTaxExcludeService)(data_get($item,'amount')), 'amount');
+            $amount = data_get(($this->getTaxExcludeService)(data_get($item, 'amount')), 'amount');
 
             $items[] = [
-                'description'      => data_get($item,'description'),
+                'description'      => data_get($item, 'description'),
                 'amount'           => $amount,
                 'invoiceable_type' => Item::TYPE_CLOUD,
                 'invoiceable_id'   => $item['rel_id'],
@@ -107,9 +107,9 @@ class MonthlyInvoiceService
             'profile_id'     => $financeProfileId,
             'items'          => $items,
             'payment_method' => Invoice::PAYMENT_METHOD_CREDIT,
-            'invoice_date'   => data_get($data,'invoice_created_at') ?? now()->format('Y-m-d H:i:s'),
-            'due_date'       => data_get($data,'invoice_due_date') ?? now()->addMonth()->format('Y-m-d H:i:s'),
-            'paid_at'        => data_get($data,'invoice_paid_date') ?? now()->format('Y-m-d H:i:s'),
+            'invoice_date'   => data_get($data, 'invoice_created_at') ?? now()->format('Y-m-d H:i:s'),
+            'due_date'       => data_get($data, 'invoice_due_date') ?? now()->addMonth()->format('Y-m-d H:i:s'),
+            'paid_at'        => data_get($data, 'invoice_paid_date') ?? now()->format('Y-m-d H:i:s'),
             'status'         => Invoice::STATUS_UNPAID,
             'notification'   => false
         ]);
