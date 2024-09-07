@@ -39,6 +39,8 @@ class MonthlyInvoiceService
 
             $financeProfileId = ($this->findOrCreateProfileService)($data['client_id'])->id;
 
+            $data['admin_id'] = 1;
+
             $invoice = $this->createInvoice($data, $financeProfileId);
 
             if (!empty($invoice)) {
