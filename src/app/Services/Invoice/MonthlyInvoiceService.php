@@ -65,6 +65,8 @@ class MonthlyInvoiceService
                         'payment_method' => Transaction::PAYMENT_METHOD_CREDIT,
                         'tracking_code'  => 'NO_TRACKING_CODE'
                     ]);
+                } else {
+                    DB::rollBack();
                 }
             }
 
