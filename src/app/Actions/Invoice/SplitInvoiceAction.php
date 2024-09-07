@@ -50,7 +50,7 @@ class SplitInvoiceAction
 
         $remainedInvoiceItemsSums = $this->itemRepository->sumItemsAmount($remainedInvoiceItems);
 
-        if ($newInvoiceItemsSums == 0 or $remainedInvoiceItemsSums == 0) {
+        if ($newInvoiceItemsSums < 0 or $remainedInvoiceItemsSums < 0) {
             throw ItemAmountShouldNotBeZeroException::make();
         }
 
