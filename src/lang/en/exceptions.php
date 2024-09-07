@@ -26,5 +26,6 @@ return [
     ExceptionCodes::NOT_ENOUGH_CREDIT                             => 'اعتبار شما کافی نیست.',
     ExceptionCodes::USER_NOT_FOUND_EXCEPTION                      => 'این کاربر یافت نشد.',
     ExceptionCodes::AMOUNT_MUST_BE_GREATER_THAN_ZERO              => 'مبلغ وارد شده باید بیشتر از صفر باشد',
-    ExceptionCodes::INVOICE_ALREADY_CHECKED                       => 'صورتحساب شماره :invoice_id قبلا توسط ادمین :admin_id تایید شده است.'
+    ExceptionCodes::INVOICE_ALREADY_CHECKED                       => 'صورتحساب شماره :invoice_id قبلا توسط ادمین :admin_id تایید شده است.',
+    ExceptionCodes::ITEM_AMOUNT_MUST_NOT_BE_ZERO                  => 'مقدار آیتم های صورتحساب نباید صفر باشد'
 ];

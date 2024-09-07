@@ -33,5 +33,6 @@ final class ExceptionCodes
     public const USER_NOT_FOUND_EXCEPTION = '410092';
     public const AMOUNT_MUST_BE_GREATER_THAN_ZERO = '4100903';
     public const INVOICE_ALREADY_CHECKED = '410094';
+    public const ITEM_AMOUNT_MUST_NOT_BE_ZERO = '410097';
 
 }

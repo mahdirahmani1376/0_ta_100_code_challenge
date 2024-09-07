@@ -65,4 +65,12 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
             ])
             ->first();
     }
+
+
+    public function sumItemsAmount(mixed $item_ids)
+    {
+        return self::newQuery()
+            ->whereIn('id',$item_ids)
+            ->sum('amount');
+    }
 }
