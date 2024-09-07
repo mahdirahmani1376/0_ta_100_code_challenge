@@ -39,6 +39,7 @@ use App\Http\Controllers\Invoice\ManualCheckController;
 use App\Http\Controllers\Invoice\MergeInvoiceController;
 use App\Http\Controllers\Invoice\MoadianLog\IndexMoadianLogController;
 use App\Http\Controllers\Invoice\MoadianLog\InquiryMoadianController;
+use App\Http\Controllers\Invoice\MonthlyInvoiceController;
 use App\Http\Controllers\Invoice\OfflineTransaction\DeleteOfflineTransactionController;
 use App\Http\Controllers\Invoice\OfflineTransaction\IndexOfflineTransactionController;
 use App\Http\Controllers\Invoice\OfflineTransaction\IndexSimilarOfflineTransactionController;
@@ -127,6 +128,7 @@ Route::namespace('Invoice')
         Route::get('{invoice}/download', DownloadInvoiceBillController::class);
         Route::post('{invoice}/apply-balance', ApplyBalanceToInvoiceController::class);
         Route::get('{invoice}/send-reminder', SendInvoiceReminderController::class);
+        Route::post('/monthly-invoices', MonthlyInvoiceController::class);
     });
 
 Route::namespace('Wallet')
