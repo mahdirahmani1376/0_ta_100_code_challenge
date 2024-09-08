@@ -29,7 +29,7 @@ class UpdateInvoiceItemsCommand extends Command
 
     public function handle(): void
     {
-        $this->info('getting all unpaid invoices older than 72 hours');
+        $this->info('Getting all unpaid invoices older than 72 hours');
 
         $unpaidInvoices = $this->invoiceRepository->index([
             'status'     => Invoice::STATUS_UNPAID,
@@ -42,7 +42,7 @@ class UpdateInvoiceItemsCommand extends Command
             'date_field' => 'updated_at'
         ]);
 
-        $this->info("count of unpaid invoices: {$unpaidInvoices->count()}");
+        $this->info("Count of unpaid invoices: {$unpaidInvoices->count()}");
 
         $unpaidInvoices->each(function (Invoice $invoice) {
             $invoice->items->each(function (Item $item) use ($invoice) {

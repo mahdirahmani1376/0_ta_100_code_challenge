@@ -19,6 +19,7 @@ class ClientCashoutResource extends JsonResource
             'profile_id' => $this->profile_id,
             'client_bank_account' => ClientBankAccountResource::make($this->clientBankAccount),
             'zarinpal_payout_id' => $this->zarinpal_payout_id,
+            'payout_id' => $this->zarinpal_payout_id,
             'admin_id' => $this->admin_id,
             'amount' => $this->amount,
             'admin_note' => $this->admin_note,
