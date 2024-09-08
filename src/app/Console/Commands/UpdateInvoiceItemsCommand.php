@@ -15,7 +15,8 @@ use Throwable;
 
 class UpdateInvoiceItemsCommand extends Command
 {
-    protected $signature = 'cron:invoice-update';
+    protected $signature = 'cron:invoice-update 
+    {--override-invoice-id= : Set this to an Invoice Id if you want to recalculate a specific invoice.}';
     protected $description = 'Update Unpaid Invoice Prices after 72 hours';
 
     public function __construct(
@@ -31,16 +32,22 @@ class UpdateInvoiceItemsCommand extends Command
     {
         $this->info('Getting all unpaid invoices older than 72 hours');
 
-        $unpaidInvoices = $this->invoiceRepository->index([
-            'status'     => Invoice::STATUS_UNPAID,
-            'to_date'    => now()->subHours(72),
-            'items'      => [
-                ["invoiceable_type" => Item::TYPE_DOMAIN],
-                ["invoiceable_type" => Item::TYPE_PRODUCT_SERVICE],
-            ],
-            'export'     => 1,
-            'date_field' => 'updated_at'
-        ]);
+        $invoiceId = $this->option('override-invoice-id');
+
+        if (!empty($invoiceId)) {
+            $unpaidInvoices = $this->invoiceRepository->newQuery()->where('id', $invoiceId)->get();
+        } else {
+            $unpaidInvoices = $this->invoiceRepository->index([
+                'status'     => Invoice::STATUS_UNPAID,
+                'to_date'    => now()->subHours(72),
+                'items'      => [
+                    ["invoiceable_type" => Item::TYPE_DOMAIN_SERVICE],
+                    ["invoiceable_type" => Item::TYPE_PRODUCT_SERVICE],
+                ],
+                'export'     => 1,
+                'date_field' => 'updated_at'
+            ]);
+        }
 
         $this->info("Count of unpaid invoices: {$unpaidInvoices->count()}");
 
@@ -73,11 +80,9 @@ class UpdateInvoiceItemsCommand extends Command
                 ]);
 
                 finance_log(FinanceLog::EDIT_INVOICE_ITEM, $item, $item->getChanges(), $oldState, $response);
-
-                $this->info("Item: $item->id updated successfully for invoice:$invoice->id changes: " . json_encode($item->getChanges()));
-                Log::info("Item: $item->id updated successfully for invoice:$invoice->id", [
-                    'changes' => $item->getChanges(),
-                ]);
+                if (!empty($item->getChanges())) {
+                    $this->info("Item: $item->id ($item->invoiceable_type) updated successfully for invoice:$invoice->id changes: " . json_encode($item->getChanges()));
+                }
             }
         } catch (Throwable $e) {
             $this->error("item with id:$item->id with invoice $invoice->id threw exception with message {$e->getMessage()}");
