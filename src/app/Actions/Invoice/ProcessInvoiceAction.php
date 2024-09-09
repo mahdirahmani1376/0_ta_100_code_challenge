@@ -8,7 +8,6 @@ use App\Jobs\Invoice\InvoiceProcessedJob;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Services\Invoice\CalcInvoicePaidAtService;
-use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\CalcInvoiceProcessedAtService;
 use App\Services\Invoice\ChangeInvoiceStatusService;
 use App\Services\Invoice\FindInvoiceByIdService;
@@ -22,7 +21,6 @@ class ProcessInvoiceAction
         private readonly ChangeInvoiceStatusService    $changeInvoiceStatusService,
         private readonly CalcInvoicePaidAtService      $calcInvoicePaidAtService,
         private readonly StoreCreditTransactionAction  $storeCreditTransactionAction,
-        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
         private readonly FindInvoiceByIdService        $findInvoiceByIdService,
         private readonly CalcInvoiceProcessedAtService $calcInvoiceProcessedAtService,
         private readonly ManualCheckService            $manualCheckService,
@@ -43,11 +41,9 @@ class ProcessInvoiceAction
             $this->processRefundedInvoice($invoice);
         }
 
-        $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
-
         // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
         // so we only change its status to paid and nothing else, this is done in another service
-        if ($invoice->processed_at) {
+        if ($invoice->processed_at && $invoice->status != Invoice::STATUS_COLLECTIONS) {
             return $invoice;
         }
         // Normal Invoices must have zero balance to be processed
