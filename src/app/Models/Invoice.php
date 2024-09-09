@@ -168,8 +168,15 @@ class Invoice extends Model
 
                 break;
             case static::STATUS_CANCELED:
+                $status = [
+                    static::STATUS_UNPAID
+                ];
+                break;
             case static::STATUS_PAYMENT_PENDING:
             case static::STATUS_COLLECTIONS:
+                if ($this->balance == 0) {
+                    $status[] = static::STATUS_PAID;
+                }
                 $status = [
                     static::STATUS_UNPAID
                 ];
