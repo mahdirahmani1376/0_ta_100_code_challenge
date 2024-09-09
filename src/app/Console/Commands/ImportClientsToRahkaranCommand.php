@@ -15,7 +15,7 @@ use Throwable;
 
 class ImportClientsToRahkaranCommand extends Command
 {
-    protected $signature = 'rahkaran:import-clients {clients?* : Client ids seperated by space,e.g. 1 2 3}';
+    protected $signature = 'rahkaran:import-clients {--clients=}';
 
     protected $description = 'Imports clients to rahkaran';
 
@@ -40,7 +40,6 @@ class ImportClientsToRahkaranCommand extends Command
                 $this->info('Client not found for profile #' . $profile->id);
                 continue;
             }
-
             $this->import($client, [], true);
             $bar->advance();
         }
@@ -56,7 +55,15 @@ class ImportClientsToRahkaranCommand extends Command
     {
         $clients = collect([]);
 
-        Profile::query()->whereNull('rahkaran_id')->chunk(1000, function (Collection $profiles) use (&$clients) {
+	$inputClients = !empty($this->option('clients')) ? explode(',', $this->option('clients')) : []; 
+
+	if ( count($inputClients) == 0 )
+	{
+		$this->error('No clients inputed');
+		exit;
+	}
+
+        Profile::query()->whereIn('client_id',  $inputClients)->whereNull('rahkaran_id')->chunk(1000, function (Collection $profiles) use (&$clients) {
             $mainAppClients = MainAppAPIService::getClients($profiles->pluck('id')->toArray(), true);
             $mainAppClients = collect($mainAppClients);
             $profiles->each(function (Profile $profile) use ($mainAppClients) {
@@ -81,69 +88,38 @@ class ImportClientsToRahkaranCommand extends Command
             if (Str::contains($message, [
                 'ورود نام و نام خانوادگی الزامی می باشد'
             ])) {
-                return null;
+                break;
             }
 
-            if (!in_array('company_address', $ignore_fields)) {
-
-                if (Str::contains($message, 'Object reference not set to an instance of an object.') && $client->is_legal) {
-                    array_push($ignore_fields, 'company_address');
-                }
+            if (Str::contains($message, 'Object reference not set to an instance of an object.') && $client->is_legal) {
+                array_push($ignore_fields, 'company_address');
             }
 
-            if ($client->is_legal && !in_array('company_address', $ignore_fields)) {
-
-                if (Str::contains($message, [
+            if (Str::contains($message, [
                     'فیلد تلفن در آدرس اجباری است',
-                    'فیلد آدرس اجباری است'
-                ])) {
-                    array_push($ignore_fields, 'company_address');
-                    return $this->import($client, $ignore_fields, true);
-                }
-            }
-
-            if (!$client->is_legal && !in_array('address', $ignore_fields)) {
-
-                if (Str::contains($message, [
+                    'فیلد آدرس اجباری است',
                     'فیلد تلفن در آدرس اجباری است',
-                    'فیلد آدرس اجباری است'
-                ])) {
-                    array_push($ignore_fields, 'address');
-                    return $this->import($client, $ignore_fields, true);
-                }
+	    ]))
+	    {
+                array_push($ignore_fields, 'company_address');
+                array_push($ignore_fields, 'address');
             }
 
-            if (!in_array('national_code', $ignore_fields)) {
-                if (Str::contains($message, [
+            if (Str::contains($message, [
                     'کد ملی شخص باید یکتا باشد.',
                     'کد/شناسه ملی وارد شده معتبر نمی باشد',
-                ])) {
-                    array_push($ignore_fields, 'national_code');
-                }
+            ])) {
+                array_push($ignore_fields, 'national_code');
             }
 
-            if (!in_array('company_registered_number', $ignore_fields)) {
-                if (Str::contains($message, [
-                    'فرمت کد اقتصادی',
-                ])) {
-                    array_push($ignore_fields, 'company_registered_number');
-
-                    return $this->import($client, $ignore_fields, true);
-                }
-            }
-
-            if (!in_array('company_national_code', $ignore_fields)) {
-                if (Str::contains($message, [
-                    'فرمت کد اقتصادی',
-                ])) {
-                    array_push($ignore_fields, 'company_national_code');
-
-                    return $this->import($client, $ignore_fields, true);
-                }
+            if (Str::contains($message, [
+                'فرمت کد اقتصادی',
+            ])) {
+                array_push($ignore_fields, 'company_registered_number');
             }
         }
 
-        return $this->import($client, $ignore_fields, false);
+        return $this->import($client, $ignore_fields, true);
     }
 
     protected function importClient(Client $client, array $ignore_fields = []): ?array
