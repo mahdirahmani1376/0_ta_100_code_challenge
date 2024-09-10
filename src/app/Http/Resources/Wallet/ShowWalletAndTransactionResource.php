@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Wallet;
 
+use App\Http\Resources\Wallet\CreditTransaction\CreditTransactionResource;
 use App\Models\Wallet;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class ShowWalletAndTransactionResource extends JsonResource
             'name'                => $this->name,
             'balance'             => $this->balance,
             'is_active'           => $this->is_active,
-            'credit_transactions' => $credit_transactions->items(),
+            'credit_transactions' => CreditTransactionResource::collection($credit_transactions->items()),
             'current_page'        => $credit_transactions->currentPage(),
             'last_page'           => $credit_transactions->lastPage(),
             'per_page'            => $credit_transactions->perPage(),
