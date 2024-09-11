@@ -41,11 +41,6 @@ class ProcessInvoiceAction
             $this->processRefundedInvoice($invoice);
         }
 
-        // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
-        // so we only change its status to paid and nothing else, this is done in another service
-        if ($invoice->processed_at && $invoice->status != Invoice::STATUS_COLLECTIONS) {
-            return $invoice;
-        }
         // Normal Invoices must have zero balance to be processed
         if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
             return $invoice;
@@ -79,7 +74,7 @@ class ProcessInvoiceAction
 
         // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
-        if ($invoice->is_credit) {
+        if ($invoice->is_credit && !$invoice->processed_at) {
             $this->storeCreditTraction($invoice, $invoice->total);
         }
 
@@ -110,7 +105,7 @@ class ProcessInvoiceAction
         }
 
 
-        if ($old_status != Invoice::STATUS_COLLECTIONS) {
+        if ($old_status != Invoice::STATUS_COLLECTIONS && !$invoice->processed_at) {
             ($this->calcInvoiceProcessedAtService)($invoice);
             if (!$invoice->is_credit) {
                 InvoiceProcessedJob::dispatch($invoice);
