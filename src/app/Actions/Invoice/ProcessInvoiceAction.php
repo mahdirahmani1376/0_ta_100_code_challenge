@@ -74,7 +74,7 @@ class ProcessInvoiceAction
         try {
             AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
         } catch (\Throwable $throwable) {
-            \Log::warning('Assign invoice number failed', $throwable->getTrace());
+            \Log::warning('Assign invoice number failed #' . $invoice->id, $throwable->getTrace());
         }
 
         // If invoice is charge-wallet or is mass payment (is_credit=true),
