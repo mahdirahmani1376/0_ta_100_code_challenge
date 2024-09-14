@@ -525,8 +525,8 @@ class RahkaranService
                 ])) {
                 ($this->assignInvoiceNumberService)($invoice);
                 $invoice->refresh();
-                $processInvoices[] = $invoice;
 
+                $processInvoices[] = $invoice;
             }
         }
 
@@ -577,7 +577,7 @@ class RahkaranService
                 /// ########
                 $voucher_item->PartyRef = $invoice->profile->rahkaran_id;
                 $voucher_item->TaxAmount = $this->getItemTax($item);
-                $voucher_item->TollAmount = $this->getItemToll($item);
+		$voucher_item->TollAmount = 0;
                 $voucher_item->TaxStateType = 1;
                 $voucher_item->PurchaseOrSale = 2;
                 $voucher_item->ItemOrService = 2;
@@ -665,6 +665,7 @@ class RahkaranService
         $rahkaran_id = $result['ID'];
         foreach ($processInvoices as $invoice) {
             $invoice->rahkaran_id = $rahkaran_id;
+	    unset($invoice->client);
             $this->invoiceRepository->update($invoice, ['rahkaran_id' => $rahkaran_id], ['rahkaran_id']);
         }
 
@@ -1467,11 +1468,7 @@ class RahkaranService
 
         $tax_percent = $item->invoice->tax_rate;
 
-        $tax = round(($tax_percent / 100) * $item->amount, 0, PHP_ROUND_HALF_DOWN);
-
-        if ($tax <= 0) {
-            var_dump('No Tax found for invoice: ' . $item->invoice_id);
-        }
+        $tax = round(($tax_percent / 100) * abs($item->amount), 0, PHP_ROUND_HALF_DOWN);
 
         return $tax;
     }
@@ -1504,7 +1501,6 @@ class RahkaranService
     {
         $totalTax = $this->getRawInvoiceTotalTax($invoice);
         $tax = $this->getRawInvoiceTax($invoice);
-        $troll = $this->getRawInvoiceToll($invoice);
 
         if ($totalTax <= 0) {
             var_dump('No Troll found for invoice: ' . $invoice->id);
@@ -1518,8 +1514,8 @@ class RahkaranService
 
         if ($client_rahkaran_id) {
             $voucher_item->PartyRef = $client_rahkaran_id;
-            $voucher_item->TaxAmount = $tax; // TODO check this
-            $voucher_item->TollAmount = $troll;
+            $voucher_item->TaxAmount = $tax;
+            $voucher_item->TollAmount = 0;
             $voucher_item->TaxStateType = 1;
             $voucher_item->PurchaseOrSale = 1;
             $voucher_item->ItemOrService = 2;
@@ -1606,9 +1602,9 @@ class RahkaranService
         return $this->transactionRepository->sum(
             'amount',
             [
-                'invoice_id' => $invoice->id
-            ],
-            $transaction_scope
+		    'invoice_id' => $invoice->id,
+		    'status' 	 => Transaction::STATUS_SUCCESS 
+	    ]
         );
     }
 
@@ -1837,6 +1833,9 @@ class RahkaranService
                 'sg-auth-hostiran' => $this->sessionId
             ], config('rahkaran.rahkaran_host'));
 
+	    //if ( Str::contains($url, 'RegisterVoucher') )
+	   
+
             $response = $this->client->request(
                 $method,
                 $url,
@@ -1852,7 +1851,7 @@ class RahkaranService
             $content = $exception->getResponse()->getBody()->getContents();
             Log::error("result $url " . $exception->getMessage(), [$exception->getResponse()->getBody()->getContents() ?? '']);
             $this->updateRequestLog($log_system, $content ?? $exception->getMessage(), $exception->getResponse()->getHeaders(), $exception->getResponse()->getStatusCode());
-            throw new FatalErrorException($exception->getMessage());
+	    throw new FatalErrorException($exception->getMessage());
         } catch (Throwable $exception) {
             Log::error("result $url " . $exception->getMessage(), $exception->getTrace());
 

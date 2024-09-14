@@ -47,7 +47,7 @@ return [
     'creditBankId'                 => env('RAHKARAN_CREDIT_BANK_ID', 3),
     'roundingBankId'               => env('RAHKARAN_ROUNDING_BANK_ID', 15),
     'bankBranchId'                 => env('RAHKARAN_BANK_BRANCH_ID', 12), // according to the excel
-    'fiscalYearRef'                => env('RAHKARAN_FISCAL_YEAR_REF', 3), // according to the example ارجاع به سال مالی: با توجه به دوره مالی که سند در آن ثبت میشود باید مشخص شود تیبل select fiscalyearid from gnr3.FiscalYear
+    'fiscalYearRef'                => env('RAHKARAN_FISCAL_YEAR_REF', 4), // according to the example ارجاع به سال مالی: با توجه به دوره مالی که سند در آن ثبت میشود باید مشخص شود تیبل select fiscalyearid from gnr3.FiscalYear
     'voucherBranchRef'             => env('RAHKARAN_VOUCHER_BRANCH_REF', 1), // according to the excel
     'voucherCreatorId'             => env('RAHKARAN_VOUCHER_CREATOR_ID', 1),// according to the excel
     'voucherLedgerRef'             => env('RAHKARAN_VOUCHER_LEDGER_REF', 1), // according to the excel ارجاع به دفترکل در اینجا برابر با مقدار 1 می باشد
