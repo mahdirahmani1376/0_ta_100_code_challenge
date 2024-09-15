@@ -17,7 +17,6 @@ class UpdateClientCashoutAction
         if (isset($data['profile_id']) && $data['profile_id'] != $clientCashout->profile_id) {
             throw new BadRequestException(__('finance.error.AccessDeniedToCashout'));
         }
-        $oldState = $clientCashout->toArray();
 
         $bank_account_id = data_get($data, 'client_bank_account_id');
         if (

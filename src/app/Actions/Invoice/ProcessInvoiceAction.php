@@ -8,7 +8,6 @@ use App\Jobs\Invoice\InvoiceProcessedJob;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Services\Invoice\CalcInvoicePaidAtService;
-use App\Services\Invoice\CalcInvoicePriceFieldsService;
 use App\Services\Invoice\CalcInvoiceProcessedAtService;
 use App\Services\Invoice\ChangeInvoiceStatusService;
 use App\Services\Invoice\FindInvoiceByIdService;
@@ -22,7 +21,6 @@ class ProcessInvoiceAction
         private readonly ChangeInvoiceStatusService    $changeInvoiceStatusService,
         private readonly CalcInvoicePaidAtService      $calcInvoicePaidAtService,
         private readonly StoreCreditTransactionAction  $storeCreditTransactionAction,
-        private readonly CalcInvoicePriceFieldsService $calcInvoicePriceFieldsService,
         private readonly FindInvoiceByIdService        $findInvoiceByIdService,
         private readonly CalcInvoiceProcessedAtService $calcInvoiceProcessedAtService,
         private readonly ManualCheckService            $manualCheckService,
@@ -43,13 +41,6 @@ class ProcessInvoiceAction
             $this->processRefundedInvoice($invoice);
         }
 
-        $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
-
-        // If an Invoice is already processed then ignore it, this might happen when a Collection Invoice is paid at the end of the month,
-        // so we only change its status to paid and nothing else, this is done in another service
-        if ($invoice->processed_at) {
-            return $invoice;
-        }
         // Normal Invoices must have zero balance to be processed
         if ($invoice->status == Invoice::STATUS_UNPAID && $invoice->balance > 0) {
             return $invoice;
@@ -78,12 +69,12 @@ class ProcessInvoiceAction
         try {
             AssignInvoiceNumberJob::dispatch($invoice); // TODO when should we assign an InvoiceNumber,is it only when paid_at is set or what ?
         } catch (\Throwable $throwable) {
-            \Log::warning('Assign invoice number failed', $throwable->getTrace());
+            \Log::warning('Assign invoice number failed #' . $invoice->id, $throwable->getTrace());
         }
 
         // If invoice is charge-wallet or is mass payment (is_credit=true),
         // create CreditTransaction records based on how many 'verified' OfflineTransactions this Invoice has and increase client's wallet balance
-        if ($invoice->is_credit) {
+        if ($invoice->is_credit && !$invoice->processed_at) {
             $this->storeCreditTraction($invoice, $invoice->total);
         }
 
@@ -114,7 +105,7 @@ class ProcessInvoiceAction
         }
 
 
-        if ($old_status != Invoice::STATUS_COLLECTIONS) {
+        if ($old_status != Invoice::STATUS_COLLECTIONS && !$invoice->processed_at) {
             ($this->calcInvoiceProcessedAtService)($invoice);
             if (!$invoice->is_credit) {
                 InvoiceProcessedJob::dispatch($invoice);

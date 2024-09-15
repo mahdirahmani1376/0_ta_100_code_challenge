@@ -88,18 +88,26 @@ class ActionOnClientCashoutAction
             }
         }
 
-
         if (!$clientCashout->zarinpal_payout_id) {
             DB::beginTransaction();
             try {
                 $payoutId = Zarinpal::cashoutToAccount($clientCashout->amount, $clientBankAccount->zarinpal_bank_account_id);
 
                 ($this->updateClientCashoutService)($clientCashout, [
-                    'zarinpal_payout_id ' => $payoutId,
                     'admin_id'            => $data['admin_id'],
+                    'zarinpal_payout_id ' => $payoutId,
                     'admin_note'          => isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note,
                     'source'              => config('payment.refund.refund_provider')
                 ]);
+
+		// TODO: Due to not updating client cashout model below code added temporary.
+		$clientCashout->admin_id = $data['admin_id'];
+		$clientCashout->zarinpal_payout_id = $payoutId;
+		$clientCashout->admin_note = isset($data['admin_note']) ? $clientCashout->admin_note . ' --- ' . $data['admin_note'] : $clientCashout->admin_note;
+		$clientCashout->source = config('payment.refund.refund_provider');
+		$clientCashout->save();
+		// This block must deleted after fixing save problem on this model.
+
                 DB::commit();
             } catch (\Throwable $exception) {
                 DB::rollBack();
