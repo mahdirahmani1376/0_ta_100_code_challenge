@@ -477,7 +477,7 @@ class RahkaranService
         $voucher->Date = $cashouts->first()->updated_at;
         $voucher->Description = $description;
         $voucher->Description_En = $description;
-        $voucher->FiscalYearRef = MainAppConfig::get(MainAppConfig::RAHKARAN_FISCAL_YEAR_REF);
+	$voucher->FiscalYearRef = $this->config->fiscalYearRef;
         $voucher->IsCurrencyBased = $this->config->voucherIsCurrencyBased;
         $voucher->IsExternal = true;
         $voucher->LedgerRef = $this->config->voucherLedgerRef;
@@ -1703,8 +1703,8 @@ class RahkaranService
     private function getPaymentFeeTransactionVoucherItem($item, $amount): VoucherItem
     {
         $voucher_item = new VoucherItem();
-        $voucher_item->SLCode = config('payment.cashout.refund_provider_rahkaran_id');
-        $voucher_item->DL4 = $this->config->zarinpalDL4;
+	$voucher_item->SLCode = $this->config->bankBaseSl;
+        $voucher_item->DL4 = config('payment.refund.refund_provider_rahkaran_id');
         $voucher_item->Credit = round($amount);
 
         $voucher_item->Description = 'کارمزد انتقال وجه به مشتری با کد پیگیری ' . $item->payout_id;

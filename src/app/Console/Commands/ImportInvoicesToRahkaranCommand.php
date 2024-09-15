@@ -125,6 +125,11 @@ class ImportInvoicesToRahkaranCommand extends Command
         $this->newLine(2);
         $this->info("Total Invoices: {$total_invoices}");
         Log::info("ImportInvoicesToRahkaranCommand Total Invoices: {$total_invoices}");
+	if ( $total_invoices == 0 ) 
+	{
+		$this->warn('Skip invoices');
+		return;
+	}
 
         $this->newLine();
         $bar = $this->output->createProgressBar($total_invoices);

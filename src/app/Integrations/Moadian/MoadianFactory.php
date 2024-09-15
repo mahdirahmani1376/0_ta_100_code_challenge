@@ -145,7 +145,10 @@ class MoadianFactory
 
             $body = new MoadianInvoiceItem();
 
-            $this->getProductsAndDomainsList($positiveItems);
+	    if ( empty($refunded_invoice_source) )
+                $this->getProductsAndDomainsList($positiveItems);
+	    else 
+	        $this->getProductsAndDomainsList($refunded_invoice_source->items);
 
             if (empty($refunded_invoice_source)) {
                 [$sstid, $sstt] = self::getMappedProductId($item);
