@@ -613,9 +613,8 @@ class RahkaranService
                     }
 
                     if ($transaction->payment_method === Transaction::PAYMENT_METHOD_INSURANCE){
-                        $this->getInsuranceTransactionVoucherItem($client_dl_code,$transaction);
                         $voucher->addVoucherItem(
-                            $this->getPaymentTransactionVoucherItem($client_dl_code, $transaction)
+                            $this->getInsuranceTransactionVoucherItem($client_dl_code, $transaction)
                         );
                         continue;
                     }
