@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Invoice;
 
 use App\Models\Invoice;
+use App\Models\Item;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class StoreInvoiceRequest extends FormRequest
             'items'                    => ['required', 'array'],
             'items.*.description'      => ['required', 'string'],
             'items.*.amount'           => ['required', 'numeric'],
-            'items.*.invoiceable_type' => ['nullable', 'string'],
+            'items.*.invoiceable_type' => ['nullable', Rule::in(Item::TYPES)],
             'items.*.invoiceable_id'   => ['nullable', 'integer'],
             'items.*.from_date'        => ['nullable', 'date',],
             'items.*.to_date'          => ['nullable', 'date',],
