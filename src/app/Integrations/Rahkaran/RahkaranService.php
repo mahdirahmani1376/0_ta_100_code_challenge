@@ -612,6 +612,11 @@ class RahkaranService
                         continue;
                     }
 
+                    if ($transaction->payment_method === Transaction::PAYMENT_METHOD_INSURANCE){
+                        $this->getInsuranceTransactionVoucherItem($client_dl_code,$transaction);
+                        continue;
+                    }
+
                     $voucher->addVoucherItem(
                         $this->getPaymentTransactionVoucherItem($client_dl_code, $transaction)
                     );
@@ -1699,6 +1704,18 @@ class RahkaranService
         $voucher_item->DL4 = $client_dl_code;
         $voucher_item->Debit = round($transaction->amount);
         $voucher_item->Description = trans('rahkaran.voucher_item.payment', [
+            'transaction_id' => $transaction->id
+        ]);
+        return $voucher_item;
+    }
+
+    private function getInsuranceTransactionVoucherItem($client_dl_code, Transaction $transaction): VoucherItem
+    {
+        $voucher_item = new VoucherItem();
+        $voucher_item->SLCode = $this->config->insuranceSl;
+        $voucher_item->DL4 = $client_dl_code;
+        $voucher_item->Debit = round($transaction->amount);
+        $voucher_item->Description = trans('rahkaran.voucher_item.insurance', [
             'transaction_id' => $transaction->id
         ]);
         return $voucher_item;

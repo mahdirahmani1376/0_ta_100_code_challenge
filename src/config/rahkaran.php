@@ -71,5 +71,6 @@ return [
     "paymentFeeDL4"                => env("RAHKARAN_PAYMENT_FEE_DL4", 90000000),
     "paymentFeeDL5"                => env("RAHKARAN_PAYMENT_FEE_DL5", 80000001),
     "zarinpalDL4"                  => env("RAHKARAN_ZARINPAL_DL4", 30000012),
-    "bankBaseSL"                   => env("RAHKARAN_BANK_BASE_SL", 1111111)
+    "bankBaseSL"                   => env("RAHKARAN_BANK_BASE_SL", 1111111),
+    "insuranceSl"                   => env("RAHKARAN_BANK_BASE_SL", 1118111)
 ];
