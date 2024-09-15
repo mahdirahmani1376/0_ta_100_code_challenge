@@ -614,7 +614,6 @@ class RahkaranService
 
                     if ($transaction->payment_method === Transaction::PAYMENT_METHOD_INSURANCE){
                         $this->getInsuranceTransactionVoucherItem($client_dl_code,$transaction);
-                        continue;
                     }
 
                     $voucher->addVoucherItem(
