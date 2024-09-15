@@ -25,7 +25,7 @@ class BankGatewaySeeder extends Seeder
 //        ]);
 
         // ----------- OmidPay ----------------
-        if (BankGateway::where('name', 'omidPay')->doesntExist()) {
+        /*if (BankGateway::where('name', 'omidPay')->doesntExist()) {
             BankGateway::create([
                 'name' => 'omidPay',
                 'name_fa' => 'امید پی',
@@ -39,20 +39,20 @@ class BankGatewaySeeder extends Seeder
                     'password' => '342162',
                 ],
             ]);
-        }
+        }*/
 
         // ----------- BazaarPay ----------------
         if (BankGateway::where('name', 'bazaarPay')->doesntExist()) {
             BankGateway::create([
-                'name' => 'bazaarPay',
-                'name_fa' => 'بازار پی',
-                'status' => BankGateway::STATUS_ACTIVE,
+                'name'                       => 'bazaarPay',
+                'name_fa'                    => 'بازار پی',
+                'status'                     => BankGateway::STATUS_ACTIVE,
                 'is_direct_payment_provider' => true,
-                'config' => [
-                    'direct_pay_url' => 'fill-here',
-                    'trace_url' => 'fill-here',
-                    'init_checkout_url' => 'fill-here',
-                    'init_contract_url' => 'fill-here',
+                'config'                     => [
+                    'direct_pay_url'      => 'fill-here',
+                    'trace_url'           => 'fill-here',
+                    'init_checkout_url'   => 'fill-here',
+                    'init_contract_url'   => 'fill-here',
                     'authorization_token' => '123',
                 ],
             ]);
