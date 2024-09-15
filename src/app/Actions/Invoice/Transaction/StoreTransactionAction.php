@@ -25,7 +25,7 @@ class StoreTransactionAction
     {
         $invoice = ($this->findInvoiceByIdService)($data['invoice_id']);
 
-	if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
+        if (!in_array($invoice->status, [Invoice::STATUS_UNPAID, Invoice::STATUS_COLLECTIONS, Invoice::STATUS_PAYMENT_PENDING])) {
             check_rahkaran($invoice);
         }
 
@@ -41,10 +41,7 @@ class StoreTransactionAction
 
         $invoice = ($this->calcInvoicePriceFieldsService)($invoice);
 
-        if ($invoice->balance <= 0) {
-            ($this->processInvoiceAction)($invoice);
-        }
-
+        ($this->processInvoiceAction)($invoice);
 
         return $transaction;
     }

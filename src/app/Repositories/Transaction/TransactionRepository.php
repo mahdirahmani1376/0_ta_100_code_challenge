@@ -81,7 +81,8 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
 
         if (!empty($data['search'])) {
             $query->where(function (Builder $query) use ($data) {
-                return $query->where('reference_id', 'LIKE', '%' . $data['search'] . '%')
+		    return $query
+		    ->orWhere('reference_id', 'LIKE', $data['search'] . '%')
                     ->orWhere('id', '%' . $data['search'] . '%')
                     ->orWhere('invoice_id', 'LIKE', '%' . $data['search'] . '%')
                     ->orWhere('tracking_code', 'LIKE', '%' . $data['search'] . '%')

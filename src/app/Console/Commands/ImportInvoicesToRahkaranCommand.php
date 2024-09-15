@@ -140,9 +140,10 @@ class ImportInvoicesToRahkaranCommand extends Command
                 continue;
             }
 
-            $jalali_date = JalaliCalender::carbonToJalali($invoices->first()->paid_at ?? $invoices->first()->created_at);
+	    $matched = $invoices->get();
+            $jalali_date = JalaliCalender::carbonToJalali($matched[0]->paid_at ?? $matched[0]->created_at);
 
-            $this->rahkaranService->createBulkInvoice($invoices->get(), $max_rounding_amount, $jalali_date);
+            $this->rahkaranService->createBulkInvoice($matched, $max_rounding_amount, $jalali_date);
             Log::info("ImportInvoicesToRahkaranCommand Invoices on {$jalali_date} imported successfully");
 
             $this->fromDate->addDay();

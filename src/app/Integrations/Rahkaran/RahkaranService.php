@@ -112,11 +112,13 @@ class RahkaranService
      */
     public function createClientParty(Client $client, array $ignored_fields = []): ?RahkaranParty
     {
-        if (!$this->isTestMode() && !empty($client->rahkaran_id)) {
-            return $this->getClientParty($client);
+        $profile = Profile::where('id', $client->finance_profile_id)->first();
+	$profile->client = $client;
+        if (!$this->isTestMode() && !empty($profile->rahkaran_id)) {
+            return $this->getClientParty($profile);
         }
 
-        $client_party = $this->mapClientParty($client, new RahkaranParty(), $ignored_fields);
+        $client_party = $this->mapClientParty($profile->client, new RahkaranParty(), $ignored_fields);
 
         if ($this->isTestMode()) {
             return $client_party;
@@ -124,7 +126,7 @@ class RahkaranService
 
         $client_party = $this->createParty($client_party);
 
-        $profile = Profile::where('id', $client->finance_profile_id)->first();
+	unset($profile->client);
         $profile->update(['rahkaran_id' => $client_party->ID]);
 
         $this->getClientDl($client);
@@ -140,12 +142,13 @@ class RahkaranService
      */
     public function getClientDl(Client $client): mixed
     {
-        $party_dl_code = $this->getClientDlPartyCode($client);
-
+	$profile = Profile::where('id', $client->finance_profile_id)->first();
+	$profile->client = $client;
+        $party_dl_code = $this->getClientDlPartyCode($profile->client);
         $party_dl = $this->getDl($party_dl_code);
 
         if (!$party_dl) {
-            return $this->generateClientDl($client);
+            return $this->generateClientDl($profile->client);
         }
 
         return $party_dl;
@@ -160,7 +163,9 @@ class RahkaranService
      */
     public function updateClientParty(Client $client): ?RahkaranParty
     {
-        $client_party = $this->mapClientParty($client, $this->getClientParty($client));
+	$profile = Profile::where('id', $client->finance_profile_id)->first();
+	$profile->client = $client;
+        $client_party = $this->mapClientParty($profile->client, $this->getClientParty($profile));
 
         if ($this->isTestMode()) {
             return $client_party;
@@ -172,25 +177,25 @@ class RahkaranService
     /**
      * Gets party by given client model
      *
-     * @param Client $client
+     * @param Profile $profile
      * @return RahkaranParty|null
      * @throws MainAppInternalAPIException
      */
-    public function getClientParty(Client $client): ?RahkaranParty
+    public function getClientParty(Profile $profile): ?RahkaranParty
     {
-        if (empty($client->rahkaran_id)) {
+        if (empty($profile->rahkaran_id)) {
             try {
-                return $this->createClientParty($client);
+                return $this->createClientParty($profile->client);
             } catch (Throwable $exception) {
                 try {
-                    return $this->createClientParty($client, ['address']);
+                    return $this->createClientParty($profile->client, ['address']);
                 } catch (Throwable $exception) {
-                    return $this->createClientParty($client, ['address', 'national_code']);
+                    return $this->createClientParty($profile->client, ['address', 'national_code']);
                 }
             }
         }
 
-        return $this->getPartyById($client->rahkaran_id);
+        return $this->getPartyById($profile->rahkaran_id);
     }
 
     /**
@@ -237,7 +242,7 @@ class RahkaranService
         $receipt->IsApproved = true;
         $receipt->Number = $reference_id;
         $receipt->SecondNumber = $transaction->invoice_id;
-        $receipt->CounterPartDLCode = $client_party?->Code;
+        $receipt->CounterPartDLCode = $client_party->Code;
         $receipt->Date = $transaction->created_at;
         $receipt->ApproveDate = $transaction->created_at;
         $receipt->TotalOperationalCurrencyAmount = $transaction->amount;
@@ -250,7 +255,7 @@ class RahkaranService
         $receipt_deposit->AccountingOperationID = $this->config->receiptAccountingOperationID;
         $receipt_deposit->CashFlowFactorID = $this->config->receiptCashFlowFactorID;
 
-        $receipt_deposit->CounterPartDLCode = $client_party?->Code;
+        $receipt_deposit->CounterPartDLCode = $client_party->Code;
         $receipt_deposit->Number = $reference_id;
 
         if ($receipt_deposit->Amount == 0) {
@@ -520,8 +525,8 @@ class RahkaranService
                 ])) {
                 ($this->assignInvoiceNumberService)($invoice);
                 $invoice->refresh();
-                $processInvoices[] = $invoice;
 
+                $processInvoices[] = $invoice;
             }
         }
 
@@ -572,7 +577,7 @@ class RahkaranService
                 /// ########
                 $voucher_item->PartyRef = $invoice->profile->rahkaran_id;
                 $voucher_item->TaxAmount = $this->getItemTax($item);
-                $voucher_item->TollAmount = $this->getItemToll($item);
+		$voucher_item->TollAmount = 0;
                 $voucher_item->TaxStateType = 1;
                 $voucher_item->PurchaseOrSale = 2;
                 $voucher_item->ItemOrService = 2;
@@ -660,6 +665,7 @@ class RahkaranService
         $rahkaran_id = $result['ID'];
         foreach ($processInvoices as $invoice) {
             $invoice->rahkaran_id = $rahkaran_id;
+	    unset($invoice->client);
             $this->invoiceRepository->update($invoice, ['rahkaran_id' => $rahkaran_id], ['rahkaran_id']);
         }
 
@@ -736,45 +742,14 @@ class RahkaranService
     private function getBankAccountId(Transaction $transaction): int
     {
         if ($transaction->amount < 10) {
-            return $this->findRahkaranIdByName('roundingBank');
+	    return $this->config->roundingBankId;
         }
         switch ($transaction->payment_method) {
+            case 'client_credit':
+                return $this->config->creditBankId;
             case 'sermelli':
             case 'sadad_meli':
                 return $this->findRahkaranIdByName('sadad_meli');
-            case 'irankish':
-                return $this->findRahkaranIdByName('irankish');
-
-            case 'mellatbank':
-                return $this->findRahkaranIdByName('mellatbank');
-
-            case 'parsianbank':
-                return $this->findRahkaranIdByName('parsianbank');
-
-            case 'zarinpal':
-                return $this->findRahkaranIdByName('zarinpal');
-
-            case 'zarinpal_sms':
-                return $this->findRahkaranIdByName('zarinpal_sms');
-
-            case 'zibal':
-                return $this->findRahkaranIdByName('zibal');
-
-            case 'asanpardakht':
-                return $this->findRahkaranIdByName('asanpardakht');
-
-            case 'saman':
-                $bankGateway = $this->findRahkaranIdByName($transaction->payment_method);
-                if (is_null($bankGateway) || is_null($bankGateway->rahkaran_id)) {
-                    throw new BadRequestException(trans('rahkaran.error.NOT_FOUND_TRANSACTION_BANK_ACCOUNT_ID', [
-                        'transaction_id' => $transaction->id
-                    ]));
-                }
-
-                return $bankGateway->rahkaran_id;
-            case 'client_credit':
-
-                return $this->findRahkaranIdByName('client_credit');
             case 'offline':
             case 'offline_bank':
             case 'offline-bank':
@@ -787,7 +762,7 @@ class RahkaranService
                 }
                 return $offlineTransaction->bankAccount->rahkaran_id;
             default:
-                return $this->config->defaultBankId;
+		return $this->findRahkaranIdByName($transaction->payment_method);
         }
     }
 
@@ -827,31 +802,32 @@ class RahkaranService
         $client_party->Type = $client->is_legal ? 1 : 0;
         $client_party->CompanyName = $client->company_name ?? $client->first_name . ' ' . $client->last_name;
 
-        $address = !in_array('address', $ignored_fields);
-
-        if ($client->is_legal || $address) {
+        if ( !empty($client->address) || !empty($client->company_address) ) {
 
             $company_addresses = [];
 
-            $client_party_address = new PartyAddress();
-            $client_party_address->Email = $client->email;
-            $client_party_address->Phone = $client->phone_number ?? $client->mobile_number;
-            $client_party_address->Name = trans('rahkaran.party.MAIN_ADDRESS');
-            $client_party_address->RegionalDivisionRef = $this->getRegion($client->city);
-            $client_party_address->Details = $client->is_legal == 0 ? $client->address : $client->company_address;
-            $company_addresses[] = $client_party_address;
+	    if ( !empty($client->address) ) 
+	    {
+		$client_party_address = new PartyAddress();
+                $client_party_address->Email = $client->email;
+                $client_party_address->Phone = $client->phone_number ?? $client->mobile_number;
+                $client_party_address->Name = trans('rahkaran.party.MAIN_ADDRESS');
+                $client_party_address->RegionalDivisionRef = $this->getRegion($client->city);
+                $client_party_address->Details = $client->address;
+                $company_addresses[] = $client_party_address;
 
-            $company_address = !in_array('company_address', $ignored_fields);
+	    }
 
-            if ($client->is_legal && $company_address && $client->company_phone_number && $client->company_city && $client->company_address) {
-                $client_party_address = new PartyAddress();
+	    if ( !empty($client->company_address) && $client->is_legal == 1 )
+	    {
+    	        $client_party_address = new PartyAddress();
                 $client_party_address->Email = $client->email;
                 $client_party_address->Phone = $client->company_phone_number ?? $client->mobile_number;
                 $client_party_address->Name = trans('rahkaran.party.COMPANY_ADDRESS');
                 $client_party_address->RegionalDivisionRef = $this->getRegion($client->company_city);
                 $client_party_address->Details = $client->company_address;
                 $company_addresses[] = $client_party_address;
-            }
+	    }
 
             $client_party->PartyAddresses = $company_addresses;
         }
@@ -975,8 +951,10 @@ class RahkaranService
      */
     private function generateClientDl(Client $client): ?DlObject
     {
-        $client_party = $this->getClientParty($client);
-        $party_dl_code = $this->getClientDlPartyCode($client);
+	$profile = Profile::where('id', $client->finance_profile_id)->first();
+	$profile->client = $client;
+        $client_party = $this->getClientParty($profile);
+        $party_dl_code = $this->getClientDlPartyCode($profile->client);
         $party_dl_type = $client->is_legal ? $this->config->legalPartyDlType : $this->config->personalPartyDlType;
         return $this->generatePartyDL($party_dl_code, $party_dl_type, $client_party, $client);
     }
@@ -1490,11 +1468,7 @@ class RahkaranService
 
         $tax_percent = $item->invoice->tax_rate;
 
-        $tax = round(($tax_percent / 100) * $item->amount, 0, PHP_ROUND_HALF_DOWN);
-
-        if ($tax <= 0) {
-            var_dump('No Tax found for invoice: ' . $item->invoice_id);
-        }
+        $tax = round(($tax_percent / 100) * abs($item->amount), 0, PHP_ROUND_HALF_DOWN);
 
         return $tax;
     }
@@ -1527,7 +1501,6 @@ class RahkaranService
     {
         $totalTax = $this->getRawInvoiceTotalTax($invoice);
         $tax = $this->getRawInvoiceTax($invoice);
-        $troll = $this->getRawInvoiceToll($invoice);
 
         if ($totalTax <= 0) {
             var_dump('No Troll found for invoice: ' . $invoice->id);
@@ -1541,8 +1514,8 @@ class RahkaranService
 
         if ($client_rahkaran_id) {
             $voucher_item->PartyRef = $client_rahkaran_id;
-            $voucher_item->TaxAmount = $tax; // TODO check this
-            $voucher_item->TollAmount = $troll;
+            $voucher_item->TaxAmount = $tax;
+            $voucher_item->TollAmount = 0;
             $voucher_item->TaxStateType = 1;
             $voucher_item->PurchaseOrSale = 1;
             $voucher_item->ItemOrService = 2;
@@ -1629,9 +1602,9 @@ class RahkaranService
         return $this->transactionRepository->sum(
             'amount',
             [
-                'invoice_id' => $invoice->id
-            ],
-            $transaction_scope
+		    'invoice_id' => $invoice->id,
+		    'status' 	 => Transaction::STATUS_SUCCESS 
+	    ]
         );
     }
 
@@ -1860,6 +1833,9 @@ class RahkaranService
                 'sg-auth-hostiran' => $this->sessionId
             ], config('rahkaran.rahkaran_host'));
 
+	    //if ( Str::contains($url, 'RegisterVoucher') )
+	   
+
             $response = $this->client->request(
                 $method,
                 $url,
@@ -1875,7 +1851,7 @@ class RahkaranService
             $content = $exception->getResponse()->getBody()->getContents();
             Log::error("result $url " . $exception->getMessage(), [$exception->getResponse()->getBody()->getContents() ?? '']);
             $this->updateRequestLog($log_system, $content ?? $exception->getMessage(), $exception->getResponse()->getHeaders(), $exception->getResponse()->getStatusCode());
-            throw new FatalErrorException($exception->getMessage());
+	    throw new FatalErrorException($exception->getMessage());
         } catch (Throwable $exception) {
             Log::error("result $url " . $exception->getMessage(), $exception->getTrace());
 
@@ -2383,8 +2359,6 @@ class RahkaranService
     private function findRahkaranIdByName($name)
     {
         return $this->bankGateWays
-            ->where('name', '=', $name)
-            ->where('status', '=', 'active')
-            ->firstOrFail()->rahkaran_id;
+            ->where('name', '=', $name)->first()->rahkaran_id;
     }
 }
