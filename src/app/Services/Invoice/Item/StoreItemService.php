@@ -16,7 +16,7 @@ class StoreItemService
     {
         $data['amount'] = (int)$data['amount'];
         if ($data['amount'] != 0 && $data['amount'] < 100) {
-            \Log::warning("Item with amount less than 100 rials detected", [
+            \Log::warning("Item with amount less than 100 rials detected invoice #{$invoice->id}", [
                 'traceback' => debug_backtrace(2)
             ]);
             throw ItemAmountInvalidException::make();
