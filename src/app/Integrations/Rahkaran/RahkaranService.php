@@ -225,7 +225,7 @@ class RahkaranService
             return $transaction;
         }
 
-        if ($this->isBarterTransaction($transaction)) {
+        if ($this->isBarterTransaction($transaction) || $this->isInsuranceTransaction($transaction) ) {
             return $transaction;
         }
 
@@ -614,6 +614,13 @@ class RahkaranService
                 foreach ($transactions as $transaction) {
 
                     if ($transaction->amount < 0 || $this->isRoundingTransaction($transaction)) {
+                        continue;
+                    }
+
+                    if ($transaction->payment_method === Transaction::PAYMENT_METHOD_INSURANCE){
+                        $voucher->addVoucherItem(
+                            $this->getInsuranceTransactionVoucherItem($client_dl_code, $transaction)
+                        );
                         continue;
                     }
 
@@ -1677,6 +1684,18 @@ class RahkaranService
         return $voucher_item;
     }
 
+    private function getInsuranceTransactionVoucherItem($client_dl_code, Transaction $transaction): VoucherItem
+    {
+        $voucher_item = new VoucherItem();
+        $voucher_item->SLCode = $this->config->insuranceSl;
+        $voucher_item->DL4 = $client_dl_code;
+        $voucher_item->Debit = round($transaction->amount);
+        $voucher_item->Description = trans('rahkaran.voucher_item.insurance', [
+            'transaction_id' => $transaction->id
+        ]);
+        return $voucher_item;
+    }
+
     /**
      * @param $amount
      * @return VoucherItem
@@ -2093,6 +2112,11 @@ class RahkaranService
     private function isBarterTransaction(Transaction $transaction): bool
     {
         return $transaction->payment_method == Transaction::PAYMENT_METHOD_BARTER;
+    }
+
+    private function isInsuranceTransaction(Transaction $transaction): bool
+    {
+        return $transaction->payment_method == Transaction::PAYMENT_METHOD_INSURANCE;
     }
 
     /**

@@ -35,10 +35,12 @@ class Transaction extends Model
     const PAYMENT_METHOD_OFFLINE = 'offline';
     const PAYMENT_METHOD_BARTER = 'barter';
     const PAYMENT_METHOD_CREDIT = 'client_credit';
+    const PAYMENT_METHOD_INSURANCE = 'insurance';
     const PAYMENT_METHODS = [
         self::PAYMENT_METHOD_OFFLINE,
         self::PAYMENT_METHOD_BARTER,
         self::PAYMENT_METHOD_CREDIT,
+        self::PAYMENT_METHOD_INSURANCE
     ];
     const STATUS_PENDING = 'pending'; // old status = 0
     const STATUS_SUCCESS = 'success'; // old status = 1

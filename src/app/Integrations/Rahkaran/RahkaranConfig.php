@@ -75,6 +75,7 @@ class RahkaranConfig
     public int $paymentFeeDL5;
     public int $zarinpalDL4;
     public int $bankBaseSl;
+    public int $insuranceSl;
 
     public function __construct()
     {
@@ -145,5 +146,6 @@ class RahkaranConfig
         $this->paymentFeeDL5 = config('rahkaran.paymentFeeDL5');
         $this->zarinpalDL4 = config('rahkaran.zarinpalDL4');
         $this->bankBaseSl = config('rahkaran.bankBaseSL');
+        $this->insuranceSl = config('rahkaran.insuranceSl');
     }
 }
