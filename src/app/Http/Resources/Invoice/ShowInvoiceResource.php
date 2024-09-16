@@ -5,6 +5,7 @@ namespace App\Http\Resources\Invoice;
 use App\Http\Resources\Invoice\Item\ShowItemResource;
 use App\Http\Resources\Invoice\OfflineTransaction\OfflineTransactionResource;
 use App\Http\Resources\Invoice\Transaction\TransactionWithoutInvoiceResource;
+use App\Http\Resources\Wallet\CreditTransaction\CreditTransactionResource;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -41,6 +42,7 @@ class ShowInvoiceResource extends JsonResource
             'transactions'          => TransactionWithoutInvoiceResource::collection($this->transactions()->orderByDesc('id')->get()),
             'items'                 => ShowItemResource::collection($this->items),
             'offline_transactions'  => OfflineTransactionResource::collection($this->offlineTransactions),
+            'credit_transactions'   => CreditTransactionResource::collection($this->creditTransactions),
         ];
     }
 }
