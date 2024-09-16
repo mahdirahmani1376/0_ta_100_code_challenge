@@ -25,8 +25,8 @@ return [
     'roundingSl'                   => env('RAHKARAN_ROUNDING_SL', 4113130),
     'roundingDl4Code'              => env('RAHKARAN_ROUNDING_DL4_CODE', 90000000),
     'roundingDl5Code'              => env('RAHKARAN_ROUNDING_DL5_CODE', 80000007),
-    'saleSl'                       => env('RAHKARAN_SALE_SL', 2111311),
-    'refundSl'                     => env('RAHKARAN_REFUND_SL', 2111312),
+    'saleSl'                       => env('RAHKARAN_SALE_SL', 2111314),
+    'refundSl'                     => env('RAHKARAN_REFUND_SL', 2111315),
     'generalDl4Code'               => env('RAHKARAN_GENERAL_DL4_CODE', 90000001),
     'generalDl5Code'               => env('RAHKARAN_GENERAL_DL5_CODE', 50001000),
     'generalDl6Code'               => env('RAHKARAN_GENERAL_DL5_CODE', 60001000),
@@ -47,7 +47,7 @@ return [
     'creditBankId'                 => env('RAHKARAN_CREDIT_BANK_ID', 3),
     'roundingBankId'               => env('RAHKARAN_ROUNDING_BANK_ID', 15),
     'bankBranchId'                 => env('RAHKARAN_BANK_BRANCH_ID', 12), // according to the excel
-    'fiscalYearRef'                => env('RAHKARAN_FISCAL_YEAR_REF', 3), // according to the example ارجاع به سال مالی: با توجه به دوره مالی که سند در آن ثبت میشود باید مشخص شود تیبل select fiscalyearid from gnr3.FiscalYear
+    'fiscalYearRef'                => env('RAHKARAN_FISCAL_YEAR_REF', 4), // according to the example ارجاع به سال مالی: با توجه به دوره مالی که سند در آن ثبت میشود باید مشخص شود تیبل select fiscalyearid from gnr3.FiscalYear
     'voucherBranchRef'             => env('RAHKARAN_VOUCHER_BRANCH_REF', 1), // according to the excel
     'voucherCreatorId'             => env('RAHKARAN_VOUCHER_CREATOR_ID', 1),// according to the excel
     'voucherLedgerRef'             => env('RAHKARAN_VOUCHER_LEDGER_REF', 1), // according to the excel ارجاع به دفترکل در اینجا برابر با مقدار 1 می باشد

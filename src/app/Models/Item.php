@@ -59,14 +59,50 @@ class Item extends Model
     const TYPE_AFFILIATION = 'affiliation';
     const TYPE_MIHAN_NIC_IR = 'MihanNicIr';
     const TYPE_MIHAN_NIC_COM = 'MihanNicCom';
+    const TYPE_CLOUD_SERVICE = 'CloudService';
+
+    const TYPES = [
+        self::TYPE_MASS_PAYMENT_INVOICE,
+        self::TYPE_ADD_CLIENT_CREDIT,
+        self::TYPE_ADD_CLOUD_CREDIT,
+        self::TYPE_DOMAIN_SERVICE,
+        self::TYPE_HOSTING,
+        self::TYPE_PRODUCT_SERVICE,
+        self::TYPE_ADMIN_TIME,
+        self::TYPE_CLOUD,
+        self::TYPE_CLOUD_IP,
+        self::TYPE_REFUND_DOMAIN,
+        self::TYPE_ADD_FUNDS,
+        self::TYPE_DOMAIN_ADDON_DNS,
+        self::TYPE_PROMO_DOMAIN,
+        self::TYPE_DOMAIN_TRANSFER,
+        self::TYPE_DOMAIN_ADDON_IP,
+        self::TYPE_DOMAIN_REGISTER,
+        self::TYPE_DOMAIN,
+        self::TYPE_UPGRADE,
+        self::TYPE_DOMAIN_HOSTING,
+        self::TYPE_ITEM,
+        self::TYPE_PRODUCT_SERVICE_UPGRADE,
+        self::TYPE_CHANGE_SERVICE,
+        self::TYPE_PARTNER_DISCOUNT,
+        self::TYPE_PARTNER_COMMISSION,
+        self::TYPE_PARTNER_PAYMENT,
+        self::TYPE_AFFILIATION,
+        self::TYPE_MIHAN_NIC_IR,
+        self::TYPE_MIHAN_NIC_COM,
+        self::TYPE_CLOUD_SERVICE
+    ];
+
+
 
     public const Invoiceable_Types = [
         self::TYPE_DOMAIN_SERVICE,
         self::TYPE_PRODUCT_SERVICE,
         self::TYPE_PRODUCT_SERVICE_UPGRADE,
         self::TYPE_CLOUD,
+        self::TYPE_CLOUD_SERVICE,
         self::TYPE_MIHAN_NIC_IR,
-        self::TYPE_MIHAN_NIC_COM
+        self::TYPE_MIHAN_NIC_COM,
     ];
 
     protected $casts = [
@@ -108,5 +144,12 @@ class Item extends Model
             ->where('invoiceable_id', $this->invoiceable_id)
             ->whereIn('invoiceable_type', $types)
             ->count() == 0 ? 'register' : 'renew';
+    }
+
+    public function setDescriptionAttribute($value): void
+    {
+        if (isset($this->attributes) and !empty($value)) {
+            $this->attributes['description'] = html_entity_decode($value);
+        }
     }
 }

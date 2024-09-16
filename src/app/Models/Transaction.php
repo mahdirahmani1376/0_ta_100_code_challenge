@@ -80,8 +80,8 @@ class Transaction extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    public function offlineTransaction(): HasOne
+    public function offlineTransaction(): BelongsTo
     {
-        return $this->hasOne(OfflineTransaction::class);
+        return $this->belongsTo(OfflineTransaction::class, 'id', 'transaction_id');
     }
 }

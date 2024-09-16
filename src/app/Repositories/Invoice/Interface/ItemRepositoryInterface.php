@@ -18,4 +18,6 @@ interface ItemRepositoryInterface extends EloquentRepositoryInterface
     public function reAssignItemsToInvoice(Invoice $invoice, array $itemIds): int;
 
     public function findAddCreditItem(Invoice $invoice): ?Item;
+
+    public function sumItemsAmount(mixed $item_ids);
 }

@@ -73,6 +73,12 @@ class BaseRepository implements EloquentRepositoryInterface
         return self::newQuery()->find($id);
     }
 
+    public function findOrFail(int $id): ?Model
+    {
+        return self::newQuery()->findOrFail($id);
+    }
+
+
     public function update(Model $object, array $attributes, array $fillable = []): Model
     {
         change_log()->setModel($object)->setBefore();

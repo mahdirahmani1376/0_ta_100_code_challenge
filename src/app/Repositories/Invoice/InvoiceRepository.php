@@ -299,18 +299,9 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         [$from, $to] = finance_report_dates($from, $to);
 
         $query = self::newQuery()
-            ->where(function (Builder $query) use ($to, $from) {
-                $query->where(function (Builder $query) use ($from, $to) {
-                    $query->where('status', Invoice::STATUS_PAID)
-                        ->whereDate('paid_at', '>=', $from)
-                        ->whereDate('paid_at', '<=', $to);
-                });
-                $query->orWhere(function (Builder $query) use ($from, $to) {
-                    $query->whereIn('status', [Invoice::STATUS_COLLECTIONS, Invoice::STATUS_REFUNDED])
-                        ->whereDate('created_at', '>=', $from)
-                        ->whereDate('created_at', '<=', $to);
-                });
-            });
+		->whereDate('paid_at', '>=', $from)
+                ->whereDate('paid_at', '<=', $to)
+		->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED, Invoice::STATUS_COLLECTIONS]);
 
         $query->where('is_mass_payment', false);
         $query->where('is_credit', false);
