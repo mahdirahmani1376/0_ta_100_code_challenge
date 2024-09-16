@@ -59,6 +59,7 @@ class Item extends Model
     const TYPE_AFFILIATION = 'affiliation';
     const TYPE_MIHAN_NIC_IR = 'MihanNicIr';
     const TYPE_MIHAN_NIC_COM = 'MihanNicCom';
+    const TYPE_CLOUD_SERVICE = 'CloudService';
 
     const TYPES = [
         self::TYPE_MASS_PAYMENT_INVOICE,
@@ -89,6 +90,7 @@ class Item extends Model
         self::TYPE_AFFILIATION,
         self::TYPE_MIHAN_NIC_IR,
         self::TYPE_MIHAN_NIC_COM,
+        self::TYPE_CLOUD_SERVICE
     ];
 
 
@@ -98,8 +100,9 @@ class Item extends Model
         self::TYPE_PRODUCT_SERVICE,
         self::TYPE_PRODUCT_SERVICE_UPGRADE,
         self::TYPE_CLOUD,
+        self::TYPE_CLOUD_SERVICE,
         self::TYPE_MIHAN_NIC_IR,
-        self::TYPE_MIHAN_NIC_COM
+        self::TYPE_MIHAN_NIC_COM,
     ];
 
     protected $casts = [
