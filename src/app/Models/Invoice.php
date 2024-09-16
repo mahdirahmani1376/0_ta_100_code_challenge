@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Collection items
  * @property InvoiceNumber invoiceNumber
  * @property Collection transactions
+ * @property HasMany|Collection creditTransactions
  * @property Collection offlineTransactions
  * @property Profile profile
  * @property Client client
@@ -193,6 +194,11 @@ class Invoice extends Model
     protected function serializeDate(DateTimeInterface $date): string
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function creditTransactions(): HasMany
+    {
+        return $this->hasMany(CreditTransaction::class, 'invoice_id', 'id');
     }
 
 }
