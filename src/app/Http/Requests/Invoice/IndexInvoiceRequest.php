@@ -46,6 +46,7 @@ class IndexInvoiceRequest extends FormRequest
             'items'                    => ['nullable', 'array',],
             'items.*.invoiceable_ids'  => ['nullable', 'array',],
             'items.*.invoiceable_type' => ['nullable', 'max:255',],
+            'transaction_type'         => ['nullable']
         ];
     }
 }

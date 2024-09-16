@@ -135,6 +135,10 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             return self::sortQuery($query)->get();
         }
 
+        $query->when(!empty($data['transaction_type']), function (Builder $query) use ($data) {
+            $query->whereRelation('transactions','payment_method', '=' , $data['transaction_type']);
+        });
+
         return self::paginate($query);
     }
 
