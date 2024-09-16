@@ -29,6 +29,7 @@ class CancelOverDueInvoiceCommand extends Command
         Item::TYPE_ADD_FUNDS               => 10,
         Item::TYPE_DOMAIN_SERVICE          => 10,
         Item::TYPE_PRODUCT_SERVICE         => 10,
+        Item::TYPE_CLOUD_SERVICE           => 10,
         Item::TYPE_ADD_CLOUD_CREDIT        => 10,
         Item::TYPE_CLOUD                   => 10,
         Item::TYPE_ITEM                    => 10,
@@ -65,7 +66,7 @@ class CancelOverDueInvoiceCommand extends Command
         // cancel invoices that contains specific invoice item
         $this->cancelInvoicesWithItem();
         // cancel other invoices (Credit,MassPayment,etc)
-	// TODO: Fix default invoice cancelation it means not defined item types wrote above.
+        // TODO: Fix default invoice cancelation it means not defined item types wrote above.
         //$this->cancelInvoicesWithDefaultItem();
     }
 
