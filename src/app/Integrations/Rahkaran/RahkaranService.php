@@ -225,7 +225,7 @@ class RahkaranService
             return $transaction;
         }
 
-        if ($this->isBarterTransaction($transaction)) {
+        if ($this->isBarterTransaction($transaction) || $this->isInsuranceTransaction($transaction) ) {
             return $transaction;
         }
 
@@ -2112,6 +2112,11 @@ class RahkaranService
     private function isBarterTransaction(Transaction $transaction): bool
     {
         return $transaction->payment_method == Transaction::PAYMENT_METHOD_BARTER;
+    }
+
+    private function isInsuranceTransaction(Transaction $transaction): bool
+    {
+        return $transaction->payment_method == Transaction::PAYMENT_METHOD_INSURANCE;
     }
 
     /**

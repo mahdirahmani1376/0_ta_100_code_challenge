@@ -38,7 +38,7 @@ return [
         'collection' => 'درآمد وصول نشده',
         'credit'     => 'استفاده از اعتبار با استفاده از تراکنش :transaction_id',
         'payment'    => 'پرداخت با استفاده از تراکنش :transaction_id',
-        'insurance'    => 'پرداخت بابت بیمه با استفاده از تراکنش :transaction_id',
+        'insurance'    => 'مانده بیمه ثبت تراکنش :transaction_id',
         'refund'     => 'بازگشت از فروش',
         'rounding'   => 'بابت رند شدن',
     ],
