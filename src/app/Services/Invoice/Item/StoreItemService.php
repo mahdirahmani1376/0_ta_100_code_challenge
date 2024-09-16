@@ -15,7 +15,7 @@ class StoreItemService
     public function __invoke(Invoice $invoice, array $data)
     {
         $data['amount'] = (int)$data['amount'];
-        if ($data['amount'] < 100) {
+        if ($data['amount'] != 0 && $data['amount'] < 100) {
             \Log::warning("Item with amount less than 100 rials detected", [
                 'traceback' => debug_backtrace(2)
             ]);
