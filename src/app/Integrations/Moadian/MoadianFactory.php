@@ -312,7 +312,7 @@ class MoadianFactory
                 $domain = $this->domains->where('id', $item->invoiceable_id)->first();
                 if (isset($domain) && isset($domain['registrar']) && Str::contains($domain['registrar']['name'], ['irnic', 'Irnic'])) {
                     $code = 2330001496112; // TODO dobuble check دامنه داخلی
-                    $description = 'تخصيص و مديريت دامنه هاي داخلي';
+		    $description = 'تخصیص و مدیریت دامنه های داخلی';
                 } else {
                     $code = 2330001496266;
                     $description = 'تخصيص و مديريت دامنه بين المللي';
@@ -320,7 +320,7 @@ class MoadianFactory
                 break;
             case Item::TYPE_MIHAN_NIC_IR:
                 $code = 2330001496112; // TODO dobuble check دامنه داخلی
-                $description = 'تخصيص و مديريت دامنه هاي داخلي';
+		$description = 'تخصیص و مدیریت دامنه های داخلی';
             case Item::TYPE_MIHAN_NIC_COM:
                 $code = 2330001496266;
                 $description = 'تخصيص و مديريت دامنه بين المللي';
@@ -338,7 +338,7 @@ class MoadianFactory
         if (is_null($code)) {
             info('mapping not found for relId: ' . $item->invoiceable_id . ' - type: ' . $item->invoiceable_type);
             $code = 2330001496129;
-            $description = 'خدمات هاست وب سايت';
+	    $description = 'خدمات هاست وب سايت'; 
         }
 
         return [$code, $description];

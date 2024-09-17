@@ -1332,14 +1332,14 @@ class RahkaranService
             case Item::TYPE_HOSTING:
             case Item::TYPE_PRODUCT_SERVICE:
             case Item::TYPE_PRODUCT_SERVICE_UPGRADE:
-                $service = MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id);
+                $service = ($item->invoiceable_id > 0) ? MainAppAPIService::getProductOrDomain('product', $item->invoiceable_id) : [];
                 $level_6 = $this->getTotalDL6Code('product', $service);
                 $level_5 = $this->getTotalDL5Code('product', $service);
-                $level_4 = $this->getTotalDL4Code('product', $service['group']);
+                $level_4 = $this->getTotalDL4Code('product', $service['group'] ?? null);
                 break;
             case Item::TYPE_DOMAIN_SERVICE:
                 // Todo: Load domain tld to find region
-                $domain = MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id);
+                $domain = ($item->invoiceable_id > 0) ? MainAppAPIService::getProductOrDomain('domain', $item->invoiceable_id) : [];
                 $level_6 = $this->getTotalDL6Code('domain', null, $domain);
                 $level_5 = $this->getTotalDL5Code('domain', null, $domain);
                 $level_4 = $this->getTotalDL4Code('domain');
@@ -2146,9 +2146,12 @@ class RahkaranService
                 $description = 'عمومی سطح چهار';
                 break;
             case 'product':
-                if (!isset($productGroup) || !isset($productGroup['name'])) {
+		if ( empty($productGroup) ) {
+                    // Other
+                    $code = 90000205;
+                    $description = 'خدمات';
                     break;
-                }
+		}
                 if (Str::contains($productGroup['name'], ['Reseller', 'نمایندگی'])) {
                     $code = 90000206;
                     $description = 'سرویس نمایندگی';
@@ -2164,10 +2167,6 @@ class RahkaranService
                     $description = 'ارتباطات';
                     break;
                 }
-                // Other
-                $code = 90000205;
-                $description = 'خدمات';
-                break;
         }
 
         $dl_object = $this->getDl($code);
