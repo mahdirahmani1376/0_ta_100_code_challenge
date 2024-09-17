@@ -33,10 +33,6 @@ class MergeInvoiceAction
             'items' => $items->toArray(),
         ];
 
-        if (!empty($data['admin_id'])){
-            $invoiceData['admin_id'] = $data['admin_id'];
-        }
-
         $mergedInvoice = ($this->storeInvoiceAction)($invoiceData);
 
         $invoices->each(function (Invoice $invoice) {
