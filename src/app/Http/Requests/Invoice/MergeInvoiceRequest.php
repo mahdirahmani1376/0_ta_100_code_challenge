@@ -16,7 +16,7 @@ class MergeInvoiceRequest extends FormRequest
         return [
             'invoice_ids' => ['required', 'array', 'min:2'],
             'invoice_ids.*' => ['integer', 'exists:invoices,id'],
-            'admin_id' => ['required', 'integer',],
+            'admin_id' => ['nullable', 'integer',],
         ];
     }
 }

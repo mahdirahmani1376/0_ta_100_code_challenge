@@ -29,7 +29,7 @@ class MergeInvoiceAction
             'tax_rate' => $invoices->first()->tax_rate,
             'due_date' => $invoices->max('due_date'),
             'profile_id' => $invoices->first()->profile_id,
-            'admin_id' => $data['admin_id'],
+            'admin_id' => data_get($data,'admin_id'),
             'items' => $items->toArray(),
         ];
         $mergedInvoice = ($this->storeInvoiceAction)($invoiceData);
