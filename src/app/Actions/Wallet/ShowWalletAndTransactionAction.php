@@ -15,7 +15,7 @@ class ShowWalletAndTransactionAction
 
     public function __invoke(int $profileId)
     {
-        $wallet = ($this->showWalletAction)($profileId);
+        $wallet = ($this->showWalletAction)($profileId, true);
         $creditTransactions = ($this->indexCreditTransactionService)([
             'profile_id' => $profileId,
         ]);
