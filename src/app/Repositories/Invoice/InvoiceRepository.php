@@ -134,6 +134,10 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         });
 
 
+        if (isset($data['per_page'])) {
+            $query->limit($data['per_page']);
+        }
+
         if (isset($data['export']) && $data['export']) {
             $query->when(!empty($data['per_page']), fn(Builder $query) => $query->limit($data['per_page']));
 
@@ -304,9 +308,9 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
         [$from, $to] = finance_report_dates($from, $to);
 
         $query = self::newQuery()
-		->whereDate('paid_at', '>=', $from)
-                ->whereDate('paid_at', '<=', $to)
-		->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED, Invoice::STATUS_COLLECTIONS]);
+            ->whereDate('paid_at', '>=', $from)
+            ->whereDate('paid_at', '<=', $to)
+            ->whereIn('status', [Invoice::STATUS_PAID, Invoice::STATUS_REFUNDED, Invoice::STATUS_COLLECTIONS]);
 
         $query->where('is_mass_payment', false);
         $query->where('is_credit', false);
