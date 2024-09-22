@@ -30,7 +30,10 @@ class ChangeInvoiceStatusAction
             $invoice = ($this->changeInvoiceStatusService)($invoice, $status);
         }
 
-        if ($status == Invoice::STATUS_PAID) {
+        if (in_array($status,[
+            Invoice::STATUS_PAID,
+            Invoice::STATUS_COLLECTIONS,
+            ])) {
             $invoice = ($this->processInvoiceAction)($invoice);
         }
 
