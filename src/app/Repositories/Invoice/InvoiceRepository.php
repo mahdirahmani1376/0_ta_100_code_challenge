@@ -129,15 +129,16 @@ class InvoiceRepository extends BaseRepository implements InvoiceRepositoryInter
             });
         }
 
+        $query->when(!empty($data['transaction_type']), function (Builder $query) use ($data) {
+            $query->whereRelation('transactions','payment_method', '=' , $data['transaction_type']);
+        });
+
+
         if (isset($data['export']) && $data['export']) {
             $query->when(!empty($data['per_page']), fn(Builder $query) => $query->limit($data['per_page']));
 
             return self::sortQuery($query)->get();
         }
-
-        $query->when(!empty($data['transaction_type']), function (Builder $query) use ($data) {
-            $query->whereRelation('transactions','payment_method', '=' , $data['transaction_type']);
-        });
 
         return self::paginate($query);
     }
