@@ -34,5 +34,6 @@ final class ExceptionCodes
     public const AMOUNT_MUST_BE_GREATER_THAN_ZERO = '4100903';
     public const INVOICE_ALREADY_CHECKED = '410094';
     public const ITEM_AMOUNT_MUST_NOT_BE_ZERO = '410097';
+    public const AMOUNT_IS_INVALID = '410098';
 
 }
