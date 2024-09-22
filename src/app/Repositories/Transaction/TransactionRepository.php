@@ -180,7 +180,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->whereDate('created_at', '<=', $to)
 	    ->where('reference_id', 'NOT LIKE', 'ROUND%')
 	    ->where('status', Transaction::STATUS_SUCCESS)
-	    ->whereNotIn('payment_method', [Transaction::PAYMENT_METHOD_CREDIT, Transaction::PAYMENT_METHOD_BARTER])
+	    ->whereNotIn('payment_method', [Transaction::PAYMENT_METHOD_CREDIT, Transaction::PAYMENT_METHOD_BARTER, Transaction::PAYMENT_METHOD_INSURANCE])
 	    ->whereHas('invoice', function (Builder $query) {
                 $query->whereNotIn('status', [Invoice::STATUS_REFUNDED]);
             })
