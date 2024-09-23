@@ -34,7 +34,7 @@ class GetInvoicesByItemTypeAction
             foreach ($data['invoiceable_ids'] as $i => $type) {
                 $data['invoiceable_ids'][$i] = "'$type'";
             }
-            $ids = implode(',', $data['invoiceable_types']);
+            $ids = implode(',', $data['invoiceable_ids']);
             $query .= " AND i.invoiceable_id in ($ids)";
         }
 
