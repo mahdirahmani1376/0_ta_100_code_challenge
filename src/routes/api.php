@@ -28,6 +28,7 @@ use App\Http\Controllers\Invoice\BulkIndexInvoiceController;
 use App\Http\Controllers\Invoice\ChangeInvoiceStatusController;
 use App\Http\Controllers\Invoice\ChargeWalletInvoiceController;
 use App\Http\Controllers\Invoice\DownloadInvoiceBillController;
+use App\Http\Controllers\Invoice\GetInvoicesByItemTypeController;
 use App\Http\Controllers\Invoice\IndexInvoiceController;
 use App\Http\Controllers\Invoice\InvoiceNumber\IndexInvoiceNumberController;
 use App\Http\Controllers\Invoice\InvoiceReportController;
@@ -119,6 +120,7 @@ Route::namespace('Invoice')
         Route::post('merge', MergeInvoiceController::class);
         Route::post('mass-payment', StoreMassPaymentInvoiceController::class);
         Route::get('report', InvoiceReportController::class);
+        Route::get('get-by-items', GetInvoicesByItemTypeController::class);
         Route::get('{invoice}', ShowInvoiceController::class);
         Route::put('{invoice}', UpdateInvoiceController::class);
         Route::get('{invoice}/status', ShowInvoiceStatusController::class);
