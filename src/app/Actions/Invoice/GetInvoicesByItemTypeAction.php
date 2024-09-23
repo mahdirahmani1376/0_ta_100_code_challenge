@@ -8,7 +8,7 @@ class GetInvoicesByItemTypeAction
 {
     public function __invoke(array $data)
     {
-        $query = "SELECT * FROM invoices AS inv INNER JOIN items i ON inv.id = i.invoice_id WHERE 1=1";
+        $query = "SELECT inv.* FROM invoices AS inv INNER JOIN items i ON inv.id = i.invoice_id WHERE 1=1";
 
         if (!empty($data['profile_id'])) {
             $query .= " AND inv.profile_id = {$data['profile_id']}";
