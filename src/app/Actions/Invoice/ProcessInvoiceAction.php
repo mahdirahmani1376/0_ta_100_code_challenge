@@ -55,7 +55,8 @@ class ProcessInvoiceAction
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
             Invoice::STATUS_REFUNDED,
-        ]) || ($invoice->status == Invoice::STATUS_COLLECTIONS && $invoice->balance = 0)) {
+            Invoice::STATUS_COLLECTIONS
+        ]) || ($invoice->status == Invoice::STATUS_COLLECTIONS && $invoice->balance == 0)) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
         }
 
