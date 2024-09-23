@@ -3,10 +3,11 @@
 namespace App\Http\Resources\Invoice;
 
 use App\Models\Invoice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class IndexInvoiceResource extends JsonResource
+class MinimalInvoiceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -14,10 +15,10 @@ class IndexInvoiceResource extends JsonResource
         return [
             'id'              => $this->id,
             'invoice_id'      => $this->id,
-            'created_at'      => $this->created_at?->toDateTimeString(),
-            'updated_at'      => $this->updated_at?->toDateTimeString(),
-            'due_date'        => $this->due_date?->toDateTimeString(),
-            'paid_at'         => $this->paid_at?->toDateTimeString(),
+            'created_at'      => self::formatDateTime($this->created_at),
+            'updated_at'      => self::formatDateTime($this->updated_at),
+            'due_date'        => self::formatDateTime($this->due_date),
+            'paid_at'         => self::formatDateTime($this->paid_at),
             'profile_id'      => $this->profile_id,
             'rahkaran_id'     => $this->rahkaran_id,
             'payment_method'  => $this->payment_method,
@@ -28,10 +29,12 @@ class IndexInvoiceResource extends JsonResource
             'tax'             => $this->tax,
             'status'          => $this->status,
             'is_mass_payment' => $this->is_mass_payment,
-            'admin_id'        => $this->admin_id,
             'is_credit'       => $this->is_credit,
-            'manual_check'    => $this->admin_id,
-            'invoice_number'  => InvoiceNumberResource::make($this->invoiceNumber),
         ];
+    }
+
+    private static function formatDateTime(string|null $date)
+    {
+        return $date ? Carbon::create($date)->format('Y-m-d H:i:s') : null;
     }
 }
