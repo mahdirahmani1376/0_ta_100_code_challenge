@@ -35,5 +35,6 @@ final class ExceptionCodes
     public const INVOICE_ALREADY_CHECKED = '410094';
     public const ITEM_AMOUNT_MUST_NOT_BE_ZERO = '410097';
     public const AMOUNT_IS_INVALID = '410098';
+    public const DIRECT_PAYMENT_ALREADY_EXISTS_EXCEPTION = '410099';
 
 }
