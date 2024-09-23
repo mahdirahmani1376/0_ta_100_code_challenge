@@ -52,13 +52,13 @@ class ProcessInvoiceAction
         }
 
         // Change status to paid unless it is a REFUND invoice
+        $old_status = $invoice->status;
         if (!in_array($invoice->status, [
             Invoice::STATUS_PAID,
             Invoice::STATUS_REFUNDED,
-        ]) || ($invoice->status == Invoice::STATUS_COLLECTIONS && $invoice->balance = 0)) {
+        ])) {
             ($this->changeInvoiceStatusService)($invoice, Invoice::STATUS_PAID);
         }
-
 
         // Calc paid_at
         if (is_null($invoice->paid_at)) {
@@ -105,7 +105,7 @@ class ProcessInvoiceAction
         }
 
 
-        if (!$invoice->processed_at) {
+        if ($old_status != Invoice::STATUS_COLLECTIONS && !$invoice->processed_at) {
             ($this->calcInvoiceProcessedAtService)($invoice);
             if (!$invoice->is_credit) {
                 InvoiceProcessedJob::dispatch($invoice);
