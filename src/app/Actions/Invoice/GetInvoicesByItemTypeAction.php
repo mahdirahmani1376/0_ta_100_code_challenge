@@ -28,9 +28,19 @@ class GetInvoicesByItemTypeAction
             foreach ($data['invoiceable_types'] as $i => $type) {
                 $data['invoiceable_types'][$i] = "'$type'";
             }
-            $status = implode(',', $data['invoiceable_types']);
-            $query .= " AND i.invoiceable_type in ($status)";
+            $types = implode(',', $data['invoiceable_types']);
+            $query .= " AND i.invoiceable_type in ($types)";
         }
+
+        if (!empty($data['invoiceable_ids'])) {
+            foreach ($data['invoiceable_ids'] as $i => $type) {
+                $data['invoiceable_ids'][$i] = "'$type'";
+            }
+            $ids = implode(',', $data['invoiceable_types']);
+            $query .= " AND i.invoiceable_id in ($ids)";
+        }
+
+        $query .= " ORDER BY inv.id DESC LIMIT 1000";
 
         return DB::select($query);
     }
