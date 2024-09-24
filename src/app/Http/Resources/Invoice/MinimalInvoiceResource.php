@@ -13,23 +13,25 @@ class MinimalInvoiceResource extends JsonResource
     {
         /** @var Invoice $this */
         return [
-            'id'              => $this->id,
-            'invoice_id'      => $this->id,
-            'created_at'      => self::formatDateTime($this->created_at),
-            'updated_at'      => self::formatDateTime($this->updated_at),
-            'due_date'        => self::formatDateTime($this->due_date),
-            'paid_at'         => self::formatDateTime($this->paid_at),
-            'profile_id'      => $this->profile_id,
-            'rahkaran_id'     => $this->rahkaran_id,
-            'payment_method'  => $this->payment_method,
-            'balance'         => $this->balance,
-            'total'           => $this->total,
-            'sub_total'       => $this->sub_total,
-            'tax_rate'        => $this->tax_rate,
-            'tax'             => $this->tax,
-            'status'          => $this->status,
-            'is_mass_payment' => $this->is_mass_payment,
-            'is_credit'       => $this->is_credit,
+            'id'               => $this->id,
+            'invoice_id'       => $this->id,
+            'created_at'       => self::formatDateTime($this->created_at),
+            'updated_at'       => self::formatDateTime($this->updated_at),
+            'due_date'         => self::formatDateTime($this->due_date),
+            'paid_at'          => self::formatDateTime($this->paid_at),
+            'profile_id'       => $this->profile_id,
+            'rahkaran_id'      => $this->rahkaran_id,
+            'payment_method'   => $this->payment_method,
+            'balance'          => $this->balance,
+            'total'            => $this->total,
+            'sub_total'        => $this->sub_total,
+            'tax_rate'         => $this->tax_rate,
+            'tax'              => $this->tax,
+            'status'           => $this->status,
+            'is_mass_payment'  => $this->is_mass_payment,
+            'is_credit'        => $this->is_credit,
+            'invoiceable_type' => $this->invoiceable_type,
+            'invoiceable_id'   => $this->invoiceable_id
         ];
     }
 
