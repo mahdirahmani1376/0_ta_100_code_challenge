@@ -60,6 +60,7 @@ class Item extends Model
     const TYPE_MIHAN_NIC_IR = 'MihanNicIr';
     const TYPE_MIHAN_NIC_COM = 'MihanNicCom';
     const TYPE_CLOUD_SERVICE = 'CloudService';
+    const TYPE_PRODUCT_SERVICE_ADDON = 'ProductServiceAddon';
 
     const TYPES = [
         self::TYPE_MASS_PAYMENT_INVOICE,
@@ -90,7 +91,8 @@ class Item extends Model
         self::TYPE_AFFILIATION,
         self::TYPE_MIHAN_NIC_IR,
         self::TYPE_MIHAN_NIC_COM,
-        self::TYPE_CLOUD_SERVICE
+        self::TYPE_CLOUD_SERVICE,
+        self::TYPE_PRODUCT_SERVICE_ADDON,
     ];
 
 
