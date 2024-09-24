@@ -25,10 +25,11 @@ class GetInvoicesByItemTypeController extends Controller
             'invoiceable_types.*' => 'required|string',
             'status'              => 'nullable|array',
             'status.*'            => ['required', 'string', Rule::in(Invoice::STATUSES)],
-            'profile_id'          => 'nullable|numeric'
+            'profile_id'          => 'nullable|numeric',
+            'limit'               => 'nullable|numeric'
         ]);
 
-        $invoices =  ($this->getInvoicesByItemTypeAction)($data);
+        $invoices = ($this->getInvoicesByItemTypeAction)($data);
 
         return MinimalInvoiceResource::collection($invoices);
     }

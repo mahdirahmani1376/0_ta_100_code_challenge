@@ -8,7 +8,7 @@ class GetInvoicesByItemTypeAction
 {
     public function __invoke(array $data)
     {
-        $query = "SELECT inv.* FROM invoices AS inv INNER JOIN items i ON inv.id = i.invoice_id WHERE 1=1";
+        $query = "SELECT inv.*,i.invoiceable_type,i.invoiceable_id FROM invoices AS inv INNER JOIN items i ON inv.id = i.invoice_id WHERE 1=1";
 
         if (!empty($data['profile_id'])) {
             $query .= " AND inv.profile_id = {$data['profile_id']}";
@@ -38,7 +38,9 @@ class GetInvoicesByItemTypeAction
             $query .= " AND i.invoiceable_id in ($ids)";
         }
 
-        $query .= " ORDER BY inv.id DESC LIMIT 1000";
+        $limit = $data['limit'] ?? 100;
+
+        $query .= " ORDER BY inv.id DESC LIMIT $limit";
 
         return DB::select($query);
     }
