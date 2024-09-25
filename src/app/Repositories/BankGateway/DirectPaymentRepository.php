@@ -22,7 +22,7 @@ class DirectPaymentRepository extends BaseRepository implements DirectPaymentRep
     {
         return self::newQuery()
             ->where('profile_id', $profileId)
-            ->whereIn('status', [DirectPayment::STATUS_INIT, DirectPayment::STATUS_ACTIVE,])
+            ->whereIn('status', [DirectPayment::STATUS_ACTIVE,])
             ->select('provider')
             ->distinct()
             ->get()

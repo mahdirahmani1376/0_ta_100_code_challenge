@@ -2,7 +2,6 @@
 
 namespace App\Integrations\BankGateway;
 
-use App\Exceptions\Http\BadRequestException;
 use App\Exceptions\SystemException\BazaarPayAPIException;
 use App\Integrations\BankGateway\Interface\BankGatewayInterface;
 use App\Models\BankGateway;
@@ -19,7 +18,6 @@ class BazaarPay extends BaseBankGateway implements Interface\BankGatewayInterfac
 
     private UpdateTransactionService $updateTransactionService;
     private FindDirectPaymentByProfileIdService $findDirectPaymentByProfileIdService;
-    private UpdateDirectPaymentService $updateDirectPaymentService;
 
     public function __construct(private readonly BankGateway $bankGateway)
     {
@@ -42,9 +40,6 @@ class BazaarPay extends BaseBankGateway implements Interface\BankGatewayInterfac
     {
         //TODO add 'provider' parameter to distinguish between different providers
         $directPayment = ($this->findDirectPaymentByProfileIdService)($transaction->profile_id);
-
-        // check contract_token validity ( trace endpoint )
-        $directPayment = self::validateContractToken($directPayment, $transaction);
 
         // create checkout_token
         $checkoutToken = self::createCheckoutToken($directPayment, $transaction);
@@ -72,34 +67,6 @@ class BazaarPay extends BaseBankGateway implements Interface\BankGatewayInterfac
         return ($this->updateTransactionService)($transaction, [
             'status' => Transaction::STATUS_SUCCESS,
         ]);
-    }
-
-    private function validateContractToken(DirectPayment $directPayment, Transaction $transaction): DirectPayment
-    {
-        $response = Http::withHeader('Content-Type', 'application/json')
-            ->withToken($this->bankGateway->config['authorization_token'])
-            ->get($this->bankGateway->config['trace_url'], [
-                'contract_token' => $directPayment->config['contract_token'],
-            ]);
-
-        if (!$response->successful()) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw BazaarPayAPIException::make($response->body(), $response->status(), json_encode([
-                'route'             => $this->bankGateway->config['trace_url'],
-                'direct_payment_id' => $directPayment->id,
-            ]));
-        }
-        if ($response->json('status') != self::TRACE_CONTRACT_STATUS_ACTIVE) {
-            ($this->updateTransactionService)($transaction, ['status' => Transaction::STATUS_FAIL,]);
-            throw new BadRequestException(__('finance.direct_payment.bazaar_pay.contract_token_not_active'));
-        }
-        if ($directPayment->status != DirectPayment::STATUS_ACTIVE) {
-            ($this->updateDirectPaymentService)($directPayment, [
-                'status' => DirectPayment::STATUS_ACTIVE,
-            ]);
-        }
-
-        return $directPayment;
     }
 
     private function createCheckoutToken(DirectPayment $directPayment, Transaction $transaction): string
@@ -142,4 +109,14 @@ class BazaarPay extends BaseBankGateway implements Interface\BankGatewayInterfac
 
         return $response->json('contract_token');
     }
+
+    public function sendTraceRequest(DirectPayment $directPayment)
+    {
+        return Http::withHeader('Content-Type', 'application/json')
+            ->withToken($this->bankGateway->config['authorization_token'])
+            ->get($this->bankGateway->config['trace_url'], [
+                'contract_token' => $directPayment->config['contract_token'],
+            ]);
+    }
+
 }
